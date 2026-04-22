@@ -1,0 +1,57 @@
+{
+  "vehicles": [
+    {
+      "id": "v1",
+      "model": "Suzuki Alto",
+      "engine_cc": 800,
+      "torque_nm": 60,
+      "weight_kg": 670,
+      "category": "Budget Hatchback",
+      "max_safe_gradient": 12,
+      "image": "https://example.com/alto.png"
+    },
+    {
+      "id": "v2",
+      "model": "Toyota Axio",
+      "engine_cc": 1500,
+      "torque_nm": 140,
+      "weight_kg": 1150,
+      "category": "Sedan (Hybrid)",
+      "max_safe_gradient": 18,
+      "image": "https://example.com/axio.png"
+    },
+    {
+      "id": "v3",
+      "model": "Toyota Land Cruiser",
+      "engine_cc": 4500,
+      "torque_nm": 430,
+      "weight_kg": 2600,
+      "category": "Luxury SUV",
+      "max_safe_gradient": 30,
+      "image": "https://example.com/lc.png"
+    }
+  ],
+  "destinations": [
+    {
+      "id": "d1",
+      "name": "Nuwara Eliya",
+      "route": "Peradeniya-Badulla Road",
+      "max_gradient": 22,
+      "danger_zones": ["Radella", "Labookellie"]
+    },
+    {
+      "id": "d2",
+      "name": "Ella",
+      "route": "Ella-Wellawaya Road",
+      "max_gradient": 18,
+      "danger_zones": ["Ella Gap"]
+    },
+    {
+      "id": "d3",
+      "name": "Kandy",
+      "route": "Colombo-Kandy Road",
+      "max_gradient": 12,
+      "danger_zones": ["Kadugannawa"]
+    }
+  ]
+}
