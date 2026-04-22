@@ -1,8 +1,8 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native';
 
-// Screens Import කිරීම
+// Import Screens from the src/screens directory
 import HomeScreen from '../screens/HomeScreen';
 import MapDetailsScreen from '../screens/MapDetailsScreen';
 import RecommendationScreen from '../screens/RecommendationScreen';
@@ -18,8 +18,8 @@ const AppNavigator = () => {
         screenOptions={{
           headerStyle: {
             backgroundColor: COLORS.secondary,
-            elevation: 0, // Android shadow ඉවත් කිරීමට
-            shadowOpacity: 0, // iOS shadow ඉවත් කිරීමට
+            elevation: 0, 
+            shadowOpacity: 0,
           },
           headerTintColor: COLORS.primary,
           headerTitleStyle: {
