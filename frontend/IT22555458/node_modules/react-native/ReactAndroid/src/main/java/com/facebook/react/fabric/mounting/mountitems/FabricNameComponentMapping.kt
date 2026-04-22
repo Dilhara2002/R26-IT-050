@@ -18,7 +18,6 @@ internal object FabricNameComponentMapping {
           "Slider" to "RCTSlider",
           "ModalHostView" to "RCTModalHostView",
           "Paragraph" to "RCTText",
-          "SelectableParagraph" to "RCTSelectableText",
           "Text" to "RCTText",
           "RawText" to "RCTRawText",
           "ActivityIndicatorView" to "AndroidProgressBar",
