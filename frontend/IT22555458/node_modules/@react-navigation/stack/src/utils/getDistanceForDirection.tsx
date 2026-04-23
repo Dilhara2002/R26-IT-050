@@ -1,12 +1,11 @@
 import type { GestureDirection, Layout } from '../types';
-import { getInvertedMultiplier } from './getInvertedMultiplier';
+import getInvertedMultiplier from './getInvertedMultiplier';
 
-export function getDistanceForDirection(
+export default function getDistanceForDirection(
   layout: Layout,
-  gestureDirection: GestureDirection,
-  isRTL: boolean
+  gestureDirection: GestureDirection
 ): number {
-  const multiplier = getInvertedMultiplier(gestureDirection, isRTL);
+  const multiplier = getInvertedMultiplier(gestureDirection);
 
   switch (gestureDirection) {
     case 'vertical':
