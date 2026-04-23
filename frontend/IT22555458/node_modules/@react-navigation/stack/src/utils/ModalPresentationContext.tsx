@@ -1,3 +1,5 @@
 import * as React from 'react';
 
-export const ModalPresentationContext = React.createContext(false);
+const ModalPresentationContext = React.createContext(false);
+
+export default ModalPresentationContext;

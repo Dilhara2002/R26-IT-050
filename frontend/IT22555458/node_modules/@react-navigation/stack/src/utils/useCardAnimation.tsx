@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-import { CardAnimationContext } from './CardAnimationContext';
+import CardAnimationContext from './CardAnimationContext';
 
-export function useCardAnimation() {
+export default function useCardAnimation() {
   const animation = React.useContext(CardAnimationContext);
 
   if (animation === undefined) {

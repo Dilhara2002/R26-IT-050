@@ -1,9 +1,9 @@
 import * as React from 'react';
 
-import { GestureHandlerRefContext } from './GestureHandlerRefContext';
+import StackGestureRefContext from './GestureHandlerRefContext';
 
-export function useGestureHandlerRef() {
-  const ref = React.useContext(GestureHandlerRefContext);
+export default function useGestureHandlerRef() {
+  const ref = React.useContext(StackGestureRefContext);
 
   if (ref === undefined) {
     throw new Error(
