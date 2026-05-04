@@ -1,0 +1,33 @@
+.one-char-text-box {
+  border: 2px solid var(--color-500);
+  border-radius: 4px;
+  margin-left: 8px;
+  margin-right: 8px;
+  width: 10vw;
+  max-width: 40px;
+  min-width: 40px;
+  height: 10vh;
+  max-height: 60px;
+  font-size: 24px;
+  text-align: center;
+  transition: 0.5 all;
+  background-color: var(--color-700);
+}
+
+.one-char-text-box:hover {
+  outline: none;
+  border: double 2px transparent;
+  background-image: linear-gradient(0deg,var(--color-700),var(--color-700)), var(--gradient-2);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.one-char-text-box:focus {
+  outline: none;
+  border: double 2px transparent;
+  width: calc(10vw - 2px);
+  height: calc(10vh - 2px);
+  background-image: linear-gradient(0deg,var(--color-700),var(--color-700)), var(--gradient-2);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
