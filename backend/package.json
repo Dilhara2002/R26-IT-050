@@ -4,9 +4,9 @@
   "description": "",
   "main": "App.js",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "node --watch src/app.js"
-},
+    "start": "node init && node src/app.js",
+    "dev": "node init && node --watch src/app.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
