@@ -1,0 +1,51 @@
+Place_ID,Name,Latitude,Longitude,District,Tags,Duration_Minutes,Rating
+1,Temple of the Sacred Tooth Relic,7.2936,80.6413,Kandy,History|Culture,120,4.7
+2,Royal Botanic Gardens Peradeniya,7.2718,80.5960,Kandy,Nature,150,4.6
+3,Kandy Lake,7.3000,80.6333,Kandy,Nature|City,60,4.8
+4,Udawatta Kele Sanctuary,7.2986,80.6422,Kandy,Nature|Wildlife,120,4.4
+5,Ceylon Tea Museum,7.2662,80.6322,Kandy,History|Culture,90,4.2
+6,Bahirawakanda Vihara Buddha Statue,7.2917,80.6288,Kandy,Culture,60,4.6
+7,Kandy View Point (Arthur's Seat),7.2889,80.6428,Kandy,City|Nature,45,4.6
+8,British Garrison Cemetery,7.2928,80.6432,Kandy,History,45,4.5
+9,Lankatilaka Vihara,7.2311,80.5658,Kandy,History|Culture,60,4.6
+10,Gadaladeniya Vihara,7.2575,80.5566,Kandy,History|Culture,60,4.5
+11,Embekke Devalaya,7.2178,80.5677,Kandy,History|Culture,60,4.7
+12,Ambuluwawa Tower,7.1444,80.5653,Kandy,Nature|Adventure|Culture,150,4.8
+13,Ranawana Purana Rajamaha Viharaya,7.2666,80.5750,Kandy,Culture,60,4.7
+14,Hanthana Mountain Range,7.2586,80.6286,Kandy,Nature|Adventure,240,4.8
+15,Degaldoruwa Temple,7.3005,80.6558,Kandy,History|Culture,60,4.4
+16,Alawathugoda Saman Devalaya,7.4055,80.6073,Kandy,History|Culture,45,4.3
+17,Giragama Walawwa,7.2943,80.6359,Kandy,History|City,45,4.1
+18,Pallekele International Cricket Stadium,7.2801,80.7020,Kandy,City|Culture,180,4.5
+19,Asgiriya Stadium,7.2988,80.6322,Kandy,City|Culture,60,4.2
+20,Sigiriya Lion Rock,7.9569,80.7597,Matale,History|Culture|Adventure,180,4.7
+21,Dambulla Cave Temple,7.8566,80.6491,Matale,History|Culture,120,4.9
+22,Pidurangala Rock,7.9644,80.7633,Matale,Nature|Adventure,150,4.8
+23,Aluvihare Rock Temple,7.4971,80.6218,Matale,History|Culture,90,4.5
+24,Muthumariamman Temple Matale,7.4764,80.6230,Matale,Culture,60,4.6
+25,National Spice Garden Matale,7.5186,80.6042,Matale,Nature|Culture,90,4.7
+26,Sembuwatta Lake,7.4394,80.6983,Matale,Nature|Adventure,120,4.6
+27,Riverston Peak,7.5283,80.7366,Matale,Nature|Adventure,180,4.8
+28,Pitawala Pathana,7.5458,80.7483,Matale,Nature,90,4.7
+29,Sera Ella,7.5883,80.7550,Matale,Nature|Adventure,120,4.5
+30,Bambarakiri Ella,7.4725,80.6658,Matale,Nature,60,4.4
+31,Nalanda Gedige,7.6700,80.6455,Matale,History|Culture,60,4.3
+32,Wasgamuwa National Park,7.7166,80.9333,Matale,Wildlife|Nature,240,4.6
+33,Ibbankatuwa Megalithic Tombs,7.8372,80.6298,Matale,History,60,4.2
+34,Knuckles Mountain Range,7.4666,80.7833,Matale,Nature|Adventure,300,4.9
+35,Hunnas Falls,7.4022,80.6866,Matale,Nature,90,4.5
+36,Horton Plains National Park,6.7831,80.7928,Nuwara Eliya,Nature|Wildlife|Adventure,240,4.6
+37,World's End,6.7831,80.7928,Nuwara Eliya,Nature|Adventure,120,4.8
+38,Baker's Falls,6.7922,80.7894,Nuwara Eliya,Nature,90,4.7
+39,Lake Gregory,6.9568,80.7773,Nuwara Eliya,Nature|City,120,4.8
+40,Victoria Park Nuwara Eliya,6.9691,80.7661,Nuwara Eliya,Nature|City,90,4.4
+41,Pedro Tea Estate,6.9744,80.7911,Nuwara Eliya,Culture|Nature,90,4.5
+42,Bluefield Tea Gardens,7.0421,80.6980,Nuwara Eliya,Culture|Nature,90,4.7
+43,Lovers Leap Waterfall,6.9784,80.7866,Nuwara Eliya,Nature|Adventure,90,4.4
+44,Ramboda Falls,7.0585,80.6990,Nuwara Eliya,Nature,60,4.6
+45,Bomburu Ella,6.9680,80.8042,Nuwara Eliya,Nature,120,4.7
+46,Hakgala Botanical Garden,6.9256,80.8220,Nuwara Eliya,Nature,120,4.4
+47,Moon Plains,6.9458,80.7941,Nuwara Eliya,Nature|Wildlife,120,4.5
+48,Seetha Amman Temple,6.9338,80.8144,Nuwara Eliya,History|Culture,45,4.6
+49,Single Tree Hill,6.9552,80.7577,Nuwara Eliya,Nature|Adventure,120,4.4
+50,Galway's Land National Park,6.9656,80.7775,Nuwara Eliya,Nature|Wildlife,90,4.3
