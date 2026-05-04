@@ -1,0 +1,15 @@
+.verif-text-area-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;  
+  margin: 10px 0px;
+}
+
+.verif-text-area {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  gap: 15px;
+  margin: 10px 0px;
+}
