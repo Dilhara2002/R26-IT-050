@@ -1,0 +1,69 @@
+.image-upload {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: -moz-fit-content; /* Firefox */
+  width: fit-content;
+  height: 160px;
+  margin-bottom: 46px;
+}
+
+.image-upload__preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 2;
+  width: 125px;
+  height: 160px;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px var(--accent-color-2);
+  background-image: url("");
+  transition: all 0.2s ease-in-out;
+}
+
+.image-upload__preview::before {
+  content: "photo_camera";
+  display: flex;
+  font-family: "Material Icons";
+  font-size: 48px;
+  top: 50%;
+  left: 50%;
+  color: var(--accent-color-3);
+  opacity: 0.5;
+  transition: all 0.2s ease-in-out;
+}
+
+.image-upload__preview[style*="background-image"]::before {
+  opacity: 0;
+}
+
+.image-upload__preview:hover::before {
+  opacity: 0.7;
+}
+
+.image-upload__preview:hover {
+  box-shadow: 0 0 0 2px var(--accent-color-2);
+}
+
+.image-upload__input {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.image-upload__path {
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  bottom: -10px;
+  color: var(--color-400);
+  font-size: 14px;
+  height: 1px;
+  width: max-content;
+}
