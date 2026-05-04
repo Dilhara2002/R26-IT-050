@@ -1,0 +1,59 @@
+.confirm-container{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--overlay-bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.confirm{
+    background-color: var(--primary-color); 
+    padding: 20px;
+    border-radius: var(--sub-border-radius);
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    width: 500px;
+    text-align: center;
+}
+
+.confirm__message-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 20px;
+}
+
+.confirm__message-container .confirm__message-icon{
+    font-size: 3rem;
+    font-family: "Material Icons";
+    color: var(--red-light-1);
+}
+
+.confirm__message-container .confirm__message-title{
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--red-light-1);
+    text-align: left;
+    width: 100%;
+}
+
+.confirm__message-container .confirm__message-text{
+    font-size: 0.75rem;
+    color: var(--accent-color-8);
+    text-align: left;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.confirm__actions{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: 20px;
+    gap: 20px;
+}
