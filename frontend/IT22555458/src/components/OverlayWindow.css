@@ -1,0 +1,28 @@
+.overlay-window {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9000;
+    width: 100%;
+    height: 100%;
+    background-color: var(--overlay-bg-color);
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    transition: all 0.5s;
+}
+
+.overlay-window:hover:not(:has(*:hover)) {
+    background-color: rgb(from var(--overlay-bg-color) r g b /.8);
+}
+
+.overlay-window-form-container{
+    box-sizing: border-box;
+    padding: 50px 100px;
+    width: 50%;
+    height: 100%;
+    box-shadow: var(--shadow-inverted-primary);
+    background-color: var(--primary-color);
+}
+
+

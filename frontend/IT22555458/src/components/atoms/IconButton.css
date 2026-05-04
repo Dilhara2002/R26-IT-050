@@ -1,0 +1,319 @@
+.icon-btn:not(:is(.minimal)) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 14px;
+  border: 0px;
+  /* width: 195px; */
+  height: 40px;
+  padding: 0px;
+  margin: 0px;
+  background: var(--color-100);
+  background-size: 100%;
+  color: var(--text-color);
+  border-radius: 4px;
+  box-shadow:  var(--shadow-primary);
+  cursor: pointer;
+  user-select: none;
+  -webkit-transition: background-size .218s, border-color .218s, box-shadow .218s;
+  transition: background-size .218s, border-color .218s, box-shadow .218s;
+}
+
+.icon-btn.minimal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  border: 0px;
+  /* width: 195px; */
+  height: 30px;
+  padding: 0px;
+  margin: 0px;
+  background-size: 100%;
+  background-color: transparent;
+  color: var(--text-color);
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-transition: background-size .218s, border-color .218s, box-shadow .218s;
+  transition: background-size .218s, border-color .218s, box-shadow .218s;
+}
+
+.icon-btn.minimal:hover {
+  background-color: hsl(from var(--color-100) h s calc(l - 5)) ;
+  -webkit-transition: background-color 218s;
+  transition: background-color .218s;
+}
+
+.icon-btn:has(.btn__icon):not(:has(.btn__text)) {
+  padding: 0px 10px;
+}
+
+.icon-btn:has(.btn__text):not(:has(.btn__icon)) {
+  padding: 0px 10px;
+}
+
+.icon-btn:has(.btn__icon):has(.btn__text) {
+  padding: 0px 20px;
+}
+
+.icon-btn:hover {
+  background-color: hsl(from var(--color-100) h s calc(l - 3)) ;
+}
+
+.icon-btn .btn__icon {
+  font-family: "Material Symbols Outlined", "Material Icons";
+  font-size: 20px;
+  width: 20px;
+}
+
+.icon-btn.mi .btn__icon {
+  font-family: "Material Icons";
+}
+
+.icon-btn .btn__text {
+  font-family: "Poppins", "Raleway", "Work Sans";
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+}
+
+/* .icon-btn .btn__icon-rmargin {
+  margin-right: 3px;
+}
+
+.icon-btn .btn__icon-lmargin {
+  margin-left: 3px;
+} */
+
+/* Heights*/
+.btn-height-30 {
+  height: 30px !important;
+}
+
+.btn-height-40 {
+  height: 40px !important;
+}
+
+
+.btn-height-50 {
+  height: 50px !important;
+}
+
+.btn-height-100 {
+  height: 100px !important;
+}
+
+.btn-height-max {
+  height: 100% !important;
+}
+
+/*Widths*/
+
+.btn-width-30{
+  padding: 0px !important;
+  width: 30px !important;
+}
+
+.btn-width-40{
+  padding: 0px !important;
+  width: 40px !important;
+}
+
+.btn-width-50 {
+  padding: 0px !important;
+  width: 50px !important;
+}
+
+.btn-width-100 {
+  padding: 0px !important;
+  width: 100px !important;
+}
+
+.btn-width-max {
+  padding: 0px !important;
+  width: 100% !important;
+}
+
+/*Background Colors*/
+.icon-btn.btn-bg-red {
+  background-color: var(--red-light-1);
+  -webkit-transition: background-color 218s;
+  transition: background-color .218s;
+}
+
+.icon-btn.btn-bg-red:hover {
+  background-color: var(--red-light-2);
+  -webkit-transition: background-color 218s;
+  transition: background-color .218s;
+}
+
+
+.icon-btn.btn-bg-green {
+  background-color: var(--green-light-1);
+  -webkit-transition: background-color 218s;
+  transition: background-color .218s;
+}
+
+.icon-btn.btn-bg-green:hover {
+  background-color: var(--green-light-2);
+  -webkit-transition: background-color 218s;
+  transition: background-color .218s;
+}
+
+.icon-btn.btn-bg-blue {
+  background-color: var(--blue-light-1);
+  background-size: 100%;
+  -webkit-transition: background-color 218s;
+  transition: background-color .218s;
+}
+
+.icon-btn.btn-bg-blue:hover {
+  background-color: var(--blue-light-2);
+  -webkit-transition: background-color 218s;
+  transition: background-color .218s;
+}
+
+.icon-btn.btn-bg-yellow {
+  background-color: var(--yellow-light-1);
+  background-size: 100%;
+  -webkit-transition: background-color 218s;
+  transition: background-color .218s;
+}
+
+.icon-btn.btn-bg-yellow:hover {
+  background-color: var(--yellow-light-2);
+  -webkit-transition: background-color 218s;
+  transition: background-color .218s;
+}
+
+/*Btn Colors*/
+.icon-btn.btn-clr-green {
+  color: var(--green-light-1);
+}
+
+.icon-btn.btn-clr-green:hover {
+  color: var(--green-light-2);
+}
+
+.icon-btn.btn-clr-red {
+  color: var(--red-light-1);
+}
+
+.icon-btn.btn-clr-red:hover {
+  color: var(--red-light-2);
+}
+
+.icon-btn.btn-clr-blue {
+  color: var(--blue-light-1);
+}
+
+.icon-btn.btn-clr-blue:hover {
+  color: var(--blue-light-2);
+}
+
+.icon-btn.btn-clr-yellow {
+  color: var(--yellow-light-1);
+}
+
+.icon-btn.btn-clr-yellow:hover {
+  color: var(--yellow-light-2);
+}
+
+.icon-btn.btn-clr-white {
+  color: white;
+}
+
+.icon-btn.btn-clr-white:hover {
+  color: #eee;
+}
+
+.btn-clr-white{
+  color: white;
+}
+
+
+
+/*Text sizes*/
+
+.btn__text-12 {
+  font-size: 12px !important;
+}
+
+.btn__text-14 {
+  font-size: 14px !important;
+}
+
+.btn__text-16 {
+  font-size: 16px !important;
+}
+
+.btn__text-18 {
+  font-size: 18px !important;
+}
+
+.btn__text-24 {
+  font-size: 24px !important;
+}
+
+.btn__text-36 {
+  font-size: 36px !important;
+}
+
+.btn__text-48 {
+  font-size: 48px !important;
+}
+
+/*Icon sizes*/
+
+.btn__icon-18 {
+  font-size: 18px !important;
+  width: 18px;
+}
+
+.btn__icon-24 {
+  font-size: 24px !important;
+  width: 24px;
+}
+
+.btn__icon-36 {
+  font-size: 36px !important;
+  width: 36px;
+}
+
+.btn__icon-48 {
+  font-size: 48px !important;
+  width: 48px;
+}
+
+/* border width */
+
+.btn-borderw-1 {
+  border: 1px solid !important;
+}
+
+/* border color */
+
+.btn-borderc-red {
+  border-color: var(--red-light-1) !important;
+}
+
+.btn-borderc-red:hover {
+  border-color: var(--red-light-2) !important;
+}
+
+.btn-borderc-747775 {
+  border-color: #747775 !important;
+}
+
+/* Margins */
+
+.btn-left-margin-5 {
+  margin-left: 5px !important;
+}
+
+.btn-right-margin-5 {
+  margin-right: 5px !important;
+}
