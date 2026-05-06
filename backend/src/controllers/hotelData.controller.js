@@ -2,6 +2,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { loadDataset } from "../services/csv.service.js";
 import { createKnowledgeGraph } from "../services/hotelGraph.service.js";
+import { createActivityGraph } from "../services/activityGraph.service.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,6 +24,26 @@ console.log("First row:", data[0]);
     await createKnowledgeGraph(data);
 
     res.json({ message: "Knowledge graph created successfully 🚀" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const buildActivityGraph = async (req, res) => {
+  try {
+    const filePath = path.join(
+      __dirname,
+      "../data/Activities-Rag.csv"
+    );
+
+    console.log("ACTIVITY CSV PATH:", filePath);
+
+    const data = await loadDataset(filePath);
+    console.log("Activities loaded:", data.length);
+
+    await createActivityGraph(data);
+
+    res.json({ message: "Activity graph created successfully 🚀" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
