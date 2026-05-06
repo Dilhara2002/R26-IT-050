@@ -1,7 +1,17 @@
+import os
 from flask import Flask, request, jsonify
-from model import filter_locations, run_genetic_algorithm
+from dotenv import load_dotenv
+
+# Load environment variables first
+load_dotenv()
+
+# Import necessary functions from model.py
+from model import filter_locations, run_genetic_algorithm, generate_itinerary_summary
 
 app = Flask(__name__)
+
+# Retrieve the API key from the environment
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 @app.route('/api/optimize-itinerary', methods=['POST'])
 def optimize_itinerary():
@@ -13,11 +23,10 @@ def optimize_itinerary():
         user_lat = data.get('current_lat', 7.2906) 
         user_lon = data.get('current_lon', 80.6337)
         
-        # --- NEW LOGIC: Dynamic Radius based on Time ---
-        # First, check if the user manually sent a radius
+        # Dynamic Radius based on Time
         radius_km = data.get('radius_km', None)
         
-        # If the user didn't send a radius, calculate a smart default based on their time
+        # Smart default based on time if radius is not provided
         if radius_km is None:
             if max_time_minutes <= 360:      # Up to 6 hours
                 radius_km = 15               # Keep them close (15km)
@@ -25,11 +34,9 @@ def optimize_itinerary():
                 radius_km = 30               # Let them explore a bit further (30km)
             elif max_time_minutes <= 1440:   # Up to 1 Day (24 hours)
                 radius_km = 60               # Medium distance (60km)
-            else:                            # More than 1 Day (e.g., 2 Days)
+            else:                            # More than 1 Day
                 radius_km = 100              # Give them a wide range (100km)
                 
-        # -----------------------------------------------
-        
         if not user_preferences:
             return jsonify({"error": "Preferences are required."}), 400
             
@@ -41,6 +48,12 @@ def optimize_itinerary():
         optimal_places, estimated_time, penalty_hit = run_genetic_algorithm(
             filtered_places, max_time_minutes, user_lat, user_lon
         )
+
+        # Generate Explainable AI (XAI) Summary using Gemini
+        xai_summary = ""
+        if optimal_places:
+            print("Generating XAI Summary using Gemini...")
+            xai_summary = generate_itinerary_summary(optimal_places, user_preferences, GEMINI_API_KEY)
         
         msg = "Itinerary optimized successfully."
         if penalty_hit:
@@ -51,12 +64,13 @@ def optimize_itinerary():
             "message": msg,
             "data": {
                 "starting_location": {"lat": user_lat, "lon": user_lon},
-                "search_radius_km": radius_km, # This will now show the dynamically calculated radius
+                "search_radius_km": radius_km, 
                 "user_preferences": user_preferences,
                 "max_time_allocated_mins": max_time_minutes,
                 "estimated_time_required": estimated_time,
                 "time_limit_exceeded": penalty_hit,
-                "optimized_route": optimal_places
+                "optimized_route": optimal_places,
+                "ai_summary": xai_summary 
             }
         }), 200
 
