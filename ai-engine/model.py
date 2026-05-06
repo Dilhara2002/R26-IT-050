@@ -35,7 +35,7 @@ def format_time_display(total_minutes):
     mins = int(total_minutes % 60)
     return f"{hours}h {mins}m"
 
-# --- 1. FILTERING (RADIUS + COSINE SIMILARITY) ---
+# --- 1. FILTERING (COMPOSITE SCORING: SIMILARITY + PROXIMITY) ---
 def filter_locations(user_preferences, user_lat, user_lon, radius_km):
     if PLACES_DF is None: return None
 
@@ -56,12 +56,25 @@ def filter_locations(user_preferences, user_lat, user_lon, radius_km):
     similarities = cosine_similarity(user_vector, tags_radius)[0]
     df_radius['Similarity_Score'] = similarities
     
-    recommended_locations = df_radius[df_radius['Similarity_Score'] > 0].sort_values(by='Similarity_Score', ascending=False).reset_index(drop=True)
+    # --- NEW LOGIC: Composite Score Calculation ---
+    # Normalize distance to a 0-1 scale (1 = exactly at start, 0 = at the edge of the radius)
+    safe_radius = max(radius_km, 0.1) 
+    df_radius['Proximity_Score'] = 1 - (df_radius['Distance_From_Start'] / safe_radius)
+    
+    # Weights: 70% importance to user preferences, 30% importance to physical closeness
+    W_SIMILARITY = 0.7
+    W_PROXIMITY = 0.3
+    
+    df_radius['Composite_Score'] = (df_radius['Similarity_Score'] * W_SIMILARITY) + (df_radius['Proximity_Score'] * W_PROXIMITY)
+    
+    # Sort by the new Composite Score
+    recommended_locations = df_radius[df_radius['Similarity_Score'] > 0].sort_values(by='Composite_Score', ascending=False).reset_index(drop=True)
     
     if recommended_locations.empty:
         recommended_locations = df_radius.sort_values(by='Distance_From_Start').reset_index(drop=True)
         
-    return recommended_locations.head(15) 
+    return recommended_locations.head(15)
+
 
 # --- 2. TRUE GENETIC ALGORITHM LOGIC ---
 def evaluate_route(route_indices, df, start_lat, start_lon):
@@ -177,11 +190,15 @@ def generate_itinerary_summary(places, preferences, api_key):
     pref_str = ", ".join(preferences)
     
     prompt = f"""
-    Act as an expert Sri Lankan travel guide. I am a tourist interested in: {pref_str}.
-    My optimized itinerary includes these locations: {places_str}.
+    Act as an Explainable AI (XAI) engine for a travel system. 
+    User Preferences: {pref_str}.
+    Optimized Route: {places_str}.
     
-    Write a short, engaging 2-3 sentence summary explaining WHY this specific route is perfect for me based on my interests. 
-    Keep it natural, exciting, and written in the second person ("You will..."). Do not list the places like a bulleted list, weave them into the story.
+    Task: Write a 3-sentence factual explanation for the user.
+    1. Explain that these places were selected because they had the highest Cosine Similarity scores for {pref_str}.
+    2. Mention that the Genetic Algorithm optimized the sequence to fit within the time limit while minimizing travel distance.
+    3. State that this specific route was chosen as the near-optimal solution compared to other candidates.
+    Keep the tone professional and objective.
     """
     
     # Exact model name from your successful cURL command

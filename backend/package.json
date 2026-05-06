@@ -6,15 +6,16 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "node --watch src/app.js"
-},
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "axios": "^1.16.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mongoose": "^9.4.1"
+    "mongoose": "^9.6.1"
   }
 }
