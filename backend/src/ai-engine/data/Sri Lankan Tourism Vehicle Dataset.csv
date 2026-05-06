@@ -1,0 +1,101 @@
+Model Name,Engine Capacity (CC),Max Torque (Nm),Curb Weight (kg),Ground Clearance (mm),Drive Type,Fuel Type,Average Fuel Consumption (km/L),Seating Capacity,Gradeability (%)
+Suzuki Alto (800),796,60,720,160,FWD,Petrol,19.5,4,18
+Perodua Axia (1.0G),998,91,825,150,FWD,Petrol,18.2,5,19
+Suzuki Wagon R (MH55S),658,60,790,150,FWD,Hybrid,21.4,4,17
+Micro Panda (1.0),997,88,937,150,FWD,Petrol,15.5,5,18
+Toyota Vitz (KSP130),996,92,970,145,FWD,Petrol,16.8,5,18
+Daihatsu Mira e:S,658,57,650,150,FWD,Petrol,22,4,16
+Hyundai Grand i10,1197,114,940,165,FWD,Petrol,14.8,5,20
+Kia Picanto (JA),998,95,950,151,FWD,Petrol,15.2,5,18
+Tata Tiago,1199,113,980,170,FWD,Petrol,16,5,21
+Suzuki Celerio,998,90,810,165,FWD,Petrol,18.5,5,19
+Toyota Aqua (Hybrid),1496,111,1080,140,FWD,Hybrid,24.5,5,20
+Honda Fit (GP5),1496,134,1130,135,FWD,Hybrid,22.8,5,22
+Suzuki Swift (RS),1242,118,910,120,FWD,Petrol,15.5,5,21
+Toyota Passo (M700A),996,92,910,150,FWD,Petrol,17.5,5,18
+Nissan Note (e-Power),1198,254,1210,150,FWD,Hybrid,23.2,5,25
+Mazda 2 (Demio),1496,148,1050,145,FWD,Petrol,14.8,5,22
+Volkswagen Polo (TSI),999,175,1100,165,FWD,Petrol,13.5,5,24
+Audi A1 (Sportback),999,200,1200,125,FWD,Petrol,14,5,25
+Toyota Starlet (2024),1462,138,980,150,FWD,Petrol,15.8,5,20
+Suzuki Spacia Custom,658,98,890,150,FWD,Hybrid,20.5,4,18
+Toyota Axio (NKE165),1496,111,1140,155,FWD,Hybrid,23.5,5,20
+Toyota Allion (NZT260),1496,136,1200,160,FWD,Petrol,14.5,5,21
+Toyota Premio (NZT260),1496,136,1200,160,FWD,Petrol,14.5,5,21
+Honda Grace (Hybrid),1496,134,1170,135,FWD,Hybrid,21,5,22
+Mitsubishi Lancer (EX),1599,143,1250,150,FWD,Petrol,11.5,5,21
+Toyota Corolla (Altis),1598,154,1270,175,FWD,Petrol,12.2,5,22
+Nissan Bluebird Sylphy,1598,154,1220,165,FWD,Petrol,11.8,5,21
+Perodua Bezza (G),1329,121,930,160,FWD,Petrol,16.5,5,20
+Honda Insight (ZE2),1339,121,1200,150,FWD,Hybrid,19.5,5,19
+Toyota Belta,1296,120,1000,155,FWD,Petrol,14.2,5,19
+Mercedes-Benz E200,1991,300,1605,160,RWD,Petrol,10.5,5,28
+BMW 318i (F30),1499,220,1425,140,RWD,Petrol,11.2,5,26
+Toyota Camry Hybrid,2487,221,1600,155,FWD,Hybrid,16.5,5,28
+Audi A4 (TFSI),1984,320,1500,145,FWD,Petrol,11.8,5,28
+Honda Accord,1498,260,1450,140,FWD,Petrol,10.8,5,26
+BMW 520d (G30),1995,400,1700,145,RWD,Diesel,13.5,5,30
+Lexus ES300h,2487,221,1700,150,FWD,Hybrid,17.5,5,28
+Mercedes-Benz S450,2999,500,2000,130,RWD,Hybrid,9.5,5,35
+Audi A6 (Quattro),1984,320,1750,140,AWD,Petrol,10.2,5,30
+Jaguar XF,1997,365,1660,135,RWD,Petrol,9.8,5,28
+Honda Vezel (RU3),1496,156,1270,160,FWD,Hybrid,18.5,5,24
+Nissan X-Trail (T32),1997,200,1500,210,4WD,Hybrid,12.5,7,30
+Toyota C-HR,1197,185,1440,155,FWD,Petrol,13.2,5,25
+Toyota Rush,1496,136,1290,220,RWD,Petrol,11.8,7,25
+Daihatsu Rocky,996,140,980,185,FWD,Petrol,16.5,5,22
+Toyota Raize,996,140,980,185,FWD,Petrol,16.5,5,22
+Suzuki Vitara,1586,156,1120,185,FWD,Petrol,13.8,5,26
+Hyundai Tucson,1999,192,1500,172,FWD,Petrol,10.5,5,25
+Kia Sportage,1999,192,1550,172,FWD,Petrol,10.2,5,25
+Mazda CX-3,1496,144,1200,160,FWD,Petrol,14.5,5,22
+DFSK Glory 580,1498,220,1510,200,FWD,Petrol,9.5,7,28
+MG HS,1490,250,1550,175,FWD,Petrol,10.8,5,30
+Chery Tiggo 4 Pro,1498,210,1388,185,FWD,Petrol,11.5,5,28
+MG ZS (Petrol),1498,150,1266,165,FWD,Petrol,12.4,5,22
+Chery Tiggo 7 Pro,1498,230,1450,175,FWD,Petrol,10.5,5,30
+DFSK Glory i-Auto,1498,220,1550,200,FWD,Petrol,9.2,7,28
+Chery Tiggo 8 Pro,1598,290,1600,190,FWD,Petrol,9.5,7,32
+BAIC X35,1499,210,1350,180,FWD,Petrol,12,5,26
+Changan CS35 Plus,1392,260,1400,180,FWD,Petrol,11.2,5,30
+Nissan Leaf (ZE1),0,320,1580,150,FWD,Electric,6.5,5,25
+Toyota LC Prado (J150),2755,450,2200,215,4WD,Diesel,9.5,7,45
+Mitsubishi Montero (V98W),3200,441,2290,235,4WD,Diesel,8.8,7,45
+Toyota Fortuner (Sigma 4),2755,500,2135,225,4WD,Diesel,9.2,7,42
+Land Rover Defender 110,1997,400,2300,291,4WD,Petrol,7.5,7,45
+Jeep Wrangler (Unlimited),1995,400,2000,242,4WD,Petrol,8.2,5,45
+Mahindra Scorpio (Classic),2184,300,1850,200,4WD,Diesel,11.5,7,38
+Force Gurkha (5-Door),2596,320,2100,233,4WD,Diesel,10.5,5,45
+Mahindra Thar (4WD),2184,300,1750,226,4WD,Diesel,12,4,45
+SsangYong Rexton,2157,441,2105,203,4WD,Diesel,10.2,7,40
+Nissan Patrol (Y62),5552,560,2700,273,4WD,Petrol,5.5,7,45
+Toyota Hilux (Revo),2755,500,2100,279,4WD,Diesel,9.8,5,45
+Mitsubishi L200 Triton,2442,430,1900,220,4WD,Diesel,10.5,5,45
+Isuzu D-Max,2999,450,2000,235,4WD,Diesel,10.2,5,45
+Nissan Navara,2488,450,1950,225,4WD,Diesel,10.8,5,45
+Ford Ranger,1996,500,2150,230,4WD,Diesel,9.5,5,45
+Mahindra Bolero Pik-up,2523,200,1495,175,RWD,Diesel,13.5,2,30
+Mazda BT-50,2999,450,2000,235,4WD,Diesel,10.2,5,45
+Volkswagen Amarok,1968,420,2050,192,AWD,Diesel,11.5,5,40
+Maruti Suzuki Jimny,1462,134,1100,210,4WD,Petrol,13,4,42
+Toyota Land Cruiser 70,4164,285,2300,230,4WD,Diesel,7.8,5,45
+Toyota Hiace (KDH201),2982,300,1835,195,RWD,Diesel,10.5,15,26
+Nissan Caravan (NV350),2488,356,1900,193,RWD,Diesel,9.8,15,28
+Toyota TownAce,1495,134,1200,175,RWD,Petrol,12.5,8,22
+Nissan NV200,1598,153,1300,160,FWD,Petrol,13.2,7,20
+Micro Tourer,2771,172,2100,170,RWD,Diesel,9.5,15,24
+Foton View CS2,2776,280,2200,170,RWD,Diesel,9.2,15,25
+Joylong A-Series,2494,260,2100,170,RWD,Diesel,9.4,15,24
+Toyota Hiace (Commuter),2755,420,2200,185,RWD,Diesel,9,15,25
+Nissan Urvan (E26),2488,356,2120,193,RWD,Diesel,9.5,15,28
+Toyota Hiace Deluxe,2755,420,2380,175,RWD,Diesel,8.8,15,25
+Toyota Coaster,4009,397,3500,185,RWD,Diesel,7.5,26,25
+Toyota Noah,1986,193,1600,160,FWD,Petrol,11.2,7,21
+Toyota Voxy,1986,193,1600,160,FWD,Petrol,11.2,7,21
+Toyota Esquire,1797,142,1570,160,FWD,Hybrid,17.5,7,20
+Toyota Alphard,2493,210,2100,160,AWD,Hybrid,14.5,7,25
+Toyota Vellfire,2493,210,2100,161,AWD,Hybrid,14.5,7,25
+Honda Stepwgn,1496,203,1650,150,FWD,Petrol,11.8,7,23
+Nissan Serena (Hybrid),1997,200,1680,160,FWD,Hybrid,15.5,7,22
+Mitsubishi Delica D:5,2267,380,1900,210,4WD,Diesel,11.2,8,32
+Kia Carnival,2199,440,2100,172,FWD,Diesel,12,7,30

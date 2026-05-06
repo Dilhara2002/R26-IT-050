@@ -3,35 +3,52 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
-// Routes ආනයනය (Importing)
+// --- 1. Import Routes ---
 const vehicleRoutes = require('./routes/vehicleRoutes');
+const safetyRoutes = require('./routes/safetyRoutes'); // Added for your Research Component
 
 const app = express();
 
-// --- Middleware ---
+// --- 2. Middleware ---
 app.use(cors());
 app.use(express.json());
 
-// --- Database Connection ---
-// PP1 වලදී පැනල් එකට පෙන්වීමට MongoDB Atlas භාවිතා කිරීම වඩාත් සුදුසුයි [cite: 161]
+// --- 3. Database Connection ---
+// Ensure MONGO_URI is defined in your .env file
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('✅ Connected to MongoDB Atlas (Vehicle Service)'))
+    .then(() => console.log('✅ Connected to MongoDB Atlas'))
     .catch((err) => console.error('❌ Database connection error:', err));
 
-// --- API Endpoints ---
+// --- 4. API Endpoints ---
 
-// මූලික Health Check එක [cite: 154]
+// Health Check Route
 app.get('/', (req, res) => {
-    res.send('Context-Aware Vehicle Recommendation Backend is Running! 🚀');
+    res.send('AI-Powered Safety-Aware Tourism Platform Backend is Running! 🚀');
 });
 
-// ඔයාගේ පර්යේෂණ කොටසට අදාළ ප්‍රධාන Route එක [cite: 121, 249]
-// මෙහිදී Vehicle Selection සහ Safety Score ගණනය කිරීම් සිදු වේ [cite: 42, 140, 265]
+/**
+ * Route: /api/vehicles
+ * Handles: General vehicle CRUD operations (from existing members)
+ */
 app.use('/api/vehicles', vehicleRoutes);
 
-// --- Server Start ---
+/**
+ * Route: /api/safety
+ * Handles: Your Research Component (Budget, Passengers, ML Safety Score, GraphRAG)
+ * This is where the core logic of your project resides.
+ */
+app.use('/api/safety', safetyRoutes);
+
+// --- 5. Global Error Handler (Optional but professional) ---
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+});
+
+// --- 6. Server Start ---
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
     console.log(`🚀 Server is live on http://localhost:${PORT}`);
-    console.log(`📄 Vehicle Recommendation Engine is active.`);
+    console.log(`🧠 AI Safety Engine & GraphRAG is active.`);
+    console.log(`🔗 API Endpoint: http://localhost:${PORT}/api/safety/analyze-safety`);
 });

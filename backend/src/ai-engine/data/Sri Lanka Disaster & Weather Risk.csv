@@ -1,0 +1,101 @@
+Route Name,Primary Risk Factor,Historical Frequency,Severity Level,Specific Risk Locations,Monsoon Impact,Typical Impact on Road,Advisory Authority,Recommended Vehicle Safety Feature
+AA001 Colombo - Kandy,Landslide,Seasonal-Monsoon,High,Kadugannawa (97-100 mileposts),South-West Monsoon,Complete closure,NBRO,High Ground Clearance
+AA001 Colombo - Kandy,Rockfall,Rare,High,Kadugannawa (98/5 milepost),South-West Monsoon,One-way traffic,NBRO,Electronic Stability Control
+AA001 Colombo - Kandy,Earth-slip,Annual,Moderate,Ganetenne Sector,South-West Monsoon,One-way traffic,NBRO,Traction Control
+AA001 Colombo - Kandy,Flash Floods,Seasonal-Monsoon,Moderate,Warakapola - Kegalle,South-West Monsoon,Slippery surface,DMC,High Wading Depth
+AA001 Colombo - Kandy,Flash Floods,Annual,Moderate,Mawanella Town,South-West Monsoon,One-way traffic,DMC,High Ground Clearance
+AA001 Colombo - Kandy,Earth-slip,Seasonal-Monsoon,Moderate,Pilimathalawa Sector,South-West Monsoon,Slippery surface,NBRO,Traction Control
+AA001 Colombo - Kandy,Landslide,Seasonal-Monsoon,High,Kegalle-Mawanella Hills,South-West Monsoon,Complete closure,NBRO,All-Wheel Drive
+AA001 Colombo - Kandy,Flash Floods,Seasonal-Monsoon,Moderate,Pasyala - Warakapola,South-West Monsoon,One-way traffic,DMC,High Ground Clearance
+AA001 Colombo - Kandy,Rockfall,Rare,High,Kadugannawa Tunnel Entrance,Both,Road Blockage,RDA/NBRO,Reinforced Chassis
+AA001 Colombo - Kandy,Flash Floods,Seasonal-Monsoon,Moderate,Yatinuwara Sector,South-West Monsoon,Slippery surface,DMC,Traction Control
+AA001 Colombo - Kandy,Landslide,Rare,High,Ambepussa Hills,South-West Monsoon,Road Blockage,NBRO,High Ground Clearance
+AA001 Colombo - Kandy,Earth-slip,Seasonal-Monsoon,Moderate,Kadugannawa Bypass,South-West Monsoon,One-way traffic,NBRO,Traction Control
+AA001 Colombo - Kandy,Earth-slip,Seasonal-Monsoon,Moderate,Peradeniya - Gampola Belt,Both,Slippery surface,NBRO,Traction Control
+AA001 Colombo - Kandy,Rockfall,Rare,Moderate,Utuwankanda Area,South-West Monsoon,Debris on road,NBRO,Reinforced Chassis
+AA001 Colombo - Kandy,Flash Floods,Annual,Moderate,Galigamuwa Junction,South-West Monsoon,Slippery surface,DMC,Traction Control
+AA023 Wellawaya - Ella,Rockfall,Annual,High,12th Kilometer Post,North-East Monsoon,Road Blockage,NBRO/DMC,Reinforced Roof
+AA023 Wellawaya - Ella,Earth-slip,Seasonal-Monsoon,Moderate,Ravana Falls Area,Both,Slippery surface,DMC,Traction Control
+AA023 Wellawaya - Ella,Rockfall,Seasonal-Monsoon,High,Ella Rock Base,North-East Monsoon,Complete closure,NBRO,High Ground Clearance
+AA023 Wellawaya - Ella,Mudslide,Seasonal-Monsoon,Moderate,Wellawaya - Telulla,North-East Monsoon,Slippery surface,DMC,Mud-Terrain Tires
+AA023 Wellawaya - Ella,Flash Floods,Seasonal-Monsoon,High,Kuda Oya - Wellawaya,Both,Submerged road,DMC,Snorkel / 4WD
+AA023 Wellawaya - Ella,Rockfall,Seasonal-Monsoon,High,Little Adam's Peak Base,Both,Debris on road,NBRO,All-Terrain Tires
+AA023 Wellawaya - Ella,Landslide,Seasonal-Monsoon,High,Ella Town Outskirts,North-East Monsoon,Complete closure,NBRO,All-Wheel Drive
+AA023 Wellawaya - Ella,Rockfall,Seasonal-Monsoon,Moderate,Ella - Wellawaya 15km,North-East Monsoon,Debris on road,NBRO,Reinforced Roof
+AA023 Wellawaya - Ella,Mudslide,Seasonal-Monsoon,Moderate,Ella Gap Southern Face,North-East Monsoon,Slippery surface,DMC,Mud-Terrain Tires
+AA023 Wellawaya - Ella,Rockfall,Seasonal-Monsoon,High,Ravana Cave Access Road,Both,Complete closure,NBRO,High Viz Lights
+AA023 Wellawaya - Ella,Flash Floods,Seasonal-Monsoon,Moderate,Buduruwagala Road,North-East Monsoon,Slippery surface,DMC,Traction Control
+AA023 Wellawaya - Ella,Mudslide,Seasonal-Monsoon,Moderate,Wellawaya - Tanamalwila,Both,Slippery surface,DMC,Mud-Terrain Tires
+AA023 Wellawaya - Ella,Rockfall,Seasonal-Monsoon,High,Ella Rock Trailhead,Both,Debris on road,NBRO,All-Terrain Tires
+AA023 Wellawaya - Ella,Earth-slip,Annual,Moderate,Kumbalwela Junction,Both,Slippery surface,NBRO,Traction Control
+AA023 Wellawaya - Ella,Rockfall,Seasonal-Monsoon,High,Ellewala Waterfall Track,Both,Road Blockage,NBRO,High Ground Clearance
+AA005 Peradeniya - Badulla,Landslide,Annual,High,Ella-Kumbalwela Segment,North-East Monsoon,Complete closure,NBRO,All-Wheel Drive
+AA005 Peradeniya - Badulla,Severe Mist,Daily-Evening,Moderate,Ramboda Pass,Both,Reduced visibility,Met Dept,Fog Lights
+AA005 Peradeniya - Badulla,Ground Frost,Rare-Seasonal,Low,Ambewella / Nuwara Eliya,North-East Monsoon,Slippery surface,Met Dept,ABS / Winter Tires
+AA005 Peradeniya - Badulla,Landslide,Annual,High,Welimada - Hali-Ela,North-East Monsoon,Road Damage,NBRO,High Ground Clearance
+AA005 Peradeniya - Badulla,Landslide,Seasonal-Monsoon,High,Pussellawa - Ramboda,South-West Monsoon,Complete closure,NBRO,High Ground Clearance
+AA005 Peradeniya - Badulla,Severe Mist,Daily,Moderate,Hakgala Garden Area,Both,Reduced visibility,Met Dept,Fog Lights
+AA005 Peradeniya - Badulla,Rockfall,Seasonal-Monsoon,Moderate,Badulla - Hali-Ela,North-East Monsoon,One-way traffic,NBRO,High Ground Clearance
+AA005 Peradeniya - Badulla,Landslide,Seasonal-Monsoon,High,Kumbalwela - Demodera,North-East Monsoon,Complete closure,NBRO,4WD / High Torque
+AA005 Peradeniya - Badulla,Severe Mist,Daily-Morning,Moderate,Nuwara Eliya - Nanu Oya,Both,Reduced visibility,Met Dept,Fog Lights
+AA005 Peradeniya - Badulla,Rockfall,Annual,Moderate,Dunhinda Road Junction,North-East Monsoon,Debris on road,NBRO,Traction Control
+AA005 Peradeniya - Badulla,Severe Mist,Seasonal-Monsoon,High,Ragala - Walapane,North-East Monsoon,Reduced visibility,Met Dept,Fog Lights
+AA005 Peradeniya - Badulla,Earth-slip,Annual,Moderate,Keppetipola - Welimada,North-East Monsoon,One-way traffic,NBRO,High Ground Clearance
+AA005 Peradeniya - Badulla,Severe Mist,Daily,Moderate,Gampola Hills,Both,Reduced visibility,Met Dept,Fog Lights
+AA005 Peradeniya - Badulla,Landslide,Seasonal-Monsoon,High,Hali-Ela - Badulla,North-East Monsoon,Complete closure,NBRO,All-Wheel Drive
+AA005 Peradeniya - Badulla,Severe Mist,Seasonal-Monsoon,High,Welimada - Keppetipola,North-East Monsoon,Reduced visibility,Met Dept,Fog Lights
+AA005 Peradeniya - Badulla,Landslide,Seasonal-Monsoon,High,Demodera Railway Viewpoint,North-East Monsoon,Complete closure,NBRO,High Ground Clearance
+AA005 Peradeniya - Badulla,Ground Frost,Rare-Seasonal,Low,Horton Plains Access,North-East Monsoon,Slippery surface,Met Dept,ABS / Winter Tires
+AA005 Peradeniya - Badulla,Landslide,Seasonal-Monsoon,High,Ella - Passara Road,North-East Monsoon,Road Damage,NBRO,All-Wheel Drive
+AA005 Peradeniya - Badulla,Landslide,Annual,High,Hanguranketha - Walapane,North-East Monsoon,Road Damage,NBRO,All-Wheel Drive
+AA005 Peradeniya - Badulla,Earth-slip,Seasonal-Monsoon,Moderate,Padiyatalawa Scarp,North-East Monsoon,One-way traffic,NBRO,Traction Control
+AA007 Avissawella - Nuwara Eliya,Landslide,Seasonal-Monsoon,High,Ginigathena Junction,South-West Monsoon,One-way traffic,NBRO,Traction Control
+AA007 Avissawella - Nuwara Eliya,Flash Floods,Seasonal-Monsoon,Moderate,Kithulgala Area,South-West Monsoon,Slippery surface,DMC,High Wading Depth
+AA007 Avissawella - Nuwara Eliya,Severe Mist,Seasonal-Monsoon,High,Hatton - Nuwara Eliya,Both,Reduced visibility,Met Dept,Adaptive Fog Lights
+AA007 Avissawella - Nuwara Eliya,Landslide,Seasonal-Monsoon,High,Talawakele Area,South-West Monsoon,Road Subsidence,NBRO,High Ground Clearance
+AA007 Avissawella - Nuwara Eliya,Severe Mist,Seasonal-Monsoon,High,Ginigathhena Pass,Both,Reduced visibility,Met Dept,Adaptive Headlights
+AA007 Avissawella - Nuwara Eliya,Flash Floods,Seasonal-Monsoon,High,Karawanella Bridge,South-West Monsoon,Submerged road,DMC,Snorkel / High Wading
+AA007 Avissawella - Nuwara Eliya,Severe Mist,Daily,High,Watawala Area,Both,Reduced visibility,Met Dept,Fog Lights
+AA007 Avissawella - Nuwara Eliya,Landslide,Seasonal-Monsoon,High,Rozella Area,South-West Monsoon,Complete closure,NBRO,High Ground Clearance
+AA007 Avissawella - Nuwara Eliya,Flash Floods,Seasonal-Monsoon,High,Nawalapitiya Sector,South-West Monsoon,Submerged road,DMC,High Ground Clearance
+AA007 Avissawella - Nuwara Eliya,Severe Mist,Daily,High,Radella Pass,Both,Reduced visibility,Met Dept,Fog Lights
+AA007 Avissawella - Nuwara Eliya,Landslide,Seasonal-Monsoon,High,Kotagala Area,South-West Monsoon,Complete closure,NBRO,High Ground Clearance
+AA007 Avissawella - Nuwara Eliya,Severe Mist,Daily,Moderate,Ginigathhena - Hatton,Both,Reduced visibility,Met Dept,Adaptive Fog Lights
+AA007 Avissawella - Nuwara Eliya,Flash Floods,Seasonal-Monsoon,High,Ginigathena Town,South-West Monsoon,Submerged road,DMC,High Ground Clearance
+AA007 Avissawella - Nuwara Eliya,Landslide,Seasonal-Monsoon,Moderate,Ambagamuwa Area,Both,Slippery surface,NBRO,Traction Control
+AA007 Avissawella - Nuwara Eliya,Earth-slip,Annual,Moderate,Ginigathena - Laxapana Road,South-West Monsoon,One-way traffic,NBRO,Traction Control
+AA002 Colombo - Wellawaya,Crosswinds,Seasonal-Monsoon,Moderate,Hambantota Coastal Belt,Both,Vehicle Instability,Met Dept,Side-wind Assist
+AA002 Colombo - Wellawaya,Flash Floods,Seasonal-Monsoon,High,Matara-Dikwella Segment,Both,Complete closure,DMC,High Ground Clearance
+AA002 Colombo - Wellawaya,Crosswinds,Seasonal-Monsoon,Moderate,Tangalle - Ambalantota,South-West Monsoon,Drift Risk,Met Dept,Stability Control
+AA002 Colombo - Wellawaya,Crosswinds,Seasonal-Monsoon,Moderate,Galle Marine Drive,South-West Monsoon,Sand on road,Met Dept,Traction Control
+AA002 Colombo - Wellawaya,Crosswinds,Seasonal-Monsoon,High,Hambantota Port Bypass,Both,Vehicle Drift,Met Dept,Side-wind Assist
+AA002 Colombo - Wellawaya,Crosswinds,Seasonal-Monsoon,Moderate,Koggala - Ahangama,Both,Vehicle Instability,Met Dept,Electronic Stability Control
+AA002 Colombo - Wellawaya,Flash Floods,Seasonal-Monsoon,Moderate,Bentota Coastal Sector,South-West Monsoon,Slippery surface,DMC,Traction Control
+AA002 Colombo - Wellawaya,Crosswinds,Seasonal-Monsoon,High,Bundala National Park Road,Both,Vehicle Instability,Met Dept,Stability Control
+AA002 Colombo - Wellawaya,Flash Floods,Seasonal-Monsoon,High,Nonagama Junction,Both,Submerged road,DMC,High Wading Depth
+AA002 Colombo - Wellawaya,Crosswinds,Seasonal-Monsoon,Moderate,Hikkaduwa - Galle,South-West Monsoon,Vehicle Drift,Met Dept,Stability Control
+AA002 Colombo - Wellawaya,Flash Floods,Seasonal-Monsoon,High,Ambalantota Bridge,Both,Submerged road,DMC,High Wading Depth
+AA002 Colombo - Wellawaya,Crosswinds,Seasonal-Monsoon,Moderate,Weligama Bay Road,South-West Monsoon,Vehicle Drift,Met Dept,Stability Control
+AA002 Colombo - Wellawaya,Crosswinds,Seasonal-Monsoon,High,Hambantota Wind Farm Zone,Both,Vehicle Drift,Met Dept,Side-wind Assist
+AA002 Colombo - Wellawaya,Flash Floods,Annual,High,Kalutara North Bridge,South-West Monsoon,Submerged road,DMC,High Wading Depth
+AA002 Colombo - Wellawaya,Flash Floods,Annual,High,Galle Town Low-lands,South-West Monsoon,Submerged road,DMC,High Wading Depth
+AA004 Colombo - Batticaloa,Flash Floods,Seasonal-Monsoon,High,Ratnapura Town,South-West Monsoon,Submerged road,DMC,Snorkel / High Wading
+AA004 Colombo - Batticaloa,Landslide,Annual,High,Beragala - Koslanda,Both,Complete closure,NBRO,4WD / Off-road tires
+AA004 Colombo - Batticaloa,Landslide,Seasonal-Monsoon,High,Haldummulla Area,North-East Monsoon,Road Blockage,NBRO,High Ground Clearance
+AA004 Colombo - Batticaloa,Flash Floods,Seasonal-Monsoon,High,Koslanda - Wellawaya,North-East Monsoon,Complete closure,DMC,High Ground Clearance
+AA004 Colombo - Batticaloa,Flash Floods,Seasonal-Monsoon,High,Bibile - Monaragala,North-East Monsoon,Submerged road,DMC,Snorkel / 4WD
+AA004 Colombo - Batticaloa,Landslide,Annual,High,Balangoda - Belihuloya,Both,Complete closure,NBRO,4WD / High Torque
+AA004 Colombo - Batticaloa,Flash Floods,Seasonal-Monsoon,Moderate,Pottuvil Coastal Road,North-East Monsoon,Slippery surface,DMC,Traction Control
+AA004 Colombo - Batticaloa,Landslide,Annual,High,Lemastota Area,North-East Monsoon,Road Damage,NBRO,4WD / High Torque
+AA004 Colombo - Batticaloa,Flash Floods,Seasonal-Monsoon,High,Padiyatalawa Sector,North-East Monsoon,Submerged road,DMC,4WD / Snorkel
+AA004 Colombo - Batticaloa,Landslide,Annual,High,Koslanda landslide zone,North-East Monsoon,Complete closure,NBRO,4WD / Snorkel
+AA015 Batticaloa - Trincomalee,Flash Floods,Seasonal-Monsoon,High,Eravur / Kattankudy,North-East Monsoon,Submerged road,DMC,High Ground Clearance
+AA015 Batticaloa - Trincomalee,Flash Floods,Annual,High,Valachchenai Segment,North-East Monsoon,Submerged road,DMC,High Wading Depth
+AA015 Batticaloa - Trincomalee,High Wind Gusts,Rare-Seasonal,High,Trincomalee Coastal Road,North-East Monsoon,Vehicle Instability,Met Dept,Side-wind Assist
+AA017 Galle - Madampe,Landslide,Annual,Moderate,Deniyaya - Rakwana,Both,Complete closure,NBRO,4WD / High Torque
+AA017 Galle - Madampe,Landslide,Annual,High,Madampe Sector,South-West Monsoon,Road Damage,NBRO,4WD / High Torque
+AA006 Ambepussa - Trincomalee,High Wind Gusts,Seasonal-Monsoon,Moderate,Habarana - Kantale,North-East Monsoon,Debris on road,Met Dept,High-Beam Assist
+AA006 Ambepussa - Trincomalee,High Wind Gusts,Seasonal-Monsoon,Moderate,Dambulla - Habarana,North-East Monsoon,Branch falls,Met Dept,Forward Collision Warning
+AA003 Peliyagoda - Puttalam,Flash Floods,Seasonal-Monsoon,High,Chilaw - Puttalam,South-West Monsoon,Submerged road,DMC,High Ground Clearance
+AA003 Peliyagoda - Puttalam,Flash Floods,Seasonal-Monsoon,High,Negombo - Ja-Ela,South-West Monsoon,Submerged road,DMC,High Wading Depth
+AA011 Habarana - Tirikkondiadimadu,Flash Floods,Seasonal-Monsoon,High,Manampitiya Bridge,North-East Monsoon,Complete closure,DMC,High Ground Clearance

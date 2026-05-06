@@ -1,0 +1,101 @@
+Route/Segment Name,Province/District,Avg Gradient (%),Max Gradient (%),Terrain Type,Road Surface Condition,Hairpin Bends,Avg Elevation (m),Typical Weather Risks,Starting Coords (Lat/Lon),Ending Coords (Lat/Lon),Terrain_Enc,Surface_Enc
+Ramboda Pass (A5),Central/Nuwara Eliya,8.2,14.5,Steep Mountainous,Asphalt-Good,12,"1,450","High Fog, Landslide Prone","7.051, 80.682","6.985, 80.751",6,1
+18 Bends (A26),Central/Matale,7.5,12.0,Steep Mountainous,Asphalt-Good,17,680,High Landslide Risk,"7.315, 80.824","7.342, 80.951",6,1
+Riverston Peak Road,Central/Matale,9.0,16.5,Steep Mountainous,Broken Tarmac,14,"1,220","Strong Winds, Heavy Fog","7.521, 80.733","7.558, 80.742",6,2
+Ella-Wellawaya (A23),Uva/Badulla,6.5,11.5,Steep Mountainous,Asphalt-Good,8,820,"Rockfall, Landslide","6.872, 81.045","6.741, 81.102",6,1
+Beragala-Haputale (A4),Uva/Badulla,7.8,13.8,Steep Mountainous,Asphalt-Good,6,"1,180","Extreme Fog, Winds","6.751, 80.912","6.772, 80.951",6,1
+Hatton-Nuwara Eliya (A7),Central/Nuwara Eliya,5.8,11.0,Rolling Hills,Asphalt-Good,5,"1,320","Persistent Rain, Fog","6.892, 80.601","6.965, 80.762",5,1
+Badulla-Spring Valley (B097),Uva/Badulla,8.5,16.2,Steep Mountainous,Broken Tarmac,15,"1,210",Landslide Prone,"6.982, 81.051","7.021, 81.122",6,2
+Bandarawela-Poonagala (B042),Uva/Badulla,7.0,13.5,Steep Mountainous,Asphalt-Fair,10,"1,380",High Fog Risk,"6.831, 80.982","6.781, 81.021",6,0
+Passara-Moneragala (A22),Uva/Moneragala,6.2,11.8,Steep Mountainous,Asphalt-Good,12,780,Rockfall Risk,"6.931, 81.152","6.882, 81.341",6,1
+Norton Bridge Access (B025),Central/Nuwara Eliya,7.6,13.0,Steep Mountainous,Asphalt-Good,7,"1,080",Strong Winds,"6.901, 80.521","6.932, 80.512",6,1
+Adam's Peak - Nallathanniya,Sabaragamuwa/Rat,9.2,17.0,Steep Mountainous,Asphalt-Fair,9,"1,150","High Rainfall, Landslide","6.832, 80.531","6.812, 80.501",6,0
+Welimada-Bandarawela (B044),Uva/Badulla,5.5,10.5,Rolling Hills,Asphalt-Good,4,"1,220","Mist, Wet Surface","6.902, 80.912","6.831, 80.982",5,1
+Hakgala Pass (A5),Central/Nuwara Eliya,6.8,11.5,Steep Mountainous,Asphalt-Good,5,"1,720","Mist, Slippery Road","6.931, 80.822","6.912, 80.851",6,1
+Kotmale Dam Road,Central/Nuwara Eliya,6.0,10.8,Steep Mountainous,Asphalt-Good,6,880,Landslide Prone,"7.031, 80.612","7.051, 80.601",6,1
+Ginigathena Pass (A7),Central/Nuwara Eliya,7.2,12.5,Steep Mountainous,Asphalt-Good,7,820,"Landslide, Mist","6.982, 80.481","6.892, 80.601",6,1
+Maskeliya-Bogawantalawa,Central/Nuwara Eliya,6.7,12.0,Steep Mountainous,Broken Tarmac,12,"1,420",Landslide Risk,"6.832, 80.581","6.781, 80.651",6,2
+Agrapatana Estate Rd,Central/Nuwara Eliya,7.4,13.2,Steep Mountainous,Broken Tarmac,9,"1,520",Heavy Fog,"6.851, 80.702","6.821, 80.741",6,2
+Ohiya-Horton Plains,Uva/Badulla,10.2,18.5,Steep Mountainous,Unpaved/Gravel,16,"1,920","High Fog, Frost","6.821, 80.851","6.801, 80.801",6,6
+Ambewela-Pattipola,Central/Nuwara Eliya,5.8,10.5,Rolling Hills,Asphalt-Fair,4,"1,880","Mist, Slippery","6.871, 80.812","6.852, 80.831",5,0
+Ettampitiya Road (B043),Uva/Badulla,7.8,14.0,Steep Mountainous,Broken Tarmac,13,"1,120",Landslide Prone,"6.912, 81.012","6.932, 80.951",6,2
+Kandapola-Ragala Sector,Central/Nuwara Eliya,7.0,12.8,Steep Mountainous,Asphalt-Fair,10,"1,680",Heavy Mist,"6.971, 80.822","7.012, 80.881",6,0
+Maturata-Padiyapelella,Central/Nuwara Eliya,8.8,15.5,Steep Mountainous,Broken Tarmac,22,920,Landslide Risk,"7.102, 80.781","7.051, 80.832",6,2
+Hunnasgiriya Approach,Central/Kandy,7.4,13.8,Steep Mountainous,Asphalt-Good,8,"1,020","Strong Winds, Mist","7.301, 80.831","7.322, 80.801",6,1
+Knuckles Conservation Rd,Central/Kandy,9.2,16.8,Steep Mountainous,Broken Tarmac,14,"1,180",Extreme Wind/Fog,"7.351, 80.851","7.382, 80.871",6,2
+Talawakelle Bypass,Central/Nuwara Eliya,5.0,9.8,Steep Mountainous,Asphalt-Good,3,"1,120",Heavy Fog,"6.932, 80.651","6.942, 80.671",6,1
+Nuwara Eliya - Moon Plains,Central/Nuwara Eliya,4.5,8.5,Rolling Hills,Asphalt-Good,2,"1,900",High Fog Risk,"6.961, 80.781","6.972, 80.812",5,1
+Pattipola-World's End,Central/Nuwara Eliya,8.2,15.2,Steep Mountainous,Broken Tarmac,7,"2,150","High Wind, Fog","6.841, 80.821","6.772, 80.781",6,2
+Gampola-Nawalapitiya,Central/Kandy,4.8,9.2,Rolling Hills,Asphalt-Good,4,720,Flood Prone,"7.162, 80.571","7.052, 80.533",5,1
+Peradeniya-Hantana Rd,Central/Kandy,8.5,14.8,Steep Mountainous,Asphalt-Fair,15,980,High Fog Risk,"7.262, 80.621","7.241, 80.641",6,0
+Udaweriya Estate Rd,Uva/Badulla,11.5,20.5,Steep Mountainous,Gravel/Unpaved,18,"2,050","Landslide, Wind","6.781, 80.882","6.792, 80.851",6,4
+Namunukula Pass,Uva/Badulla,9.8,17.5,Steep Mountainous,Broken Tarmac,20,"1,580","Fog, Rockfall","6.931, 81.121","6.901, 81.081",6,2
+Lunugala-Bibile (A5),Uva/Badulla,7.2,14.5,Steep Mountainous,Asphalt-Good,14,620,Monsoon Rain,"7.031, 81.201","7.152, 81.231",6,1
+Padiyatalawa-18 Bends,Uva/Badulla,6.8,11.8,Steep Mountainous,Asphalt-Good,5,550,Heat/Landslide,"7.321, 80.981","7.301, 80.831",6,1
+Keppetipola Bypass,Uva/Badulla,4.2,8.0,Rolling Hills,Asphalt-Good,2,"1,250","Mist, Crosswinds","6.912, 80.881","6.892, 80.912",5,1
+Demodera Spiral Access,Uva/Badulla,5.5,9.5,Steep Mountainous,Asphalt-Fair,4,920,Landslide Prone,"6.902, 81.051","6.912, 81.041",6,0
+Hikkaduwa Coastal Belt,Southern/Galle,0.4,1.2,Coastal Flat,Asphalt-Good,0,5,Coastal Erosion,"6.132, 80.091","6.162, 80.112",0,1
+Akurala Breach Zone,Southern/Galle,0.2,1.0,Coastal Flat,Asphalt-Good,0,3,Tsunami/Flood Risk,"6.182, 80.051","6.201, 80.042",0,1
+Galle-Unawatuna (A2),Southern/Galle,1.0,3.2,Coastal Flat,Asphalt-Good,0,12,High Traffic Risk,"6.031, 80.221","6.012, 80.252",0,1
+Weligama Bay Bypass,Southern/Matara,0.7,2.2,Coastal Flat,Asphalt-Good,1,10,Crosswinds,"5.971, 80.431","5.962, 80.451",0,1
+Mirissa Cliff Route,Southern/Matara,2.8,6.5,Coastal Rolling,Asphalt-Good,2,28,"Sea Spray, Wind","5.941, 80.451","5.932, 80.472",1,1
+Matara-Tangalle (A2),Southern/Hamban,1.8,4.5,Coastal Rolling,Asphalt-Good,3,22,Animal Crossings,"5.941, 80.541","6.021, 80.791",1,1
+Hambantota Port Access,Southern/Hamban,0.5,1.8,Coastal Flat,Asphalt-Good,0,15,Heavy Crosswinds,"6.121, 81.121","6.152, 81.202",0,1
+Trincomalee Beach Rd,Eastern/Trinco,0.4,1.0,Coastal Flat,Asphalt-Good,0,8,Sand Accumulation,"8.581, 81.212","8.682, 81.191",0,1
+Arugam Bay Bridge,Eastern/Ampara,1.0,2.8,Coastal Flat,Asphalt-Good,0,12,Coastal Storms,"6.842, 81.821","6.831, 81.832",0,1
+Batticaloa Lagoon Rd,Eastern/Batti,0.3,0.8,Coastal Flat,Asphalt-Good,0,5,Monsoon Flooding,"7.712, 81.701","7.682, 81.722",0,1
+Pottuvil-Panama Sector,Eastern/Ampara,0.9,2.2,Coastal Flat,Asphalt-Fair,0,10,Wild Elephant Risk,"6.871, 81.831","6.752, 81.811",0,0
+Negombo-Chilaw (A3),Western/Puttalam,0.5,1.5,Coastal Flat,Asphalt-Good,0,12,Coastal Inundation,"7.212, 79.841","7.572, 79.791",0,1
+Puttalam Salt Marsh Rd,North Western/Put,0.1,0.4,Coastal Flat,Asphalt-Good,0,4,Extreme Heat/Wind,"7.982, 79.821","8.121, 79.852",0,1
+Mannar Causeway (A14),Northern/Mannar,0.2,0.5,Coastal Flat,Asphalt-Good,0,2,High Crosswinds,"8.981, 79.912","8.972, 79.851",0,1
+Jaffna-Kayts Causeway,Northern/Jaffna,0.1,0.2,Coastal Flat,Asphalt-Good,0,2,Tidal Flooding,"9.661, 80.011","9.682, 79.912",0,1
+Mullaitivu-Paranthan,Northern/Mulla,0.5,1.2,Coastal Flat,Asphalt-Good,0,15,Monsoon Swells,"9.281, 80.812","9.382, 80.412",0,1
+Kalpitiya Road,North Western/Put,0.6,1.8,Coastal Flat,Broken Tarmac,0,6,"Sand Drift, Wind","8.231, 79.761","8.352, 79.712",0,2
+Panadura-Ratnapura (A8),Western/Kalutara,1.8,4.8,Rolling Hills,Asphalt-Good,2,45,Riverine Flooding,"6.712, 79.912","6.721, 80.122",5,1
+Beruwala-Bentota (A2),Western/Kalutara,0.9,2.5,Coastal Flat,Asphalt-Good,1,10,Tourist Traffic,"6.471, 79.981","6.421, 80.001",0,1
+Matara-Akuressa (A24),Southern/Matara,2.5,6.0,Rolling Hills,Asphalt-Good,3,55,Flash Floods,"5.952, 80.541","6.102, 80.481",5,1
+Ampara-Uhana (A27),Eastern/Ampara,2.8,6.8,Rolling Hills,Asphalt-Good,4,115,"Rural Dust, Heat","7.321, 81.551","7.512, 81.352",5,1
+Valaichchenai Coastal Rd,Eastern/Batti,0.4,1.2,Coastal Flat,Asphalt-Good,0,8,Tsunami Risk,"7.921, 81.531","7.912, 81.572",0,1
+Ambalangoda-Elpitiya,Southern/Galle,3.8,7.5,Rolling Hills,Asphalt-Fair,4,85,Slippery Surface,"6.231, 80.051","6.271, 80.142",5,0
+Galle-Deniyaya (A17),Southern/Galle,5.2,9.8,Rolling Hills,Asphalt-Good,8,320,Persistent Rain,"6.032, 80.211","6.321, 80.552",5,1
+Baddegama-Hikkaduwa,Southern/Galle,2.8,5.8,Rolling Hills,Asphalt-Good,2,55,River Flooding,"6.181, 80.181","6.132, 80.091",5,1
+Southern Expressway E01,Western/Southern,1.5,4.0,Rolling Hills,Asphalt-Good,0,42,High Speed Safety,"6.841, 79.961","6.021, 80.541",5,1
+Kurunegala-Puttalam (A10),North West/Kurun,2.2,5.5,Rolling Hills,Asphalt-Good,3,112,Traffic Congestion,"7.481, 80.361","8.021, 79.851",5,1
+Chilaw-Wariyapola (B079),North West/Putt,1.8,4.2,Rolling Hills,Asphalt-Good,2,85,Monsoon Inundation,"7.571, 79.791","7.601, 80.221",5,1
+Nilaveli-Kumburupiddy,Eastern/Trinco,0.5,1.5,Coastal Flat,Asphalt-Fair,0,12,Sand Siltation,"8.681, 81.192","8.751, 81.121",0,0
+Batticaloa-Trinco (A15),Eastern/Batti,0.3,1.2,Coastal Flat,Asphalt-Good,0,10,Tsunami/Flood Risk,"7.712, 81.701","8.581, 81.212",0,1
+Kathiraveli Coastal,Eastern/Batti,0.4,1.0,Coastal Flat,Asphalt-Fair,0,5,Storm Surge,"8.121, 81.351","8.182, 81.321",0,0
+Pottuvil-Arugam Bay,Eastern/Ampara,0.8,1.8,Coastal Flat,Asphalt-Good,0,12,Heavy Winds,"6.871, 81.831","6.841, 81.821",0,1
+Kirinda-Tissa Road,Southern/Hamban,1.2,3.5,Coastal Rolling,Asphalt-Good,1,25,Wildlife Crossings,"6.221, 81.331","6.281, 81.292",1,1
+Tangalle Circular Road,Southern/Hamban,2.5,5.2,Rolling Hills,Asphalt-Good,4,45,Tourist Traffic,"6.021, 80.791","6.032, 80.801",5,1
+Kudawella Blowhole Rd,Southern/Matara,5.8,12.5,Coastal Steep,Asphalt-Fair,6,40,"Sea Spray, Mist","5.981, 80.751","5.992, 80.762",2,0
+Bogawantalawa-Balangoda,Sabaragamuwa/Rat,11.5,20.0,Steep Mountainous,Gravel/Estate,24,"1,550","Landslide, Mist","6.782, 80.651","6.652, 80.701",6,3
+Bulutota Pass (A17),Sabaragamuwa/Rat,9.8,16.5,Steep Mountainous,Asphalt-Fair,10,"1,020","Intense Rain, Fog","6.452, 80.612","6.471, 80.651",6,0
+Kalawana-Kukulegama,Sabaragamuwa/Rat,8.0,13.8,Steep Mountainous,Broken Tarmac,12,680,High Flood Risk,"6.632, 80.401","6.581, 80.351",6,2
+Bulathkohupitiya-Dedugala,Sabaragamuwa/Keg,10.5,18.8,Steep Mountainous,Broken Tarmac,18,980,Landslide Risk,"7.041, 80.331","7.021, 80.381",6,2
+Aranayake Rural Road,Sabaragamuwa/Keg,6.8,12.0,Rolling Hills,Asphalt-Fair,4,480,Extreme Landslide,"7.151, 80.421","7.182, 80.451",5,0
+Namunukula Ridge Rd,Uva/Badulla,10.0,17.8,Steep Mountainous,Broken Tarmac,20,"1,620","High Fog, Rockfall","6.931, 81.121","6.901, 81.081",6,2
+Meegahakiula-Arawa,Uva/Badulla,7.5,14.2,Steep Mountainous,Asphalt-Fair,12,520,Heat/Landslide,"7.121, 81.112","7.081, 81.151",6,0
+Badalkumbura-Buttala,Uva/Moneragala,8.5,15.2,Steep Mountainous,Asphalt-Fair,15,820,Rockfall Risk,"6.852, 81.301","6.751, 81.251",6,0
+Neluwa-Lankagama Rd,Southern/Galle,12.8,22.5,Steep Mountainous,Unpaved/Gravel,28,680,Landslide/Floods,"6.351, 80.381","6.401, 80.451",6,6
+Morningside - Rakwana,Sabaragamuwa/Rat,11.2,19.8,Steep Mountainous,Unpaved/Gravel,18,"1,080","High Fog, Landslide","6.441, 80.601","6.452, 80.612",6,6
+Laggala-Wasgamuwa,Central/Matale,5.5,12.2,Rolling Hills,Asphalt-Fair,8,420,"Rockfall, Animals","7.581, 80.821","7.721, 80.951",5,0
+Walapane-Nildandahinna,Central/Nuwara Eliya,9.8,17.2,Steep Mountainous,Broken Tarmac,25,"1,120",Landslide Prone,"7.051, 80.832","7.001, 80.912",6,2
+Hanguranketha Bypass,Central/Kandy,7.0,11.5,Steep Mountainous,Asphalt-Good,12,880,Rockfall Risk,"7.212, 80.712","7.151, 80.781",6,1
+Labugama Reservoir Rd,Western/Colombo,5.5,10.8,Rolling Hills,Asphalt-Good,6,210,Strong Winds,"6.851, 80.181","6.821, 80.221",5,1
+Matugama-Pelawatta,Western/Kalutara,6.0,10.5,Rolling Hills,Asphalt-Good,5,92,Slippery Surface,"6.521, 80.111","6.542, 80.251",5,1
+Pitigala-Hiniduma (B014),Southern/Galle,7.8,13.8,Steep Mountainous,Asphalt-Fair,12,280,Landslide Risk,"6.271, 80.142","6.312, 80.301",6,0
+Medawachchiya-Vavuniya,North Central/Anu,0.8,2.5,Plain Flat,Asphalt-Good,0,115,Extreme Heat,"8.541, 80.501","8.751, 80.501",3,1
+Sigiriya Rural Elephant Rd,Central/Matale,1.8,3.8,Plain Flat,Unpaved/Dirt,0,190,Elephant Conflict,"7.951, 80.751","7.912, 80.782",3,5
+Galkulama-Anuradhapura,North Central/Anu,1.0,2.5,Plain Flat,Asphalt-Good,0,110,High Rural Traffic,"8.312, 80.481","8.351, 80.401",3,1
+Ella-Passara Road (B113),Uva/Badulla,8.2,15.8,Steep Mountainous,Asphalt-Fair,16,"1,050","Fog, Wet Surface","6.871, 81.042","6.931, 81.152",6,0
+Bibile-Uraniya (B057),Uva/Badulla,5.2,10.8,Rolling Hills,Asphalt-Good,6,380,Flood Risk,"7.151, 81.231","7.321, 80.981",5,1
+Badalkumbura-Buttala,Uva/Moneragala,8.8,16.5,Steep Mountainous,Asphalt-Fair,14,780,Rockfall Risk,"6.851, 81.302","6.752, 81.251",6,0
+Nilgala Forest Sector,Uva/Moneragala,4.8,9.5,Rolling Hills,Unpaved/Gravel,2,310,"Fire Hazard, Dust","7.182, 81.381","7.222, 81.452",5,6
+Buttala-Kataragama (B035),Uva/Moneragala,1.8,4.5,Plain/Rolling,Asphalt-Good,2,160,Wildlife Crossing,"6.751, 81.251","6.421, 81.331",4,1
+Biyanwila-Ganemulla,Western/Gampaha,1.2,3.5,Rolling Hills,Asphalt-Good,0,45,Local Congestion,"7.021, 79.951","7.051, 79.981",5,1
+Seeduwa-Udugampola,Western/Gampaha,0.8,2.8,Coastal Flat,Asphalt-Good,0,22,Intersection Risk,"7.121, 79.901","7.141, 79.952",0,1
+Panadura-Nambapana (A8),Western/Kalutara,1.8,4.8,Rolling Hills,Asphalt-Good,2,38,High Riverine Risk,"6.711, 79.912","6.722, 80.121",5,1
+Ingiriya-Halwatura (B068),Western/Kalutara,4.8,9.2,Rolling Hills,Asphalt-Fair,4,65,Heavy Monsoon,"6.741, 80.162","6.781, 80.201",5,0
+Deniyaya-Viharahena (B099),Southern/Matara,7.5,13.2,Steep Mountainous,Broken Tarmac,12,850,Landslide Prone,"6.331, 80.551","6.301, 80.582",6,2
+Morawaka-Thiniyawala,Southern/Matara,8.2,14.5,Steep Mountainous,Asphalt-Fair,15,720,Intense Rain,"6.251, 80.501","6.312, 80.351",6,0
