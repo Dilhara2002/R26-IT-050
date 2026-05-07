@@ -1,11 +1,20 @@
+/**
+ * Main Entry Point: AI-Powered Safety-Aware Tourism Platform
+ * Purpose: Backend orchestration for ML Safety Engine and GraphRAG.
+ */
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 // --- 1. Import Routes ---
-const vehicleRoutes = require('./routes/vehicleRoutes');
-const safetyRoutes = require('./routes/safetyRoutes'); // Added for your Research Component
+// Note: safetyRoutes is the core of your research component.
+const safetyRoutes = require('./routes/safetyRoutes');
+
+// Placeholder for other team members' work (Commented out if file is missing)
+// const vehicleRoutes = require('./routes/vehicleRoutes'); 
 
 const app = express();
 
@@ -15,40 +24,51 @@ app.use(express.json());
 
 // --- 3. Database Connection ---
 // Ensure MONGO_URI is defined in your .env file
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('✅ Connected to MongoDB Atlas'))
-    .catch((err) => console.error('❌ Database connection error:', err));
+if (process.env.MONGO_URI) {
+    mongoose.connect(process.env.MONGO_URI)
+        .then(() => console.log('✅ Connected to MongoDB Atlas'))
+        .catch((err) => console.error('❌ Database connection error:', err));
+} else {
+    console.warn('⚠️ MONGO_URI not found in .env. Database features may be limited.');
+}
 
 // --- 4. API Endpoints ---
 
-// Health Check Route
+// Base Health Check
 app.get('/', (req, res) => {
-    res.send('AI-Powered Safety-Aware Tourism Platform Backend is Running! 🚀');
+    res.status(200).json({
+        message: 'AI-Powered Safety-Aware Tourism Platform Backend is Running! 🚀',
+        status: 'Healthy',
+        engine: 'ML + GraphRAG Active'
+    });
 });
 
 /**
- * Route: /api/vehicles
- * Handles: General vehicle CRUD operations (from existing members)
- */
-app.use('/api/vehicles', vehicleRoutes);
-
-/**
  * Route: /api/safety
- * Handles: Your Research Component (Budget, Passengers, ML Safety Score, GraphRAG)
- * This is where the core logic of your project resides.
+ * Purpose: Handles Research Logic (Budget filtering, ML Safety Score, GraphRAG reasoning).
+ * Primary Endpoint: POST http://localhost:5001/api/safety/recommend-vehicle
  */
 app.use('/api/safety', safetyRoutes);
 
-// --- 5. Global Error Handler (Optional but professional) ---
+// Optional: Uncomment this only when vehicleRoutes.js is created in src/routes/
+// app.use('/api/vehicles', vehicleRoutes);
+
+// --- 5. Global Error Handler ---
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
+    console.error('SERVER_ERROR:', err.stack);
+    res.status(500).json({ 
+        success: false, 
+        message: 'Internal Server Error',
+        error: err.message 
+    });
 });
 
 // --- 6. Server Start ---
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
+    console.log(`\n=================================================`);
     console.log(`🚀 Server is live on http://localhost:${PORT}`);
-    console.log(`🧠 AI Safety Engine & GraphRAG is active.`);
-    console.log(`🔗 API Endpoint: http://localhost:${PORT}/api/safety/analyze-safety`);
+    console.log(`🧠 Research Engine: Safety-Aware Vehicle Recommendation`);
+    console.log(`🔗 Active Endpoint: http://localhost:${PORT}/api/safety/recommend-vehicle`);
+    console.log(`=================================================\n`);
 });

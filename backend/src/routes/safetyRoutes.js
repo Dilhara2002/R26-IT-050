@@ -5,20 +5,47 @@ const path = require('path');
 const fs = require('fs');
 const csv = require('csv-parser');
 
-// 1. Function to fetch road data
-const getRoadData = (routeName) => {
+/**
+ * Helper: Normalizes strings by removing spaces and making them lowercase
+ * This ensures "Beragala-Haputale" matches "beragalahaputale"
+ */
+const normalize = (str) => (str ? str.toString().toLowerCase().replace(/\s+/g, '') : '');
+
+// 1. Function to fetch road data with Smart Fuzzy Matching
+const getRoadData = (userProvidedName) => {
     return new Promise((resolve) => {
         let selectedRoad = null;
+        const normalizedInput = normalize(userProvidedName);
 
         fs.createReadStream(path.join(__dirname, '../ai-engine/data/processed_roads.csv'))
             .pipe(csv())
-            .on('data', (data) => {
-                if (data['Route/Segment Name'] === routeName) {
-                    selectedRoad = data;
+            .on('data', (row) => {
+                // Find the correct column name regardless of slight variations
+                const csvRouteName = row['Route/Segment Name'] || row['Route Name'] || row['Segment Name'];
+                
+                if (csvRouteName) {
+                    const normalizedCSVName = normalize(csvRouteName);
+                    
+                    // Smart Matching: Check if the user input is PART of the CSV name or vice versa
+                    if (normalizedCSVName.includes(normalizedInput) || normalizedInput.includes(normalizedCSVName)) {
+                        selectedRoad = row;
+                        console.log(`✅ Match Found in CSV: ${csvRouteName}`);
+                    }
                 }
             })
             .on('end', () => resolve(selectedRoad));
     });
+};
+
+// Helper: Calculate Travel Cost based on your formula
+const calculateTrueCost = (distance, efficiency, fuelType) => {
+    const fuelPrice = fuelType === 'Diesel' ? 341 : 371; // Current SL rates
+    const driverFeePerKm = 50; 
+    const profitMargin = 1.20; // 20% margin
+
+    const fuelCost = (distance / parseFloat(efficiency)) * fuelPrice;
+    const baseCost = fuelCost + (distance * driverFeePerKm);
+    return Math.round(baseCost * profitMargin);
 };
 
 // 2. Main API Route
@@ -26,33 +53,28 @@ router.post('/recommend-vehicle', async (req, res) => {
     try {
         const { budget, passengers, distance, routeName, isRaining } = req.body;
         
-        // A. Get road gradient and related data
+        // A. Get road gradient with Smart Search
         const roadInfo = await getRoadData(routeName);
         if (!roadInfo) {
-            return res.status(404).json({ message: "Route data not found" });
+            return res.status(404).json({ 
+                success: false,
+                message: `Route '${routeName}' not found in database. Please check spelling.` 
+            });
         }
 
         const vehicles = [];
 
-        // Read vehicle data from CSV
+        // Read vehicle data
         fs.createReadStream(path.join(__dirname, '../ai-engine/data/processed_vehicles.csv'))
             .pipe(csv())
             .on('data', (data) => vehicles.push(data))
             .on('end', async () => {
 
-                // B. Filter and analyze each vehicle (Safety + Cost)
+                // B. Analyze each vehicle via Python ML Model + Cost Formula
                 const analyzedVehicles = await Promise.all(
                     vehicles.map(async (v) => {
-
-                        // Get safety score from Python ML model
                         const score = await getMLSafetyScore(v, roadInfo, isRaining);
-
-                        // Calculate cost
-                        const cost = calculateTrueCost(
-                            distance,
-                            v['Efficiency (km/L)'],
-                            v['Fuel Type']
-                        );
+                        const cost = calculateTrueCost(distance, v['Efficiency (km/L)'], v['Fuel Type']);
 
                         return {
                             ...v,
@@ -62,56 +84,55 @@ router.post('/recommend-vehicle', async (req, res) => {
                     })
                 );
 
-                // C. Selection logic
-                // Select vehicles that match budget + passenger count and sort by highest safety
-                const recommendations = analyzedVehicles
+                // C. Selection logic: Budget + Passengers + Safety
+                const withinBudget = analyzedVehicles
                     .filter(v =>
                         v.calculatedCost <= budget &&
                         parseInt(v['Seating Capacity']) >= passengers
                     )
                     .sort((a, b) => b.safetyScore - a.safetyScore);
 
-                // Send response
+                // Find Upsell (Safer vehicle just slightly above budget)
+                const upsellOption = analyzedVehicles
+                    .filter(v => v.calculatedCost > budget && v.calculatedCost <= budget * 1.25)
+                    .sort((a, b) => b.safetyScore - a.safetyScore)[0];
+
                 res.json({
                     success: true,
-                    bestSafetyMatch: recommendations[0] || null,
-                    roadGradient: roadInfo['Max Gradient (%)'],
-                    weatherImpact: isRaining
-                        ? "High impact due to rain"
-                        : "Normal",
-                    upsell: analyzedVehicles.find(v =>
-                        v.calculatedCost > budget &&
-                        v.calculatedCost <= budget * 1.2
-                    )
+                    routeDetected: roadInfo['Route/Segment Name'],
+                    roadGradient: roadInfo['Max Gradient (%)'] + "%",
+                    bestSafetyMatch: withinBudget[0] || null,
+                    otherOptions: withinBudget.slice(1, 3),
+                    upsell: upsellOption || null,
+                    weatherStatus: isRaining ? "Heavy Rain - Safety scores reduced" : "Clear Weather"
                 });
             });
 
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 
-// Helper function to call Python ML model
+// 3. Helper to call Python ML script
 const getMLSafetyScore = (vehicle, road, isRaining) => {
     return new Promise((resolve) => {
-
         const pythonInput = JSON.stringify({
             cc: vehicle['Engine Capacity (CC)'],
             torque: vehicle['Max Torque (Nm)'],
             gradeability: vehicle['Gradeability (%)'],
             gradient: road['Max Gradient (%)'],
-            surface: road['Surface_Enc'],
-            rain: isRaining ? 20 : 0 // Increase risk if raining
+            surface: road['Surface_Enc'] || 1, 
+            rain: isRaining ? 20 : 0
         });
 
+        // Use 'python3' for macOS
         const py = spawn('python3', [
             path.join(__dirname, '../ai-engine/scripts/predict_safety.py'),
             pythonInput
         ]);
 
-        py.stdout.on('data', (data) => {
-            resolve(parseFloat(data.toString()));
-        });
+        py.stdout.on('data', (data) => resolve(parseFloat(data.toString())));
+        py.stderr.on('data', (data) => console.error(`ML_Error: ${data}`));
     });
 };
 
