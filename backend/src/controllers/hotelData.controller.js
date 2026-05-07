@@ -74,8 +74,10 @@ export const generatePackageFromPrompt = async (req, res) => {
       });
     }
 
+    console.log("Extracting preferences...");
     const preferences = await extractPreferences(prompt);
 
+    console.log("Searching graph...");
     const packages = await findMatchingPackages(preferences);
 
     if (!packages.length) {
@@ -83,27 +85,71 @@ export const generatePackageFromPrompt = async (req, res) => {
         userPrompt: prompt,
         extractedPreferences: preferences,
         packageCount: 0,
-        packages: [],
+        selectedPackage: null,
         itinerary: null,
-        message: "No matching package found for the given preferences.",
+        userFriendlyResponse: "Sorry, no matching tour package was found for your request.",
       });
     }
 
-    const itinerary = await generateItineraryText({
-      prompt,
-      preferences,
-      packages,
-    });
+    const selectedPackage = packages[0];
 
-    res.json({
+    const totalDays = preferences.durationDays || 3;
+
+    // ✅ only use activities according to requested day count
+    const limitedActivities = selectedPackage.activities.slice(0, totalDays);
+
+    const itinerary = {
+      title: `${totalDays}-Day ${selectedPackage.district} Tour Package`,
+      summary: `Stay at ${selectedPackage.hotelName} with ${
+        preferences.activityCategory || "selected"
+      } activities.`,
+      selectedHotel: {
+        name: selectedPackage.hotelName,
+        district: selectedPackage.district,
+        grade: selectedPackage.grade,
+        foodType: selectedPackage.foodType,
+        category: selectedPackage.hotelCategory,
+      },
+      dayWisePlan: limitedActivities.map((activity, index) => ({
+        day: index + 1,
+        activities: [activity.name],
+        notes: `${activity.category} activity. Suitable for ${activity.suitableFor}. Price level: ${activity.priceLevel}.`,
+      })),
+      whyThisPackageMatches: [
+        `Located in ${selectedPackage.district}`,
+        `Hotel grade matches ${selectedPackage.grade}`,
+        `Food preference matches ${preferences.foodType}`,
+        `Activities match ${preferences.activityCategory}`,
+      ],
+    };
+
+    const userFriendlyResponse = `
+Here is your ${totalDays}-day ${selectedPackage.district} tour package.
+
+You will stay at ${selectedPackage.hotelName}, a ${selectedPackage.grade} ${selectedPackage.hotelCategory}. This hotel supports ${selectedPackage.foodType} food options, which matches your food preference.
+
+Your trip includes ${preferences.activityCategory || "selected"} activities such as ${limitedActivities
+      .map((activity) => activity.name)
+      .join(", ")}.
+
+This package was selected because it is located in ${selectedPackage.district}, matches the ${selectedPackage.grade} hotel grade, supports your ${preferences.foodType} food preference, and includes ${
+      preferences.activityCategory || "matching"
+    } activities.
+`.trim();
+
+    console.log("Sending response...");
+
+    return res.json({
       userPrompt: prompt,
       extractedPreferences: preferences,
       packageCount: packages.length,
-      packages,
+      selectedPackage,
       itinerary,
+      userFriendlyResponse,
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("ERROR:", error);
+    return res.status(500).json({
       error: error.message,
     });
   }
