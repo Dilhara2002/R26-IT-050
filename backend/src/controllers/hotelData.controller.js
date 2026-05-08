@@ -95,7 +95,7 @@ export const generatePackageFromPrompt = async (req, res) => {
 
     const totalDays = preferences.durationDays || 3;
 
-    // ✅ only use activities according to requested day count
+    //  only use activities according to requested day count
     const limitedActivities = selectedPackage.activities.slice(0, totalDays);
 
     const itinerary = {
