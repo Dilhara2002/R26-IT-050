@@ -1,27 +1,30 @@
+import { useState } from "react";
+
 import {
   View,
   Text,
   StyleSheet,
   Alert,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
-
-import { useState } from "react";
 
 import { router } from "expo-router";
 
 import TourismPromptInput from "../../components/tourism/TourismPromptInput";
-
 import tourismColors from "../../constants/tourism/tourismColors";
-
 import { generateTourismPackage } from "../../services/tourism/tourismApi";
 
 export default function HomeScreen() {
   const [prompt, setPrompt] = useState("");
-
   const [loading, setLoading] = useState(false);
 
   const handleGenerate = async () => {
+    if (!prompt.trim()) {
+      Alert.alert("Required", "Please enter your travel request.");
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -29,14 +32,16 @@ export default function HomeScreen() {
 
       router.push({
         pathname: "/results",
-
         params: {
           packageData: JSON.stringify(data),
           prompt,
         },
       });
     } catch (error) {
-      Alert.alert("Error", error.message);
+      const message =
+        error instanceof Error ? error.message : "Something went wrong";
+
+      Alert.alert("Error", message);
     } finally {
       setLoading(false);
     }
@@ -44,32 +49,22 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.badge}>
-        Graph RAG Tourism Assistant
-      </Text>
+      <Text style={styles.badge}>Graph RAG Tourism Assistant</Text>
 
-      <Text style={styles.title}>
-        Discover Sri Lanka Smarter
-      </Text>
+      <Text style={styles.title}>Discover Sri Lanka Smarter</Text>
 
       <Text style={styles.subtitle}>
         Describe your dream trip using natural language.
       </Text>
 
-      <TourismPromptInput
-        value={prompt}
-        onChangeText={setPrompt}
-      />
+      <TourismPromptInput value={prompt} onChangeText={setPrompt} />
 
       {loading ? (
-        <ActivityIndicator
-          size="large"
-          color={tourismColors.primary}
-        />
+        <ActivityIndicator size="large" color={tourismColors.primary} />
       ) : (
-        <Text style={styles.generateButton} onPress={handleGenerate}>
-          ✨ Generate Package
-        </Text>
+        <Pressable style={styles.generateButton} onPress={handleGenerate}>
+          <Text style={styles.generateButtonText}>✨ Generate Package</Text>
+        </Pressable>
       )}
     </View>
   );
@@ -109,11 +104,14 @@ const styles = StyleSheet.create({
 
   generateButton: {
     backgroundColor: tourismColors.primary,
-    color: "#FFFFFF",
-    textAlign: "center",
     padding: 18,
     borderRadius: 18,
+    alignItems: "center",
+  },
+
+  generateButtonText: {
+    color: "#FFFFFF",
     fontWeight: "800",
-    overflow: "hidden",
+    fontSize: 16,
   },
 });
