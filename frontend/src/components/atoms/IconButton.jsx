@@ -1,39 +1,105 @@
-import React from "react";
+import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
-import "./IconButton.css";
+function IconButton({
+  content,
+  title,
+  iconb,
+  icona,
+  w,
+  h,
+  size,
+  bg = "#2563EB",
+  c = "#FFFFFF",
+  is = 20,
+  ts = 14,
+  rm = 0,
+  lm = 0,
+  tm = 0,
+  bm = 0,
+  extraClass,
+  onClick,
+  onPress,
+}) {
+  const width = w || size || "100%";
+  const height = h || size || 44;
 
-/**
- * @description IconButton is a component that displays a button with an icon and text content
- * 
- * @param {Object} content - content of the button
- * @param {String} title - title of the button
- * @param {String} iconb - icon before text content
- * @param {String} icona - icon after text content
- * @param {Number} w - width
- * @param {Number} h - height
- * @param {Number} size - width and height. If `w` and `h` are not provided, this will be used
- * @param {String} bg - background color
- * @param {String} c - color
- * @param {String} is - icon size
- * @param {String} ts - text size
- * @param {Number} rm - right margin
- * @param {Number} lm - left margin
- * @param {Number} tm - top margin
- * @param {Number} bm - bottom margin
- * @param {String} extraClass - extra classes to add to the button
- * @param {Function} onClick - function to call when the button is clicked
- * @returns 
- */
-function IconButton({ content, title, iconb, icona, w, h, size, bg, c, is, ts, rm, lm, tm, bm, extraClass, onClick }) {
-  w = w || size;
-  h = h || size;
+  const bgColor =
+    bg === "green"
+      ? "#22C55E"
+      : bg === "red"
+      ? "#EF4444"
+      : bg === "blue"
+      ? "#2563EB"
+      : bg === "yellow"
+      ? "#EAB308"
+      : bg || "#2563EB";
+
+  const textColor =
+    c === "white"
+      ? "#FFFFFF"
+      : c === "green"
+      ? "#22C55E"
+      : c === "red"
+      ? "#EF4444"
+      : c === "blue"
+      ? "#2563EB"
+      : c || "#FFFFFF";
+
+  const isMinimal = extraClass === "minimal";
+
   return (
-    <button title={title} style={{width: `${w}px`, height:`${h}px`}} className={`icon-btn btn-bg-${bg} btn-clr-${c} btn-right-margin-${rm} btn-left-margin-${lm} ${extraClass}`} onClick={onClick}>
-      {(iconb && content && <span className={`btn__icon btn__icon-${is}`}>{iconb || ""}</span>) || (iconb && <span className={`btn__icon btn__icon-${is}`}>{iconb || ""}</span>)}
-      {content && <span className={`btn__text btn__text-${ts}`}>{content}</span>}
-      {(icona && content && <span className={`btn__icon btn__icon-${is}`}>{icona || ""}</span>) || (icona && <span className={`btn__icon btn__icon-${is}`}>{icona || ""}</span>)}
-    </button>
+    <TouchableOpacity
+      accessibilityLabel={title}
+      activeOpacity={0.8}
+      onPress={onPress || onClick}
+      style={[
+        styles.button,
+        {
+          width,
+          height,
+          backgroundColor: isMinimal ? "transparent" : bgColor,
+          marginRight: rm,
+          marginLeft: lm,
+          marginTop: tm,
+          marginBottom: bm,
+        },
+      ]}
+    >
+      {iconb ? (
+        <Text style={[styles.icon, { fontSize: is, color: textColor }]}>
+          {iconb}
+        </Text>
+      ) : null}
+
+      {content ? (
+        <Text style={[styles.text, { fontSize: ts, color: textColor }]}>
+          {content}
+        </Text>
+      ) : null}
+
+      {icona ? (
+        <Text style={[styles.icon, { fontSize: is, color: textColor }]}>
+          {icona}
+        </Text>
+      ) : null}
+    </TouchableOpacity>
   );
 }
 
 export default IconButton;
+
+const styles = StyleSheet.create({
+  button: {
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    paddingHorizontal: 14,
+  },
+  icon: {
+    marginHorizontal: 4,
+  },
+  text: {
+    fontWeight: "600",
+  },
+});
