@@ -1,66 +1,56 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 
-import './ImagePreview.css';
-
-function ImagePreview({ id, name, required, onChange, ref}) {
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const [fileName, setFileName] = useState('Choose File');
-  const inputRef = useRef(null);
-
-  const handleFileChange = useCallback((event) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setFileName(file.name);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      onChange?.(file);
-    }
-  }, [onChange]);
-
-  // Reset functionality
-  const reset = useCallback(() => {
-    setPreviewUrl(null);
-    setFileName('Choose File');
-    if (inputRef.current) {
-      inputRef.current.value = '';
-    }
-    onChange?.(null);
-  }, [onChange]);
-
-  // Cleanup object URLs
-  useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
-
-  // Expose reset method and forward ref
-  React.useImperativeHandle(ref, () => ({
-    ...(inputRef.current),
-    reset,
-  }));
-
+function ImagePreview({ id, name, required, onChange, imageUri }) {
   return (
-    <label className="image-upload" id={id}>
-      <input
-        type="file"
-        name={name}
-        id={id}
-        className="image-upload__input"
-        accept="image/*"
-        onChange={handleFileChange}
-        ref={inputRef}
-        required={required}
-      />
-      <div
-        className="image-upload__preview"
-        style={{ backgroundImage: previewUrl ? `url(${previewUrl})` : undefined }}
-      />
-      <div className="image-upload__path">{fileName}</div>
-    </label>
+    <TouchableOpacity
+      activeOpacity={0.8}
+      style={styles.container}
+      onPress={() => onChange?.(null)}
+    >
+      <View style={styles.preview}>
+        {imageUri ? (
+          <Image source={{ uri: imageUri }} style={styles.image} />
+        ) : (
+          <Text style={styles.camera}>📷</Text>
+        )}
+      </View>
+
+      <Text style={styles.path}>
+        {imageUri ? "Image Selected" : "Choose File"}
+      </Text>
+    </TouchableOpacity>
   );
 }
 
 export default ImagePreview;
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  preview: {
+    width: 125,
+    height: 160,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#93C5FD",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+    backgroundColor: "#F8FAFC",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+  },
+  camera: {
+    fontSize: 42,
+    opacity: 0.6,
+  },
+  path: {
+    marginTop: 8,
+    fontSize: 13,
+    color: "#64748B",
+  },
+});

@@ -1,42 +1,112 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
+import { View, Text, TextInput, StyleSheet } from "react-native";
 
-import "./RightIconRectInput.css"
-
-/**
- * @description RightIconRectInput is a component that displays an input field with an icon on the right side.
- * 
- * @param {Boolean} labelFront - If label to display in front of the input field
- * @param {String} placeholder - placeholder text for the input field
- * @param {String} value - value of the input field
- * @param {String} name - name of the input field
- * @param {String} inputLabel - label for the input field
- * @param {String} icon - icon to display on the right side of the input field. Should be a google material icon
- * @param {Number} height - height of the input field
- * @param {String} type - type of the input field (text, password, email, etc)
- * @param {Boolean} required - whether the input field is required
- * @param {Function} onChange - function to call when the input field value changes
- * @param {String} extraClass - extra classes to add to the input field
- * @returns 
- */
-function RightIconRectInput({ labelFront=false, placeholder = "", value = "", name = "", inputLabel = "", icon, height = 40, type = "text", required, onChange, extraClass }) {
+function RightIconRectInput({
+  labelFront = false,
+  placeholder = "",
+  value = "",
+  name = "",
+  inputLabel = "",
+  icon,
+  height = 40,
+  type = "text",
+  required,
+  onChange,
+  onChangeText,
+  extraClass,
+  multiline = false,
+}) {
   const [userValue, setValue] = useState(value);
 
   useEffect(() => {
-    setValue(value); // Update internal state when value prop changes
+    setValue(value);
   }, [value]);
 
+  const handleChange = (text) => {
+    setValue(text);
+
+    const eventLikeObject = {
+      target: {
+        name,
+        value: text,
+        required,
+      },
+    };
+
+    onChange?.(eventLikeObject);
+    onChangeText?.(text);
+  };
+
   return (
-    <div className={`right-iconned-input-contaner ${labelFront ? "label-front" : ""}`}>
-      {inputLabel &&
-        <label htmlFor={inputLabel} className={`right-iconned-input__label ${extraClass}__label`}>
-          {inputLabel}
-        </label>}
-      <div className={`right-iconned-input ${extraClass}__input`} style={{ height: height }}>
-        <input id={inputLabel} type={type} onChange={(e) => { setValue(e.target.value); onChange?.(e) }} placeholder={placeholder} value={userValue} name={name} required={required ? "required" : ""} />
-        {icon && <span className="">{icon}</span>}
-      </div>
-    </div>
+    <View style={[styles.container, labelFront && styles.labelFront]}>
+      {inputLabel ? <Text style={styles.label}>{inputLabel}</Text> : null}
+
+      <View style={[styles.inputBox, { height }]}>
+        <TextInput
+          style={[
+            styles.input,
+            icon && styles.inputWithIcon,
+            multiline && styles.multiline,
+          ]}
+          placeholder={placeholder}
+          value={userValue}
+          onChangeText={handleChange}
+          secureTextEntry={type === "password"}
+          keyboardType={type === "email" ? "email-address" : "default"}
+          multiline={multiline}
+          textAlignVertical={multiline ? "top" : "center"}
+          placeholderTextColor="#94A3B8"
+        />
+
+        {icon ? <Text style={styles.icon}>{icon}</Text> : null}
+      </View>
+    </View>
   );
 }
 
 export default RightIconRectInput;
+
+const styles = StyleSheet.create({
+  container: {
+    width: "100%",
+    marginBottom: 14,
+  },
+  labelFront: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#334155",
+    marginBottom: 6,
+  },
+  inputBox: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#CBD5E1",
+    justifyContent: "center",
+    position: "relative",
+  },
+  input: {
+    flex: 1,
+    paddingHorizontal: 12,
+    fontSize: 14,
+    color: "#0F172A",
+  },
+  inputWithIcon: {
+    paddingRight: 45,
+  },
+  multiline: {
+    paddingTop: 12,
+    paddingBottom: 12,
+  },
+  icon: {
+    position: "absolute",
+    right: 12,
+    fontSize: 22,
+    color: "#64748B",
+  },
+});
