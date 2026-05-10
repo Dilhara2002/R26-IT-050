@@ -1,44 +1,79 @@
-const fs = require('fs');
-const csv = require('csv-parser');
-const path = require('path');
+const { driver } = require("../../config/neo4j");
 
-/**
- * GraphRAG Reasoning Engine
- * This component combines ML model results with historical disaster 
- * and weather data (Knowledge Base) to generate explanations.
- */
+const normalize = (value) =>
+  value ? value.toString().toLowerCase().trim() : "";
+
 class GraphManager {
-    constructor() {
-        this.disasterData = [];
-        this.loadKnowledgeBase();
-    }
+  async getRouteRisks(routeName) {
+    const session = driver.session();
 
-    // Load the Knowledge Base (Disaster Data) from CSV file
-    loadKnowledgeBase() {
-        const filePath = path.join(__dirname, '../data/processed_disasters.csv');
-        fs.createReadStream(filePath)
-            .pipe(csv())
-            .on('data', (data) => this.disasterData.push(data))
-            .on('end', () => {
-                console.log('✅ GraphRAG Knowledge Base Loaded.');
-            });
-    }
-
-    // Generate reasoning based on ML score and selected route
-    getSafetyReasoning(route, mlScore) {
-        // Find historical disaster data related to the given route
-        const risks = this.disasterData.filter(d => d['Route Name'] === route);
-        
-        let reasoning = `The AI model predicted a safety score of ${mlScore}%. `;
-        
-        if (risks.length > 0) {
-            reasoning += `Based on historical data, this route has risks such as ${risks[0]['Primary Risk Factor']} with a ${risks[0]['Severity Level']} severity level. `;
-        } else {
-            reasoning += "No major historical disaster risks were found for this route.";
+    try {
+      const result = await session.run(
+        `
+        MATCH (r:Road)-[:HAS_RISK]->(d:DisasterRisk)
+        WHERE toLower(r.routeName) CONTAINS toLower($routeName)
+           OR toLower($routeName) CONTAINS toLower(r.routeName)
+           OR any(word IN split(toLower($routeName), " ")
+              WHERE size(word) > 3 AND toLower(r.routeName) CONTAINS word)
+        RETURN
+          r.routeName AS matchedRoute,
+          d.routeName AS disasterRoute,
+          d.riskType AS riskType,
+          d.severity AS severity,
+          d.primaryFactor AS primaryFactor,
+          d.recommendation AS recommendation
+        LIMIT 10
+        `,
+        {
+          routeName: routeName || "",
         }
+      );
 
-        return reasoning;
+      return result.records.map((record) => ({
+        matchedRoute: record.get("matchedRoute"),
+        disasterRoute: record.get("disasterRoute"),
+        riskType: record.get("riskType"),
+        severity: record.get("severity"),
+        primaryFactor: record.get("primaryFactor"),
+        recommendation: record.get("recommendation"),
+      }));
+    } catch (error) {
+      console.error("Neo4j Graph Query Error:", error.message);
+      return [];
+    } finally {
+      await session.close();
     }
+  }
+
+  async getSafetyReasoning(routeName, mlScore, isRaining = false) {
+    const risks = await this.getRouteRisks(routeName);
+
+    let explanation = `The ML model predicted a safety score of ${mlScore}%. `;
+
+    if (risks.length > 0) {
+      const highRisk =
+        risks.find((risk) => normalize(risk.severity) === "high") || risks[0];
+
+      explanation += `Neo4j GraphRAG found ${risks.length} related historical risk record(s) for this route. `;
+      explanation += `The most relevant risk is ${highRisk.riskType || "road hazard"} with ${highRisk.severity || "unknown"} severity. `;
+      explanation += `Main factor: ${highRisk.primaryFactor || "route condition"}. `;
+      explanation += `Recommendation: ${highRisk.recommendation || "Travel carefully and monitor road conditions."}`;
+    } else {
+      explanation += "Neo4j GraphRAG did not find a strong historical disaster relationship for this route. ";
+      explanation += "The recommendation is mainly based on ML prediction, road gradient, vehicle capability, and weather condition.";
+    }
+
+    if (isRaining) {
+      explanation += " Rain condition was detected, so the safety score was reduced.";
+    }
+
+    return {
+      source: "Neo4j Knowledge Graph",
+      explanation,
+      matchedRisks: risks,
+      riskCount: risks.length,
+    };
+  }
 }
 
 module.exports = new GraphManager();
