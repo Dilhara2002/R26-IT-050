@@ -76,7 +76,7 @@ def filter_locations(user_preferences, user_lat, user_lon, radius_km):
     return recommended_locations.head(15)
 
 
-# --- 2. TRUE GENETIC ALGORITHM LOGIC ---
+# --- 2. TRUE GENETIC ALGORITHM LOGIC (UPDATED WITH TIME ALLOCATION) ---
 def evaluate_route(route_indices, df, start_lat, start_lon):
     if not route_indices: return 0, 0
     
@@ -105,8 +105,8 @@ def run_genetic_algorithm(filtered_df, max_time_minutes, start_lat, start_lon):
     if filtered_df is None or filtered_df.empty: return [], "0h 0m", False
 
     all_indices = list(range(len(filtered_df)))
-    pop_size = 50
-    generations = 100
+    pop_size = 100
+    generations = 200
     
     population = []
     for _ in range(pop_size):
@@ -125,9 +125,11 @@ def run_genetic_algorithm(filtered_df, max_time_minutes, start_lat, start_lon):
             time, sim = evaluate_route(route, filtered_df, start_lat, start_lon)
             
             if time <= max_time_minutes:
-                fitness = sim * 100 
+                # NEW LOGIC: Reward similarity, but heavily REWARD shorter travel times / logical routing
+                # (10000 / time) ensures that shorter paths get a massive score boost
+                fitness = (sim * 100) + (100 / (time + 1))
             else:
-                fitness = 1 / (time + 1) 
+                fitness = 0.001 / (time + 1)
                 
             fitnesses.append(fitness)
             
@@ -176,12 +178,14 @@ def run_genetic_algorithm(filtered_df, max_time_minutes, start_lat, start_lon):
         best_overall_time, _ = evaluate_route(best_overall_route, filtered_df, start_lat, start_lon)
         penalty_hit = best_overall_time > max_time_minutes
         
-    optimal_places = [filtered_df.iloc[idx]['Name'] for idx in best_overall_route]
+    # --- HERE IS THE FIX FOR THE UI TIME DISPLAY ---
+    # Append the duration explicitly to the place name so the user knows exactly how long to spend
+    optimal_places = [f"{filtered_df.iloc[idx]['Name']} ({int(filtered_df.iloc[idx]['Duration_Minutes'])} mins)" for idx in best_overall_route]
     formatted_time = format_time_display(best_overall_time)
     
     return optimal_places, formatted_time, penalty_hit
 
-# --- 3. EXPLAINABLE AI (XAI) WITH DIRECT REST API ---
+# --- 3. EXPLAINABLE AI (XAI) WITH DIRECT REST API (UPDATED PROMPT) ---
 def generate_itinerary_summary(places, preferences, api_key):
     if not places or not api_key:
         return "An optimal route has been generated based on your parameters."
@@ -190,18 +194,24 @@ def generate_itinerary_summary(places, preferences, api_key):
     pref_str = ", ".join(preferences)
     
     prompt = f"""
-    Act as an Explainable AI (XAI) engine for a travel system. 
+    Act strictly as an Explainable AI (XAI) text-formatter for a Context-Aware Spatio-Temporal travel system. 
     User Preferences: {pref_str}.
-    Optimized Route: {places_str}.
+    Optimized Route with Allocated Times: {places_str}.
     
-    Task: Write a 3-sentence factual explanation for the user.
-    1. Explain that these places were selected because they had the highest Cosine Similarity scores for {pref_str}.
-    2. Mention that the Genetic Algorithm optimized the sequence to fit within the time limit while minimizing travel distance.
-    3. State that this specific route was chosen as the near-optimal solution compared to other candidates.
-    Keep the tone professional and objective.
+    Task: Generate a highly engaging, structured, and informative summary for the user.
+    
+    CRITICAL RULES: 
+    1. Do NOT use the em dash symbol anywhere in your response. Use standard hyphens, colons, or commas instead.
+    2. Maintain proper hyphenation for academic terms: "Context-Aware", "Spatio-Temporal", and "time-efficient".
+    3. Break the response into clear, distinct paragraphs.
+    4. Use relevant and engaging emojis (like 🌿, 🏛️, 🚗, ✨, ⏱️) naturally within the text.
+
+    Format your response in three parts:
+    1. Introductory Paragraph: Briefly explain that these places were selected because they achieved the highest Cosine Similarity scores for {pref_str}, and the Genetic Algorithm optimized the sequence to be time-efficient while minimizing travel distance.
+    2. Itinerary Breakdown: Create a numbered list for each place in the route. For each place, provide a short, captivating 1-sentence description with an appropriate emoji of what the user will experience there, and explicitly mention the allocated time (e.g., "Spend 60 minutes exploring...").
+    3. Concluding Sentence: Reassure the user that this specific Context-Aware route was chosen as the near-optimal solution meeting all Sub-Objectives.
     """
     
-    # Exact model name from your successful cURL command
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={api_key}"
     headers = {'Content-Type': 'application/json'}
     payload = {
@@ -218,8 +228,8 @@ def generate_itinerary_summary(places, preferences, api_key):
             return data['candidates'][0]['content']['parts'][0]['text'].strip()
         else:
             print(f"Gemini REST API Error: {response.text}")
-            return "This optimized itinerary perfectly blends your selected interests, taking you through a carefully curated sequence of locations."
+            return "This Context-Aware itinerary blends your selected interests, taking you through a carefully curated sequence of locations."
             
     except Exception as e:
         print(f"HTTP Request Error: {e}")
-        return "This optimized itinerary perfectly blends your selected interests, taking you through a carefully curated sequence of locations."
+        return "This Context-Aware itinerary blends your selected interests, taking you through a carefully curated sequence of locations."
