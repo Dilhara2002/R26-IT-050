@@ -6,7 +6,6 @@ const readline = require("readline");
 const { spawn } = require("child_process");
 
 const { getRouteDetails } = require("../services/routeService");
-const graphManager = require("../ai-engine/knowledge-graph/graphManager");
 const { getWeatherByCoordinates } = require("../services/weatherService");
 
 // ---------- Helpers ----------
@@ -14,7 +13,9 @@ const normalize = (str) =>
   str ? str.toString().toLowerCase().replace(/\s+/g, "").trim() : "";
 
 const toNumber = (value, fallback = 0) => {
-  const num = Number(String(value || "").replace("%", "").replace(/,/g, "").trim());
+  const num = Number(
+    String(value || "").replace("%", "").replace(/,/g, "").trim()
+  );
   return Number.isFinite(num) ? num : fallback;
 };
 
@@ -75,9 +76,11 @@ const loadCsvData = async (filePath) => {
       headers = values;
     } else {
       const row = {};
+
       headers.forEach((header, index) => {
         row[header] = values[index] || "";
       });
+
       rows.push(row);
     }
   }
@@ -125,14 +128,22 @@ const getRoadData = async (startLocation, endLocation) => {
   return matchedRoads[0];
 };
 
-// ---------- New Dataset Pricing ----------
+// ---------- Dataset Pricing ----------
 const calculateHirePrice = (vehicle, distanceKm) => {
   const baseHireCharge = toNumber(
-    getField(vehicle, ["BaseHireCharge", "Base Hire Charge", "Base_Hire_Charge"])
+    getField(vehicle, [
+      "BaseHireCharge",
+      "Base Hire Charge",
+      "Base_Hire_Charge",
+    ])
   );
 
   const rentalPricePerKM = toNumber(
-    getField(vehicle, ["RentalPricePerKM", "Rental Price Per KM", "Rental_Price_Per_KM"])
+    getField(vehicle, [
+      "RentalPricePerKM",
+      "Rental Price Per KM",
+      "Rental_Price_Per_KM",
+    ])
   );
 
   if (baseHireCharge <= 0 || rentalPricePerKM <= 0) {
@@ -142,7 +153,7 @@ const calculateHirePrice = (vehicle, distanceKm) => {
   return Math.round(baseHireCharge + distanceKm * rentalPricePerKM);
 };
 
-// ---------- Old Fallback Cost Calculation ----------
+// ---------- Fallback Cost Calculation ----------
 const calculateTrueCost = (distance, efficiency, fuelType) => {
   const fuelPrice = fuelType === "Diesel" ? 341 : 371;
   const driverFeePerKm = 60;
@@ -178,13 +189,21 @@ const getBatchMLSafetyScores = (vehicles, road, isRaining) => {
   return new Promise((resolve, reject) => {
     const batchInput = vehicles.map((vehicle) => ({
       cc: toNumber(
-        getField(vehicle, ["Engine Capacity (CC)", "Engine_CC", "Engine Capacity"])
+        getField(vehicle, [
+          "Engine Capacity (CC)",
+          "Engine_CC",
+          "Engine Capacity",
+        ])
       ),
       torque: toNumber(
         getField(vehicle, ["Max Torque (Nm)", "Torque_Nm", "Max Torque"])
       ),
       gradeability: toNumber(
-        getField(vehicle, ["Gradeability (%)", "Gradeability_Percent", "Gradeability"])
+        getField(vehicle, [
+          "Gradeability (%)",
+          "Gradeability_Percent",
+          "Gradeability",
+        ])
       ),
       gradient: toNumber(road["Max Gradient (%)"]),
       surface: getSurfaceValue(road["Road Surface Condition"]),
@@ -242,13 +261,8 @@ const getBatchMLSafetyScores = (vehicles, road, isRaining) => {
 // ---------- Main API ----------
 router.post("/recommend-vehicle", async (req, res) => {
   try {
-    const {
-      budget,
-      passengers,
-      startLocation,
-      endLocation,
-      preferredVehicle,
-    } = req.body;
+    const { budget, passengers, startLocation, endLocation, preferredVehicle } =
+      req.body;
 
     if (!budget || !passengers || !startLocation || !endLocation) {
       return res.status(400).json({
@@ -260,6 +274,20 @@ router.post("/recommend-vehicle", async (req, res) => {
 
     const userBudget = Number(budget);
     const passengerCount = Number(passengers);
+
+    if (!Number.isFinite(userBudget) || userBudget <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Budget must be a valid positive number.",
+      });
+    }
+
+    if (!Number.isFinite(passengerCount) || passengerCount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Passengers must be a valid positive number.",
+      });
+    }
 
     const routeDetails = await getRouteDetails(startLocation, endLocation);
     const distanceKm = Number(routeDetails.distanceKm);
@@ -287,7 +315,11 @@ router.post("/recommend-vehicle", async (req, res) => {
       });
     }
 
-    const vehiclePath = path.join(__dirname, "../ai-engine/data/processed_vehicles.csv");
+    const vehiclePath = path.join(
+      __dirname,
+      "../ai-engine/data/processed_vehicles.csv"
+    );
+
     const vehicles = await loadCsvData(vehiclePath);
 
     const mlScores = await getBatchMLSafetyScores(vehicles, roadInfo, isRaining);
@@ -298,11 +330,19 @@ router.post("/recommend-vehicle", async (req, res) => {
       const safetyScore = mlScores[i];
 
       const baseHireCharge = toNumber(
-        getField(vehicle, ["BaseHireCharge", "Base Hire Charge", "Base_Hire_Charge"])
+        getField(vehicle, [
+          "BaseHireCharge",
+          "Base Hire Charge",
+          "Base_Hire_Charge",
+        ])
       );
 
       const rentalPricePerKM = toNumber(
-        getField(vehicle, ["RentalPricePerKM", "Rental Price Per KM", "Rental_Price_Per_KM"])
+        getField(vehicle, [
+          "RentalPricePerKM",
+          "Rental Price Per KM",
+          "Rental_Price_Per_KM",
+        ])
       );
 
       const estimatedHirePrice = calculateHirePrice(vehicle, distanceKm);
@@ -329,11 +369,14 @@ router.post("/recommend-vehicle", async (req, res) => {
     const recommended = analyzedVehicles
       .filter((vehicle) => {
         const vehiclePrice = Number(vehicle.estimatedHirePrice);
-
         const matchesBudget = vehiclePrice <= userBudget;
 
         const seatingCapacity = toNumber(
-          getField(vehicle, ["Seating Capacity", "MaxPassengers", "Max Passengers"])
+          getField(vehicle, [
+            "Seating Capacity",
+            "MaxPassengers",
+            "Max Passengers",
+          ])
         );
 
         const matchesPassengers = seatingCapacity >= passengerCount;
@@ -345,7 +388,9 @@ router.post("/recommend-vehicle", async (req, res) => {
         ]);
 
         const matchesPreferredVehicle = preferredVehicle
-          ? vehicleCategory.toLowerCase().includes(preferredVehicle.toLowerCase())
+          ? vehicleCategory
+              .toLowerCase()
+              .includes(preferredVehicle.toLowerCase())
           : true;
 
         return matchesBudget && matchesPassengers && matchesPreferredVehicle;
@@ -359,14 +404,6 @@ router.post("/recommend-vehicle", async (req, res) => {
       });
 
     const bestVehicle = recommended[0] || null;
-
-    const graphReasoning = bestVehicle
-      ? await graphManager.getSafetyReasoning(
-          roadInfo["Route/Segment Name"],
-          bestVehicle.safetyScore,
-          isRaining
-        )
-      : null;
 
     const safetyUpsell =
       analyzedVehicles
@@ -386,11 +423,12 @@ router.post("/recommend-vehicle", async (req, res) => {
 
     return res.json({
       success: true,
+      branch: "safety-analyzer-testing",
       message:
         recommended.length === 0
           ? "No vehicle found within your budget. Please increase the budget or remove preferredVehicle."
-          : "Vehicle recommendation generated successfully using Real ML Inference + GraphRAG reasoning + dataset pricing.",
-      systemType: "Real ML Inference + GraphRAG Reasoning + Pricing Filter",
+          : "Vehicle recommendation generated successfully using Real ML Inference + dataset pricing.",
+      systemType: "Real ML Inference + Pricing Filter",
       trip: {
         from: startLocation,
         to: endLocation,
@@ -412,7 +450,6 @@ router.post("/recommend-vehicle", async (req, res) => {
         predictionSource: "Python Random Forest ML Model",
         pricingSource: "Vehicle dataset BaseHireCharge + RentalPricePerKM",
       },
-      graphRAG: graphReasoning,
       bestSafetyMatch: bestVehicle,
       alternativeOptions: recommended.slice(1, 3),
       safetyUpsell,
@@ -424,7 +461,8 @@ router.post("/recommend-vehicle", async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Internal server error.",
+      branch: "safety-analyzer-testing",
+      message: "Internal server error in ML testing branch.",
       error: error.message,
     });
   }

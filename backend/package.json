@@ -1,13 +1,18 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "App.js",
+  "description": "ML-based safety analyzer testing branch without GraphRAG",
+  "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
     "dev": "node --watch src/app.js"
   },
-  "keywords": [],
+  "keywords": [
+    "ml",
+    "safety-analyzer",
+    "vehicle-recommendation",
+    "tourism"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
@@ -16,9 +21,6 @@
     "cors": "^2.8.6",
     "csv-parser": "^3.2.0",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "mongoose": "^9.6.1",
-    "neo4j-driver": "^6.0.1",
-    "ollama": "^0.6.3"
+    "express": "^5.2.1"
   }
 }
