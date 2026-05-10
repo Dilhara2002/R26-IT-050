@@ -8,20 +8,29 @@ const splitCsvLine = (line) => {
   let current = "";
   let insideQuotes = false;
 
-  for (let char of line) {
-    if (char === '"') insideQuotes = !insideQuotes;
-    else if (char === "," && !insideQuotes) {
+  for (const char of line) {
+    if (char === '"') {
+      insideQuotes = !insideQuotes;
+    } else if (char === "," && !insideQuotes) {
       result.push(current.trim());
       current = "";
-    } else current += char;
+    } else {
+      current += char;
+    }
   }
 
   result.push(current.trim());
+
   return result.map((item) => item.replace(/^"|"$/g, "").trim());
 };
 
 const loadCsvData = async (filePath) => {
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`CSV file not found: ${filePath}`);
+  }
+
   const rows = [];
+
   const rl = readline.createInterface({
     input: fs.createReadStream(filePath),
     crlfDelay: Infinity,
@@ -31,14 +40,18 @@ const loadCsvData = async (filePath) => {
 
   for await (const line of rl) {
     if (!line.trim()) continue;
+
     const values = splitCsvLine(line);
 
-    if (headers.length === 0) headers = values;
-    else {
+    if (headers.length === 0) {
+      headers = values;
+    } else {
       const row = {};
+
       headers.forEach((header, index) => {
         row[header] = values[index] || "";
       });
+
       rows.push(row);
     }
   }
@@ -50,33 +63,37 @@ const importKnowledgeGraph = async () => {
   const session = driver.session();
 
   try {
-    console.log("🚀 Starting Neo4j Graph Import...");
+    console.log("🚀 Starting Neo4j GraphRAG Knowledge Import...");
 
-    const roadPath = path.join(__dirname, "../ai-engine/data/processed_roads.csv");
-    const disasterPath = path.join(__dirname, "../ai-engine/data/processed_disasters.csv");
-    const vehiclePath = path.join(__dirname, "../ai-engine/data/processed_vehicles.csv");
+    const roadPath = path.join(
+      __dirname,
+      "../ai-engine/data/processed_roads.csv"
+    );
+
+    const disasterPath = path.join(
+      __dirname,
+      "../ai-engine/data/processed_disasters.csv"
+    );
 
     const roads = await loadCsvData(roadPath);
     const disasters = await loadCsvData(disasterPath);
-    const vehicles = await loadCsvData(vehiclePath);
 
     console.log(`✅ Roads Loaded: ${roads.length}`);
     console.log(`✅ Disasters Loaded: ${disasters.length}`);
-    console.log(`✅ Vehicles Loaded: ${vehicles.length}`);
 
-    console.log("🧹 Clearing old graph...");
+    console.log("🧹 Clearing old Neo4j graph...");
     await session.run("MATCH (n) DETACH DELETE n");
 
     console.log("🛣 Creating Road Nodes...");
+
     for (const road of roads) {
       await session.run(
         `
-        CREATE (:Road {
-          routeName: $routeName,
-          gradient: $gradient,
-          terrain: $terrain,
-          surface: $surface
-        })
+        MERGE (r:Road { routeName: $routeName })
+        SET
+          r.gradient = $gradient,
+          r.terrain = $terrain,
+          r.surface = $surface
         `,
         {
           routeName: road["Route/Segment Name"] || "Unknown Route",
@@ -88,52 +105,33 @@ const importKnowledgeGraph = async () => {
     }
 
     console.log("⚠️ Creating Disaster Risk Nodes...");
+
     for (const disaster of disasters) {
       await session.run(
         `
-        CREATE (:DisasterRisk {
+        MERGE (d:DisasterRisk {
           routeName: $routeName,
-          riskType: $riskType,
-          severity: $severity,
-          primaryFactor: $primaryFactor,
-          recommendation: $recommendation
+          riskType: $riskType
         })
+        SET
+          d.severity = $severity,
+          d.primaryFactor = $primaryFactor,
+          d.recommendation = $recommendation
         `,
         {
           routeName: disaster["Route Name"] || "Unknown Route",
           riskType: disaster["Disaster/Risk Type"] || "Unknown Risk",
           severity: disaster["Severity Level"] || "Unknown",
-          primaryFactor: disaster["Primary Risk Factor"] || "Unknown",
-          recommendation: disaster["Safety Recommendation"] || "Travel carefully",
+          primaryFactor:
+            disaster["Primary Risk Factor"] || "Unknown Risk Factor",
+          recommendation:
+            disaster["Safety Recommendation"] || "Travel carefully",
         }
       );
     }
 
-    console.log("🚗 Creating Vehicle Nodes...");
-    for (const vehicle of vehicles) {
-      await session.run(
-        `
-        CREATE (:Vehicle {
-          model: $model,
-          category: $category,
-          fuelType: $fuelType,
-          seating: $seating,
-          gradeability: $gradeability,
-          torque: $torque
-        })
-        `,
-        {
-          model: vehicle["Vehicle Name (Make & Model)"] || "Unknown Vehicle",
-          category: vehicle["Vehicle Category"] || "Unknown",
-          fuelType: vehicle["Fuel Type"] || "Unknown",
-          seating: Number(vehicle["Seating Capacity"] || 0),
-          gradeability: Number(vehicle["Gradeability (%)"] || 0),
-          torque: Number(vehicle["Max Torque (Nm)"] || 0),
-        }
-      );
-    }
+    console.log("🔗 Creating Road → DisasterRisk relationships...");
 
-    console.log("🔗 Creating Road → Risk relationships...");
     await session.run(`
       MATCH (r:Road), (d:DisasterRisk)
       WHERE toLower(r.routeName) CONTAINS toLower(d.routeName)
@@ -141,7 +139,7 @@ const importKnowledgeGraph = async () => {
       MERGE (r)-[:HAS_RISK]->(d)
     `);
 
-    console.log("✅ Neo4j Knowledge Graph Imported Successfully!");
+    console.log("✅ Neo4j GraphRAG Knowledge Graph Imported Successfully!");
   } catch (error) {
     console.error("❌ Neo4j Import Error:", error.message);
   } finally {
