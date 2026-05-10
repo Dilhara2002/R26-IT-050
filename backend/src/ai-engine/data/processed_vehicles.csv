@@ -1,0 +1,201 @@
+Vehicle Name (Make & Model),Engine Capacity (CC),Max Torque (Nm),Fuel Efficiency (km/L),Fuel Type,Seating Capacity,Gradeability (%),Vehicle Category,BaseHireCharge,RentalPricePerKM,Fuel_Type_Enc
+Suzuki Alto (800),796.0,60,22,Petrol,4,18,Economy,350,105,3
+Suzuki Alto (K10),998.0,89,24.9,Petrol,5,20,Economy,380,100,3
+Suzuki Wagon R (Hybrid),658.0,50,26,Hybrid,4,15,Economy,450,110,2
+Suzuki Wagon R (Indian),1197.0,113,23.5,Petrol,5,22,Economy,420,115,3
+Toyota Wigo (Gen 2),998.0,89,21,Petrol,5,19,Economy,400,120,3
+Perodua Axia,998.0,91,23.2,Petrol,5,20,Economy,400,115,3
+Maruti Suzuki Swift (2024),1197.0,112,24.8,Petrol,5,22,Economy,500,125,3
+Tata Tiago,1199.0,113,20,Petrol,5,20,Economy,450,125,3
+Hyundai Grand i10 Nios,1197.0,114,20.7,Petrol,5,20,Economy,480,125,3
+Renault Kwid,999.0,91,22,Petrol,5,18,Economy,380,115,3
+Suzuki Celerio (AGS),998.0,89,26.6,Petrol,5,20,Economy,420,110,3
+Toyota Vitz (Safety Edition),996.0,92,21,Petrol,5,18,Economy,550,130,3
+Toyota Passo (Hana),996.0,92,21,Petrol,5,18,Economy,550,130,3
+Nissan Dayz (Kei),658.0,60,23,Petrol,4,15,Economy,450,120,3
+Honda N-Box,658.0,65,22,Petrol,4,15,Economy,450,125,3
+Suzuki Hustler,658.0,63,24,Petrol,4,18,Economy,480,120,3
+Daihatsu Tanto,658.0,64,22,Petrol,4,15,Economy,450,125,3
+Mitsubishi eK Wagon,658.0,60,23,Petrol,4,15,Economy,450,120,3
+Suzuki Spacia (Custom),658.0,50,25,Hybrid,4,15,Economy,500,120,2
+Maruti Suzuki Ignis,1197.0,113,20.9,Petrol,5,20,Economy,500,130,3
+Tata Tiago NRG,1199.0,113,20.2,Petrol,5,21,Economy,500,130,3
+Hyundai i20 (IVT),1197.0,115,20,Petrol,5,22,Economy,550,135,3
+Honda Fit (Hybrid GP5),1496.0,160,26,Hybrid,5,22,Economy,650,140,2
+Nissan Note (e-Power),1198.0,254,28,Hybrid,5,24,Economy,700,135,2
+Toyota Aqua (Hybrid),1490.0,120,30,Hybrid,5,20,Economy,650,135,2
+Suzuki Baleno (2024),1197.0,113,22.3,Petrol,5,21,Economy,550,130,3
+Toyota Glanza,1197.0,113,22.3,Petrol,5,21,Economy,550,130,3
+Maruti Suzuki S-Presso,998.0,89,24.8,Petrol,5,20,Economy,400,115,3
+Mahindra KUV100 NXT,1198.0,190,18,Diesel,6,22,Economy,600,140,0
+Perodua Viva Elite,989.0,90,18,Petrol,5,19,Economy,350,115,3
+Datsun Redi-GO,999.0,91,22,Petrol,5,18,Economy,350,115,3
+Hyundai Santro (2024),1086.0,99,20,Petrol,5,19,Economy,400,125,3
+Suzuki A-Star,998.0,90,19,Petrol,5,18,Economy,380,120,3
+Suzuki Estilo,1061.0,90,18,Petrol,5,18,Economy,380,125,3
+Daihatsu Mira e:S,658.0,57,30,Petrol,4,14,Economy,350,105,3
+Toyota Pixis,658.0,57,30,Petrol,4,14,Economy,350,105,3
+Honda Life,658.0,60,22,Petrol,4,15,Economy,400,120,3
+Mitsubishi Mirage,1193.0,100,20,Petrol,5,18,Economy,450,130,3
+Nissan Micra (Active),1198.0,104,19,Petrol,5,19,Economy,450,130,3
+Ford Figo (Diesel),1498.0,215,24,Diesel,5,23,Economy,600,145,0
+Volkswagen Polo (TSI),999.0,175,18,Petrol,5,24,Economy,700,150,3
+Toyota Aygo X,998.0,93,21,Petrol,4,19,Economy,550,135,3
+Kia Picanto,1248.0,122,19.5,Petrol,5,20,Economy,500,135,3
+Hyundai Getz Prime,1341.0,115,15,Petrol,5,19,Economy,450,150,3
+Tata Indica eV2,1405.0,140,25,Diesel,5,21,Economy,400,130,0
+Chevrolet Beat,1199.0,108,18,Petrol,5,19,Economy,450,135,3
+Fiat 500,1242.0,102,18,Petrol,4,18,Economy,800,160,3
+Smart Fortwo,999.0,91,22,Petrol,2,18,Economy,1000,160,3
+Suzuki Ritz,1248.0,190,23,Diesel,5,22,Economy,550,140,0
+Micro Panda,1000.0,90,16,Petrol,5,18,Economy,350,125,3
+Honda City (RS Turbo),988.0,173,23,Petrol,5,22,Sedan,1200,155,3
+Honda City (i-VTEC),1497.0,145,16.8,Petrol,5,22,Sedan,1100,165,3
+Toyota Axio (Hybrid),1496.0,111,27,Hybrid,5,20,Sedan,1300,150,2
+Toyota Axio (Petrol),1496.0,136,15,Petrol,5,19,Sedan,1100,170,3
+Toyota Premio (G),1496.0,136,15,Petrol,5,19,Sedan,1500,195,3
+Toyota Allion (260),1496.0,136,15,Petrol,5,19,Sedan,1500,195,3
+Maruti Suzuki Dzire,1197.0,113,24.5,Petrol,5,22,Sedan,1000,145,3
+Honda Amaze (2024),1199.0,110,18.6,Petrol,5,20,Sedan,1000,155,3
+Hyundai Aura,1197.0,114,20,Petrol,5,20,Sedan,1000,155,3
+Hyundai Verna (Turbo),1482.0,253,18.5,Petrol,5,25,Sedan,1800,185,3
+Skoda Slavia (1.5 TSI),1498.0,250,18,Petrol,5,25,Sedan,2000,190,3
+Volkswagen Virtus,1498.0,250,18.1,Petrol,5,25,Sedan,2000,190,3
+Honda Civic (RS 2025),1498.0,240,15,Petrol,5,24,Sedan,2500,210,3
+Toyota Corolla Altis,1798.0,173,14.5,Petrol,5,22,Sedan,1800,200,3
+Nissan Sunny (N17),1498.0,134,16,Petrol,5,20,Sedan,1200,175,3
+Mitsubishi Attrage,1193.0,100,20,Petrol,5,18,Sedan,1100,160,3
+Perodua Bezza,1329.0,121,21,Petrol,5,20,Sedan,1100,155,3
+Honda Grace (Hybrid),1496.0,160,26,Hybrid,5,22,Sedan,1500,155,2
+Toyota Prius (ZVW50),1797.0,142,28,Hybrid,5,20,Sedan,1800,160,2
+Honda Insight,1339.0,121,24,Hybrid,5,18,Sedan,1500,160,2
+Toyota Camry (Hybrid),2487.0,221,25.4,Hybrid,5,24,Luxury,5000,245,2
+Honda Accord (2024),1993.0,335,18,Hybrid,5,25,Luxury,5500,280,2
+Mercedes-Benz C-Class,1999.0,440,23,Diesel,5,26,Luxury,12000,345,0
+BMW 3 Series (330i),1998.0,400,13,Petrol,5,28,Luxury,12000,380,3
+Audi A4 (35 TFSI),1984.0,320,17,Petrol,5,24,Luxury,12000,360,3
+Toyota Belta,1496.0,138,15,Petrol,5,19,Sedan,1100,175,3
+Nissan Almera,999.0,152,18,Petrol,5,21,Sedan,1100,165,3
+Mazda 3,1998.0,200,14,Petrol,5,22,Sedan,1800,200,3
+Hyundai Elantra,1999.0,192,14.5,Petrol,5,22,Sedan,1800,210,3
+Kia Forte,1591.0,154,15,Petrol,5,21,Sedan,1500,200,3
+Volkswagen Vento,999.0,175,17.5,Petrol,5,23,Sedan,1200,180,3
+Skoda Rapid,999.0,175,18,Petrol,5,23,Sedan,1200,175,3
+Ford Fiesta,1498.0,205,20,Diesel,5,22,Sedan,1100,175,0
+Fiat Linea,1248.0,209,20,Diesel,5,21,Sedan,1100,170,0
+Chevrolet Cruze,1998.0,360,14,Diesel,5,26,Sedan,1800,215,0
+Toyota Etios,1496.0,132,16.7,Petrol,5,19,Sedan,1000,165,3
+Nissan Sylphy,1798.0,174,15,Petrol,5,20,Sedan,1500,195,3
+Honda City (e:HEV),1498.0,253,26.5,Hybrid,5,24,Sedan,1600,165,2
+Mitsubishi Lancer EX,1998.0,197,11,Petrol,5,21,Sedan,1500,210,3
+Toyota Mark X,2499.0,243,10,Petrol,5,25,Luxury,8000,320,3
+Lexus ES 300h,2487.0,221,22.5,Hybrid,5,22,Luxury,15000,450,2
+Volvo S60,1969.0,300,14,Petrol,5,26,Luxury,15000,480,3
+Mercedes-Benz E-Class,1950.0,400,16,Diesel,5,25,Luxury,25000,550,0
+BMW 5 Series,1995.0,400,17.5,Diesel,5,25,Luxury,25000,550,0
+Audi A6,1984.0,370,14,Petrol,5,24,Luxury,25000,580,3
+Jaguar XF,1997.0,365,13,Petrol,5,25,Luxury,25000,600,3
+Rolls-Royce Ghost,6750.0,850,6.3,Petrol,5,30,Luxury,150000,2500,3
+Bentley Flying Spur,5950.0,900,6,Petrol,5,32,Luxury,150000,2600,3
+Maybach S-Class,5980.0,900,7.5,Petrol,4,28,Luxury,150000,2400,3
+Toyota Century,4968.0,510,13,Hybrid,5,25,Luxury,180000,2800,2
+Honda Vezel (e:HEV),1497.0,253,24,Hybrid,5,32,SUV,2500,180,2
+Toyota Corolla Cross,1798.0,163,23,Hybrid,5,30,SUV,2800,185,2
+Hyundai Creta,1493.0,250,18,Diesel,5,30,SUV,2500,220,0
+Kia Seltos,1493.0,250,19,Diesel,5,30,SUV,2500,215,0
+Tata Nexon,1497.0,260,23.2,Diesel,5,28,SUV,1800,180,0
+Tata Punch,1199.0,113,20,Petrol,5,25,SUV,1500,165,3
+Mahindra Scorpio-N,2184.0,400,14,Diesel,7,40,SUV,4500,285,0
+Mahindra Thar (Roxx),2184.0,370,12,Diesel,5,45,SUV,5000,310,0
+Toyota Fortuner (_4),2755.0,500,11,Diesel,7,45,SUV,8500,380,0
+Mitsubishi Montero (V98),3200.0,441,11.5,Diesel,7,45,SUV,8500,395,0
+Toyota Hilux Revo,2755.0,500,12,Diesel,5,45,SUV,7000,320,0
+Range Rover Defender,2997.0,650,10,Diesel,7,45,Luxury,45000,850,0
+Tata Safari (New Gen),1956.0,350,15,Diesel,7,35,SUV,4000,265,0
+Mahindra XUV700,2184.0,450,13,Diesel,7,38,SUV,4000,270,0
+Suzuki Jimny (5-Door),1462.0,134,16.9,Petrol,5,42,SUV,3500,210,3
+Toyota Raize (Turbo),998.0,140,18,Petrol,5,22,SUV,2200,185,3
+Nissan Magnite,999.0,160,18,Petrol,5,22,SUV,1800,175,3
+Renault Kiger,999.0,160,18,Petrol,5,22,SUV,1800,175,3
+Maruti Suzuki Fronx,998.0,148,21.5,Petrol,5,25,SUV,2000,175,3
+Maruti Suzuki Brezza,1462.0,137,19.8,Petrol,5,25,SUV,2200,195,3
+Toyota Rush,1496.0,136,14,Petrol,7,24,SUV,3000,225,3
+Honda BR-V,1498.0,145,15.5,Petrol,7,24,SUV,3000,215,3
+Daihatsu Rocky,996.0,140,18.5,Petrol,5,22,SUV,2200,185,3
+Hyundai Venue,998.0,172,18,Petrol,5,24,SUV,2000,185,3
+Kia Sonet,1493.0,250,19,Diesel,5,28,SUV,2200,195,0
+Volkswagen Taigun,999.0,178,18,Petrol,5,26,SUV,2500,210,3
+Skoda Kushaq,999.0,178,18,Petrol,5,26,SUV,2500,210,3
+MG Astor,1349.0,220,14,Petrol,5,26,SUV,2500,230,3
+Jeep Compass,1956.0,350,17,Diesel,5,32,SUV,5000,285,0
+Mahindra Thar (3-Door),2184.0,300,12,Diesel,4,45,SUV,4500,310,0
+Force Gurkha,2596.0,250,12,Diesel,4,45,SUV,4500,320,0
+Isuzu D-Max V-Cross,1898.0,350,12,Diesel,5,45,SUV,6000,295,0
+Mitsubishi Triton,2442.0,430,12,Diesel,5,45,SUV,6000,310,0
+Ford Raptor (V6),2956.0,583,8.5,Petrol,5,45,SUV,25000,750,3
+Toyota Land Cruiser 300,3346.0,700,8,Diesel,7,45,Luxury,65000,950,0
+Lexus LX 570,5663.0,530,6,Petrol,7,40,Luxury,75000,1200,3
+Range Rover Sport,2997.0,700,10.5,Diesel,5,45,Luxury,55000,880,0
+BMW X5,2998.0,700,12,Diesel,5,35,Luxury,45000,780,0
+Audi Q7,2995.0,500,11.2,Petrol,7,32,Luxury,45000,820,3
+Mercedes-Benz GLE,2925.0,700,13,Diesel,5,35,Luxury,45000,780,0
+Volvo XC90,1969.0,480,15,Hybrid,7,32,Luxury,45000,720,2
+Porsche Cayenne,2894.0,550,10.8,Petrol,5,40,Luxury,85000,1100,3
+Lamborghini Urus,3996.0,850,7.8,Petrol,5,45,Luxury,250000,3500,3
+Bentley Bentayga,3996.0,770,7.5,Petrol,5,40,Luxury,220000,3200,3
+Rolls-Royce Cullinan,6750.0,850,6.5,Petrol,5,35,Luxury,350000,4500,3
+Nissan Patrol (2025),3496.0,700,7.5,Petrol,7,45,SUV,25000,680,3
+Toyota Vanguard,2362.0,224,12,Petrol,7,28,SUV,4500,295,3
+Nissan X-Trail,1997.0,200,13.5,Petrol,7,28,SUV,4000,280,3
+Mitsubishi Outlander,2360.0,222,12,Petrol,7,28,SUV,4000,290,3
+Mazda CX-5,1998.0,210,14,Petrol,5,26,SUV,4500,285,3
+Toyota KDH (Hiace 2.8),2755.0,450,11,Diesel,15,25,Van,4500,245,0
+Toyota KDH (Hiace 3.0),2982.0,300,10,Diesel,15,25,Van,4500,250,0
+Nissan Caravan (NV350),2488.0,213,11,Petrol,6,22,Van,4000,240,3
+Toyota Coaster (Bus),4009.0,390,8,Diesel,20,25,Van,12000,380,0
+Mitsubishi Delica D:5,2267.0,380,12,Diesel,8,35,Van,5500,280,0
+Toyota Alphard,2487.0,239,16,Hybrid,7,22,Luxury,15000,345,2
+Toyota Vellfire,2487.0,240,16,Hybrid,7,22,Luxury,15000,345,2
+Toyota Noah (Hybrid),1797.0,142,23,Hybrid,8,20,Van,3500,210,2
+Toyota Voxy (Hybrid),1797.0,142,23,Hybrid,7,20,Van,3500,210,2
+Toyota Esquire,1797.0,142,23,Hybrid,7,20,Van,3500,210,2
+Honda Step Wagon,1496.0,203,14,Petrol,7,22,Van,3800,225,3
+Suzuki Every (Van),658.0,48,18,Petrol,4,12,Van,1500,160,3
+Nissan Serena (e-Power),1198.0,315,18,Hybrid,7,22,Van,3800,200,2
+Mitsubishi Xpander,1499.0,141,14.5,Petrol,7,22,MUV,3200,220,3
+Maruti Suzuki Ertiga,1462.0,137,20.3,Petrol,7,24,MUV,3000,195,3
+Maruti Suzuki XL6,1462.0,137,20.3,Petrol,6,24,MUV,3200,195,3
+Toyota Innova Crysta,2393.0,343,13,Diesel,7,28,MUV,4500,265,0
+Toyota Innova Hycross,1987.0,209,23.2,Hybrid,7,28,MUV,4800,225,2
+Kia Carens,1493.0,250,21,Diesel,7,26,MUV,3200,205,0
+Mahindra Marazzo,1497.0,300,17,Diesel,7,26,MUV,3200,215,0
+Renault Triber,999.0,96,18.2,Petrol,7,20,MUV,2200,180,3
+Force Traveller,2596.0,350,11,Diesel,15,25,Van,8000,320,0
+Tata Winger,2179.0,200,12,Diesel,12,25,Van,7000,295,0
+Mahindra Supro,909.0,55,21,Diesel,2,22,Van,2500,185,0
+Tata Ace (Gold),702.0,45,21,Diesel,2,22,Van,2200,180,0
+Ashok Leyland Dost,1478.0,190,17.5,Diesel,2,28,Van,3000,210,0
+Toyota LiteAce,1495.0,134,12.5,Petrol,2,20,Van,2800,215,3
+Suzuki Carry,1462.0,135,14,Petrol,2,25,Van,2500,210,3
+MG Windsor EV,,200,331km Range,Electric,5,25,MUV,4500,180,1
+BYD M6,,310,500km Range,Electric,7,28,MUV,5000,195,1
+Kia Carnival (2025),2151.0,440,14,Diesel,7,30,Luxury,18000,450,0
+Toyota Sienna,2487.0,239,15,Hybrid,8,22,Van,6000,285,2
+Chrysler Pacifica,3604.0,355,9,Petrol,7,24,Luxury,15000,480,3
+Mercedes-Benz V-Class,1950.0,440,13,Diesel,7,26,Luxury,25000,550,0
+Hyundai Staria,2199.0,430,11.5,Diesel,9,28,Van,7500,320,0
+Nissan NV200,1997.0,188,10.5,Petrol,2,20,Van,3000,225,3
+Honda Odyssey (Hybrid),1993.0,315,18,Hybrid,7,22,Luxury,12000,320,2
+TVS King (Tuk Tuk),199.0,15,30,Petrol,3,18,Economy,150,95,3
+Bajaj RE (Tuk Tuk),236.0,19,32,Petrol,3,18,Economy,150,90,3
+Piaggio Ape,197.0,15,30,Petrol,3,16,Economy,150,95,3
+Mahindra Treo,,42,130km Range,Electric,3,15,Economy,250,85,1
+Toyota Hilux (Champ),2393.0,400,14,Diesel,2,35,Van,4500,255,0
+BYD Atto 3,,310,480km Range,Electric,5,28,SUV,4000,190,1
+MG ZS EV,,280,461km Range,Electric,5,26,SUV,3800,195,1
+Hyundai Ioniq 5,,350,631km Range,Electric,5,30,Luxury,18000,345,1
+Kia EV6,,605,528km Range,Electric,5,32,Luxury,18000,355,1
+Tesla Model Y,,450,514km Range,Electric,5,30,Luxury,20000,380,1
+Tata Curvv EV,,215,502km Range,Electric,5,30,SUV,3500,190,1
+Mahindra XUV400,,310,456km Range,Electric,5,28,SUV,3200,195,1
+Nissan Ariya,,300,500km Range,Electric,5,28,SUV,4500,210,1

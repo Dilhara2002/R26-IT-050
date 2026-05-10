@@ -52,9 +52,9 @@ const importKnowledgeGraph = async () => {
   try {
     console.log("🚀 Starting Neo4j Graph Import...");
 
-    const roadPath = path.join(__dirname, "../ai-engine/data/Road Dataset.csv");
-    const disasterPath = path.join(__dirname, "../ai-engine/data/Disaster Dataset.csv");
-    const vehiclePath = path.join(__dirname, "../ai-engine/data/vehicles.csv");
+    const roadPath = path.join(__dirname, "../ai-engine/data/processed_roads.csv");
+    const disasterPath = path.join(__dirname, "../ai-engine/data/processed_disasters.csv");
+    const vehiclePath = path.join(__dirname, "../ai-engine/data/processed_vehicles.csv");
 
     const roads = await loadCsvData(roadPath);
     const disasters = await loadCsvData(disasterPath);

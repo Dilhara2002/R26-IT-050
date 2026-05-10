@@ -4,7 +4,40 @@ import { colors } from "../styles/colors";
 import VehicleCard from "../components/VehicleCard";
 import RiskCard from "../components/RiskCard";
 
-export default function ResultScreen({ result, onBack, onNewSearch }) {
+export default function ResultScreen({
+  result,
+  errorMessage,
+  onBack,
+  onNewSearch,
+}) {
+  if (!result) {
+    return (
+      <View style={styles.emptyContainer}>
+        <TouchableOpacity onPress={onBack}>
+          <Text style={styles.backText}>← Back</Text>
+        </TouchableOpacity>
+
+        <View style={styles.errorCard}>
+          <Text style={styles.errorTitle}>No Recommendation Found</Text>
+
+          <Text style={styles.errorText}>
+            {errorMessage ||
+              "The system could not generate a vehicle recommendation for this trip."}
+          </Text>
+
+          <Text style={styles.errorReason}>
+            Possible reasons: invalid route, no matching road segment, no suitable
+            vehicle for the selected budget/passengers, or backend prediction error.
+          </Text>
+
+          <TouchableOpacity style={styles.button} onPress={onBack}>
+            <Text style={styles.buttonText}>Back to Form</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <TouchableOpacity onPress={onBack}>
@@ -68,6 +101,11 @@ const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
   },
+  emptyContainer: {
+    backgroundColor: colors.background,
+    padding: 20,
+    flex: 1,
+  },
   backText: {
     color: colors.primary,
     fontSize: 16,
@@ -125,6 +163,32 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     color: colors.warning,
+  },
+  errorCard: {
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 18,
+    padding: 20,
+    marginTop: 20,
+  },
+  errorTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: colors.primaryDark,
+    marginBottom: 12,
+  },
+  errorText: {
+    fontSize: 16,
+    color: colors.text,
+    lineHeight: 24,
+    marginBottom: 12,
+  },
+  errorReason: {
+    fontSize: 14,
+    color: colors.muted,
+    lineHeight: 22,
+    marginBottom: 20,
   },
   button: {
     backgroundColor: colors.primary,

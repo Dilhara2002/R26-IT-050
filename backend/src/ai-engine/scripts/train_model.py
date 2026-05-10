@@ -7,8 +7,8 @@ import os
 import math
 
 # Paths to your datasets
-VEHICLE_PATH = "../data/vehicles.csv"
-ROAD_PATH = "../data/Road Dataset.csv"
+VEHICLE_PATH = "../data/processed_vehicles.csv"
+ROAD_PATH = "../data/processed_roads.csv"
 MODEL_PATH = "safety_model.joblib"
 
 

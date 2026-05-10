@@ -87,7 +87,7 @@ const loadCsvData = async (filePath) => {
 
 // ---------- Road Matching ----------
 const getRoadData = async (startLocation, endLocation) => {
-  const roadPath = path.join(__dirname, "../ai-engine/data/Road Dataset.csv");
+  const roadPath = path.join(__dirname, "../ai-engine/data/processed_roads.csv");
   const roads = await loadCsvData(roadPath);
 
   const generatedRouteName = `${startLocation}-${endLocation}`;
@@ -287,7 +287,7 @@ router.post("/recommend-vehicle", async (req, res) => {
       });
     }
 
-    const vehiclePath = path.join(__dirname, "../ai-engine/data/vehicles.csv");
+    const vehiclePath = path.join(__dirname, "../ai-engine/data/processed_vehicles.csv");
     const vehicles = await loadCsvData(vehiclePath);
 
     const mlScores = await getBatchMLSafetyScores(vehicles, roadInfo, isRaining);
