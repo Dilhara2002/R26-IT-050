@@ -1,6 +1,7 @@
 /**
- * Main Entry Point: AI-Powered Safety-Aware Tourism Platform
- * Purpose: Backend orchestration for ML Safety Engine, MongoDB, and Neo4j GraphRAG.
+ * Project: AI-Powered Safety-Aware Tourism Platform
+ * Branch: safety-analyzer-Graphrag
+ * Purpose: Backend Entry Point focused on Neo4j Knowledge Graph & GraphRAG Reasoning.
  */
 
 const express = require("express");
@@ -8,9 +9,11 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 
+// Importing Neo4j configuration
 const { verifyNeo4jConnection } = require("./config/neo4j");
 
 // --- 1. Import Routes ---
+// Note: In this branch, safetyRoutes.js should contain GraphRAG-specific logic
 const safetyRoutes = require("./routes/safetyRoutes");
 
 const app = express();
@@ -19,7 +22,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- 3. MongoDB Connection ---
+// --- 3. MongoDB Connection (Optional for this Research Branch) ---
 if (process.env.MONGO_URI) {
   mongoose
     .connect(process.env.MONGO_URI)
@@ -27,43 +30,42 @@ if (process.env.MONGO_URI) {
     .catch((err) =>
       console.error("❌ MongoDB connection error:", err.message)
     );
-} else {
-  console.warn("⚠️ MONGO_URI not found in .env. MongoDB features may be limited.");
 }
 
-// --- 4. Neo4j Knowledge Graph Connection ---
+// --- 4. Neo4j Knowledge Graph Connection (MANDATORY for this Branch) ---
+// This branch focuses on GraphRAG, so Neo4j must be active.
 verifyNeo4jConnection();
 
-// --- 5. API Endpoints ---
+// --- 5. Base API Endpoint ---
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "AI-Powered Safety-Aware Tourism Platform Backend is Running! 🚀",
-    status: "Healthy",
-    engine: "Real ML Inference + Neo4j GraphRAG Active",
+    message: "Tourism Safety Platform: GraphRAG Research Branch is Running! 🚀",
+    status: "Active",
+    focus: "Knowledge Graph Reasoning (Neo4j)",
+    engine: "GraphRAG Inference Active",
     endpoints: {
-      safetyRecommendation: "/api/safety/recommend-vehicle",
+      graphAnalysis: "/api/safety/recommend-vehicle",
     },
   });
 });
 
 /**
  * Route: /api/safety
- * Purpose: Handles Research Logic:
- * - Real route distance calculation
- * - ML safety score prediction
- * - GraphRAG reasoning
- * - Vehicle recommendation
+ * Dedicated to GraphRAG Research Logic:
+ * - Historical Disaster Risk Retrieval
+ * - Knowledge Graph Relationship Mapping
+ * - Road-to-Hazard Contextual Reasoning
  */
 app.use("/api/safety", safetyRoutes);
 
 // --- 6. Global Error Handler ---
 app.use((err, req, res, next) => {
-  console.error("SERVER_ERROR:", err.stack);
+  console.error("GRAPH_BRANCH_SERVER_ERROR:", err.stack);
 
   res.status(500).json({
     success: false,
-    message: "Internal Server Error",
+    message: "Internal Server Error in GraphRAG Branch",
     error: err.message,
   });
 });
@@ -73,8 +75,8 @@ const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
   console.log("\n=================================================");
-  console.log(`🚀 Server is live on http://localhost:${PORT}`);
-  console.log("🧠 Research Engine: Real ML + Neo4j GraphRAG");
-  console.log(`🔗 Active Endpoint: http://localhost:${PORT}/api/safety/recommend-vehicle`);
+  console.log(`🚀 GRAPH-RAG BRANCH is live on http://localhost:${PORT}`);
+  console.log("🧠 Research Focus: Neo4j Knowledge Graph Reasoning");
+  console.log(`🔗 Endpoint: http://localhost:${PORT}/api/safety/recommend-vehicle`);
   console.log("=================================================\n");
 });
