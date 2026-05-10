@@ -1,3 +1,9 @@
+/**
+ * Screen: ResultScreen
+ * Branch: safety-analyzer-Graphrag
+ * Purpose: Displays GraphRAG-based safety recommendations and historical road hazards.
+ */
+
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, StyleSheet, View } from "react-native";
 import { colors } from "../styles/colors";
@@ -10,6 +16,7 @@ export default function ResultScreen({
   onBack,
   onNewSearch,
 }) {
+  // --- Error State (When no road data or graph context is found) ---
   if (!result) {
     return (
       <View style={styles.emptyContainer}>
@@ -18,20 +25,19 @@ export default function ResultScreen({
         </TouchableOpacity>
 
         <View style={styles.errorCard}>
-          <Text style={styles.errorTitle}>No Recommendation Found</Text>
+          <Text style={styles.errorTitle}>Analysis Unavailable</Text>
 
           <Text style={styles.errorText}>
             {errorMessage ||
-              "The system could not generate a vehicle recommendation for this trip."}
+              "The Knowledge Graph could not find relevant safety context for this specific route."}
           </Text>
 
           <Text style={styles.errorReason}>
-            Possible reasons: invalid route, no matching road segment, no suitable
-            vehicle for the selected budget/passengers, or backend prediction error.
+            Possible reasons: The route is not yet indexed in Neo4j, or the locations provided could not be mapped to existing road segments.
           </Text>
 
           <TouchableOpacity style={styles.button} onPress={onBack}>
-            <Text style={styles.buttonText}>Back to Form</Text>
+            <Text style={styles.buttonText}>Return to Form</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -44,46 +50,64 @@ export default function ResultScreen({
         <Text style={styles.backText}>← Back</Text>
       </TouchableOpacity>
 
-      <Text style={styles.title}>Recommendation Result</Text>
+      <Text style={styles.title}>Safety Analysis</Text>
       <Text style={styles.subtitle}>
-        ML prediction enhanced with Neo4j GraphRAG reasoning.
+        Historical road hazard reasoning powered by Neo4j GraphRAG.
       </Text>
 
+      {/* --- Trip Summary Section --- */}
       <View style={styles.summaryCard}>
-        <Text style={styles.cardTitle}>Trip Summary</Text>
+        <Text style={styles.cardTitle}>Route Overview</Text>
 
-        <Text style={styles.text}>From: {result?.trip?.from}</Text>
-        <Text style={styles.text}>To: {result?.trip?.to}</Text>
-        <Text style={styles.text}>Distance: {result?.trip?.distanceKm} km</Text>
-        <Text style={styles.text}>
-          Duration: {result?.trip?.durationMinutes} mins
-        </Text>
-        <Text style={styles.text}>
-          Matched Road: {result?.analysis?.matchedRoad}
-        </Text>
-        <Text style={styles.text}>Weather: {result?.analysis?.weather}</Text>
+        <View style={styles.row}>
+          <Text style={styles.label}>Route Path:</Text>
+          <Text style={styles.value}>{result?.trip?.from} to {result?.trip?.to}</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Total Distance:</Text>
+          <Text style={styles.value}>{result?.trip?.distanceKm} km</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Matched Road:</Text>
+          <Text style={styles.value}>{result?.analysis?.matchedRoad || "N/A"}</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Terrain Type:</Text>
+          <Text style={styles.value}>{result?.analysis?.terrain || "N/A"}</Text>
+        </View>
       </View>
 
-      <VehicleCard title="Best Safety Match" vehicle={result?.bestSafetyMatch} />
+      {/* --- Main Recommendation --- */}
+      <VehicleCard title="Primary Recommendation" vehicle={result?.bestSafetyMatch} />
 
+      {/* --- Alternative Options --- */}
       {result?.alternativeOptions?.map((vehicle, index) => (
         <VehicleCard
           key={index}
-          title={`Alternative Option ${index + 1}`}
+          title={`Alternative ${index + 1}`}
           vehicle={vehicle}
         />
       ))}
 
+      {/* --- GraphRAG Detailed Reasoning --- */}
       <View style={styles.graphCard}>
-        <Text style={styles.graphTitle}>GraphRAG Safety Reasoning</Text>
+        <Text style={styles.graphTitle}>Knowledge Graph Insights</Text>
 
-        <Text style={styles.text}>{result?.graphRAG?.explanation}</Text>
-
-        <Text style={styles.riskCount}>
-          Risk Records Found: {result?.graphRAG?.riskCount || 0}
+        <Text style={styles.explanationText}>
+          {result?.graphRAG?.explanation || "Analyzing historical patterns..."}
         </Text>
+
+        <View style={styles.badgeContainer}>
+          <Text style={styles.riskCount}>
+             Historical Records Found: {result?.graphRAG?.riskCount || 0}
+          </Text>
+        </View>
       </View>
 
+      {/* --- Individual Risk Cards (from Neo4j Nodes) --- */}
       {result?.graphRAG?.matchedRisks?.map((risk, index) => (
         <RiskCard key={index} risk={risk} />
       ))}
@@ -105,62 +129,86 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     padding: 20,
     flex: 1,
+    justifyContent: "center",
   },
   backText: {
     color: colors.primary,
     fontSize: 16,
     fontWeight: "700",
-    marginTop: 10,
     marginBottom: 16,
   },
   title: {
-    fontSize: 30,
-    fontWeight: "bold",
+    fontSize: 32,
+    fontWeight: "800",
     color: colors.primaryDark,
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 15,
     color: colors.muted,
     marginTop: 6,
     marginBottom: 24,
+    lineHeight: 22,
   },
   summaryCard: {
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 10,
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 12,
   },
   cardTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontWeight: "700",
     color: colors.text,
-    marginBottom: 10,
+    marginBottom: 12,
   },
-  text: {
-    fontSize: 15,
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  label: {
+    fontSize: 14,
+    color: colors.muted,
+    fontWeight: "500",
+  },
+  value: {
+    fontSize: 14,
     color: colors.text,
-    marginBottom: 7,
-    lineHeight: 22,
+    fontWeight: "600",
+    textAlign: "right",
+    flex: 1,
+    marginLeft: 10,
   },
   graphCard: {
-    backgroundColor: "#F0FDFA",
+    backgroundColor: "#F0FDFA", // Light teal background
     borderWidth: 1,
     borderColor: "#99F6E4",
-    borderRadius: 18,
-    padding: 18,
-    marginTop: 18,
+    borderRadius: 20,
+    padding: 20,
+    marginTop: 20,
   },
   graphTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontWeight: "800",
     color: colors.primaryDark,
     marginBottom: 10,
   },
+  explanationText: {
+    fontSize: 15,
+    color: colors.text,
+    lineHeight: 24,
+  },
+  badgeContainer: {
+    marginTop: 15,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#CCFBF1",
+  },
   riskCount: {
-    marginTop: 10,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "700",
     color: colors.warning,
   },
@@ -168,14 +216,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 18,
-    padding: 20,
-    marginTop: 20,
+    borderRadius: 20,
+    padding: 24,
   },
   errorTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: colors.primaryDark,
+    color: colors.danger,
     marginBottom: 12,
   },
   errorText: {
@@ -195,8 +242,8 @@ const styles = StyleSheet.create({
     padding: 18,
     borderRadius: 16,
     alignItems: "center",
-    marginTop: 28,
-    marginBottom: 40,
+    marginTop: 30,
+    marginBottom: 50,
   },
   buttonText: {
     color: "#FFFFFF",
