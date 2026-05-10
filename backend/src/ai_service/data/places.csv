@@ -1,0 +1,1001 @@
+Place_ID,Name,Latitude,Longitude,District,Tags,Duration_Minutes,Rating
+1,Temple of the Sacred Tooth Relic,7.2936,80.6413,Kandy,History|Culture,120,4.7
+2,Royal Botanic Gardens Peradeniya,7.2718,80.596,Kandy,Nature,150,4.6
+3,Kandy Lake,7.3,80.6333,Kandy,Nature|City,60,4.8
+4,Udawatta Kele Sanctuary,7.2986,80.6422,Kandy,Nature|Wildlife,120,4.4
+5,Ceylon Tea Museum,7.2662,80.6322,Kandy,History|Culture,90,4.2
+6,Bahirawakanda Vihara Buddha Statue,7.2917,80.6288,Kandy,Culture,60,4.6
+7,Kandy View Point (Arthur's Seat),7.2889,80.6428,Kandy,City|Nature,45,4.6
+8,British Garrison Cemetery,7.2928,80.6432,Kandy,History,45,4.5
+9,Lankatilaka Vihara,7.2311,80.5658,Kandy,History|Culture,60,4.6
+10,Gadaladeniya Vihara,7.2575,80.5566,Kandy,History|Culture,60,4.5
+11,Embekke Devalaya,7.2178,80.5677,Kandy,History|Culture,60,4.7
+12,Ambuluwawa Tower,7.1444,80.5653,Kandy,Nature|Adventure|Culture,150,4.8
+13,Ranawana Purana Rajamaha Viharaya,7.2666,80.575,Kandy,Culture,60,4.7
+14,Hanthana Mountain Range,7.2586,80.6286,Kandy,Nature|Adventure,240,4.8
+15,Degaldoruwa Temple,7.3005,80.6558,Kandy,History|Culture,60,4.4
+16,Alawathugoda Saman Devalaya,7.4055,80.6073,Kandy,History|Culture,45,4.3
+17,Giragama Walawwa,7.2943,80.6359,Kandy,History|City,45,4.1
+18,Pallekele International Cricket Stadium,7.2801,80.702,Kandy,City|Culture,180,4.5
+19,Asgiriya Stadium,7.2988,80.6322,Kandy,City|Culture,60,4.2
+20,Sigiriya Lion Rock,7.9569,80.7597,Matale,History|Culture|Adventure,180,4.7
+21,Dambulla Cave Temple,7.8566,80.6491,Matale,History|Culture,120,4.9
+22,Pidurangala Rock,7.9644,80.7633,Matale,Nature|Adventure,150,4.8
+23,Aluvihare Rock Temple,7.4971,80.6218,Matale,History|Culture,90,4.5
+24,Muthumariamman Temple Matale,7.4764,80.623,Matale,Culture,60,4.6
+25,National Spice Garden Matale,7.5186,80.6042,Matale,Nature|Culture,90,4.7
+26,Sembuwatta Lake,7.4394,80.6983,Matale,Nature|Adventure,120,4.6
+27,Riverston Peak,7.5283,80.7366,Matale,Nature|Adventure,180,4.8
+28,Pitawala Pathana,7.5458,80.7483,Matale,Nature,90,4.7
+29,Sera Ella,7.5883,80.755,Matale,Nature|Adventure,120,4.5
+30,Bambarakiri Ella,7.4725,80.6658,Matale,Nature,60,4.4
+31,Nalanda Gedige,7.67,80.6455,Matale,History|Culture,60,4.3
+32,Wasgamuwa National Park,7.7166,80.9333,Matale,Wildlife|Nature,240,4.6
+33,Ibbankatuwa Megalithic Tombs,7.8372,80.6298,Matale,History,60,4.2
+34,Knuckles Mountain Range,7.4666,80.7833,Matale,Nature|Adventure,300,4.9
+35,Hunnas Falls,7.4022,80.6866,Matale,Nature,90,4.5
+36,Horton Plains National Park,6.7831,80.7928,Nuwara Eliya,Nature|Wildlife|Adventure,240,4.6
+37,World's End,6.7831,80.7928,Nuwara Eliya,Nature|Adventure,120,4.8
+38,Baker's Falls,6.7922,80.7894,Nuwara Eliya,Nature,90,4.7
+39,Lake Gregory,6.9568,80.7773,Nuwara Eliya,Nature|City,120,4.8
+40,Victoria Park Nuwara Eliya,6.9691,80.7661,Nuwara Eliya,Nature|City,90,4.4
+41,Pedro Tea Estate,6.9744,80.7911,Nuwara Eliya,Culture|Nature,90,4.5
+42,Bluefield Tea Gardens,7.0421,80.698,Nuwara Eliya,Culture|Nature,90,4.7
+43,Lovers Leap Waterfall,6.9784,80.7866,Nuwara Eliya,Nature|Adventure,90,4.4
+44,Ramboda Falls,7.0585,80.699,Nuwara Eliya,Nature,60,4.6
+45,Bomburu Ella,6.968,80.8042,Nuwara Eliya,Nature,120,4.7
+46,Hakgala Botanical Garden,6.9256,80.822,Nuwara Eliya,Nature,120,4.4
+47,Moon Plains,6.9458,80.7941,Nuwara Eliya,Nature|Wildlife,120,4.5
+48,Seetha Amman Temple,6.9338,80.8144,Nuwara Eliya,History|Culture,45,4.6
+49,Single Tree Hill,6.9552,80.7577,Nuwara Eliya,Nature|Adventure,120,4.4
+50,Galway's Land National Park,6.9656,80.7775,Nuwara Eliya,Nature|Wildlife,90,4.3
+51,Natha Devale,7.2942,80.6405,Kandy,History|Culture,45,4.6
+52,Maha Vishnu Devalaya,7.2947,80.6398,Kandy,History|Culture,45,4.7
+53,Pattini Devale,7.2938,80.6385,Kandy,History|Culture,30,4.5
+54,Kataragama Devalaya Kandy,7.2925,80.6372,Kandy,History|Culture,30,4.5
+55,Kandy National Museum,7.2933,80.6422,Kandy,History|Culture,60,4.4
+56,St. Paul's Church Kandy,7.2936,80.6408,Kandy,History|Culture,30,4.5
+57,Asgiri Maha Viharaya,7.2981,80.6322,Kandy,History|Culture,60,4.6
+58,Malwatte Maha Viharaya,7.2908,80.6417,Kandy,History|Culture,60,4.6
+59,Galmaduwa Rajamaha Viharaya,7.2886,80.6758,Kandy,History|Culture,45,4.5
+60,Medawala Rajamaha Viharaya,7.3519,80.5833,Kandy,History|Culture,45,4.7
+61,Commonwealth War Cemetery Kandy,7.2764,80.6069,Kandy,History,45,4.8
+62,Trinity College Chapel,7.2978,80.6386,Kandy,History|Culture,30,4.7
+63,Kadugannawa Railway Museum,7.2567,80.5219,Kandy,History,60,4.4
+64,Dawson Tower,7.2561,80.5217,Kandy,History|City,30,4.3
+65,Nelligala International Buddhist Centre,7.3008,80.5597,Kandy,Culture|Nature,90,4.8
+66,Hindagala Rajamaha Viharaya,7.2389,80.5964,Kandy,History|Culture,45,4.5
+67,Red Mosque Kandy,7.2917,80.6369,Kandy,History|Culture,30,4.4
+68,Kandy City Centre,7.2925,80.6378,Kandy,City,90,4.4
+69,Kandy Clock Tower,7.2911,80.6353,Kandy,City|History,15,4.2
+70,Wales Park,7.2903,80.6389,Kandy,Nature|City,45,4.3
+71,Saree Ella,7.4103,80.7511,Kandy,Nature|Adventure,60,4.7
+72,Jodu Ella,7.4128,80.7489,Kandy,Nature|Adventure,60,4.5
+73,Huluganga Falls,7.3972,80.7258,Kandy,Nature,45,4.6
+74,Thangappuwa Falls,7.3892,80.7964,Kandy,Nature|Adventure,90,4.8
+75,Rangala Natural Pool,7.3556,80.7719,Kandy,Nature|Adventure,90,4.6
+76,Loolkandura Estate,7.1436,80.6983,Kandy,History|Nature,120,4.7
+77,Kondagala,7.1481,80.6978,Kandy,Nature|Adventure,180,4.8
+78,Pettigala,7.2472,80.8258,Kandy,Nature|Adventure,240,4.6
+79,Pothgulgala,7.2625,80.5842,Kandy,Nature|Adventure,120,4.5
+80,Alagalla Mountain Range,7.2831,80.4853,Kandy,Nature|Adventure,240,4.7
+81,Galboda Falls,7.0658,80.4811,Kandy,Nature|Adventure,180,4.6
+82,Kadiyanlena Falls,7.0397,80.5694,Kandy,Nature,45,4.7
+83,Dodanwala Devalaya,7.2878,80.5622,Kandy,History|Culture,45,4.4
+84,Canbuy Gem Museum,7.2833,80.6094,Kandy,Culture|City,45,4.2
+85,Rathna Ella,7.3517,80.9936,Kandy,Nature|Adventure,180,4.8
+86,Euphoria Spice and Herbal Garden,7.5028,80.6219,Matale,Nature|Culture,60,4.5
+87,Matale Heritage Centre,7.4683,80.6231,Matale,Culture|History,60,4.4
+88,Fort MacDowall,7.4719,80.6225,Matale,History,30,4.1
+89,Christ Church Matale,7.4697,80.6217,Matale,History|Culture,30,4.4
+90,Kaludiya Pokuna,7.8672,80.7336,Matale,History|Nature,90,4.7
+91,Kandalama Reservoir,7.8864,80.7103,Matale,Nature|Wildlife,90,4.6
+92,Bowatenna Dam,7.6586,80.6869,Matale,Nature|City,45,4.3
+93,Moragahakanda Reservoir,7.7478,80.7814,Matale,Nature,60,4.5
+94,Kalu Ganga Dam,7.5625,80.8258,Matale,Nature,45,4.4
+95,Dambulugala Inscriptions,7.8572,80.6517,Matale,History,45,4.4
+96,Menikdena Archaeological Reserve,7.8042,80.6247,Matale,History|Nature,90,4.6
+97,Arangala Mountain,7.6694,80.6067,Matale,Nature|Adventure,180,4.7
+98,Manigala Peak,7.5458,80.7719,Matale,Nature|Adventure,240,4.8
+99,Dumbara Ella,7.4936,80.8211,Matale,Nature|Adventure,180,4.7
+100,Duwili Ella,7.5097,80.8353,Matale,Nature|Adventure,240,4.9
+101,Sansun Ella,7.4981,80.8247,Matale,Nature,60,4.6
+102,Thattu Ella,7.5025,80.8286,Matale,Nature,60,4.5
+103,Meemure Village,7.4339,80.8447,Matale,Culture|Nature,240,4.8
+104,Atanwala Village,7.5367,80.7681,Matale,Culture|Nature,120,4.7
+105,Thalkote Wewa,7.9622,80.7331,Matale,Nature|Wildlife,60,4.5
+106,Sigiriya Museum,7.9547,80.7578,Matale,History|Culture,90,4.6
+107,Mapagala Rock,7.9472,80.7558,Matale,History|Nature,60,4.5
+108,Dambulla Dedicated Economic Centre,7.8631,80.6536,Matale,City|Culture,45,4.2
+109,Popham's Arboretum,7.8714,80.6381,Matale,Nature|Wildlife,90,4.6
+110,Kandalama Hot Air Ballooning,7.8817,80.7025,Matale,Adventure|Nature,180,4.8
+111,Rangiri Dambulla International Stadium,7.8617,80.6653,Matale,City,45,4.3
+112,Somawathiya Stupa Dambulla,7.8542,80.6489,Matale,History|Culture,45,4.4
+113,Naula Rajamaha Viharaya,7.7125,80.6383,Matale,History|Culture,45,4.3
+114,Ambokka Rajamaha Viharaya,7.6322,80.5756,Matale,History|Culture,45,4.4
+115,Gurubewila Purana Viharaya,7.5819,80.6014,Matale,History|Culture,30,4.3
+116,Bambaragala Pathana,7.5683,80.7358,Matale,Nature|Adventure,120,4.6
+117,Ranmudu Ella Matale,7.5411,80.7419,Matale,Nature,45,4.5
+118,Nuwara Eliya Post Office,6.9716,80.7664,Nuwara Eliya,History|City,30,4.5
+119,Holy Trinity Church Nuwara Eliya,6.9725,80.7642,Nuwara Eliya,History|Culture,30,4.4
+120,Nuwara Eliya Golf Club,6.9717,80.7647,Nuwara Eliya,City|Nature,120,4.4
+121,Royal Turf Club,6.9628,80.7692,Nuwara Eliya,City|Culture,90,4.3
+122,Grand Hotel High Tea,6.9722,80.7628,Nuwara Eliya,Culture|City,90,4.6
+123,St. Clair's Falls,6.9512,80.6479,Nuwara Eliya,Nature,45,4.7
+124,Devon Falls,6.9517,80.6297,Nuwara Eliya,Nature,45,4.7
+125,Laxapana Falls,6.8986,80.5008,Nuwara Eliya,Nature|Adventure,90,4.8
+126,Aberdeen Falls,6.9483,80.5019,Nuwara Eliya,Nature|Adventure,90,4.8
+127,Dunsinane Falls,7.0336,80.6719,Nuwara Eliya,Nature,60,4.6
+128,Pundalu Oya Falls,7.0189,80.6694,Nuwara Eliya,Nature,45,4.5
+129,Puna Falls,7.0544,80.6978,Nuwara Eliya,Nature|Adventure,90,4.6
+130,Gartmore Falls,6.8042,80.5414,Nuwara Eliya,Nature|Adventure,120,4.7
+131,Moray Falls,6.8125,80.5369,Nuwara Eliya,Nature,90,4.6
+132,Kurundu Oya Falls,7.0125,80.8528,Nuwara Eliya,Nature|Adventure,120,4.6
+133,Galwala Ella Falls,6.9786,80.7714,Nuwara Eliya,Nature,45,4.3
+134,Glen Falls,6.9711,80.7583,Nuwara Eliya,Nature,30,4.2
+135,Ambewela Farms,6.8833,80.8036,Nuwara Eliya,Nature|Culture,90,4.5
+136,New Zealand Farm,6.8653,80.8142,Nuwara Eliya,Nature|Culture,90,4.5
+137,Shanthipura View Point,6.9858,80.7497,Nuwara Eliya,Nature|City,45,4.5
+138,Great Western Mountain,6.9639,80.7061,Nuwara Eliya,Nature|Adventure,300,4.7
+139,Kikiliyamana Mountain,6.9889,80.7381,Nuwara Eliya,Nature|Adventure,180,4.5
+140,Mandaram Nuwara,7.0378,80.7817,Nuwara Eliya,Nature|Culture,180,4.8
+141,Kolapathana Ella,7.0311,80.7783,Nuwara Eliya,Nature|Adventure,90,4.7
+142,Kabaragala Peak,7.1086,80.5847,Nuwara Eliya,Nature|Adventure,240,4.7
+143,Chariot Path,7.0858,80.6483,Nuwara Eliya,Nature|History,240,4.8
+144,Mlesna Tea Castle St. Clair,6.9458,80.6444,Nuwara Eliya,Culture|History,60,4.4
+145,Thalawakele Tea Research Institute,6.9383,80.6617,Nuwara Eliya,History|Culture,90,4.5
+146,Damro Labookellie Tea Centre,7.0347,80.7242,Nuwara Eliya,Culture,90,4.6
+147,Sri Bhakta Hanuman Temple,7.0519,80.6861,Nuwara Eliya,History|Culture,45,4.5
+148,Gayathri Peedam,6.9822,80.7686,Nuwara Eliya,History|Culture,30,4.4
+149,Swarnagiri Maha Viharaya,6.9647,80.7719,Nuwara Eliya,History|Culture,45,4.5
+150,Nuwara Eliya Central Market,6.9708,80.7689,Nuwara Eliya,City|Culture,60,4.2
+151,Pinnawala Elephant Orphanage,7.2945,80.3949,Kegalle,Wildlife|Nature,180,4.7
+152,Pinnawala Zoo,7.3002,80.3985,Kegalle,Wildlife,120,3.8
+153,Millennium Elephant Foundation,7.2721,80.3854,Kegalle,Wildlife|Nature,150,4.2
+154,Elephant Freedom Project,7.2685,80.3721,Kegalle,Wildlife|Nature,150,4.5
+155,Saradiel Village & Resort,7.2521,80.4563,Kegalle,Culture|History,90,4.3
+156,Bible Rock (Bathalegala),7.1852,80.4856,Kegalle,Nature|Adventure,240,4.8
+157,Alagalla Mountain Range,7.2356,80.5123,Kegalle,Nature|Adventure,300,4.7
+158,Belilena Cave Kitulgala,6.9856,80.4256,Kegalle,History|Nature,120,4.6
+159,Kitulgala White Water Rafting,6.9923,80.4152,Kegalle,Adventure,180,4.9
+160,Olu Ella Waterfall,6.9756,80.4521,Kegalle,Nature,60,4.4
+161,Asupini Ella Waterfall,7.1523,80.5021,Kegalle,Nature,90,4.2
+162,Dedigama Kota Vehera,7.2156,80.2856,Kegalle,History|Religion,60,4.5
+163,Berendi Kovil Dehiovita,6.9523,80.2152,Kegalle,History|Religion,45,4
+164,Aluth Nuwara Dedimunda Devalaya,7.2452,80.4652,Kegalle,History|Religion,90,4.6
+165,Deliwala Kotavehera Rambukkana,7.3352,80.3843,Kegalle,History|Religion,60,4.1
+166,Beligala Raja Maha Vihara,7.2856,80.2521,Kegalle,History|Religion,75,4.3
+167,Devanagala Raja Maha Vihara,7.2125,80.4625,Kegalle,History|Religion,120,4.7
+168,Uthuwankanda Peak,7.2512,80.4485,Kegalle,Nature|Adventure,150,4.5
+169,Wattarama Raja Maha Vihara,7.2023,80.3252,Kegalle,History|Religion,90,4.2
+170,Danagirigala Raja Maha Vihara,7.2585,80.4852,Kegalle,History|Religion,120,4.4
+171,Kadugannawa Rock View Point,7.2533,80.5056,Kegalle,Nature|City,30,4.5
+172,Susantha Spice & Herbal Garden,7.2352,80.3652,Kegalle,Nature|Culture,60,3.9
+173,Ceylon Tea Factory Mawanella,7.2512,80.4412,Kegalle,Culture,60,4.1
+174,Holombuwa Sthripura Cave Vihara,7.2052,80.2523,Kegalle,Religion|History,60,4
+175,Bisowela Purana Gallen Vihara,7.1523,80.3521,Kegalle,Religion|History,45,3.8
+176,Uduwaka Dunumala Ella,7.1352,80.1856,Kegalle,Nature,60,4.3
+177,Wee Oya Ella Falls,6.9852,80.4652,Kegalle,Nature,45,4
+178,Malalpola Ella Falls,6.9652,80.4452,Kegalle,Nature,45,3.9
+179,Kitul Ella Falls,6.9952,80.4352,Kegalle,Nature,30,3.7
+180,Gorok Ella Falls,6.9552,80.4252,Kegalle,Nature,30,3.8
+181,Katuwel Ella Falls,6.9752,80.4152,Kegalle,Nature,45,4.1
+182,Manella Waterfalls Area,7.1852,80.5252,Kegalle,Nature,60,4.2
+183,Rikili Falls Aranayaka,7.1252,80.5152,Kegalle,Nature,60,4
+184,Rukmal Falls Bulathkohupitiya,7.1152,80.5052,Kegalle,Nature,45,3.9
+185,Lenathiri Falls,7.1052,80.4952,Kegalle,Nature,45,3.8
+186,Welanda Falls,7.0952,80.4852,Kegalle,Nature,45,3.7
+187,Galgediyana Falls,7.0852,80.4752,Kegalle,Nature,60,4.1
+188,Ganthuna Falls Cluster,7.1452,80.4752,Kegalle,Nature,45,4
+189,Ahupini Falls Mawanella,7.1652,80.4652,Kegalle,Nature,60,4.2
+190,Yakage Falls,7.1752,80.4552,Kegalle,Nature,45,3.9
+191,Na Guna Ella,7.1852,80.4452,Kegalle,Nature,45,3.8
+192,Wahilihiniyan Falls,7.1952,80.4352,Kegalle,Nature,45,3.7
+193,Bo Falls Area,7.2052,80.4252,Kegalle,Nature,30,3.8
+194,Miyan Falls Cluster,7.2152,80.4152,Kegalle,Nature,30,3.9
+195,Pussella Viharaya,7.2252,80.3952,Kegalle,Religion,45,4
+196,Kandegedara Buddhist Temple,7.2352,80.3852,Kegalle,Religion,45,3.9
+197,Dunukewela Ancient Temple,7.2452,80.3752,Kegalle,Religion,45,3.8
+198,Pothgulgala Forest Monastery,7.2552,80.3652,Kegalle,Religion,90,4.5
+199,Gothama Buddhist Viharaya,7.2652,80.3552,Kegalle,Religion,60,4.1
+200,Ridi Bodhiya Pilgrimage Site,7.2752,80.3452,Kegalle,Religion,45,4
+201,Gotabhaya Raja Maha Vihara,7.2852,80.3352,Kegalle,Religion|History,60,4.2
+202,Rideethotuwa Vihara,7.2952,80.3252,Kegalle,Religion,45,3.9
+203,Daluggala Sri Bodhirajaramaya,7.3052,80.3152,Kegalle,Religion,60,4.1
+204,Wewaladeniya Sri Mahindodaya Piriwena,7.2152,80.2252,Kegalle,Religion|Culture,90,4.3
+205,Alkegama Tampita Viharaya,7.2412,80.4352,Kegalle,Religion|History,45,4
+206,Arambegama Tampita Viharaya,7.2956,80.4123,Kegalle,Religion|History,45,4.1
+207,Asmadala Tampita Viharaya,7.1752,80.4652,Kegalle,Religion|History,60,4.2
+208,Attanagoda Tampita Viharaya,7.2485,80.4852,Kegalle,Religion|History,60,4.3
+209,Burunnewa Tampita Viharaya,7.2352,80.2852,Kegalle,Religion|History,45,4.1
+210,Eraminigammana Tampita Viharaya,7.1523,80.4123,Kegalle,Religion|History,45,4
+211,Mediliya Tampita Viharaya,7.1352,80.4521,Kegalle,Religion|History,45,4.1
+212,Gondiwela Tampita Viharaya,7.2512,80.4052,Kegalle,Religion|History,45,3.9
+213,Hingula Tampita Viharaya,7.2552,80.4652,Kegalle,Religion|History,30,3.8
+214,Ambulugala Raja Maha Vihara,7.2352,80.4752,Kegalle,Religion|History,90,4.5
+215,Beligammana Pothgul Viharaya,7.2512,80.4452,Kegalle,Religion|History,60,4.3
+216,Dodantale Sri Seneviratna Vihara,7.2585,80.4612,Kegalle,Religion|History,90,4.6
+217,Deliwala Ancient Stupa,7.3312,80.378,Kegalle,History|Religion,60,4.2
+218,Ruwanwella Ancient Fort,7.0521,80.2512,Kegalle,History,60,4.1
+219,Menikkadawara Archaeological Site,7.2252,80.3152,Kegalle,History,45,3.8
+220,Beligala Fortress Ruins,7.2812,80.2452,Kegalle,History|Adventure,180,4.4
+221,Kadugannawa Tunnel Site,7.2515,80.5052,Kegalle,History|City,20,4.5
+222,Dawson's Rest House Kegalle,7.2512,80.3452,Kegalle,History|City,45,3.9
+223,Mangalagama Ambalama Site,7.3012,80.3912,Kegalle,History|Culture,30,4
+224,Mawanella Colonial Bridge,7.2521,80.4421,Kegalle,History,20,3.8
+225,Bogala Graphite Mine Center,7.1167,80.3333,Kegalle,Adventure|Culture,120,4.6
+226,Rosyth Estate Tea Hub,7.2023,80.3412,Kegalle,Nature|Culture,120,4.7
+227,New Paradise Herbal Garden,7.2412,80.4412,Kegalle,Nature,60,4
+228,Uthuwankanda Historical Church,7.2512,80.4452,Kegalle,Religion,30,3.9
+229,Kithulgala Tropical Rainforest,7.0012,80.4252,Kegalle,Nature|Wildlife,180,4.8
+230,Maha Oya Scenic View Point,7.2852,80.3952,Kegalle,Nature,30,4.2
+231,Selawa Mountain Range Trails,7.1512,80.4952,Kegalle,Nature|Adventure,240,4.5
+232,Karittakanda Observation Point,7.2052,80.3152,Kegalle,Nature,30,4
+233,Hemmatagama Paddy Valley,7.1852,80.4252,Kegalle,Nature,60,4.3
+234,Aranayaka Samadhi Monument,7.1523,80.4712,Kegalle,History,45,4
+235,Diyasunna Kirti Sri Rajasingha Vihara,7.3012,80.4121,Kegalle,Religion|History,60,4.1
+236,Keraminiya Raja Maha Viharaya,7.2512,80.4352,Kegalle,Religion|History,60,4.2
+237,Mannagoda Sudarshanarama Viharaya,7.2152,80.4512,Kegalle,Religion|History,45,3.9
+238,Muwapitiya Tempita Viharaya,7.3152,80.3952,Kegalle,Religion|History,45,4
+239,Nawagamuwa Ancient Viharaya,7.2852,80.4123,Kegalle,Religion|History,60,4.1
+240,Udanvita Raja Maha Viharaya,7.2952,80.4052,Kegalle,Religion|History,60,4.2
+241,Udugama Purana Raja Maha Viharaya,7.3152,80.3852,Kegalle,Religion|History,60,4.1
+242,Nilwakka Ancient Viharaya,7.2612,80.3412,Kegalle,Religion|History,60,4.2
+243,Makura Protected Viharaya,7.2712,80.3352,Kegalle,Religion|History,45,4
+244,Kaudugama Image House,7.2512,80.3552,Kegalle,Religion|History,60,4.1
+245,Maniyangama Image House,6.9652,80.2252,Kegalle,Religion|History,60,4.2
+246,Yatahalena Cave Viharaya,7.1512,80.3252,Kegalle,Religion|History,60,4.3
+247,Devalegama Kataragama Devalaya,7.1852,80.3152,Kegalle,Religion|History,45,4
+248,Wakirigala Archaeological Site,7.1412,80.4612,Kegalle,History,90,4.4
+249,Ambalena Rock Caves,7.2252,80.2152,Kegalle,History|Nature,90,4.3
+250,Dorawaka Lena Cave,7.2512,80.2352,Kegalle,History|Nature,90,4.5
+251,Asokarama Forest Caves,7.2152,80.2052,Kegalle,Religion|Nature,120,4.6
+252,Budulena Gala Raja Maha Vihara,7.2412,80.4521,Kegalle,Religion|History,60,4.2
+253,Degalathiriya Cave Vihara,7.2512,80.3452,Kegalle,Religion|History,60,4.1
+254,Elpitiya Ancient Cave,7.2352,80.2521,Kegalle,Religion|History,60,4.3
+255,Ganekanda Archaeological Vihara,7.2412,80.3552,Kegalle,Religion|History,60,4.2
+256,Hettimulla Ancient Temple,7.1612,80.3452,Kegalle,Religion,45,3.9
+257,Ussapitiya Junction Market,7.1752,80.4121,Kegalle,Culture|City,60,4
+258,Mawanella Scenic Overlook,7.2512,80.4444,Kegalle,City,15,3.5
+259,Rambukkana Colonial Hub,7.3312,80.3952,Kegalle,History|City,30,4.2
+260,Galatara Proto-Historic Burial,7.1512,80.4652,Kegalle,History,60,4.1
+261,Nawagamuwa Ura Keta Linda,7.5026,80.6504,Kegalle,History,20,3.7
+262,Meeduma Mahindarama Vihare Cave,7.5503,80.6189,Kegalle,Religion|History,60,4
+263,Nagawanarama Kadigamuwa Site,7.5277,80.7112,Kegalle,Religion|History,90,4.2
+264,Nugawela Devale Area,7.5514,80.6345,Kegalle,Religion,45,3.9
+265,Kurempola Medagodella Vihare,7.5185,80.6443,Kegalle,Religion|History,45,3.8
+266,Wattarama Four Ancient Pillars,7.2023,80.3252,Kegalle,History,30,4.1
+267,Kappagoda Malasungeya Foundation,7.2412,80.4652,Kegalle,History|Religion,45,3.9
+268,Belingala Higuralkanda Cave,6.9173,80.3096,Kegalle,History|Nature,120,4.4
+269,Halgahatenna Maha Lenagala,6.5524,80.1808,Kegalle,History|Nature,120,4.3
+270,Bambaragala Hettikanda Cave,6.9227,80.2861,Kegalle,History|Nature,120,4.5
+271,Padidora Sri Buwanekaba Cave,7.135,80.262,Kegalle,Religion|History,90,4.4
+272,Udamakadawara Wayside Shelter,7.1517,80.2845,Kegalle,History,30,3.8
+273,Woodend Estate Nature Falls,6.9512,80.2521,Kegalle,Nature,45,4
+274,Nikawalamulla Clay Cemetery,7.0512,80.2812,Kegalle,History,60,4.2
+275,Pinnalanda Elephant View,7.2945,80.3965,Kegalle,Nature,30,4.4
+276,Maha Oya Elephant Bathing,7.2952,80.3921,Kegalle,Nature|Wildlife,120,4.8
+277,ASN Malgolla Factory,7.1052,80.4252,Kegalle,Culture,60,4.1
+278,Hingalgoda Tea View Point,7.2512,80.3652,Kegalle,Culture,45,3.9
+279,Imbulgahagoda Nature Estate,7.1512,80.3452,Kegalle,Nature,60,3.8
+280,Ingurugala Plantation Tour,7.1852,80.4123,Kegalle,Nature|Culture,90,4.2
+281,Ivy Valley Mountain View,7.1252,80.4512,Kegalle,Nature,30,4
+282,Kanuketiya Hills Overlook,7.1412,80.4212,Kegalle,Nature,30,3.9
+283,Karawita Forest Tea Trails,7.1612,80.3912,Kegalle,Nature,120,4.1
+284,Lellopitiya Tea Valley Trails,7.1152,80.4612,Kegalle,Nature,60,4
+285,Malwattagama Mountain Garden,7.1012,80.4512,Kegalle,Nature,60,3.8
+286,Nugatalawa High Ground View,7.0912,80.4412,Kegalle,Nature,30,3.7
+287,Pelawatta Village Overlook,7.0812,80.4312,Kegalle,City,20,3.5
+288,Tholobowatta Heritage Path,7.0712,80.4212,Kegalle,Nature,60,3.8
+289,Uudalamatte High View,7.0612,80.4112,Kegalle,Nature,30,3.9
+290,Wanduramba Forest Garden,7.0512,80.4012,Kegalle,Nature,60,4.1
+291,Wathawana Spice Trails,7.0412,80.3912,Kegalle,Nature,120,4
+292,Galpaya Heritage Factory,7.0312,80.3812,Kegalle,Culture,60,4.2
+293,Ganganee Green Valley,7.0212,80.3712,Kegalle,Nature,60,3.9
+294,Gatagahawela Observation Deck,7.0112,80.3612,Kegalle,Nature,30,3.8
+295,Halwitigala Heritage Hub,7.0012,80.3512,Kegalle,Culture,45,4
+296,Handugala Forest View,6.9912,80.3412,Kegalle,Nature,30,3.7
+297,Hapugahawatta Nature Trails,6.9812,80.3312,Kegalle,Nature,120,4.1
+298,Hidellana Industrial Center,6.9712,80.3212,Kegalle,Culture,60,4.2
+299,Hillside Forest Center,6.9612,80.3112,Kegalle,Culture,45,3.9
+300,Himara Mountain Valley,6.9512,80.3012,Kegalle,Nature,60,4
+301,Karagoda Forest Trails,6.9412,80.2912,Kegalle,Nature,120,4.1
+302,Aruna Plantation Hub,7.1512,80.3852,Kegalle,Culture,60,4.2
+303,Blue Hills Heritage Factory,7.1212,80.3552,Kegalle,Culture,60,4.1
+304,Ceciliyan Nature Reserve,7.1012,80.3252,Kegalle,Nature,90,4.3
+305,Danawala Cultural Factory,7.0812,80.2952,Kegalle,Culture,60,4
+306,Dartry Valley Overlook,7.0512,80.2652,Kegalle,Nature,30,3.8
+307,Deerwood Nature Garden,7.0212,80.2352,Kegalle,Nature,60,4.1
+308,Enselwatte Heritage Trails,6.9912,80.2052,Kegalle,Nature,120,4.4
+309,Galpaditenne Nature View,6.9712,80.1752,Kegalle,Nature,30,3.9
+310,Green Lanka Cultural Hub,6.9512,80.1452,Kegalle,Culture,45,4
+311,Greenwood Heritage Factory,6.9312,80.1152,Kegalle,Culture,60,4.1
+312,Gurukanda Nature View,6.9112,80.0852,Kegalle,Nature,30,3.7
+313,Haughton Heritage Estate,6.8912,80.0552,Kegalle,Nature,120,4.2
+314,James Valley Nature View,6.8712,80.0252,Kegalle,Nature,30,3.8
+315,Kanneliya Heritage Trails,6.8512,79.9952,Kegalle,Nature,120,4.3
+316,Karawita Cultural Hub,6.8312,79.9652,Kegalle,Culture,45,4
+317,Kurunduwatta Nature View,7.2212,80.4852,Kegalle,Nature,30,3.9
+318,Nugatalawa Nature Path,7.2012,80.4552,Kegalle,Nature,60,4
+319,Nugawela Heritage Factory,7.1812,80.4252,Kegalle,Culture,60,4.1
+320,Opatha Nature Trails,7.1612,80.3952,Kegalle,Nature,120,4.2
+321,Pallebage Nature Valley,7.1412,80.3652,Kegalle,Nature,60,3.8
+322,Panangala Nature View,7.1212,80.3352,Kegalle,Nature,30,3.7
+323,Pattigala Cultural Hub,7.1012,80.3052,Kegalle,Culture,45,4
+324,Pelawatta Nature Path,7.0812,80.2752,Kegalle,Nature,60,3.9
+325,Pinnawala Nature Garden,7.2945,80.4121,Kegalle,Nature,90,4.5
+326,Pitabeddara Nature View,7.2512,80.4412,Kegalle,Nature,30,4
+327,Ratnapura Nature Valley,7.2012,80.4612,Kegalle,Nature,60,4.1
+328,Sabaragamuwa Cultural Hub,7.1512,80.4812,Kegalle,Culture,45,4
+329,Talapalakanda Nature View,7.1012,80.5012,Kegalle,Nature,30,3.8
+330,Thalahagama Nature Trails,7.0512,80.5212,Kegalle,Nature,120,4.2
+331,Urubokka Nature Valley,7.0012,80.5412,Kegalle,Nature,60,4.1
+332,Waralla Nature View,6.9512,80.5612,Kegalle,Nature,30,3.9
+333,Yainna Cultural Hub,6.9012,80.5812,Kegalle,Culture,45,4
+334,Ambe Oya Observation Point,7.2356,80.3123,Kegalle,Nature,30,4.1
+335,Aranayake Rubber Estate Trails,7.1523,80.4512,Kegalle,Nature|Culture,60,4
+336,Bulathkohupitiya Falls Overlook,7.1052,80.4123,Kegalle,Nature,45,4.2
+337,Dehiovita Kelani Bank,6.9652,80.2152,Kegalle,Nature,60,4.1
+338,Deraniyagala Mountain Trail,6.9212,80.3452,Kegalle,Nature|Adventure,180,4.4
+339,Galigamuwa Heritage Plaza,7.1852,80.3121,Kegalle,City,30,3.6
+340,Ruwanwella Historic Bridge,7.0521,80.2552,Kegalle,City|Nature,20,3.8
+341,Yatiyanthota Forest Falls,7.0212,80.3252,Kegalle,Nature,30,4.1
+342,Warakapola Transit Point,7.2252,80.2121,Kegalle,City,45,3.9
+343,Mawanella Historical Center,7.2521,80.4444,Kegalle,City,30,3.7
+344,Kegalle District Library,7.2511,80.349,Kegalle,City|Culture,60,4
+345,Alagalla Heritage Fortress,7.2352,80.5121,Kegalle,History|Adventure,180,4.5
+346,Beligala Ancient Bodhi Wall,7.2852,80.2523,Kegalle,History|Religion,45,4.2
+347,Dedigama Historical Museum,7.2156,80.2842,Kegalle,History,60,4.3
+348,Menikkadawara Ancient Viharaya,7.2252,80.3142,Kegalle,Religion|History,60,4.1
+349,Pinnawala Maha Oya Bathing,7.2952,80.3912,Kegalle,Wildlife|Nature,120,4.9
+350,Kitulgala Prehistoric Beli Lena,6.9856,80.4212,Kegalle,History|Nature,120,4.7
+351,Muthiyangana Raja Maha Vihara,6.9912,81.0556,Badulla,Religion|History|Culture,60,4.7
+352,Dunhinda Falls,7.0234,81.0612,Badulla,Nature|Adventure,90,4.8
+353,Bogoda Ancient Wooden Bridge,6.9292,81.0112,Badulla,History|Culture,45,4.6
+354,Demodara Nine Arch Bridge,6.8768,81.0608,Badulla,History|Nature|Adventure,90,4.9
+355,Ella Rock,6.8533,81.0456,Badulla,Nature|Adventure,240,4.8
+356,Little Adam's Peak,6.8633,81.0634,Badulla,Nature|Adventure,120,4.8
+357,Ravana Falls,6.8412,81.0545,Badulla,Nature|History,45,4.5
+358,Lipton's Seat,6.7824,81.0167,Badulla,Nature|History|Culture,150,4.7
+359,Dhowa Rock Temple,6.8245,81.0123,Badulla,Religion|History|Culture,60,4.4
+360,Adisham Bungalow,6.7723,80.9345,Badulla,History|Culture|Nature,90,4.6
+361,Diyaluma Falls,6.7333,81.0315,Badulla,Nature|Adventure,180,4.9
+362,Bambarakanda Falls,6.7733,80.8311,Badulla,Nature|Adventure,120,4.7
+363,Mahiyangana Raja Maha Vihara,7.3221,80.9908,Badulla,Religion|History|Culture,90,4.8
+364,Sorabora Wewa Reservoir,7.3456,81.0123,Badulla,Nature|History|Culture,90,4.5
+365,Dambana Vedda Village,7.3912,81.1123,Badulla,Culture|Wildlife|History,180,4.3
+366,Namunukula Mountain Peak,6.9212,81.1123,Badulla,Nature|Adventure,300,4.6
+367,St. Mark's Church Badulla,6.9934,81.0534,Badulla,History|Religion|Culture,40,4.2
+368,Badulla Clock Tower,6.9898,81.0567,Badulla,History|City|Culture,15,4.1
+369,Old Welekade Market,6.9876,81.0545,Badulla,History|City|Culture,45,4
+370,Uva Halpewatte Tea Factory,6.8912,81.0456,Badulla,Culture|Nature|History,120,4.5
+371,Demodara Railway Station,6.9034,81.0612,Badulla,History|City|Adventure,45,4.4
+372,Dambatenne Tea Factory,6.7912,81.0234,Badulla,History|Culture|Nature,90,4.6
+373,Flying Ravana Adventure Park,6.8612,81.0612,Badulla,Adventure,120,4.8
+374,Rawana Ella Cave,6.8434,81.0512,Badulla,History|Adventure|Nature,90,4.2
+375,Nil Diya Pokuna Blue Water Cave,6.8212,81.0834,Badulla,Adventure|Nature,180,4.7
+376,Pallewela Ella Waterfall,6.8123,81.1123,Badulla,Nature|Adventure,60,4.1
+377,Bomburu Ella Waterfall,6.9345,80.8912,Badulla,Nature|Adventure,150,4.7
+378,Narangala Mountain,6.9912,81.1823,Badulla,Nature|Adventure,240,4.5
+379,Badulla Kataragama Devalaya,6.9902,81.0545,Badulla,Religion|Culture|History,45,4.3
+380,Fox Hill Diyatalawa,6.8123,80.9545,Badulla,Nature|Adventure,60,4.2
+381,Lanka Ella Waterfall,6.7612,80.8234,Badulla,Nature|Adventure,180,4.6
+382,Upper Diyaluma Falls,6.7389,81.0289,Badulla,Nature|Adventure,120,4.8
+383,Peessa Ella Waterfall,7.0212,81.2545,Badulla,Nature|Adventure,120,4.4
+384,Buduruwagala Rock Temple Area,6.6834,81.0834,Badulla,History|Religion|Nature,90,4.7
+385,Mahiyangana Relic Chamber Museum,7.3225,80.9912,Badulla,History|Culture,60,4.3
+386,Besama Natural Pool Mahiyanganaya,7.3123,81.0345,Badulla,Nature|Adventure,60,4
+387,Ulhitiya Wewa Reservoir,7.4512,81.0834,Badulla,Nature|Wildlife,90,4.2
+388,Randenigala Dam Viewpoint,7.2123,80.9234,Badulla,Nature|Adventure|City,45,4.4
+389,Alawathugoda Temple,7.2834,80.9834,Badulla,Religion|Culture,45,4.1
+390,Mini World's End Madulsima,7.0512,81.2123,Badulla,Nature|Adventure,180,4.9
+391,Kahataruppa Galamuduna Viewpoint,6.9712,81.2012,Badulla,Nature|Adventure,120,4.5
+392,Kithal Ella Waterfall,6.8545,81.0312,Badulla,Nature|Adventure,60,4.2
+393,Broughton Estate Bungalow,6.7912,80.9612,Badulla,History|Culture,60,4
+394,Dambawinna Purana Vihara,6.8912,80.9123,Badulla,History|Religion,45,4.1
+395,Ampitiya Archaeological Site,7.1234,81.1234,Badulla,History|Culture,90,3.9
+396,Boliyedda Vihara,7.0567,81.0834,Badulla,Religion|History,45,3.8
+397,Andagala Ruins,7.2123,81.2123,Badulla,History|Adventure,120,4
+398,Badulla Provincial Council Building,6.9923,81.0567,Badulla,History|City,30,3.7
+399,Paranavitana Library Inscription,6.9934,81.0589,Badulla,History|Culture,30,4.2
+400,Badulla Dutch Fort Site,6.9876,81.0534,Badulla,History|City,60,4.1
+401,Mana Ella Waterfall,6.9123,80.9234,Badulla,Nature|Adventure,90,4.3
+402,Kaluwa Wetuna Waterfall,7.2512,81.0545,Badulla,Nature|Adventure,120,4.5
+403,Ratna Ella Waterfall,7.2912,81.0234,Badulla,Nature|Adventure,180,4.8
+404,Bambaragala Peak Ella,6.8834,81.0234,Badulla,Nature|Adventure,240,4.4
+405,Thangamale Bird Sanctuary,6.7634,80.9412,Badulla,Nature|Wildlife,180,4.6
+406,Eagle Rock Viewpoint,6.7512,80.9634,Badulla,Nature|Adventure,120,4.7
+407,Prabhawa Mountain Viewpoint,6.7734,80.9545,Badulla,Nature|Adventure,90,4.5
+408,St. Catherine's Seat,6.8123,80.9834,Badulla,Nature|History,60,4.4
+409,Pilkington Point,6.7412,81.0123,Badulla,Nature|Adventure,45,4.3
+410,Devil's Staircase Route,6.7834,80.8234,Badulla,Adventure|Nature,360,4.9
+411,Dandukumbura Raja Maha Vihara,7.1812,81.1834,Badulla,History|Religion,60,4
+412,Alankaragobe Purana Vihara,7.1545,81.1123,Badulla,History|Religion,45,3.9
+413,Ampitiya Vihara Badulla,6.9956,81.0712,Badulla,History|Religion,40,3.8
+414,Andeniya Timber Bridge,6.9934,81.0412,Badulla,History|Adventure,30,4.1
+415,Badulla Base Hospital Colonial Bldg,6.9912,81.0545,Badulla,History|City,30,3.6
+416,Badulla District Secretary Bungalow,6.9921,81.0612,Badulla,History|City,20,3.7
+417,Badulla GA Bungalow,6.9925,81.0623,Badulla,History|City,20,3.8
+418,Badulla Court Complex,6.9902,81.0556,Badulla,History|City,30,3.9
+419,Bandarawela Hotel Colonial Bldg,6.8292,80.9876,Badulla,History|Culture,60,4.4
+420,Glen Alpin Estate,6.9512,81.0345,Badulla,Culture|Nature,60,4
+421,Spring Valley Estate,7.0123,81.1123,Badulla,Culture|Nature,90,4.2
+422,Telbedde Tea Estate,6.9712,81.0834,Badulla,Culture|Nature,90,4.1
+423,Ury Estate,7.0345,81.1234,Badulla,Culture|Nature,60,3.9
+424,Wewessa Tea Estate,6.9812,81.1123,Badulla,Culture|Nature,60,4
+425,Cullen Estate,6.7545,80.9123,Badulla,Culture|Nature,60,4.1
+426,Gowerakelle Estate,6.8912,81.1123,Badulla,Culture|Nature,60,4
+427,Newburgh Green Tea Factory,6.8712,81.0634,Badulla,Culture|Nature,90,4.3
+428,Aruna Passara Tea Factory,6.9345,81.1545,Badulla,Culture|Nature,60,3.9
+429,Hapugahawatta Tea Factory,6.8123,80.9567,Badulla,Culture|Nature,45,4
+430,Gold Buds Uva Tea Factory,6.9945,81.0812,Badulla,Culture|Nature,60,4.1
+431,Iddalgashena Tea Factory,6.7834,80.8912,Badulla,Culture|Nature,90,4.5
+432,Needwood Tea Factory,6.7712,80.8812,Badulla,Culture|Nature,60,4
+433,Cannavarella Tea Factory,6.9212,81.1234,Badulla,Culture|Nature,60,3.9
+434,Rookatenna Tea Estate,6.9567,81.0345,Badulla,Culture|Nature,60,4.1
+435,St. James Tea Estate,6.9234,81.0567,Badulla,Culture|Nature,60,4
+436,Sarnia Group Tea Estate,6.9412,81.1234,Badulla,Culture|Nature,90,4.2
+437,Chelsea Tea Estate,6.8512,81.0123,Badulla,Culture|Nature,60,4
+438,Dyraaba Tea Estate,6.8312,80.9545,Badulla,Culture|Nature,60,3.9
+439,Demodera Group Tea Estate,6.8834,81.0712,Badulla,Culture|Nature,90,4.3
+440,Hindagala Tea Estate,6.9123,81.1123,Badulla,Culture|Nature,60,4.1
+441,Kandahena Group Tea Estate,6.9345,81.1345,Badulla,Culture|Nature,60,4
+442,Keenakelle Tea Estate,6.9567,81.1545,Badulla,Culture|Nature,60,3.9
+443,Nahavilla Tea Estate,6.8912,81.0834,Badulla,Culture|Nature,60,4
+444,Neluwa Tea Estate,6.8412,80.9834,Badulla,Culture|Nature,60,4.1
+445,Prince's Land Tea Estate,7.0123,81.0545,Badulla,Culture|Nature,60,4
+446,Rosette Tea Estate,6.9678,81.0234,Badulla,Culture|Nature,60,3.9
+447,Yelverton Tea Estate,6.8612,81.0545,Badulla,Culture|Nature,60,4
+448,Cecilton Tea Estate,6.7212,80.9123,Badulla,Culture|Nature,60,4.1
+449,Pettiagalla Tea Estate,6.7456,80.9234,Badulla,Culture|Nature,60,4
+450,Rasagalla Tea Estate,6.7123,80.8912,Badulla,Culture|Nature,60,4.1
+451,Adi Hate Wala Ella Waterfall,6.9212,81.1545,Badulla,Nature|Adventure,45,3.9
+452,Alakolagala Ella Waterfall,6.9812,81.1834,Badulla,Nature|Adventure,60,4
+453,Alikola Oya North Waterfall,6.9567,81.1612,Badulla,Nature|Adventure,60,3.8
+454,Aradunu Ella Waterfall,7.0212,81.1123,Badulla,Nature|Adventure,60,3.9
+455,Arawakumbura Dunhinda Waterfall,7.1234,81.1545,Badulla,Nature|Adventure,90,4.2
+456,Dehigala Ella Waterfall,7.0512,81.0834,Badulla,Nature|Adventure,60,4.1
+457,Diyabetma Ella Waterfall,6.9123,81.0545,Badulla,Nature|Adventure,45,3.7
+458,Diyawetena Ella Waterfall,6.8912,81.1123,Badulla,Nature|Adventure,60,4
+459,Dumpeella Ella Waterfall,6.8412,80.9834,Badulla,Nature|Adventure,60,3.9
+460,Dun Ella Waterfall,6.8123,81.0545,Badulla,Nature|Adventure,60,4.1
+461,Ellatota Ella Waterfall,6.7912,80.9123,Badulla,Nature|Adventure,45,4
+462,Gal Ekka Ella Waterfall,6.7512,81.0234,Badulla,Nature|Adventure,60,3.8
+463,Galkanda Ella Waterfall,6.7212,81.0834,Badulla,Nature|Adventure,60,3.9
+464,Gerandi Ella Ettampitiya,6.9567,81.0123,Badulla,Nature|Adventure,90,4.2
+465,Kirindioya Ella Waterfall,6.7123,81.0234,Badulla,Nature|Adventure,90,4.3
+466,Kuda Dunhinda Waterfall,7.0256,81.0634,Badulla,Nature|Adventure,45,4.4
+467,Kudalu Ella Waterfall,6.9812,81.0545,Badulla,Nature|Adventure,45,3.9
+468,Mahadola Ella Waterfall,6.8912,81.1545,Badulla,Nature|Adventure,60,3.8
+469,Mana Ella Welimada,6.9034,80.9123,Badulla,Nature|Adventure,90,4.2
+470,Meemana Ella Waterfall,6.8612,81.1123,Badulla,Nature|Adventure,60,3.9
+471,Milla Ella Waterfall,6.8212,81.0545,Badulla,Nature|Adventure,45,4
+472,Nagadowa Ella Waterfall,6.7912,81.0834,Badulla,Nature|Adventure,60,3.8
+473,Nagarak Ella Waterfall,6.7612,80.8234,Badulla,Nature|Adventure,120,4.5
+474,Nalini Ella Waterfall,6.7412,81.0545,Badulla,Nature|Adventure,60,3.9
+475,Obada Ella Waterfall,6.7212,81.0123,Badulla,Nature|Adventure,45,3.7
+476,Pankandura Ella Waterfall,6.8512,80.9545,Badulla,Nature|Adventure,60,3.8
+477,Papulagala Ella Waterfall,6.8834,81.0712,Badulla,Nature|Adventure,60,4
+478,Piyangiri Ella Waterfall,6.9123,81.1123,Badulla,Nature|Adventure,60,3.9
+479,Ranpuhulan Ella Waterfall,6.9345,81.1345,Badulla,Nature|Adventure,60,4.1
+480,Ranugalla Dunhinda Waterfall,7.1567,81.1545,Badulla,Nature|Adventure,120,4.4
+481,Ravana Ella Upper Falls,6.8423,81.0534,Badulla,Nature|Adventure,90,4.6
+482,Uduwara Ella Waterfall,6.8912,81.0834,Badulla,Nature|Adventure,60,4.1
+483,Unagolla Ella Waterfall,6.8412,80.9834,Badulla,Nature|Adventure,60,4
+484,Walankanda Ella Waterfall,7.0123,81.0545,Badulla,Nature|Adventure,60,3.9
+485,Wanduramala Ella Waterfall,6.9678,81.0234,Badulla,Nature|Adventure,60,4
+486,Wewassa Ella Waterfall Passara,6.9712,81.1545,Badulla,Nature|Adventure,90,4.2
+487,Wishari Ella Waterfall,6.8123,80.9567,Badulla,Nature|Adventure,45,3.8
+488,Haldummulla Ella Waterfall,6.7712,80.8912,Badulla,Nature|Adventure,60,4.1
+489,Gotuwala Ella Waterfall,6.9123,81.0545,Badulla,Nature|Adventure,45,3.9
+490,Weebeddegedara Kandura Ella,6.9567,81.1123,Badulla,Nature|Adventure,60,3.7
+491,Akurukaduwa Ella Waterfall,6.9812,81.0834,Badulla,Nature|Adventure,45,3.8
+492,Polgahaarawa Kaluwala Pool,6.8912,81.0412,Badulla,Nature|Adventure,60,4
+493,Maduwalla Kandura Ella,6.8412,81.0234,Badulla,Nature|Adventure,45,3.9
+494,Jeewan Ella Waterfall,6.8123,81.1234,Badulla,Nature|Adventure,60,4.1
+495,Hakurutale Ella Waterfall,7.0345,81.1545,Badulla,Nature|Adventure,60,4
+496,Mandawala Ella Waterfall,7.0123,81.1345,Badulla,Nature|Adventure,45,3.9
+497,Radella Ella Waterfall,6.9812,81.1234,Badulla,Nature|Adventure,60,4
+498,Diyagalla Ella Waterfall,6.9456,81.1123,Badulla,Nature|Adventure,60,4.1
+499,Bomburu Ella Upper Cascade,6.9323,80.8876,Badulla,Nature|Adventure,180,4.8
+500,Pallewela Secret Waterfall,6.8112,81.1145,Badulla,Nature|Adventure,90,4.5
+501,Muthiyangana Ancient Stupa,6.9915,81.0558,Badulla,Religion|History,30,4.8
+502,Badulla Prison Colonial Building,6.9928,81.0562,Badulla,History|City,20,3.4
+503,Badulla Railway Station Bungalow,6.9912,81.0423,Badulla,History|City,30,4
+504,Badulla Rose Bank Building,6.9934,81.0592,Badulla,History|City,20,3.8
+505,Badulla Salusala Building,6.9921,81.0545,Badulla,History|City,20,3.5
+506,Badulla SP Bungalow,6.9912,81.0534,Badulla,History|City,15,3.7
+507,Bandarawela Central Market,6.8312,80.9856,Badulla,City|Culture,45,4.1
+508,Dhowa Tunnel Entrance,6.8248,81.0125,Badulla,History|Adventure,30,4.2
+509,Buduge Kanda Raja Maha Vihara,7.0412,81.0567,Badulla,History|Religion,60,4.1
+510,Bulathwatta Len Vihara,6.9312,81.0234,Badulla,History|Religion,45,4
+511,Dikkapitiya Purana Vihara,6.8834,80.9234,Badulla,History|Religion,45,3.9
+512,Bibilegama Temple Area,6.9123,81.1545,Badulla,History|Culture,60,3.8
+513,Yahalatamadiththa Temple,6.8612,81.0423,Badulla,Religion|History,45,4
+514,Karandagolla Prehistoric Caves,6.8234,81.0856,Badulla,History|Adventure,120,4.4
+515,Kurullangala Cave Art Site,6.8212,81.0878,Badulla,History|Adventure,180,4.5
+516,Mahamevnawa Monastery Bandarawela,6.8234,80.9612,Badulla,Religion|Culture,60,4.8
+517,Ghaneson Hindu Kovil Ella,6.8712,81.0456,Badulla,Religion|Culture,30,4.2
+518,Ravana Cave Temple,6.8423,81.0523,Badulla,Religion|History,60,4.3
+519,Demodara Tunnel Viewpoint,6.9012,81.0634,Badulla,Adventure|Nature,30,4.1
+520,Black Bridge Ella,6.8634,81.0412,Badulla,History|Adventure,30,4
+521,Ravana Pool Club,6.8612,81.0612,Badulla,City|Adventure,180,4.7
+522,Ella Town Main Street,6.8723,81.0456,Badulla,City|Culture,120,4.5
+523,Haputale Railway Station View,6.7678,80.9512,Badulla,City|Nature,30,4.6
+524,Diyatalawa Military Academy,6.8123,80.9412,Badulla,History|City,60,3.9
+525,Haldummulla Town Viewpoint,6.7712,80.8912,Badulla,Nature|City,30,4.2
+526,Beragala Junction Viewpoint,6.7512,80.9123,Badulla,Nature|City,20,4.4
+527,Koslanda Town Center,6.7412,81.0234,Badulla,City|Culture,45,3.8
+528,Welimada Market Square,6.9034,80.9123,Badulla,City|Culture,60,3.9
+529,Passara Town Clock Tower,6.9345,81.1545,Badulla,City|History,15,3.6
+530,Lunugala Tea Valley View,7.0334,81.2012,Badulla,Nature|Culture,45,4.1
+531,Viyaluwa Valley Viewpoint,7.1234,81.1123,Badulla,Nature|Adventure,60,4.3
+532,Meegahakivula Ancient Temple,7.1545,81.1234,Badulla,Religion|History,45,3.8
+533,Kandaketiya Rice Fields,7.1812,81.1545,Badulla,Nature|Culture,90,4
+534,Sorabora Lake Boating Point,7.3478,81.0134,Badulla,Adventure|Nature,60,4.5
+535,Dambana Cultural Center,7.3912,81.1123,Badulla,Culture|History,90,4.2
+536,Mahaweli River View Mahiyangana,7.3112,80.9834,Badulla,Nature|Wildlife,45,4.3
+537,Victoria Randenigala Sanctuary,7.2123,80.9545,Badulla,Wildlife|Nature,120,4.4
+538,Loggal Oya Reservoir,7.1812,81.0234,Badulla,Nature|Wildlife,60,4
+539,Badulu Oya River Bathing Point,6.9834,81.0612,Badulla,Nature|Adventure,60,4.1
+540,Muthiyangana Bo Tree,6.9912,81.0554,Badulla,Religion|History,20,4.7
+541,Badulla Municipal Garden,6.9934,81.0512,Badulla,City|Nature,45,3.9
+542,Haputale Black Forest,6.7512,80.9612,Badulla,Nature|Wildlife,150,4.5
+543,Thotulagala Tea Plantation View,6.7567,80.9545,Badulla,Nature|Culture,60,4.4
+544,Nayabedda Estate Viewpoint,6.8123,80.9812,Badulla,Nature|Culture,60,4.3
+545,Idalgashena Gap Viewpoint,6.7812,80.8912,Badulla,Nature|Adventure,90,4.8
+546,Kandegedara Ancient Temple,7.0234,81.0834,Badulla,Religion|History,45,4
+547,Uva Highlands Viewpoint,6.9812,81.0834,Badulla,Nature|Culture,45,4.2
+548,Spring Valley Forest Reserve,7.0123,81.1123,Badulla,Nature|Wildlife,180,4.4
+549,Namunukula Nine Peaks Trail,6.9234,81.1145,Badulla,Nature|Adventure,360,4.7
+550,Ballaketuwa Tea Valley,6.9412,81.1345,Badulla,Nature|Culture,60,4.1
+551,Nallur Kandaswamy Kovil,9.6745,80.0293,Jaffna,Religion|Culture|History,90,4.8
+552,Jaffna Dutch Fort,9.6616,80.007,Jaffna,History|City,120,4.5
+553,Jaffna Public Library,9.662,80.0115,Jaffna,History|Culture|City,60,4.7
+554,Keerimalai Sacred Water Springs,9.8167,80,Jaffna,Nature|Religion,60,4.4
+555,Naguleswaram Shiva Temple,9.8168,80.0001,Jaffna,Religion|History,45,4.4
+556,Casuarina Beach Karainagar,9.7558,79.8833,Jaffna,Beach|Nature,180,4.6
+557,Delft Island (Neduntheevu),9.5167,79.6833,Jaffna,Nature|Wildlife|History,360,4.4
+558,Nagadeepa Purana Viharaya,9.6167,79.7667,Jaffna,Religion|History,90,4.6
+559,Nainativu Nagapooshani Amman Temple,9.619,79.7743,Jaffna,Religion|Culture,90,4.7
+560,Point Pedro Lighthouse,9.8269,80.2497,Jaffna,History|Beach,30,4.3
+561,Kantharodai (Kadurugoda Viharaya),9.746,80.003,Jaffna,History|Religion,60,4.5
+562,Elephant Pass War Memorial,9.3333,80.4,Jaffna,History,45,4.1
+563,Manthri Manai (Minister Residence),9.675,80.035,Jaffna,History|Culture,30,4.2
+564,Sangiliyan Thoppu (Palace Arch),9.676,80.036,Jaffna,History|Landmark,20,4.3
+565,Charty Beach,9.5833,79.95,Jaffna,Beach|Nature,120,4.1
+566,Jaffna Archaeological Museum,9.6667,80.0233,Jaffna,History|Culture,60,4.3
+567,Rio Ice Cream Parlour,9.673,80.028,Jaffna,City|Culture,45,4.4
+568,Jaffna Clock Tower,9.6644,80.0108,Jaffna,History|City,15,4.2
+569,Dambakola Patuna (Jambukola),9.816,79.916,Jaffna,History|Religion,60,4.6
+570,Nilavarai Bottomless Well,9.75,80.0833,Jaffna,Nature|History,45,4.3
+571,Fort Hammenhiel,9.7,79.8667,Jaffna,History|Adventure,120,4.4
+572,Point Pedro Northernmost Tip,9.8333,80.2333,Jaffna,Beach|Landmark,30,4.5
+573,Manalkadu Sand Dunes,9.7333,80.2667,Jaffna,Nature|Beach,90,4.2
+574,St. Mary's Cathedral Jaffna,9.6642,80.0245,Jaffna,Religion|History,45,4.5
+575,Ariyalai Siddhivinayakar Temple,9.6592,80.0475,Jaffna,Religion|Culture,45,4.4
+576,Kankesanthurai Beach,9.8167,80.05,Jaffna,Beach|Nature,120,4.4
+577,Keerimalai Hanuman Murti,9.8165,80.0005,Jaffna,Religion|Landmark,15,4.1
+578,Maruthanarmadam Hanuman Statue,9.723,80.016,Jaffna,Religion|Landmark,20,4.5
+579,Vallipuram Alvar Vishnu Temple,9.8,80.2333,Jaffna,Religion|History,60,4.4
+580,Gurunagar Fish Market,9.658,80.015,Jaffna,City|Culture,60,4.3
+581,Jaffna Public Park,9.665,80.011,Jaffna,City|Nature,60,4.3
+582,SJV Chelvanayakam Monument,9.6655,80.012,Jaffna,History|City,15,4.1
+583,Our Lady of Refuge Church,9.663,80.018,Jaffna,Religion|History,30,4.5
+584,Jaffna Central Market,9.664,80.013,Jaffna,City|Culture,90,4
+585,Old Kachcheri Building Ruins,9.668,80.03,Jaffna,History,30,4.2
+586,Jamuna Eri (Royal Pond),9.6755,80.0355,Jaffna,History|Nature,30,4
+587,Vaitheeswaran Temple,9.6715,80.0103,Jaffna,Religion,45,4.3
+588,Chathurantham (Mandaitivu),9.6167,79.9833,Jaffna,Nature|Beach,120,4
+589,Kovilan Point Lighthouse,9.7618,79.8633,Jaffna,History|Beach,30,4.2
+590,Nagathambiran Kovil,9.7833,80.1333,Jaffna,Religion|Culture,45,4.1
+591,Delft Baobab Tree,9.505,79.7,Jaffna,Nature|History,20,4.5
+592,Delft Pigeon Cot,9.51,79.69,Jaffna,History,15,4.2
+593,Delft Dutch Hospital,9.511,79.691,Jaffna,History,30,4
+594,Delft Wild Horse Plains,9.52,79.71,Jaffna,Nature|Wildlife,120,4.7
+595,Delft Queens Tower,9.49,79.72,Jaffna,History,30,4.3
+596,Growing Stone (Delft),9.515,79.705,Jaffna,Nature|Religion,20,4.1
+597,Hanuman Footprint (Delft),9.518,79.708,Jaffna,Religion|Nature,15,4
+598,British Horse Stables (Delft),9.508,79.7005,Jaffna,History,30,3.9
+599,Cholan Buddhist Ruins (Delft),9.512,79.688,Jaffna,History|Religion,45,4
+600,Akkarai Beach,9.65,80.05,Jaffna,Beach|Nature,120,4.1
+601,Kovitkadavai Pillaiyar,9.81,80.18,Jaffna,Religion,45,4.2
+602,Maviddapuram Kandaswamy Temple,9.8011,80.035,Jaffna,Religion|History,60,4.6
+603,Saddanathar Sivan Kovil,9.6733,80.0333,Jaffna,Religion|History,45,4.2
+604,Sri Muthu Vinayagar Kovil,9.6214,80.1091,Jaffna,Religion,45,4.3
+605,Ubayakathirgamam Temple,9.82,80.2,Jaffna,Religion,60,4.4
+606,Vannarpannai Vaitheeswaran Temple,9.6715,80.0103,Jaffna,Religion|History,45,4.4
+607,Velakkai Pillaiyar Temple,9.7167,79.9833,Jaffna,Religion,45,4.1
+608,Jaffna Central College (1816),9.6616,80.0142,Jaffna,History|City,30,4.2
+609,St. John's College (1823),9.6577,80.0269,Jaffna,History|City,30,4.2
+610,Chundikuli Girls College (1896),9.656,80.0287,Jaffna,History|City,20,4.1
+611,Vembadi Girls' High School,9.6625,80.0125,Jaffna,History|City,20,4
+612,Uduvil Girls' College (1824),9.73,80.01,Jaffna,History|City,30,4.3
+613,Hartley College Point Pedro,9.825,80.245,Jaffna,History|City,20,4.2
+614,Union College Tellippalai,9.78,80.03,Jaffna,History|City,30,4.1
+615,Holy Family Convent Jaffna,9.6635,80.0235,Jaffna,History|City,20,4
+616,St. Patrick's College,9.66,80.025,Jaffna,History|City,30,4.2
+617,Jaffna College (Vaddukoddai),9.74,79.93,Jaffna,History|City,45,4.4
+618,Drieberg College Chavakachcheri,9.65,80.15,Jaffna,History|City,20,3.9
+619,Jaffna Channel Lighthouse,9.627,80.0328,Jaffna,History,15,4
+620,Kankesanthurai Lighthouse,9.8161,80.0448,Jaffna,History,15,4.1
+621,Pungudutivu Lighthouse,9.5678,79.8541,Jaffna,History,15,3.9
+622,St. Antony's Shrine Kachchatheevu,9.3833,79.5167,Jaffna,Religion|Adventure,120,4.8
+623,Palace of Thiruvasagam,9.645,80.115,Jaffna,Culture|Religion,90,4.6
+624,Maruthanarmadam Market,9.7235,80.0155,Jaffna,City|Culture,60,4.3
+625,Maviddapuram Murugan Kovil,9.8,80.034,Jaffna,Religion|History,60,4.5
+626,Achchelu Easan Temple,9.745,80.095,Jaffna,Religion,45,4.1
+627,Achchuveli Dutch Church Ruins,9.748,80.101,Jaffna,History,30,4
+628,Allolai Siva Temple,9.65,80.02,Jaffna,Religion,30,4
+629,Araly Wisalachchi Temple,9.68,79.94,Jaffna,Religion,45,4.2
+630,Chunnakam Sivan Kovil,9.746,80.015,Jaffna,Religion,45,4.3
+631,Inuvil Kandaswamy Temple,9.715,80.005,Jaffna,Religion,60,4.4
+632,Kodikamam Gnanavairavar,9.685,80.19,Jaffna,Religion,45,4
+633,Kokuvil Parameswaran Kovil,9.6855,80.0175,Jaffna,Religion,45,4.3
+634,Kopay Sivan Temple,9.705,80.06,Jaffna,Religion,45,4.1
+635,Mylani Visvanatha Sivan,9.74,80.02,Jaffna,Religion,45,4.2
+636,Navaly Kasikandam Sivan,9.68,79.97,Jaffna,Religion,45,4.1
+637,Neervely Perunthalai Sivan,9.72,80.06,Jaffna,Religion,60,4.3
+638,Pannipulam Jambunathar,9.735,79.95,Jaffna,Religion,45,4.2
+639,Puloly Pasupatheeswarar,9.815,80.23,Jaffna,Religion,60,4.4
+640,Puththur Nilavarai Pond,9.752,80.0835,Jaffna,Nature|History,45,4.3
+641,Sandilipay Nunasai Sivan,9.725,79.965,Jaffna,Religion,45,4.1
+642,Sithankeny Sivan Kovil,9.72,79.945,Jaffna,Religion,45,4.2
+643,Thondamanaru Selva Sannithi,9.814,80.138,Jaffna,Religion|Culture,90,4.7
+644,Urumpirai Chokkanathar,9.705,80.035,Jaffna,Religion,45,4.2
+645,Vaddukoddai Sivan Kovil,9.74,79.932,Jaffna,Religion|History,60,4.5
+646,Valvettithurai Sivan Temple,9.825,80.17,Jaffna,Religion|Culture,60,4.4
+647,Ariyalai Mahamari Amman,9.655,80.055,Jaffna,Religion,45,4.3
+648,Karainagar Sivan Temple,9.748,79.885,Jaffna,Religion|Culture,60,4.5
+649,Uppukulam Pillayar Temple,9.66,80.01,Jaffna,Religion,30,4
+650,Urumpirai Katpakappillaiyaar,9.71,80.038,Jaffna,Religion,45,4.3
+651,Arasady Vyravar Chankanai,9.755,79.96,Jaffna,Religion,30,4
+652,Nagendra Madam Sivan,9.695,79.945,Jaffna,Religion,30,3.9
+653,Nallur Sivan Temple,9.673,80.031,Jaffna,Religion,45,4.2
+654,Nanthavil Amman Kokuvil,9.69,80.015,Jaffna,Religion,45,4.1
+655,Narasingha Vairavar,9.66,80.185,Jaffna,Religion,30,4
+656,Neeraviyadi Sri Natesar,9.668,80.022,Jaffna,Religion,45,4.2
+657,Om Sri Palayadipillayar,9.655,80.205,Jaffna,Religion,30,4
+658,Palaly Raja Rajeswari,9.81,80.08,Jaffna,Religion,45,4.2
+659,Paralai Eeswara Vinayagar,9.745,79.945,Jaffna,Religion,45,4.1
+660,Periya Thambiran Achchuveli,9.75,80.105,Jaffna,Religion,45,4
+661,Ponnampalavaneswarar,9.665,80.008,Jaffna,Religion,45,4.2
+662,Puttalai Pillayar Temple,9.76,80.2,Jaffna,Religion,45,4.1
+663,Sanguvelly Sivagnana,9.705,80.005,Jaffna,Religion,45,4
+664,Selva Sannithi Murugan,9.8135,80.1385,Jaffna,Religion|Culture,60,4.6
+665,Aavarangal Sivan Temple,9.758,80.1165,Jaffna,Religion,45,4.2
+666,Saravanai Sivan Temple,9.645,79.935,Jaffna,Religion,45,4.1
+667,Kayts Sivan Temple,9.691,79.905,Jaffna,Religion,45,4
+668,Kopay South Sivan,9.7,80.065,Jaffna,Religion,30,4
+669,Mahiyapiddy Sivan Temple,9.742,79.975,Jaffna,Religion,45,4.1
+670,Punnalaikadduwan Sivan,9.76,80.05,Jaffna,Religion,45,4.2
+671,St. Joseph's Alaveddy,9.753,80.015,Jaffna,Religion|History,30,4.1
+672,St. Philip Neris Allaipiddy,9.635,79.985,Jaffna,Religion|History,30,4.2
+673,Our Lady of Refuge Anaicoddai,9.68,79.985,Jaffna,Religion|History,30,4.1
+674,Sacred Heart Navali,9.685,79.975,Jaffna,Religion|History,30,4
+675,St. Peters Navali South,9.675,79.97,Jaffna,Religion|History,30,4
+676,Our Lady of Good Health,9.67,80.03,Jaffna,Religion|History,20,4.1
+677,St. Joseph's Atchuvely,9.745,80.105,Jaffna,Religion|History,30,4.1
+678,Mount Carmel Vasavilan,9.805,80.075,Jaffna,Religion|History,30,4
+679,Our Lady of Good Voyage Chaddy,9.61,79.94,Jaffna,Religion|History|Beach,45,4.3
+680,St. Anthony's Mannkamban,9.625,79.965,Jaffna,Religion|History,30,4.1
+681,St. Theresa's Chundikuli,9.658,80.03,Jaffna,Religion|History,30,4.2
+682,Our Lady of Madhu Messalai,9.66,80.2,Jaffna,Religion|History,30,4.1
+683,St. Anthony's Navatkuli,9.65,80.09,Jaffna,Religion|History,30,4
+684,Our Lady of Vellankanny,9.68,80.21,Jaffna,Religion|History,30,4.1
+685,Our Lady of Miracle Navatkuli,9.655,80.095,Jaffna,Religion|History,30,4.2
+686,Our Lady of Lourdes Madduvil,9.67,80.18,Jaffna,Religion|History,30,4.1
+687,Our Lady of Rosary Columbuthurei,9.645,80.04,Jaffna,Religion|History,30,4.2
+688,St. Thomas Delft,9.51,79.685,Jaffna,Religion|History,20,4
+689,St. Lawrence Delft,9.52,79.68,Jaffna,Religion|History,20,4
+690,Mount Carmel Gurunagar,9.655,80.015,Jaffna,Religion|History,30,4.3
+691,Holy Redeemer Maniyanthottam,9.648,80.038,Jaffna,Religion|History,30,4.1
+692,St. Nicholas Navanturai,9.665,79.995,Jaffna,Religion|History,30,4.1
+693,St. Anthony's Manipay,9.715,79.98,Jaffna,Religion|History,30,4.2
+694,Our Lady of Fatima Pandatheripu,9.75,79.95,Jaffna,Religion|History,30,4.2
+695,Kathirai Madha Sillalai,9.765,79.94,Jaffna,Religion|History,45,4.4
+696,Our Lady of Lourdes Pt Pedro,9.825,80.235,Jaffna,Religion|History,30,4.3
+697,Our Lady of Velankani Pt Pedro,9.82,80.24,Jaffna,Religion|History,30,4.2
+698,St. Michel's Urumpirai,9.7,80.03,Jaffna,Religion|History,30,4.1
+699,St. Jude's Ariyalai,9.655,80.045,Jaffna,Religion|History,30,4.1
+700,Old Park Jaffna,9.6685,80.025,Jaffna,City|Nature,60,4.3
+701,Subramaniyam Park,9.6635,80.0145,Jaffna,City|Nature,45,4.2
+702,Pannai Park,9.66,80.01,Jaffna,City|Nature,45,4.1
+703,Pannai Causeway Bridge,9.658,80.005,Jaffna,City|Nature|Landmark,30,4.7
+704,Jaffna Lagoon Viewpoint,9.65,80.01,Jaffna,Nature|Landmark,30,4.5
+705,MGR Statue Passaiyoor,9.652,80.03,Jaffna,Culture|Landmark,15,4
+706,Gateway of Jaffna (A9),9.638,80.125,Jaffna,Landmark,10,4.3
+707,Jaffna Heritage Hotel Area,9.675,80.028,Jaffna,City|Culture,45,4.4
+708,Earlalai Public Library,9.715,80.035,Jaffna,City|Culture,30,4.7
+709,Yamuna Eri,9.6755,80.0355,Jaffna,History|Nature,20,4
+710,Poothathamby Arch,9.6765,80.0365,Jaffna,History|Landmark,15,4.5
+711,Jaffna Cultural Centre,9.664,80.011,Jaffna,Culture|City,60,4.4
+712,Public Park Jaffna Fort,9.661,80.005,Jaffna,City|Nature,60,4.3
+713,Arumuka Navalar House,9.668,80.02,Jaffna,History|Culture,30,4.1
+714,Chankanai Dutch Church,9.755,79.965,Jaffna,History,30,4
+715,Myliddy Church Ruins,9.81,80.055,Jaffna,History,30,3.9
+716,Delft Island Fort Ruins,9.513,79.687,Jaffna,History,45,4.2
+717,Indu Sathanam Hall,9.6685,80.023,Jaffna,History|Culture,20,4
+718,Jaffna Hindu College (Old),9.669,80.024,Jaffna,History,20,4.1
+719,Kilnar Hall Vannarpannai,9.672,80.015,Jaffna,History,20,4
+720,Manalkadu Church Ruins,9.735,80.268,Jaffna,History,45,4.3
+721,Kayts Dutch Church Ruins,9.692,79.904,Jaffna,History,30,4
+722,Kayts Island Fort,9.705,79.88,Jaffna,History,45,4.1
+723,Muthukumara Swamy Pond,9.78,80.2,Jaffna,History|Religion,30,4
+724,Navalar Maha Vidyalayam,9.67,80.018,Jaffna,History,20,4
+725,Pungudutivu Church Ruins,9.57,79.85,Jaffna,History,30,3.9
+726,Sarapiddy Stables (Delft),9.505,79.71,Jaffna,History,30,4
+727,St. Anthony's Karampon,9.67,79.89,Jaffna,Religion|History,30,4.1
+728,Bishop's House Karampon,9.671,79.891,Jaffna,History,20,4
+729,St. Francis Church Alvai,9.815,80.21,Jaffna,Religion|History,30,4
+730,St. James Church Nallur,9.675,80.03,Jaffna,Religion|History,30,4.1
+731,St. John Baptist Chundikuli,9.657,80.0275,Jaffna,Religion|History,30,4.2
+732,St. Martin's Building,9.664,80.025,Jaffna,History,20,4
+733,St. Peter's Mandaitivu,9.615,79.99,Jaffna,Religion|History,30,4
+734,Vaddukoddai Cathedral,9.7405,79.9315,Jaffna,Religion|History,45,4.5
+735,Therimudi Doss House,9.825,80.24,Jaffna,History,15,3.9
+736,Vedi Arasan Fort Delft,9.514,79.686,Jaffna,History,30,4
+737,Veerapattiyar Kovil Uduppiddy,9.8,80.18,Jaffna,Religion|History,45,4.2
+738,Parali Murugan Bodhi Tree,9.75,79.94,Jaffna,Religion|History,30,4.1
+739,Nagavihara Buddhist Temple,9.67,80.02,Jaffna,Religion|History,45,4.5
+740,Jaffna Railway Station Area,9.668,80.022,Jaffna,City|History,30,4.1
+741,Kankesanthurai Harbour,9.82,80.04,Jaffna,Landmark|History,45,4.2
+742,Thalsawena Resort Beach,9.822,80.045,Jaffna,Beach|Nature,120,4.4
+743,Mathagal Beach,9.815,79.92,Jaffna,Beach|Nature,120,4.1
+744,Kaakkai Thevu Fish Market,9.66,79.98,Jaffna,City|Culture,60,4
+745,Passaiyoor Beach,9.651,80.035,Jaffna,Beach|Culture,60,3.9
+746,Kallady Sivan Temple,9.824,80.175,Jaffna,Religion,45,4.1
+747,Polikandy Pillayaar,9.828,80.185,Jaffna,Religion,30,4
+748,Manthikai Government Hospital,9.81,80.22,Jaffna,City|Landmark,15,3.8
+749,Valampuri Restaurant Area,9.669,80.0225,Jaffna,City|Culture,60,4.5
+750,Elephant Pass Water Tank,9.335,80.405,Jaffna,History,15,4
+751,Galle Dutch Fort,6.0258,80.2175,Galle,History|Culture|City,240,4.7
+752,Galle Lighthouse,6.0248,80.2185,Galle,History|Beach|City,30,4.6
+753,Dutch Reformed Church (Groote Kerk),6.0264,80.2166,Galle,History|Religion|Culture,45,4.5
+754,Galle National Museum,6.0267,80.2163,Galle,History|Culture,60,4.3
+755,National Maritime Museum Galle,6.0275,80.2169,Galle,History|Culture,90,4.3
+756,Old Dutch Hospital Shopping Precinct,6.0261,80.2181,Galle,History|City|Culture,120,4.4
+757,Galle Fort Clock Tower,6.0303,80.2155,Galle,History|City,20,4.5
+758,Sun Bastion,6.0294,80.2144,Galle,History|Adventure,30,4.5
+759,Moon Bastion,6.0284,80.2148,Galle,History|Adventure,30,4.6
+760,Star Bastion,6.0295,80.2132,Galle,History|Adventure,30,4.5
+761,Zwart Bastion (Black Bastion),6.027,80.2189,Galle,History|Adventure,30,4.4
+762,Akersloot Bastion,6.0263,80.2192,Galle,History|Nature,30,4.4
+763,Aurora Bastion,6.0251,80.219,Galle,History|Adventure,20,4.3
+764,Point Utrecht Bastion,6.0247,80.2184,Galle,History|Beach,20,4.7
+765,Triton Bastion,6.0249,80.2156,Galle,History|Beach,20,4.6
+766,Neptune Bastion,6.0254,80.2145,Galle,History|Beach,20,4.5
+767,Clippenburg Bastion,6.0261,80.2136,Galle,History|Beach,20,4.6
+768,Flagrock Bastion,6.0253,80.2141,Galle,History|Adventure,40,4.7
+769,Aeolus Bastion,6.0273,80.2133,Galle,History|Adventure,20,4.4
+770,Fishmark Bastion,6.0298,80.215,Galle,History|Adventure,20,4.3
+771,Commandment Bastion,6.0305,80.2158,Galle,History|Adventure,20,4.3
+772,The Old Gate (VOC Gate),6.0273,80.2173,Galle,History|Culture,15,4.6
+773,Main Gate Galle Fort,6.0286,80.2146,Galle,History|City,15,4.5
+774,Meeran Jumma Mosque,6.0249,80.2179,Galle,Religion|History|Culture,40,4.4
+775,All Saints Anglican Church,6.0262,80.2164,Galle,Religion|History|Culture,30,4.4
+776,Buddhist Temple (Fort),6.0265,80.215,Galle,Religion|History|Culture,30,4.3
+777,Old Dutch Market (Galle Fruit Market),6.0321,80.2161,Galle,Culture|City,45,4.3
+778,Galle International Cricket Stadium,6.0335,80.2152,Galle,City|Adventure,60,4.7
+779,Sea Turtle Hatchery Mahamodara,6.0412,80.2031,Galle,Wildlife|Nature,60,4.5
+780,Japanese Peace Pagoda Rumassala,6.0118,80.2372,Galle,Religion|Nature|Adventure,60,4.7
+781,Jungle Beach Unawatuna,6.0145,80.2391,Galle,Beach|Nature|Adventure,180,4.6
+782,Unawatuna Beach,6.0108,80.2472,Galle,Beach|Adventure,240,4.7
+783,Yatagala Raja Maha Viharaya,6.0156,80.2642,Galle,Religion|History|Culture,90,4.7
+784,Hiyare Forest Reserve,6.0621,80.3152,Galle,Nature|Wildlife|Adventure,180,4.6
+785,Kanneliya Forest Reserve,6.2512,80.3345,Galle,Nature|Wildlife|Adventure,300,4.8
+786,Anagimale Ella Waterfall,6.2485,80.3412,Galle,Nature|Adventure,60,4.5
+787,Narangas Ella Waterfall,6.2551,80.3524,Galle,Nature|Adventure,120,4.6
+788,Malamura Ella Waterfall,6.2679,80.2948,Galle,Nature|Adventure,90,4.4
+789,Madu Ganga River Safari (Balapitiya),6.2651,80.0351,Galle,Nature|Wildlife|Adventure,120,4.6
+790,Cinnamon Island (Madu Ganga),6.2712,80.0423,Galle,Culture|Nature,60,4.5
+791,Kothduwa Raja Maha Viharaya,6.2845,80.0381,Galle,Religion|History,45,4.6
+792,Satha Paha Duwa (Shrine Island),6.2621,80.0392,Galle,Religion|Culture,20,4.3
+793,Ma Doowa Island,6.2755,80.0312,Galle,Culture|Nature,60,4.4
+794,Ambalangoda Ariyapala Mask Museum,6.2341,80.0532,Galle,Culture|History,60,4.6
+795,Ambalangoda Puppet Art Centre,6.2362,80.0515,Galle,Culture|History,45,4.5
+796,Ambalangoda Fish Market,6.2312,80.0501,Galle,Culture|City,30,4.2
+797,Sunandaramaya Temple Ambalangoda,6.2421,80.0551,Galle,Religion|Culture,40,4.4
+798,Hikkaduwa Coral Sanctuary,6.1362,80.1031,Galle,Nature|Wildlife|Adventure,120,4.5
+799,Hikkaduwa Beach,6.1312,80.1051,Galle,Beach|Adventure,240,4.7
+800,Seenigama Vihara (Island Temple),6.1512,80.0912,Galle,Religion|History|Culture,60,4.6
+801,Tsunami Photo Museum Hikkaduwa,6.1621,80.0851,Galle,History|Culture,60,4.7
+802,Tsunami Honganji Viharaya (Big Buddha),6.1645,80.0842,Galle,Religion|History,30,4.5
+803,Koggala Lake Boat Safari,5.9912,80.3451,Galle,Nature|Wildlife|Adventure,120,4.5
+804,Madol Doova (Mangrove Island),5.9875,80.3512,Galle,Nature|Culture,60,4.6
+805,Martin Wickramasinghe Folk Museum,5.9942,80.3381,Galle,Culture|History,90,4.6
+806,Stilt Fishermen Koggala,5.9921,80.3405,Galle,Culture|Beach,30,4.7
+807,Bentota Beach,6.4212,80.0012,Galle,Beach|Adventure,240,4.8
+808,Brief Garden by Bevis Bawa,6.4421,80.0151,Galle,Nature|Culture,90,4.7
+809,Lunuganga Garden (Geoffrey Bawa),6.4012,80.0251,Galle,Nature|Culture,120,4.8
+810,Kande Viharaya Temple,6.4351,80.0051,Galle,Religion|History,60,4.7
+811,Galapatha Raja Maha Vihara,6.4185,80.0112,Galle,Religion|History,45,4.5
+812,Dalawella Beach (Palm Swing),6.0085,80.2675,Galle,Beach|Adventure,120,4.7
+813,Thalpe Natural Rock Pools,6.0012,80.2851,Galle,Beach|Nature,90,4.6
+814,Kabalana Beach Ahangama,5.9751,80.3851,Galle,Beach|Adventure,180,4.6
+815,Dewata Beach (Surf Spot),6.0312,80.2312,Galle,Beach|Adventure,180,4.5
+816,Historical Mansion Museum,6.0263,80.2155,Galle,History|Culture,45,4.2
+817,Galle Fort Post Office,6.0275,80.2152,Galle,History|City,15,4.1
+818,Dutch Governor's House,6.0269,80.2161,Galle,History,30,4.3
+819,Galle Library (Fort),6.0266,80.2168,Galle,History|Culture,20,4.4
+820,St. Mary's Cathedral Galle,6.0392,80.2151,Galle,Religion|History,40,4.5
+821,Bonavista Coral Reef,6.0151,80.2312,Galle,Nature|Wildlife|Adventure,120,4.4
+822,Rumassala South Beach,6.0112,80.2398,Galle,Beach|Nature,180,4.5
+823,Sri Vivekaramaya Temple,6.0135,80.2351,Galle,Religion|Culture,30,4.3
+824,Mihiripenna Beach,6.0051,80.2712,Galle,Beach|Adventure,120,4.4
+825,Koggala Turtle Hatchery,5.9931,80.3312,Galle,Wildlife|Nature,45,4.5
+826,Habaraduwa Sea Turtle Farm,5.9981,80.3112,Galle,Wildlife|Nature,45,4.4
+827,Bird Island (Koggala Lake),5.9812,80.3498,Galle,Nature|Wildlife,60,4.5
+828,Temple Island (Koggala Lake),5.9851,80.3541,Galle,Religion|History,45,4.6
+829,Cinnamon Island (Koggala Lake),5.9881,80.3521,Galle,Culture|Nature,60,4.5
+830,Handunugoda Tea Estate,5.9912,80.3651,Galle,Culture|Nature,120,4.7
+831,Ahungalla Beach,6.3112,80.0212,Galle,Beach|Adventure,180,4.6
+832,Kosgoda Sea Turtle Hatchery,6.3351,80.0051,Galle,Wildlife|Nature,60,4.7
+833,Balapitiya Beach,6.2612,80.0312,Galle,Beach|Nature,120,4.4
+834,Rathgama Lake Boat Safari,6.0712,80.1551,Galle,Nature|Wildlife,90,4.3
+835,Pitiwella Beach,6.0851,80.1412,Galle,Beach|Adventure,120,4.5
+836,Boossa Beach,6.0751,80.1512,Galle,Beach|Adventure,120,4.3
+837,Dodanduwa Lagoon,6.1051,80.1212,Galle,Nature|Wildlife,90,4.2
+838,Island Hermitage (Polgasduwa),6.1112,80.1151,Galle,Religion|Nature|History,120,4.8
+839,Kumarakanda Purana Vihara,6.1151,80.1112,Galle,Religion|History,45,4.4
+840,Kathaluwa Old Temple,5.9912,80.3612,Galle,Religion|History|Culture,60,4.6
+841,Richmond Hill Church,6.0451,80.2051,Galle,Religion|History,30,4.4
+842,Atapattu Walawwa,6.0381,80.2181,Galle,History|Culture,45,4.3
+843,Edward's Pillar Bonavista,6.0121,80.2341,Galle,History,15,4
+844,Galle Prison (Historic),6.0321,80.2141,Galle,History,20,3.9
+845,Galwadugoda Purana Vihara,6.0351,80.2131,Galle,Religion|History,40,4.2
+846,Meepe Ambalama (Rest Hall),6.0012,80.3012,Galle,History|Culture,20,4.1
+847,Alagoda Walawwa,6.2112,80.2512,Galle,History,30,3.8
+848,Ambarukkharama Maha Vihara,6.2712,80.0351,Galle,Religion|History,45,4.3
+849,Ampitiya Devalaya,6.1551,80.2112,Galle,Religion|Culture,30,4.1
+850,Atadage Walawwa Kataluwa,5.9951,80.3551,Galle,History,40,4.2
+851,Cathedral of the Mother of Rosary,6.0398,80.2145,Galle,Religion|History,30,4.4
+852,Deeparama Vihara Godagedara,6.2812,80.0312,Galle,Religion|History,45,4.3
+853,Dope Ganekanda Vihara,6.4312,80.0012,Galle,Religion|History,40,4.2
+854,Ganegoda Raja Maha Vihara,6.2412,80.1512,Galle,Religion|History,60,4.4
+855,Ihalagoda Siri Vijeyarama,6.2512,80.1612,Galle,Religion|History,45,4.1
+856,Jayasingharama Purana Vihara,6.1812,80.2312,Galle,Religion|History,45,4.2
+857,Kuligoda Vanavasa Vihara,6.1412,80.1112,Galle,Religion|History,40,4.1
+858,Mabotunna Vihara,6.1612,80.1912,Galle,Religion|History,45,4.2
+859,Magistrate's Court (Historic),6.0268,80.2178,Galle,History|City,20,4.1
+860,Panangala Gangarama Vihara,6.3512,80.3812,Galle,Religion|History,50,4.3
+861,Randhombe Sangaraja Vihara,6.2651,80.0412,Galle,Religion|History,45,4.4
+862,Siripawara Bodhirajarama,6.2912,80.0312,Galle,Religion|History,45,4.2
+863,Sri Sumanarama Vihara,6.0512,80.2212,Galle,Religion|History,40,4.1
+864,Sri Vijaya Sundararama,6.0712,80.2812,Galle,Religion|History,45,4.2
+865,Udumalagala Gangarama,6.1112,80.2712,Galle,Religion|History,45,4.3
+866,Vaduwelivitiya Gangarama,6.1912,80.2112,Galle,Religion|History,45,4.1
+867,Yathramulla Vanavasa Raja Maha,6.4112,80.0051,Galle,Religion|History,45,4.2
+868,Sudharmalaya Temple (Fort),6.0261,80.2155,Galle,Religion|History,30,4.4
+869,Breadfruit Tree (Historic),6.0263,80.2191,Galle,History|Nature,15,4.5
+870,National Maritime Archaeology Museum,6.0276,80.2171,Galle,History|Culture,90,4.6
+871,Pedlar Street (Fort),6.0265,80.2162,Galle,City|Culture,120,4.7
+872,Lighthouse Street (Fort),6.0255,80.2172,Galle,City|History,60,4.5
+873,Church Street (Fort),6.0269,80.2165,Galle,City|History,60,4.6
+874,Hospital Street (Fort),6.0259,80.2183,Galle,City|History,45,4.4
+875,Leyen Baan Street (Fort),6.027,80.2155,Galle,City|History,45,4.3
+876,Amangalla Historic Hotel,6.0267,80.2165,Galle,History|Culture,60,4.8
+877,Galle Central Bus Stand,6.0351,80.2145,Galle,City,30,3.6
+878,Galle Railway Station,6.0361,80.2135,Galle,City|History,30,4.1
+879,Gin Ganga River Mouth,6.0451,80.1851,Galle,Nature|Beach,60,4.2
+880,Wakwella Bridge,6.0812,80.2012,Galle,City|History,20,4.3
+881,Koggala Airport (Historic),5.9912,80.3312,Galle,History|City,30,4
+882,Martin Wickramasinghe Gallery,5.9945,80.3385,Galle,Culture|History,60,4.5
+883,Kosgoda Spice Garden,6.3412,80.0151,Galle,Nature|Culture,60,4.4
+884,Maduganga Lake View Point,6.2751,80.0451,Galle,Nature,30,4.5
+885,Uragasmanhandiya Market,6.3212,80.0812,Galle,Culture|City,60,4.1
+886,Kottawa Rainforest Reserve,6.1051,80.3112,Galle,Nature|Wildlife,120,4.6
+887,Ahangama Beach,5.9712,80.3651,Galle,Beach|Adventure,180,4.5
+888,Marshmallow Surf Point,5.9721,80.3812,Galle,Beach|Adventure,180,4.6
+889,The Rock Surf Point (Kabalana),5.9755,80.3842,Galle,Beach|Adventure,180,4.7
+890,Gas Station Surf Point,5.9712,80.3751,Galle,Beach|Adventure,120,4.4
+891,Insight Surf Point,5.9725,80.3821,Galle,Beach|Adventure,120,4.5
+892,Sticks Surf Point,5.9715,80.3781,Galle,Beach|Adventure,120,4.4
+893,Midigama Coconut Beach,5.9612,80.3912,Galle,Beach|Adventure,180,4.7
+894,Lazy Left Surf Break,5.9625,80.3951,Galle,Beach|Adventure,180,4.6
+895,Ram's Right Surf Break,5.9615,80.3981,Galle,Beach|Adventure,180,4.7
+896,Owakanda Reef Break,6.0751,80.1451,Galle,Beach|Adventure,180,4.5
+897,Mahamodara Beach,6.0421,80.2012,Galle,Beach|Nature,120,4.2
+898,Closenberg Hotel View Point,6.0315,80.2315,Galle,History|Beach,45,4.6
+899,Sahana Beach Restaurant Area,6.0321,80.2325,Galle,Beach|City,120,4.4
+900,Madu River Fish Spa,6.2681,80.0381,Galle,Adventure|Nature,45,4.5
+901,Madu River Cinnamon Peeling Center,6.2701,80.0411,Galle,Culture,60,4.6
+902,Randombe Lake,6.2512,80.0351,Galle,Nature|Wildlife,90,4.3
+903,Udugalpitiya Devol Devalaya,6.1051,80.1151,Galle,Religion|Culture,45,4.4
+904,Dodanduwa Fish Market,6.1012,80.1251,Galle,Culture|City,30,4.2
+905,Ratgama Lake Bird Sanctuary,6.0712,80.1612,Galle,Nature|Wildlife,120,4.5
+906,Telwatta Tsunami Museum,6.1612,80.0812,Galle,History|Culture,60,4.7
+907,Pahala Kimbiya Raja Maha Vihara,6.1412,80.2512,Galle,Religion|History,45,4.3
+908,Bataduwa Stone Pond,6.0512,80.2412,Galle,History|Nature,30,4
+909,Thelikada Sunandarama,6.1312,80.2112,Galle,Religion|History,45,4.2
+910,Weliwatta Purana Vihara,6.0312,80.2112,Galle,Religion|History,40,4.1
+911,Urawaththa Gangarama,6.1512,80.0912,Galle,Religion|History,45,4.2
+912,Richmond Hill Methodist Church,6.0461,80.2041,Galle,Religion|History,30,4.5
+913,Medakeembiya Kshetrarama,6.1512,80.2212,Galle,Religion|History,45,4.2
+914,Mahagoda Tapodhanarama,6.3112,80.1512,Galle,Religion|History,45,4.3
+915,Maduwa Sudharamarama,6.2751,80.0312,Galle,Religion|History,45,4.2
+916,Kumarakanda Image House,6.1155,80.1115,Galle,History|Religion,30,4.4
+917,Kuligoda Buddha Shrine,6.1415,80.1115,Galle,Religion|History,30,4.1
+918,Kshetrarama Middharamulla,6.2912,80.0412,Galle,Religion|History,45,4.3
+919,Kosgoda Ganegodella Vihara,6.3312,80.0112,Galle,Religion|History,45,4.2
+920,Jayasingharama Preaching Hall,6.1815,80.2315,Galle,History|Religion,30,4.2
+921,Ihala Walpola Sri Gawthamarama,6.1212,80.2912,Galle,Religion|History,45,4.1
+922,Ganegodella Footprint Shrine,6.2812,80.0512,Galle,Religion|History,30,4.4
+923,Ganegoda Bana Preaching Hall,6.2415,80.1515,Galle,History|Religion,30,4.3
+924,Galwadugoda Stupa,6.0355,80.2135,Galle,Religion|History,20,4.2
+925,Galle Prison Tunnel (Historic),6.0325,80.2145,Galle,History,15,4
+926,Deeparama Bhikku Dwelling,6.2815,80.0315,Galle,History|Religion,30,4.3
+927,Cathedral Calvary Site,6.0401,80.2141,Galle,Religion|History,20,4.4
+928,Atapattu Walawwa Boundary Wall,6.0385,80.2185,Galle,History,15,4.1
+929,Ampitiya Stone Pillars,6.1555,80.2115,Galle,History|Religion,15,4
+930,Ambarukkharama Dagoba,6.2715,80.0355,Galle,Religion|History,20,4.3
+931,Alagoda Walawwa Chetiya,6.2115,80.2515,Galle,Religion|History,20,3.9
+932,Yatagala Cave Shrine,6.0158,80.2645,Galle,Religion|History,45,4.7
+933,Yatagala Ancient Stupa,6.0154,80.2641,Galle,Religion|History,30,4.6
+934,Unawatuna Surf Point,6.0101,80.2451,Galle,Beach|Adventure,120,4.5
+935,Rumassala Hill Trekking Trail,6.0125,80.2381,Galle,Nature|Adventure,90,4.6
+936,Hikkaduwa Turtle Release Point,6.1321,80.1041,Galle,Wildlife|Nature,45,4.8
+937,Akurala Beach (Northern Galle),6.1851,80.0612,Galle,Beach|Nature,120,4.6
+938,Rathgama Owakanda Point,6.0721,80.1412,Galle,Beach|Adventure,120,4.4
+939,Mahamodara River Safari,6.0451,80.2035,Galle,Nature|Wildlife,90,4.1
+940,Kanneliya Information Center,6.2501,80.3341,Galle,Nature|City,30,4.5
+941,Kanneliya Butterfly Trail,6.2521,80.3361,Galle,Nature|Wildlife,90,4.7
+942,Hiyare Reservoir & Dam,6.0625,80.3155,Galle,Nature|History,45,4.6
+943,Hiyare Animal Rescue Center,6.0615,80.3145,Galle,Wildlife|Nature,60,4.7
+944,Ambalangoda Puppet Workshop,6.2365,80.0518,Galle,Culture|History,60,4.5
+945,Ariyapala Mask Workshop,6.2345,80.0535,Galle,Culture,60,4.6
+946,Balapitiya Madu River Bridge,6.2645,80.0345,Galle,City|Nature,15,4.2
+947,Madu Ganga Mangrove Tunnel,6.2691,80.0371,Galle,Nature|Adventure,30,4.8
+948,Kothduwa Bo Tree (130 yrs),6.2848,80.0384,Galle,Religion|Nature,15,4.7
+949,Ma Doowa Cinnamon Plots,6.2758,80.0315,Galle,Culture|Nature,45,4.4
+950,Koggala Folk Museum Transport Gallery,5.9945,80.3385,Galle,History|Culture,45,4.6
+951,Gangaramaya Temple,6.9164,79.8564,Colombo,Religion|Culture|History,60,4.3
+952,Seema Malaka,6.9176,79.8533,Colombo,Religion|Culture,30,4.2
+953,Kelaniya Raja Maha Viharaya,6.9516,79.9194,Colombo,Religion|History,60,4
+954,Jami Ul-Alfar Mosque (Red Mosque),6.9385,79.8518,Colombo,Religion|History,30,4.4
+955,Grand Mosque of Colombo,6.9404,79.859,Colombo,Religion|History,30,4.2
+956,St. Lucia's Cathedral,6.9481,79.8642,Colombo,Religion|History,30,4.4
+957,Wolvendaal Church,6.9419,79.8589,Colombo,Religion|History,30,4.3
+958,Colombo Dutch Museum,6.9361,79.8516,Colombo,History|Culture,60,4
+959,Fort Railway Station,6.9336,79.8508,Colombo,History|City,15,4.1
+960,Galle Face Green,6.9266,79.8435,Colombo,Beach|City,60,4.2
+961,Mount Lavinia Beach,6.8383,79.863,Colombo,Beach|City,120,4
+962,Beira Lake,6.9333,79.85,Colombo,Nature|City,30,4
+963,Viharamahadevi Park,6.9083,79.8563,Colombo,Nature|City,60,4.3
+964,Independence Memorial Hall,6.9046,79.8673,Colombo,History|Culture,60,4.2
+965,Pettah Market,6.9341,79.8549,Colombo,City,60,4
+966,Pettah Floating Market,6.9328,79.8556,Colombo,City,60,4
+967,Lotus Tower,6.927,79.8583,Colombo,City|Culture,90,4
+968,National Museum of Colombo,6.906,79.861,Colombo,History|Culture,120,4.3
+969,National Museum of Natural History,6.9112,79.8611,Colombo,History|Nature,60,4.1
+970,Diyatha Uyana,6.9563,79.9202,Colombo,Nature|City,90,4.1
+971,Colombo Port Maritime Museum,6.9389,79.8428,Colombo,History|Culture,45,4.2
+972,St. Peter's Church,6.9375,79.8447,Colombo,History|Religion,30,4
+973,St. Anthony's Shrine (Kochchikade),6.9467,79.8561,Colombo,Religion,30,4.5
+974,Sambodhi Chaithya,6.9383,79.8419,Colombo,History|Religion,15,4
+975,Nelum Pokuna Theatre,6.9108,79.8633,Colombo,Culture,90,4.3
+976,Lionel Wendt Art Centre,6.9069,79.8603,Colombo,Culture,60,4.1
+977,Arcade Independence Square,6.9046,79.8675,Colombo,City|Culture,60,4.2
+978,Crescat Boulevard,6.917,79.8482,Colombo,City,60,3.9
+979,Majestic City,6.8939,79.8547,Colombo,City,90,4.2
+980,Liberty Plaza,6.9119,79.8501,Colombo,City,60,3.8
+981,Nawagamuwa Pattini Devalaya,6.9242,80.018,Colombo,Religion|Culture,30,4.3
+982,Diyawanna Oya,6.9271,79.8612,Colombo,Nature|City,60,4
+983,Gem and Jewelry Museum,6.9258,79.8769,Colombo,Culture,45,4.1
+984,Bandaranaike Memorial International Conference Hall (BMICH),6.9017,79.8728,Colombo,Culture|City,60,4.2
+985,Colombo National Zoological Gardens,6.8541,79.871,Colombo,Wildlife,180,4.4
+986,Bellanwila-Attidiya Bird Sanctuary,6.8414,79.8908,Colombo,Nature|Wildlife,60,4.5
+987,Kotte Raja Maha Vihara,6.881,79.9048,Colombo,Religion|History,45,4.1
+988,Beddagana Wetland Park,6.8906,79.9084,Colombo,Nature,60,4.2
+989,Khan Clock Tower,6.9369,79.8492,Colombo,History|City,10,3.8
+990,Kayman's Gate Bell Tower,6.9385,79.853,Colombo,History,10,4
+991,Sri Muthumariamman Temple,6.9507,79.8628,Colombo,Religion|Culture,30,4.1
+992,Holy Emmanuel Church,6.7849,79.8868,Colombo,Religion|History,15,4.2
+993,Sri Kailawasanathan Swami Devasthanam (Hindu Temple),6.9402,79.8855,Colombo,Religion|History,30,4.3
+994,Bellanwila Raja Maha Viharaya,6.898,79.9033,Colombo,Religion|History,60,4.3
+995,Colombo Planetarium (Vidya Mandiraya),6.9006,79.8628,Colombo,Culture|Adventure,60,4.2
+996,Kanatte (Colombo General) Cemetery,6.9079,79.8716,Colombo,History,30,4
+997,Liveramentu (Jawatta) Cemetery,6.8966,79.869,Colombo,History,30,4
+998,Old Parliament Building,6.9468,79.8856,Colombo,History,30,4.2
+999,Laksala (Government Handicraft Shop),6.8981,79.8603,Colombo,Culture|City,30,4
+1000,Colombo Town Hall,6.9128,79.8578,Colombo,History|City,30,4
