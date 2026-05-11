@@ -1,5 +1,11 @@
 import React from "react";
-import { ScrollView, Text, TouchableOpacity, StyleSheet, View } from "react-native";
+import {
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  View,
+} from "react-native";
 import { colors } from "../styles/colors";
 import VehicleCard from "../components/VehicleCard";
 import RiskCard from "../components/RiskCard";
@@ -12,22 +18,20 @@ export default function ResultScreen({
 }) {
   if (!result) {
     return (
-      <View style={styles.emptyContainer}>
-        <TouchableOpacity onPress={onBack}>
-          <Text style={styles.backText}>← Back</Text>
-        </TouchableOpacity>
-
+      <View style={styles.page}>
         <View style={styles.errorCard}>
-          <Text style={styles.errorTitle}>No Recommendation Found</Text>
+          <Text style={styles.errorTitle}>
+            No Vehicle Recommendation Found
+          </Text>
 
           <Text style={styles.errorText}>
             {errorMessage ||
-              "The system could not generate a vehicle recommendation for this trip."}
+              "The system could not generate a vehicle suggestion for this trip."}
           </Text>
 
           <Text style={styles.errorReason}>
-            Possible reasons: invalid route, no matching road segment, no suitable
-            vehicle for the selected budget/passengers, or backend prediction error.
+            Please check your route, budget, passenger count or try again with
+            different inputs.
           </Text>
 
           <TouchableOpacity style={styles.button} onPress={onBack}>
@@ -39,33 +43,44 @@ export default function ResultScreen({
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <TouchableOpacity onPress={onBack}>
-        <Text style={styles.backText}>← Back</Text>
-      </TouchableOpacity>
+    <ScrollView style={styles.page} contentContainerStyle={styles.content}>
 
-      <Text style={styles.title}>Recommendation Result</Text>
-      <Text style={styles.subtitle}>
-        ML prediction enhanced with Neo4j GraphRAG reasoning.
-      </Text>
+      {/* HEADER */}
+      <View style={styles.hero}>
+        <Text style={styles.heroIcon}>🚘</Text>
+        <Text style={styles.title}>Vehicle Recommendation</Text>
+        <Text style={styles.subtitle}>
+          AI-powered smart vehicle matching based on your trip details.
+        </Text>
+      </View>
 
-      <View style={styles.summaryCard}>
+      {/* TRIP SUMMARY */}
+      <View style={styles.card}>
         <Text style={styles.cardTitle}>Trip Summary</Text>
 
         <Text style={styles.text}>From: {result?.trip?.from}</Text>
         <Text style={styles.text}>To: {result?.trip?.to}</Text>
-        <Text style={styles.text}>Distance: {result?.trip?.distanceKm} km</Text>
+        <Text style={styles.text}>
+          Distance: {result?.trip?.distanceKm} km
+        </Text>
         <Text style={styles.text}>
           Duration: {result?.trip?.durationMinutes} mins
         </Text>
         <Text style={styles.text}>
           Matched Road: {result?.analysis?.matchedRoad}
         </Text>
-        <Text style={styles.text}>Weather: {result?.analysis?.weather}</Text>
+        <Text style={styles.text}>
+          Weather: {result?.analysis?.weather}
+        </Text>
       </View>
 
-      <VehicleCard title="Best Safety Match" vehicle={result?.bestSafetyMatch} />
+      {/* BEST MATCH */}
+      <VehicleCard
+        title="Best Recommended Vehicle"
+        vehicle={result?.bestSafetyMatch}
+      />
 
+      {/* ALTERNATIVES */}
       {result?.alternativeOptions?.map((vehicle, index) => (
         <VehicleCard
           key={index}
@@ -74,12 +89,11 @@ export default function ResultScreen({
         />
       ))}
 
-      <View style={styles.graphCard}>
-        <Text style={styles.graphTitle}>GraphRAG Safety Reasoning</Text>
+      {/* RISK SECTION */}
+      <View style={styles.riskCard}>
+        <Text style={styles.riskTitle}>Risk Analysis</Text>
 
-        <Text style={styles.text}>{result?.graphRAG?.explanation}</Text>
-
-        <Text style={styles.riskCount}>
+        <Text style={styles.text}>
           Risk Records Found: {result?.graphRAG?.riskCount || 0}
         </Text>
       </View>
@@ -88,119 +102,125 @@ export default function ResultScreen({
         <RiskCard key={index} risk={risk} />
       ))}
 
+      {/* NEW SEARCH BUTTON */}
       <TouchableOpacity style={styles.button} onPress={onNewSearch}>
-        <Text style={styles.buttonText}>New Search</Text>
+        <Text style={styles.buttonText}>New Vehicle Search</Text>
       </TouchableOpacity>
+
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.background,
-    padding: 20,
+  page: {
     flex: 1,
+    backgroundColor: "#EAF2FF",
   },
-  emptyContainer: {
-    backgroundColor: colors.background,
-    padding: 20,
-    flex: 1,
+
+  content: {
+    padding: 18,
+    paddingBottom: 40,
   },
-  backText: {
-    color: colors.primary,
-    fontSize: 16,
-    fontWeight: "700",
-    marginTop: 10,
-    marginBottom: 16,
+
+  hero: {
+    backgroundColor: "#1D4ED8",
+    borderRadius: 26,
+    padding: 22,
+    marginBottom: 18,
+    alignItems: "center",
   },
+
+  heroIcon: {
+    fontSize: 50,
+    marginBottom: 8,
+  },
+
   title: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: colors.primaryDark,
+    fontSize: 22,
+    fontWeight: "900",
+    color: "#FFFFFF",
+    textAlign: "center",
   },
+
   subtitle: {
-    fontSize: 15,
-    color: colors.muted,
-    marginTop: 6,
-    marginBottom: 24,
+    color: "#DBEAFE",
+    textAlign: "center",
+    marginTop: 8,
   },
-  summaryCard: {
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 18,
+
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
     padding: 18,
-    marginBottom: 10,
+    marginBottom: 12,
+    elevation: 3,
   },
+
   cardTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: colors.text,
+    fontSize: 18,
+    fontWeight: "900",
     marginBottom: 10,
+    color: "#0F172A",
   },
+
   text: {
-    fontSize: 15,
-    color: colors.text,
-    marginBottom: 7,
-    lineHeight: 22,
+    fontSize: 14,
+    color: "#334155",
+    marginBottom: 6,
   },
-  graphCard: {
-    backgroundColor: "#F0FDFA",
-    borderWidth: 1,
-    borderColor: "#99F6E4",
-    borderRadius: 18,
-    padding: 18,
-    marginTop: 18,
+
+  riskCard: {
+    backgroundColor: "#F1F5F9",
+    borderRadius: 20,
+    padding: 16,
+    marginTop: 16,
   },
-  graphTitle: {
+
+  riskTitle: {
+    fontSize: 16,
+    fontWeight: "900",
+    marginBottom: 8,
+    color: "#0F172A",
+  },
+
+  errorCard: {
+    backgroundColor: "#FFFFFF",
+    margin: 20,
+    padding: 20,
+    borderRadius: 24,
+    elevation: 4,
+  },
+
+  errorTitle: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: colors.primaryDark,
+    fontWeight: "900",
+    marginBottom: 10,
+    color: "#0F172A",
+  },
+
+  errorText: {
+    fontSize: 15,
+    color: "#475569",
     marginBottom: 10,
   },
-  riskCount: {
-    marginTop: 10,
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.warning,
-  },
-  errorCard: {
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 18,
-    padding: 20,
-    marginTop: 20,
-  },
-  errorTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: colors.primaryDark,
-    marginBottom: 12,
-  },
-  errorText: {
-    fontSize: 16,
-    color: colors.text,
-    lineHeight: 24,
-    marginBottom: 12,
-  },
+
   errorReason: {
-    fontSize: 14,
-    color: colors.muted,
-    lineHeight: 22,
+    fontSize: 13,
+    color: "#64748B",
     marginBottom: 20,
   },
+
   button: {
-    backgroundColor: colors.primary,
-    padding: 18,
-    borderRadius: 16,
+    backgroundColor: "#2563EB",
+    padding: 16,
+    borderRadius: 18,
     alignItems: "center",
-    marginTop: 28,
-    marginBottom: 40,
+    marginTop: 20,
   },
+
   buttonText: {
     color: "#FFFFFF",
-    fontSize: 17,
-    fontWeight: "bold",
+    fontSize: 15,
+    fontWeight: "900",
   },
 });

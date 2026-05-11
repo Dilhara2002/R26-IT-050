@@ -60,11 +60,8 @@ export default function TripInputScreen({
   const selectLocation = (type, location) => {
     updateField(type, location.name);
 
-    if (type === "startLocation") {
-      setStartSuggestions([]);
-    } else {
-      setEndSuggestions([]);
-    }
+    if (type === "startLocation") setStartSuggestions([]);
+    else setEndSuggestions([]);
   };
 
   const handleCategorySelect = (category) => {
@@ -81,215 +78,302 @@ export default function TripInputScreen({
   );
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <TouchableOpacity onPress={onBack}>
-        <Text style={styles.backText}>← Back</Text>
-      </TouchableOpacity>
+    <ScrollView style={styles.page} contentContainerStyle={styles.content}>
 
-      <Text style={styles.title}>Trip Details</Text>
-      <Text style={styles.subtitle}>
-        Enter your route and travel requirements.
-      </Text>
-
-      <Text style={styles.label}>Budget</Text>
-      <TextInput
-        style={styles.input}
-        value={form.budget}
-        onChangeText={(value) => updateField("budget", value)}
-        keyboardType="numeric"
-        placeholder="Enter your budget"
-        placeholderTextColor={colors.muted}
-      />
-
-      <Text style={styles.label}>Passengers</Text>
-      <TextInput
-        style={styles.input}
-        value={form.passengers}
-        onChangeText={(value) => updateField("passengers", value)}
-        keyboardType="numeric"
-        placeholder="Number of passengers"
-        placeholderTextColor={colors.muted}
-      />
-
-      <Text style={styles.label}>Start Location</Text>
-      <TextInput
-        style={styles.input}
-        value={form.startLocation}
-        onChangeText={(value) => handleLocationSearch("startLocation", value)}
-        placeholder="Example: Colombo"
-        placeholderTextColor={colors.muted}
-      />
-
-      {startSuggestions.length > 0 && (
-        <View style={styles.suggestionBox}>
-          <FlatList
-            data={startSuggestions}
-            keyExtractor={(item, index) => `${item.displayName}-${index}`}
-            renderItem={({ item }) => renderSuggestion("startLocation", item)}
-            scrollEnabled={false}
-          />
-        </View>
-      )}
-
-      <Text style={styles.label}>End Location</Text>
-      <TextInput
-        style={styles.input}
-        value={form.endLocation}
-        onChangeText={(value) => handleLocationSearch("endLocation", value)}
-        placeholder="Example: Kandy"
-        placeholderTextColor={colors.muted}
-      />
-
-      {endSuggestions.length > 0 && (
-        <View style={styles.suggestionBox}>
-          <FlatList
-            data={endSuggestions}
-            keyExtractor={(item, index) => `${item.displayName}-${index}`}
-            renderItem={({ item }) => renderSuggestion("endLocation", item)}
-            scrollEnabled={false}
-          />
-        </View>
-      )}
-
-      <Text style={styles.label}>Vehicle Category</Text>
-
-      <View style={styles.categoryContainer}>
-        {vehicleCategories.map((category) => {
-          const isActive = selectedCategory === category;
-
-          return (
-            <TouchableOpacity
-              key={category}
-              style={[
-                styles.categoryButton,
-                isActive && styles.categoryButtonActive,
-              ]}
-              onPress={() => handleCategorySelect(category)}
-            >
-              <Text
-                style={[
-                  styles.categoryText,
-                  isActive && styles.categoryTextActive,
-                ]}
-              >
-                {category}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+      {/* HEADER */}
+      <View style={styles.hero}>
+        <Text style={styles.heroIcon}>🚗</Text>
+        <Text style={styles.title}>Vehicle Recommendation</Text>
+        <Text style={styles.subtitle}>
+          Enter your trip details to get smart vehicle suggestions.
+        </Text>
       </View>
 
-      <TouchableOpacity
-        style={[styles.button, loading && styles.buttonDisabled]}
-        onPress={onSubmit}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>
-          {loading ? "Analyzing..." : "Recommend Vehicle"}
-        </Text>
-      </TouchableOpacity>
+      {/* FORM CARD */}
+      <View style={styles.card}>
+
+        <TouchableOpacity onPress={onBack}>
+          <Text style={styles.backText}>← Back</Text>
+        </TouchableOpacity>
+
+        {/* BUDGET (LKR) */}
+        <Text style={styles.label}>Budget (LKR)</Text>
+
+        <View style={styles.currencyInputContainer}>
+          <Text style={styles.currencySymbol}>₨</Text>
+
+          <TextInput
+            style={styles.currencyInput}
+            value={form.budget}
+            onChangeText={(value) =>
+              updateField("budget", value.replace(/[^0-9]/g, ""))
+            }
+            keyboardType="numeric"
+            placeholder="Enter amount"
+            placeholderTextColor="#94A3B8"
+          />
+        </View>
+
+        <Text style={styles.label}>Passengers</Text>
+        <TextInput
+          style={styles.input}
+          value={form.passengers}
+          onChangeText={(value) => updateField("passengers", value)}
+          keyboardType="numeric"
+          placeholder="Number of passengers"
+          placeholderTextColor="#94A3B8"
+        />
+
+        <Text style={styles.label}>Start Location</Text>
+        <TextInput
+          style={styles.input}
+          value={form.startLocation}
+          onChangeText={(value) =>
+            handleLocationSearch("startLocation", value)
+          }
+          placeholder="Example: Colombo"
+          placeholderTextColor="#94A3B8"
+        />
+
+        {startSuggestions.length > 0 && (
+          <View style={styles.suggestionBox}>
+            <FlatList
+              data={startSuggestions}
+              keyExtractor={(item, index) =>
+                `${item.displayName}-${index}`
+              }
+              renderItem={({ item }) =>
+                renderSuggestion("startLocation", item)
+              }
+              scrollEnabled={false}
+            />
+          </View>
+        )}
+
+        <Text style={styles.label}>End Location</Text>
+        <TextInput
+          style={styles.input}
+          value={form.endLocation}
+          onChangeText={(value) =>
+            handleLocationSearch("endLocation", value)
+          }
+          placeholder="Example: Kandy"
+          placeholderTextColor="#94A3B8"
+        />
+
+        {endSuggestions.length > 0 && (
+          <View style={styles.suggestionBox}>
+            <FlatList
+              data={endSuggestions}
+              keyExtractor={(item, index) =>
+                `${item.displayName}-${index}`
+              }
+              renderItem={({ item }) =>
+                renderSuggestion("endLocation", item)
+              }
+              scrollEnabled={false}
+            />
+          </View>
+        )}
+
+        <Text style={styles.label}>Vehicle Category</Text>
+
+        <View style={styles.categoryContainer}>
+          {vehicleCategories.map((category) => {
+            const isActive = selectedCategory === category;
+
+            return (
+              <TouchableOpacity
+                key={category}
+                style={[
+                  styles.categoryButton,
+                  isActive && styles.categoryButtonActive,
+                ]}
+                onPress={() => handleCategorySelect(category)}
+              >
+                <Text
+                  style={[
+                    styles.categoryText,
+                    isActive && styles.categoryTextActive,
+                  ]}
+                >
+                  {category}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            loading && styles.buttonDisabled,
+          ]}
+          onPress={onSubmit}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? "Analyzing..." : "Find Best Vehicle"}
+          </Text>
+        </TouchableOpacity>
+
+      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.background,
-    padding: 20,
+  page: {
     flex: 1,
+    backgroundColor: "#EAF2FF",
   },
-  backText: {
-    color: colors.primary,
-    fontSize: 16,
-    fontWeight: "700",
-    marginTop: 10,
-    marginBottom: 16,
+  content: {
+    padding: 18,
+    paddingBottom: 40,
+  },
+
+  hero: {
+    backgroundColor: "#1D4ED8",
+    borderRadius: 26,
+    padding: 22,
+    marginBottom: 18,
+    alignItems: "center",
+  },
+  heroIcon: {
+    fontSize: 50,
+    marginBottom: 8,
   },
   title: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: colors.primaryDark,
+    fontSize: 22,
+    fontWeight: "900",
+    color: "#FFFFFF",
+    textAlign: "center",
   },
   subtitle: {
-    fontSize: 15,
-    color: colors.muted,
-    marginTop: 6,
-    marginBottom: 24,
+    color: "#DBEAFE",
+    textAlign: "center",
+    marginTop: 8,
   },
-  label: {
-    fontSize: 15,
+
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    padding: 20,
+    elevation: 4,
+  },
+
+  backText: {
+    color: "#1D4ED8",
     fontWeight: "700",
-    color: colors.text,
-    marginBottom: 8,
+    marginBottom: 12,
+  },
+
+  label: {
+    fontSize: 14,
+    fontWeight: "700",
     marginTop: 14,
+    marginBottom: 6,
+    color: "#0F172A",
   },
-  input: {
-    backgroundColor: colors.card,
+
+  currencyInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F8FAFC",
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: "#E2E8F0",
     borderRadius: 14,
-    padding: 14,
-    fontSize: 16,
-    color: colors.text,
+    paddingHorizontal: 12,
   },
-  suggestionBox: {
-    backgroundColor: colors.card,
+
+  currencySymbol: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#0F172A",
+    marginRight: 6,
+  },
+
+  currencyInput: {
+    flex: 1,
+    paddingVertical: 13,
+    fontSize: 15,
+    color: "#0F172A",
+  },
+
+  input: {
+    backgroundColor: "#F8FAFC",
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: "#E2E8F0",
+    borderRadius: 14,
+    padding: 13,
+    fontSize: 15,
+    color: "#0F172A",
+  },
+
+  suggestionBox: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
     borderRadius: 12,
     marginTop: 6,
     overflow: "hidden",
   },
+
   suggestionItem: {
-    padding: 13,
+    padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: "#E2E8F0",
   },
+
   suggestionText: {
     fontSize: 14,
-    color: colors.text,
+    color: "#0F172A",
   },
+
   categoryContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    marginBottom: 16,
+    marginTop: 8,
   },
+
   categoryButton: {
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 20,
-    paddingVertical: 10,
+    backgroundColor: "#F1F5F9",
+    paddingVertical: 8,
     paddingHorizontal: 14,
+    borderRadius: 18,
   },
+
   categoryButtonActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: "#2563EB",
   },
+
   categoryText: {
-    color: colors.text,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "600",
+    color: "#334155",
   },
+
   categoryTextActive: {
     color: "#FFFFFF",
     fontWeight: "800",
   },
+
   button: {
-    backgroundColor: colors.primary,
-    padding: 18,
-    borderRadius: 16,
+    backgroundColor: "#2563EB",
+    padding: 16,
+    borderRadius: 18,
     alignItems: "center",
-    marginTop: 28,
-    marginBottom: 40,
+    marginTop: 22,
   },
+
   buttonDisabled: {
     opacity: 0.7,
   },
+
   buttonText: {
     color: "#FFFFFF",
-    fontSize: 17,
-    fontWeight: "bold",
+    fontSize: 16,
+    fontWeight: "900",
   },
 });
