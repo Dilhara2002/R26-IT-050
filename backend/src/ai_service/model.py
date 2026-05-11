@@ -50,10 +50,10 @@ def initialize_ai_engine():
         RF_MODEL = RandomForestClassifier(
             n_estimators=1000,       
             max_features='sqrt',
-            max_depth=None,          
+            max_depth=50,          
             min_samples_split=2,     
             min_samples_leaf=1,      
-            class_weight='balanced', 
+            
             random_state=42
         )
         

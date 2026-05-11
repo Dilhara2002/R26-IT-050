@@ -1,26 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, ActivityIndicator, Text } from "react-native";
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
+import { View, StyleSheet, ActivityIndicator, Text, Pressable } from "react-native";
 import * as Location from "expo-location";
 
-export default function MapScreen({ route }) {
-  // ResultScreen එකෙන් එවන දත්ත ලබාගැනීම
+// Auto-resolves to ResultMap.js on Mobile, and ResultMap.web.js on Web
+import ResultMap from "../components/ResultMap";
+
+export default function MapScreen({ route, navigation }) {
   const { itineraryData } = route.params || {};
-  
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      // යූසර්ගෙන් Location Permission ඉල්ලීම
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        alert('Permission to access location was denied');
         setLoading(false);
         return;
       }
-
-      // යූසර් දැනට ඉන්න තැන ලබාගැනීම
       let userLocation = await Location.getCurrentPositionAsync({});
       setLocation(userLocation.coords);
       setLoading(false);
@@ -30,48 +26,60 @@ export default function MapScreen({ route }) {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading Map...</Text>
+        <ActivityIndicator size="large" color="#1D4ED8" />
+        <Text style={styles.loadingText}>Loading Interactive Map...</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <MapView
-        provider={PROVIDER_GOOGLE}
-        style={styles.map}
-        initialRegion={{
-          latitude: location ? location.latitude : 7.2906,
-          longitude: location ? location.longitude : 80.6337,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        }}
-        showsUserLocation={true} // යූසර් ඉන්න තැන නිල් පාටින් පෙන්වයි
-        showsMyLocationButton={true}
-      >
-        {/* යූසර් ඉන්න තැනට Marker එකක් */}
-        {location && (
-          <Marker
-            coordinate={{ latitude: location.latitude, longitude: location.longitude }}
-            title="You are here"
-            pinColor="blue"
-          />
-        )}
-
-        {/* AI එකෙන් ලැබුණු Route එකේ තැන් මැප් එකේ පෙන්වීම */}
-        {itineraryData && itineraryData.optimized_route && itineraryData.optimized_route.map((place, index) => {
-           // මෙතනදී අපි උපකල්පනය කරන්නේ backend එකෙන් තැන් වල lat/long එවනවා කියලා.
-           // දැනට ඔයාගේ data වල නම විතරක් තියෙන නිසා මේක placeholder එකක් විදිහට තියෙන්න දෙන්න.
-           return null; 
-        })}
-      </MapView>
+      <ResultMap location={location} itineraryData={itineraryData} />
+      
+      <View style={styles.floatingCard}>
+        <Text style={styles.cardTitle}>Live Route View</Text>
+        <Text style={styles.cardSub}>Optimized for your current context</Text>
+        
+        <Pressable 
+          onPress={() => navigation.goBack()} 
+          style={styles.backBtn}
+        >
+          <Text style={styles.backBtnText}>Back to List</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  map: { flex: 1 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' }
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#EAF2FF' },
+  loadingText: { marginTop: 10, color: '#1D4ED8', fontWeight: 'bold' },
+  floatingCard: {
+    position: 'absolute',
+    top: 50,
+    alignSelf: 'center', // <--- Centers it perfectly on web
+    width: '90%',
+    maxWidth: 400, // <--- Stops it from stretching across the screen
+    backgroundColor: '#fff',
+    borderRadius: 22,
+    padding: 20,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+  cardTitle: { fontSize: 18, fontWeight: "900", color: "#0F172A" },
+  cardSub: { color: "#64748B", fontSize: 13, marginTop: 2 },
+  backBtn: {
+    marginTop: 15,
+    backgroundColor: '#EFF6FF',
+    padding: 10,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#BFDBFE'
+  },
+  backBtnText: { color: '#1D4ED8', fontWeight: 'bold' }
 });

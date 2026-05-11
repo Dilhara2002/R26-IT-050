@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
-
+from flask_cors import CORS
 # Load environment variables
 load_dotenv()
 
@@ -9,6 +9,7 @@ load_dotenv()
 from model import filter_locations, run_genetic_algorithm, generate_itinerary_summary
 
 app = Flask(__name__)
+CORS(app) # Enables CORS for all routes so Web Browsers can connect
 
 # Retrieve Gemini API Key
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
