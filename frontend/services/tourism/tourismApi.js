@@ -1,22 +1,20 @@
-const BASE_URL = "http://YOUR_PC_IP:5000/api";
+const BASE_URL = "http://localhost:5000/api";
 
-export async function generateTourismPackage(userPrompt) {
-  const response = await fetch(`${BASE_URL}/recommend`, {
+export async function generateTourismPackage(prompt) {
+  const response = await fetch(`${BASE_URL}/generate-package`, {
     method: "POST",
-
     headers: {
       "Content-Type": "application/json",
     },
-
     body: JSON.stringify({
-      userPrompt,
+      prompt,
     }),
   });
 
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Failed");
+    throw new Error(data.message || data.error || "Failed to generate package");
   }
 
   return data;
