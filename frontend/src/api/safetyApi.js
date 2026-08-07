@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://192.168.1.8:5001/api";
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_BASE_URL ||
+  "http://localhost:5001/api";
 
 export const getVehicleRecommendation = async (payload) => {
   try {
@@ -8,39 +10,40 @@ export const getVehicleRecommendation = async (payload) => {
       `${API_BASE_URL}/safety/recommend-vehicle`,
       payload,
       {
-        timeout: 15000,
+        timeout: 20000,
       }
     );
 
-    // Check if response exists
     if (!response.data) {
-      throw new Error("No data received from server");
+      throw new Error("No data received from server.");
+    }
+
+    if (response.data.success === false) {
+      return {
+        success: false,
+        error: true,
+        message:
+          response.data.message ||
+          response.data.error ||
+          "Recommendation failed.",
+      };
     }
 
     return response.data;
-
   } catch (error) {
-    console.log("API Error:", error);
+    console.log("Safety API Error:", error.message);
 
-    // Backend custom error message
     const message =
       error.response?.data?.message ||
       error.response?.data?.error ||
-
-      // Network errors
       (error.code === "ECONNABORTED"
         ? "Request timeout. Server took too long to respond."
         : null) ||
-
-      // Axios no response
       (!error.response
-        ? "Cannot connect to backend server."
+        ? "Cannot connect to backend server. Check the API URL and ensure the backend is running."
         : null) ||
-
-      // Default fallback
       "Failed to generate vehicle recommendation.";
 
-    // Return structured error
     return {
       success: false,
       error: true,

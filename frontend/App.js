@@ -13,6 +13,7 @@ import HomeScreen from "./src/screens/HomeScreen";
 import TripInputScreen from "./src/screens/TripInputScreen";
 import ResultScreen from "./src/screens/ResultScreen";
 
+
 export default function App() {
   const [screen, setScreen] = useState("home");
   const [loading, setLoading] = useState(false);
@@ -28,50 +29,99 @@ export default function App() {
     preferredVehicle: "",
   });
 
+
   const handleSubmit = async () => {
     try {
       setLoading(true);
 
-      // Reset previous states
       setResult(null);
       setErrorMessage("");
 
       const response = await getVehicleRecommendation({
         budget: Number(form.budget),
         passengers: Number(form.passengers),
-        startLocation: form.startLocation,
-        endLocation: form.endLocation,
-        preferredVehicle: form.preferredVehicle,
-        isRaining: form.isRaining,
+        startLocation: form.startLocation.trim(),
+        endLocation: form.endLocation.trim(),
+        preferredVehicle: form.preferredVehicle.trim(),
       });
 
-      // Check if response is empty
-      if (!response) {
-  setErrorMessage("Failed to fetch recommendation.");
-  setScreen("result");
-  return;
-}
+      console.log(
+        "Recommendation API Response:",
+        response
+      );
 
+
+      // No response at all
+      if (!response) {
+        setErrorMessage(
+          "No response received from the backend."
+        );
+
+        setResult(null);
+        setScreen("result");
+        return;
+      }
+
+
+      // Backend/API returned a structured failure
+      if (
+        response.success === false ||
+        response.error === true
+      ) {
+        const message =
+          response.message ||
+          response.error ||
+          "Failed to generate recommendation.";
+
+        setErrorMessage(message);
+        setResult(null);
+        setScreen("result");
+        return;
+      }
+
+
+      // Validate the v2 backend response
+      if (!response.riskPrediction) {
+        setErrorMessage(
+          "The backend returned an invalid recommendation response."
+        );
+
+        setResult(null);
+        setScreen("result");
+        return;
+      }
+
+
+      // Successful v2 response
       setResult(response);
       setScreen("result");
+
     } catch (error) {
-      console.log("Recommendation Error:", error);
+      console.log(
+        "Recommendation Error:",
+        error
+      );
 
       const message =
         error?.response?.data?.message ||
+        error?.response?.data?.error ||
         error?.message ||
         "Failed to generate recommendation. Please try again.";
 
       setErrorMessage(message);
       setResult(null);
-
       setScreen("result");
 
-      Alert.alert("Recommendation Error", message);
+      Alert.alert(
+        "Recommendation Error",
+        message
+      );
+
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleNewSearch = () => {
     setResult(null);
@@ -88,10 +138,13 @@ export default function App() {
     setScreen("form");
   };
 
+
   return (
     <SafeAreaView style={styles.container}>
       {screen === "home" && (
-        <HomeScreen onStart={() => setScreen("form")} />
+        <HomeScreen
+          onStart={() => setScreen("form")}
+        />
       )}
 
       {screen === "form" && (
@@ -123,6 +176,7 @@ export default function App() {
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
