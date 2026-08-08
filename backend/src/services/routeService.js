@@ -16,11 +16,14 @@ const formatSriLankaLocation = (location) => {
 };
 
 
+
 const geocodeLocation = async (location) => {
 
   const tryGeocode = async (placeName) => {
 
-    const searchText = formatSriLankaLocation(placeName);
+    const searchText =
+      formatSriLankaLocation(placeName);
+
 
     const response = await axios.get(
       "https://nominatim.openstreetmap.org/search",
@@ -54,16 +57,27 @@ const geocodeLocation = async (location) => {
 
 
     return {
-      longitude: Number(place.lon),
-      latitude: Number(place.lat),
-      label: place.display_name,
+
+      longitude:
+        Number(place.lon),
+
+      latitude:
+        Number(place.lat),
+
+      label:
+        place.display_name,
+
+      correctedName:
+        placeName,
+
     };
   };
 
 
+
   try {
 
-    // First attempt using user's input
+    // First try original user input
     return await tryGeocode(location);
 
 
@@ -80,17 +94,21 @@ const geocodeLocation = async (location) => {
       await correctLocationName(location);
 
 
+
     console.log(
       `AI corrected location: ${correctedLocation}`
     );
 
 
-    // Try corrected name
+
+    // Retry with corrected location
     return await tryGeocode(
       correctedLocation
     );
   }
 };
+
+
 
 
 
@@ -111,8 +129,10 @@ const getRouteDetails = async (
 
 
 
+
     const coordinates =
       `${start.longitude},${start.latitude};${end.longitude},${end.latitude}`;
+
 
 
 
@@ -144,11 +164,13 @@ const getRouteDetails = async (
 
     return {
 
+
       distanceKm:
         Number(
           (route.distance / 1000)
           .toFixed(2)
         ),
+
 
 
       durationMinutes:
@@ -158,12 +180,28 @@ const getRouteDetails = async (
         ),
 
 
+
       startLocationLabel:
         start.label,
 
 
+
       endLocationLabel:
         end.label,
+
+
+
+      // AI corrected names
+      correctedStartLocation:
+        start.correctedName ||
+        startLocation,
+
+
+
+      correctedEndLocation:
+        end.correctedName ||
+        endLocation,
+
 
 
       startCoordinates: {
@@ -173,7 +211,9 @@ const getRouteDetails = async (
 
         latitude:
           start.latitude,
+
       },
+
 
 
       endCoordinates: {
@@ -183,6 +223,7 @@ const getRouteDetails = async (
 
         latitude:
           end.latitude,
+
       },
 
     };
@@ -201,8 +242,10 @@ const getRouteDetails = async (
     throw new Error(
       "Failed to fetch route details"
     );
+
   }
 };
+
 
 
 

@@ -1405,22 +1405,20 @@ router.post(
 
 
         trip: {
+  from:
+    routeDetails.correctedStartLocation ||
+    startLocation,
 
-          from:
-            startLocation,
+  to:
+    routeDetails.correctedEndLocation ||
+    endLocation,
 
-          to:
-            endLocation,
+  distanceKm:
+    routeDetails.distanceKm,
 
-          distanceKm:
-            routeDetails
-              .distanceKm,
-
-          durationMinutes:
-            routeDetails
-              .durationMinutes,
-
-        },
+  durationMinutes:
+    routeDetails.durationMinutes,
+},
 
 
         riskPrediction: {
