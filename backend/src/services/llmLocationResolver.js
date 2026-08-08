@@ -1,7 +1,9 @@
-const ollama = require("ollama");
+const ollama = require("ollama").default;
+
 
 const correctLocationName = async (location) => {
   try {
+
     const prompt = `
 You are a Sri Lankan location correction assistant.
 
@@ -17,6 +19,7 @@ Rules:
 
     const response = await ollama.chat({
       model: "llama3.1:8b",
+
       messages: [
         {
           role: "user",
@@ -25,13 +28,21 @@ Rules:
       ],
     });
 
+
     return response.message.content.trim();
+
+
   } catch (error) {
-    console.log("LLM Location Resolver Error:", error.message);
+
+    console.log(
+      "LLM Location Resolver Error:",
+      error.message
+    );
 
     return location;
   }
 };
+
 
 module.exports = {
   correctLocationName,

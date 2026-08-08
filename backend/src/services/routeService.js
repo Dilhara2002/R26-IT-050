@@ -1,5 +1,10 @@
 const axios = require("axios");
 
+const {
+  correctLocationName,
+} = require("./llmLocationResolver");
+
+
 const formatSriLankaLocation = (location) => {
   const text = location.trim();
 
@@ -10,9 +15,12 @@ const formatSriLankaLocation = (location) => {
   return `${text}, Sri Lanka`;
 };
 
+
 const geocodeLocation = async (location) => {
-  try {
-    const searchText = formatSriLankaLocation(location);
+
+  const tryGeocode = async (placeName) => {
+
+    const searchText = formatSriLankaLocation(placeName);
 
     const response = await axios.get(
       "https://nominatim.openstreetmap.org/search",
@@ -23,6 +31,7 @@ const geocodeLocation = async (location) => {
           limit: 1,
           countrycodes: "lk",
         },
+
         headers: {
           "User-Agent":
             "AI-Powered-Sri-Lankan-Tourism-Platform/1.0",
@@ -30,33 +39,82 @@ const geocodeLocation = async (location) => {
       }
     );
 
-    if (!response.data || response.data.length === 0) {
-      throw new Error(`No coordinates found for ${searchText}`);
+
+    if (
+      !response.data ||
+      response.data.length === 0
+    ) {
+      throw new Error(
+        `No coordinates found for ${searchText}`
+      );
     }
 
+
     const place = response.data[0];
+
 
     return {
       longitude: Number(place.lon),
       latitude: Number(place.lat),
       label: place.display_name,
     };
+  };
+
+
+  try {
+
+    // First attempt using user's input
+    return await tryGeocode(location);
+
+
   } catch (error) {
-    console.error(
-      "Geocoding Error:",
-      error.response?.data || error.message
+
+
+    console.log(
+      `Location not found: ${location}`
     );
 
-    throw new Error(`Geocoding failed for ${location}`);
+
+    // AI spelling correction
+    const correctedLocation =
+      await correctLocationName(location);
+
+
+    console.log(
+      `AI corrected location: ${correctedLocation}`
+    );
+
+
+    // Try corrected name
+    return await tryGeocode(
+      correctedLocation
+    );
   }
 };
 
-const getRouteDetails = async (startLocation, endLocation) => {
-  try {
-    const start = await geocodeLocation(startLocation);
-    const end = await geocodeLocation(endLocation);
 
-    const coordinates = `${start.longitude},${start.latitude};${end.longitude},${end.latitude}`;
+
+const getRouteDetails = async (
+  startLocation,
+  endLocation
+) => {
+
+  try {
+
+
+    const start =
+      await geocodeLocation(startLocation);
+
+
+    const end =
+      await geocodeLocation(endLocation);
+
+
+
+    const coordinates =
+      `${start.longitude},${start.latitude};${end.longitude},${end.latitude}`;
+
+
 
     const response = await axios.get(
       `https://router.project-osrm.org/route/v1/driving/${coordinates}`,
@@ -69,35 +127,84 @@ const getRouteDetails = async (startLocation, endLocation) => {
       }
     );
 
-    const route = response.data.routes?.[0];
+
+
+    const route =
+      response.data.routes?.[0];
+
+
 
     if (!route) {
-      throw new Error("No route found between locations.");
+      throw new Error(
+        "No route found between locations."
+      );
     }
 
+
+
     return {
-      distanceKm: Number((route.distance / 1000).toFixed(2)),
-      durationMinutes: Number((route.duration / 60).toFixed(0)),
-      startLocationLabel: start.label,
-      endLocationLabel: end.label,
+
+      distanceKm:
+        Number(
+          (route.distance / 1000)
+          .toFixed(2)
+        ),
+
+
+      durationMinutes:
+        Number(
+          (route.duration / 60)
+          .toFixed(0)
+        ),
+
+
+      startLocationLabel:
+        start.label,
+
+
+      endLocationLabel:
+        end.label,
+
+
       startCoordinates: {
-        longitude: start.longitude,
-        latitude: start.latitude,
+
+        longitude:
+          start.longitude,
+
+        latitude:
+          start.latitude,
       },
+
+
       endCoordinates: {
-        longitude: end.longitude,
-        latitude: end.latitude,
+
+        longitude:
+          end.longitude,
+
+        latitude:
+          end.latitude,
       },
+
     };
+
+
+
   } catch (error) {
+
+
     console.error(
       "Route Error:",
-      error.response?.data || error.message
+      error.message
     );
 
-    throw new Error("Failed to fetch route details");
+
+    throw new Error(
+      "Failed to fetch route details"
+    );
   }
 };
+
+
 
 module.exports = {
   getRouteDetails,
