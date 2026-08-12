@@ -924,7 +924,10 @@ const runRiskPrediction = (
       // PYTHON_BIN=/path/to/python
       const pythonBinary =
         process.env.PYTHON_BIN ||
-        "python";
+        path.join(
+          __dirname,
+          "../../.venv/bin/python"
+        );
 
 
       const pythonProcess =
