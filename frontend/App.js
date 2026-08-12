@@ -26,7 +26,7 @@ export default function App() {
     passengers: "",
     startLocation: "",
     endLocation: "",
-    preferredVehicle: "",
+    preferredCategory: "",
   });
 
 
@@ -42,7 +42,7 @@ export default function App() {
         passengers: Number(form.passengers),
         startLocation: form.startLocation.trim(),
         endLocation: form.endLocation.trim(),
-        preferredVehicle: form.preferredVehicle.trim(),
+        preferredCategory: form.preferredCategory.trim(),
       });
 
       console.log(
@@ -132,7 +132,7 @@ export default function App() {
       passengers: "",
       startLocation: "",
       endLocation: "",
-      preferredVehicle: "",
+      preferredCategory: "",
     });
 
     setScreen("form");

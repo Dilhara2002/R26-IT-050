@@ -32,7 +32,7 @@ export default function TripInputScreen({
   const [startSuggestions, setStartSuggestions] = useState([]);
   const [endSuggestions, setEndSuggestions] = useState([]);
 
-  const selectedCategory = form.preferredVehicle || "All";
+  const selectedCategory = form.preferredCategory || "All";
 
   const updateField = (key, value) => {
     setForm((prev) => ({
@@ -68,7 +68,7 @@ export default function TripInputScreen({
   };
 
   const handleCategorySelect = (category) => {
-    updateField("preferredVehicle", category === "All" ? "" : category);
+    updateField("preferredCategory", category === "All" ? "" : category);
   };
 
   const renderSuggestion = (type, item) => (
