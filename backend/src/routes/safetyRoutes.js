@@ -620,6 +620,28 @@ const runRiskPrediction = (
 
       let errorOutput = "";
 
+      let settled = false;
+
+
+      const rejectMlUnavailable = (
+        message
+      ) => {
+
+        if (settled) {
+          return;
+        }
+
+        settled = true;
+
+        const error = new Error(
+          message
+        );
+
+        error.code = "ML_UNAVAILABLE";
+
+        reject(error);
+      };
+
 
       pythonProcess.stdout.on(
         "data",
@@ -643,10 +665,8 @@ const runRiskPrediction = (
         "error",
         (error) => {
 
-          reject(
-            new Error(
-              `Could not start Python ML process: ${error.message}`
-            )
+          rejectMlUnavailable(
+            `Could not start Python ML process: ${error.message}`
           );
 
         }
@@ -657,16 +677,18 @@ const runRiskPrediction = (
         "close",
         (code) => {
 
+          if (settled) {
+            return;
+          }
+
           if (
             code !== 0
           ) {
-            return reject(
-              new Error(
-                `ML prediction failed: ${
-                  errorOutput ||
-                  output
-                }`
-              )
+            return rejectMlUnavailable(
+              `ML prediction failed: ${
+                errorOutput ||
+                output
+              }`
             );
           }
 
@@ -682,14 +704,14 @@ const runRiskPrediction = (
             if (
               !result.success
             ) {
-              return reject(
-                new Error(
-                  result.error ||
-                  "ML prediction returned an error."
-                )
+              return rejectMlUnavailable(
+                result.error ||
+                "ML prediction returned an error."
               );
             }
 
+
+            settled = true;
 
             resolve(
               result
@@ -697,10 +719,8 @@ const runRiskPrediction = (
 
           } catch (error) {
 
-            reject(
-              new Error(
-                `Failed to parse ML output: ${output}`
-              )
+            rejectMlUnavailable(
+              `Failed to parse ML output: ${output}`
             );
 
           }
@@ -1099,10 +1119,41 @@ router.post(
         );
 
 
-      const riskPrediction =
-        await runRiskPrediction(
-          mlInput
-        );
+      let riskPrediction;
+
+
+      try {
+
+        riskPrediction =
+          await runRiskPrediction(
+            mlInput
+          );
+
+      } catch (error) {
+
+        if (
+          error.code ===
+          "ML_UNAVAILABLE"
+        ) {
+
+          console.error(
+            "ML prediction unavailable:",
+            error.message
+          );
+
+          return res.status(503).json({
+            success: false,
+            error: true,
+            code: "ML_UNAVAILABLE",
+            message:
+              "The route risk prediction service is temporarily unavailable. Please try again.",
+          });
+
+        }
+
+        throw error;
+
+      }
 
 
       // ------------------------------------------------
