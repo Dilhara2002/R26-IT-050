@@ -1035,18 +1035,57 @@ router.post(
       // Neo4j graph context
       // ------------------------------------------------
 
-      const graphContext =
-        await graphManager
-          .getMLRiskContext(
-            matchedRoadName
-          );
+      let graphContext = {
+        status: "unavailable",
+        records: [],
+        risks: [],
+        message:
+          "Neo4j graph context is currently unavailable.",
+      };
 
 
-      const graphReasoning =
-        await graphManager
-          .getSafetyReasoning(
+      let graphReasoning = {
+        status: "unavailable",
+        message:
+          "Neo4j safety reasoning is currently unavailable.",
+        explanation: null,
+        risks: [],
+        records: [],
+      };
+
+
+      try {
+
+        const [
+          fetchedGraphContext,
+          fetchedGraphReasoning,
+        ] = await Promise.all([
+          graphManager.getMLRiskContext(
             matchedRoadName
-          );
+          ),
+          graphManager.getSafetyReasoning(
+            matchedRoadName
+          ),
+        ]);
+
+
+        if (fetchedGraphContext) {
+          graphContext = fetchedGraphContext;
+        }
+
+
+        if (fetchedGraphReasoning) {
+          graphReasoning = fetchedGraphReasoning;
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Neo4j graph lookup failed. Continuing without graph context:",
+          error.message
+        );
+
+      }
 
 
       // ------------------------------------------------
