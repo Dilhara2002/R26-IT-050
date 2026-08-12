@@ -788,6 +788,117 @@ const calculateVehicleSuitability = (
 };
 
 
+const getVehicleTorque = (
+  vehicle
+) =>
+  toNumber(
+    getField(
+      vehicle,
+      [
+        "Max Torque (Nm)",
+      ]
+    )
+  );
+
+
+const getVehicleEngineCapacity = (
+  vehicle
+) =>
+  toNumber(
+    getField(
+      vehicle,
+      [
+        "Engine Capacity (CC)",
+      ]
+    )
+  );
+
+
+const compareVehiclesByRisk = (
+  first,
+  second,
+  riskLevel
+) => {
+
+  const normalizedRiskLevel =
+    String(riskLevel || "")
+      .toLowerCase()
+      .trim();
+
+  const firstMargin =
+    toNumber(
+      first.vehicleSuitability
+        ?.gradeabilityMargin
+    );
+
+  const secondMargin =
+    toNumber(
+      second.vehicleSuitability
+        ?.gradeabilityMargin
+    );
+
+  const firstTorque =
+    getVehicleTorque(first);
+
+  const secondTorque =
+    getVehicleTorque(second);
+
+  const firstEngineCapacity =
+    getVehicleEngineCapacity(first);
+
+  const secondEngineCapacity =
+    getVehicleEngineCapacity(second);
+
+  const firstPrice =
+    toNumber(
+      first.estimatedHirePrice
+    );
+
+  const secondPrice =
+    toNumber(
+      second.estimatedHirePrice
+    );
+
+  const comparePrice = () =>
+    firstPrice - secondPrice;
+
+  const compareMargin = () =>
+    secondMargin - firstMargin;
+
+  const compareTorque = () =>
+    secondTorque - firstTorque;
+
+  const compareEngineCapacity = () =>
+    secondEngineCapacity -
+    firstEngineCapacity;
+
+
+  if (normalizedRiskLevel === "low") {
+    return (
+      comparePrice() ||
+      compareMargin()
+    );
+  }
+
+
+  if (normalizedRiskLevel === "high") {
+    return (
+      compareMargin() ||
+      compareTorque() ||
+      compareEngineCapacity() ||
+      comparePrice()
+    );
+  }
+
+
+  return (
+    compareMargin() ||
+    compareTorque() ||
+    comparePrice()
+  );
+};
+
+
 // ==================================================
 // Python ML inference
 // ==================================================
@@ -1083,8 +1194,15 @@ router.post(
         passengers,
         startLocation,
         endLocation,
+        preferredCategory,
         preferredVehicle,
       } = req.body;
+
+
+      const requestedVehicleCategory =
+        preferredCategory ||
+        preferredVehicle ||
+        "";
 
 
       // ------------------------------------------------
@@ -1498,7 +1616,7 @@ router.post(
 
 
               const matchesPreference =
-                preferredVehicle
+                requestedVehicleCategory
                   ? String(
                       vehicle
                         .vehicleCategory
@@ -1506,7 +1624,7 @@ router.post(
                       .toLowerCase()
                       .includes(
                         String(
-                          preferredVehicle
+                          requestedVehicleCategory
                         )
                           .toLowerCase()
                       )
@@ -1532,39 +1650,12 @@ router.post(
             (
               first,
               second
-            ) => {
-
-              // Prefer more road capability margin
-              const marginDifference =
-                second
-                  .vehicleSuitability
-                  .gradeabilityMargin
-                -
-                first
-                  .vehicleSuitability
-                  .gradeabilityMargin;
-
-
-              if (
-                marginDifference !==
-                0
-              ) {
-                return (
-                  marginDifference
-                );
-              }
-
-
-              // Then prefer lower price
-              return (
-                first
-                  .estimatedHirePrice
-                -
-                second
-                  .estimatedHirePrice
-              );
-
-            }
+            ) =>
+              compareVehiclesByRisk(
+                first,
+                second,
+                riskPrediction.riskLevel
+              )
           );
 
 
@@ -1618,6 +1709,22 @@ router.post(
                 passengerCount;
 
 
+              const matchesPreference =
+                requestedVehicleCategory
+                  ? String(
+                      vehicle
+                        .vehicleCategory
+                    )
+                      .toLowerCase()
+                      .includes(
+                        String(
+                          requestedVehicleCategory
+                        )
+                          .toLowerCase()
+                      )
+                  : true;
+
+
               const gradientSuitable =
                 vehicle
                   .vehicleSuitability
@@ -1640,6 +1747,7 @@ router.post(
                 aboveBudget &&
                 withinUpsellLimit &&
                 enoughSeats &&
+                matchesPreference &&
                 gradientSuitable &&
                 betterCapability
               );
@@ -1650,37 +1758,12 @@ router.post(
             (
               first,
               second
-            ) => {
-
-              const marginDifference =
-                second
-                  .vehicleSuitability
-                  .gradeabilityMargin
-                -
-                first
-                  .vehicleSuitability
-                  .gradeabilityMargin;
-
-
-              if (
-                marginDifference !==
-                0
-              ) {
-                return (
-                  marginDifference
-                );
-              }
-
-
-              return (
-                first
-                  .estimatedHirePrice
-                -
-                second
-                  .estimatedHirePrice
-              );
-
-            }
+            ) =>
+              compareVehiclesByRisk(
+                first,
+                second,
+                riskPrediction.riskLevel
+              )
           )[0] ||
         null;
 
