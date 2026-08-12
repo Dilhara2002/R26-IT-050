@@ -5,10 +5,63 @@ const {
 } = require("./llmLocationResolver");
 
 
-const formatSriLankaLocation = (location) => {
-  const text = String(location || "").trim();
+// ==================================================
+// Configuration
+// ==================================================
 
-  if (text.toLowerCase().includes("sri lanka")) {
+const NOMINATIM_URL =
+  "https://nominatim.openstreetmap.org/search";
+
+const GEOAPIFY_URL =
+  "https://api.geoapify.com/v1/geocode/autocomplete";
+
+const OSRM_URL =
+  "https://router.project-osrm.org/route/v1/driving";
+
+
+// A direct Nominatim match must be quite strong.
+// Otherwise we allow Geoapify to correct the text.
+const DIRECT_MATCH_THRESHOLD = 0.84;
+
+// Geoapify is specifically being used for typo/autocomplete
+// resolution, so this can be slightly lower.
+const GEOAPIFY_MATCH_THRESHOLD = 0.72;
+
+// Ollama is only a final candidate generator.
+// Its candidate must still resemble the user's original text.
+const OLLAMA_MATCH_THRESHOLD = 0.68;
+
+
+// ==================================================
+// Text helpers
+// ==================================================
+
+const normalizeText = (value) => {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+
+const compactText = (value) => {
+  return normalizeText(value)
+    .replace(/\s+/g, "");
+};
+
+
+const formatSriLankaLocation = (location) => {
+  const text =
+    String(location || "").trim();
+
+  if (
+    text
+      .toLowerCase()
+      .includes("sri lanka")
+  ) {
     return text;
   }
 
@@ -16,205 +69,717 @@ const formatSriLankaLocation = (location) => {
 };
 
 
-const geocodeWithNominatim = async (location) => {
-  const searchText = formatSriLankaLocation(location);
+// ==================================================
+// Levenshtein similarity
+// ==================================================
 
-  const response = await axios.get(
-    "https://nominatim.openstreetmap.org/search",
-    {
-      params: {
-        q: searchText,
-        format: "json",
-        limit: 1,
-        countrycodes: "lk",
+const levenshteinDistance = (
+  firstValue,
+  secondValue
+) => {
+  const first =
+    String(firstValue || "");
+
+  const second =
+    String(secondValue || "");
+
+  const matrix =
+    Array.from(
+      {
+        length:
+          first.length + 1,
       },
-      headers: {
-        "User-Agent":
-          "AI-Powered-Sri-Lankan-Tourism-Platform/1.0",
-      },
-      timeout: 8000,
+      () =>
+        Array(
+          second.length + 1
+        ).fill(0)
+    );
+
+
+  for (
+    let i = 0;
+    i <= first.length;
+    i += 1
+  ) {
+    matrix[i][0] = i;
+  }
+
+
+  for (
+    let j = 0;
+    j <= second.length;
+    j += 1
+  ) {
+    matrix[0][j] = j;
+  }
+
+
+  for (
+    let i = 1;
+    i <= first.length;
+    i += 1
+  ) {
+    for (
+      let j = 1;
+      j <= second.length;
+      j += 1
+    ) {
+      const cost =
+        first[i - 1] ===
+        second[j - 1]
+          ? 0
+          : 1;
+
+
+      matrix[i][j] =
+        Math.min(
+          matrix[i - 1][j] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j - 1] +
+            cost
+        );
     }
-  );
+  }
+
+
+  return matrix[
+    first.length
+  ][
+    second.length
+  ];
+};
+
+
+const basicSimilarity = (
+  firstValue,
+  secondValue
+) => {
+  const first =
+    String(firstValue || "");
+
+  const second =
+    String(secondValue || "");
+
 
   if (
-    !response.data ||
-    response.data.length === 0
+    !first ||
+    !second
   ) {
-    return null;
+    return 0;
   }
 
-  const place = response.data[0];
 
-  return {
-    longitude: Number(place.lon),
-    latitude: Number(place.lat),
-    label: place.display_name,
-    correctedName:
-  place.display_name
-    ? place.display_name.split(",")[0].trim()
-    : location,
-    source: "Nominatim",
-  };
-};
-
-
-const geocodeWithGeoapify = async (location) => {
-  const apiKey =
-    process.env.GEOAPIFY_API_KEY;
-
-  if (!apiKey) {
-    return null;
+  if (
+    first === second
+  ) {
+    return 1;
   }
 
-  const response = await axios.get(
-    "https://api.geoapify.com/v1/geocode/autocomplete",
-    {
-      params: {
-        text: location,
-        type: "locality",
-        filter: "countrycode:lk",
-        limit: 5,
-        format: "json",
-        apiKey,
-      },
-      timeout: 8000,
-    }
+
+  const maxLength =
+    Math.max(
+      first.length,
+      second.length
+    );
+
+
+  if (
+    maxLength === 0
+  ) {
+    return 1;
+  }
+
+
+  const distance =
+    levenshteinDistance(
+      first,
+      second
+    );
+
+
+  return Math.max(
+    0,
+    1 -
+      distance /
+        maxLength
   );
-
-  const results =
-    response.data?.results || [];
-
-  if (results.length === 0) {
-    return null;
-  }
-
-  const ranked = results
-    .filter((item) => {
-      return (
-        Number.isFinite(Number(item.lat)) &&
-        Number.isFinite(Number(item.lon))
-      );
-    })
-    .sort((a, b) => {
-      const aConfidence =
-        Number(a.rank?.confidence || 0);
-
-      const bConfidence =
-        Number(b.rank?.confidence || 0);
-
-      return bConfidence - aConfidence;
-    });
-
-  if (ranked.length === 0) {
-    return null;
-  }
-
-  const best = ranked[0];
-
-  return {
-    longitude: Number(best.lon),
-    latitude: Number(best.lat),
-
-    label:
-      best.formatted ||
-      best.name ||
-      location,
-
-    correctedName:
-      best.name ||
-      best.city ||
-      location,
-
-    source: "Geoapify",
-
-    confidence:
-      Number(
-        best.rank?.confidence || 0
-      ),
-  };
 };
 
 
-const geocodeWithOllamaCandidates = async (
+const similarityScore = (
+  firstValue,
+  secondValue
+) => {
+  const normalFirst =
+    normalizeText(
+      firstValue
+    );
+
+  const normalSecond =
+    normalizeText(
+      secondValue
+    );
+
+
+  const normalScore =
+    basicSimilarity(
+      normalFirst,
+      normalSecond
+    );
+
+
+  // This makes:
+  // "nuwaraeliya"
+  // and
+  // "Nuwara Eliya"
+  // compare correctly.
+  const compactScore =
+    basicSimilarity(
+      compactText(
+        firstValue
+      ),
+      compactText(
+        secondValue
+      )
+    );
+
+
+  return Math.max(
+    normalScore,
+    compactScore
+  );
+};
+
+
+// ==================================================
+// Candidate-name helpers
+// ==================================================
+
+const getNominatimCandidateName = (
+  place
+) => {
+  if (
+    place?.name
+  ) {
+    return String(
+      place.name
+    ).trim();
+  }
+
+
+  if (
+    place?.display_name
+  ) {
+    return String(
+      place.display_name
+    )
+      .split(",")[0]
+      .trim();
+  }
+
+
+  return "";
+};
+
+
+const getGeoapifyCandidateName = (
+  item
+) => {
+  return String(
+    item?.name ||
+    item?.city ||
+    item?.county ||
+    ""
+  ).trim();
+};
+
+
+// ==================================================
+// Nominatim candidates
+// ==================================================
+
+const getNominatimCandidates = async (
   location
 ) => {
-  const candidates =
-    await getLocationCandidates(location);
+  const searchText =
+    formatSriLankaLocation(
+      location
+    );
 
-  if (
-    !Array.isArray(candidates) ||
-    candidates.length === 0
-  ) {
-    return null;
-  }
 
-  for (const candidate of candidates) {
-    try {
-      const result =
-        await geocodeWithNominatim(
-          candidate
+  const response =
+    await axios.get(
+      NOMINATIM_URL,
+      {
+        params: {
+          q:
+            searchText,
+
+          format:
+            "json",
+
+          limit:
+            5,
+
+          countrycodes:
+            "lk",
+
+          namedetails:
+            1,
+        },
+
+        headers: {
+          "User-Agent":
+            "AI-Powered-Sri-Lankan-Tourism-Platform/1.0",
+        },
+
+        timeout:
+          8000,
+      }
+    );
+
+
+  const places =
+    Array.isArray(
+      response.data
+    )
+      ? response.data
+      : [];
+
+
+  return places
+    .map((place) => {
+      const name =
+        getNominatimCandidateName(
+          place
         );
 
-      if (result) {
-        return {
-          ...result,
-          correctedName: candidate,
-          source: "Ollama + Nominatim",
-        };
-      }
-    } catch (error) {
-      continue;
-    }
-  }
 
-  return null;
+      const similarity =
+        similarityScore(
+          location,
+          name
+        );
+
+
+      return {
+        longitude:
+          Number(
+            place.lon
+          ),
+
+        latitude:
+          Number(
+            place.lat
+          ),
+
+        label:
+          place.display_name ||
+          name,
+
+        correctedName:
+          name,
+
+        source:
+          "Nominatim",
+
+        similarity:
+          Number(
+            similarity.toFixed(4)
+          ),
+
+        raw:
+          place,
+      };
+    })
+
+    .filter(
+      (candidate) =>
+        candidate.correctedName &&
+        Number.isFinite(
+          candidate.longitude
+        ) &&
+        Number.isFinite(
+          candidate.latitude
+        )
+    )
+
+    .sort(
+      (a, b) =>
+        b.similarity -
+        a.similarity
+    );
 };
 
 
-const geocodeLocation = async (location) => {
-  const cleanLocation =
-    String(location || "").trim();
+// ==================================================
+// Geoapify candidates
+// ==================================================
 
-  if (!cleanLocation) {
-    throw new Error(
-      "Location cannot be empty."
-    );
+const getGeoapifyCandidates = async (
+  location
+) => {
+  const apiKey =
+    process.env
+      .GEOAPIFY_API_KEY;
+
+
+  if (!apiKey) {
+    return [];
   }
 
-  // 1. Try exact/original user input first
+
+  const response =
+    await axios.get(
+      GEOAPIFY_URL,
+      {
+        params: {
+          text:
+            location,
+
+          type:
+            "locality",
+
+          filter:
+            "countrycode:lk",
+
+          limit:
+            5,
+
+          format:
+            "json",
+
+          apiKey,
+        },
+
+        timeout:
+          8000,
+      }
+    );
+
+
+  const results =
+    response.data
+      ?.results || [];
+
+
+  return results
+    .map((item) => {
+      const name =
+        getGeoapifyCandidateName(
+          item
+        );
+
+
+      const similarity =
+        similarityScore(
+          location,
+          name
+        );
+
+
+      const confidence =
+        Number(
+          item.rank
+            ?.confidence ||
+          0
+        );
+
+
+      return {
+        longitude:
+          Number(
+            item.lon
+          ),
+
+        latitude:
+          Number(
+            item.lat
+          ),
+
+        label:
+          item.formatted ||
+          name,
+
+        correctedName:
+          name,
+
+        source:
+          "Geoapify",
+
+        similarity:
+          Number(
+            similarity.toFixed(4)
+          ),
+
+        confidence:
+          Number(
+            confidence.toFixed(4)
+          ),
+
+        raw:
+          item,
+      };
+    })
+
+    .filter(
+      (candidate) =>
+        candidate.correctedName &&
+        Number.isFinite(
+          candidate.longitude
+        ) &&
+        Number.isFinite(
+          candidate.latitude
+        )
+    )
+
+    .sort(
+      (a, b) => {
+        if (
+          b.similarity !==
+          a.similarity
+        ) {
+          return (
+            b.similarity -
+            a.similarity
+          );
+        }
+
+
+        return (
+          b.confidence -
+          a.confidence
+        );
+      }
+    );
+};
+
+
+// ==================================================
+// Ollama verified fallback
+// ==================================================
+
+const geocodeWithOllamaCandidates =
+  async (
+    originalLocation
+  ) => {
+    let candidates = [];
+
+
+    try {
+      candidates =
+        await getLocationCandidates(
+          originalLocation
+        );
+    } catch (error) {
+      console.log(
+        `Ollama candidate generation failed for "${originalLocation}":`,
+        error.message
+      );
+
+      return null;
+    }
+
+
+    if (
+      !Array.isArray(
+        candidates
+      ) ||
+      candidates.length === 0
+    ) {
+      return null;
+    }
+
+
+    for (
+      const candidateName
+      of candidates
+    ) {
+      const candidateSimilarity =
+        similarityScore(
+          originalLocation,
+          candidateName
+        );
+
+
+      // Critical protection:
+      // prevents things such as
+      // abcxyz -> Anuradhapura.
+      if (
+        candidateSimilarity <
+        OLLAMA_MATCH_THRESHOLD
+      ) {
+        continue;
+      }
+
+
+      try {
+        const verified =
+          await getNominatimCandidates(
+            candidateName
+          );
+
+
+        if (
+          verified.length === 0
+        ) {
+          continue;
+        }
+
+
+        const best =
+          verified[0];
+
+
+        // Candidate must also be a
+        // strong match to what Ollama said.
+        const verificationSimilarity =
+          similarityScore(
+            candidateName,
+            best.correctedName
+          );
+
+
+        if (
+          verificationSimilarity <
+          DIRECT_MATCH_THRESHOLD
+        ) {
+          continue;
+        }
+
+
+        return {
+          ...best,
+
+          source:
+            "Ollama + Nominatim",
+
+          originalInput:
+            originalLocation,
+
+          aiCandidate:
+            candidateName,
+
+          inputSimilarity:
+            Number(
+              candidateSimilarity
+                .toFixed(4)
+            ),
+        };
+
+      } catch (error) {
+        continue;
+      }
+    }
+
+
+    return null;
+  };
+
+
+// ==================================================
+// Main location resolver
+// ==================================================
+
+const geocodeLocation = async (
+  location
+) => {
+  const cleanLocation =
+    String(
+      location || ""
+    ).trim();
+
+
+  if (!cleanLocation) {
+    const error =
+      new Error(
+        "Location cannot be empty."
+      );
+
+    error.code =
+      "LOCATION_REQUIRED";
+
+    throw error;
+  }
+
+
+  // ----------------------------------------------
+  // 1. Nominatim direct lookup
+  // ----------------------------------------------
+
   try {
-    const direct =
-      await geocodeWithNominatim(
+    const nominatimCandidates =
+      await getNominatimCandidates(
         cleanLocation
       );
 
-    if (direct) {
-      return direct;
+
+    if (
+      nominatimCandidates.length >
+      0
+    ) {
+      const best =
+        nominatimCandidates[0];
+
+
+      if (
+        best.similarity >=
+        DIRECT_MATCH_THRESHOLD
+      ) {
+        console.log(
+          `Nominatim accepted "${cleanLocation}" -> "${best.correctedName}" (similarity=${best.similarity})`
+        );
+
+        return best;
+      }
+
+
+      console.log(
+        `Nominatim result rejected for "${cleanLocation}": "${best.correctedName}" similarity=${best.similarity}`
+      );
     }
   } catch (error) {
     console.log(
-      `Nominatim direct lookup failed for "${cleanLocation}":`,
+      `Nominatim lookup failed for "${cleanLocation}":`,
       error.message
     );
   }
 
-  console.log(
-    `Location not found directly: ${cleanLocation}`
-  );
 
-  // 2. Geoapify typo/autocomplete fallback
+  // ----------------------------------------------
+  // 2. Geoapify typo/autocomplete resolution
+  // ----------------------------------------------
+
   try {
-    const geoapifyResult =
-      await geocodeWithGeoapify(
+    const geoapifyCandidates =
+      await getGeoapifyCandidates(
         cleanLocation
       );
 
-    if (geoapifyResult) {
-      console.log(
-        `Geoapify corrected "${cleanLocation}" -> "${geoapifyResult.correctedName}"`
-      );
 
-      return geoapifyResult;
+    if (
+      geoapifyCandidates.length >
+      0
+    ) {
+      const best =
+        geoapifyCandidates[0];
+
+
+      if (
+        best.similarity >=
+        GEOAPIFY_MATCH_THRESHOLD
+      ) {
+        console.log(
+          `Geoapify accepted "${cleanLocation}" -> "${best.correctedName}" (similarity=${best.similarity}, confidence=${best.confidence})`
+        );
+
+        return best;
+      }
+
+
+      console.log(
+        `Geoapify result rejected for "${cleanLocation}": "${best.correctedName}" similarity=${best.similarity}`
+      );
     }
   } catch (error) {
     console.log(
@@ -224,16 +789,25 @@ const geocodeLocation = async (location) => {
     );
   }
 
-  // 3. Ollama candidate fallback
+
+  // ----------------------------------------------
+  // 3. Ollama candidate generation
+  //
+  // AI never becomes final authority.
+  // Candidate must pass similarity +
+  // Nominatim verification.
+  // ----------------------------------------------
+
   try {
     const ollamaResult =
       await geocodeWithOllamaCandidates(
         cleanLocation
       );
 
+
     if (ollamaResult) {
       console.log(
-        `Ollama fallback corrected "${cleanLocation}" -> "${ollamaResult.correctedName}"`
+        `Ollama verified "${cleanLocation}" -> "${ollamaResult.correctedName}"`
       );
 
       return ollamaResult;
@@ -245,11 +819,27 @@ const geocodeLocation = async (location) => {
     );
   }
 
-  throw new Error(
-    `Unable to resolve location: ${cleanLocation}`
-  );
+
+  // ----------------------------------------------
+  // Nothing trustworthy was found.
+  // Do NOT silently route somewhere else.
+  // ----------------------------------------------
+
+  const error =
+    new Error(
+      `Unable to confidently resolve location: ${cleanLocation}`
+    );
+
+  error.code =
+    "LOCATION_NOT_FOUND";
+
+  throw error;
 };
 
+
+// ==================================================
+// Route calculation
+// ==================================================
 
 const getRouteDetails = async (
   startLocation,
@@ -261,46 +851,71 @@ const getRouteDetails = async (
         startLocation
       );
 
+
     const end =
       await geocodeLocation(
         endLocation
       );
 
+
     const coordinates =
       `${start.longitude},${start.latitude};${end.longitude},${end.latitude}`;
 
-    const response = await axios.get(
-      `https://router.project-osrm.org/route/v1/driving/${coordinates}`,
-      {
-        params: {
-          overview: "false",
-          alternatives: "false",
-          steps: "false",
-        },
-        timeout: 10000,
-      }
-    );
+
+    const response =
+      await axios.get(
+        `${OSRM_URL}/${coordinates}`,
+        {
+          params: {
+            overview:
+              "false",
+
+            alternatives:
+              "false",
+
+            steps:
+              "false",
+          },
+
+          timeout:
+            10000,
+        }
+      );
+
 
     const route =
-      response.data?.routes?.[0];
+      response.data
+        ?.routes?.[0];
+
 
     if (!route) {
-      throw new Error(
-        "No route found between locations."
-      );
+      const error =
+        new Error(
+          "No route found between the resolved locations."
+        );
+
+      error.code =
+        "ROUTE_NOT_FOUND";
+
+      throw error;
     }
+
 
     return {
       distanceKm:
         Number(
-          (route.distance / 1000)
-            .toFixed(2)
+          (
+            route.distance /
+            1000
+          ).toFixed(2)
         ),
 
       durationMinutes:
         Number(
-          (route.duration / 60)
-            .toFixed(0)
+          (
+            route.duration /
+            60
+          ).toFixed(0)
         ),
 
       startLocationLabel:
@@ -323,6 +938,14 @@ const getRouteDetails = async (
       endLocationSource:
         end.source,
 
+      startLocationSimilarity:
+        start.similarity ??
+        null,
+
+      endLocationSimilarity:
+        end.similarity ??
+        null,
+
       startCoordinates: {
         longitude:
           start.longitude,
@@ -339,16 +962,37 @@ const getRouteDetails = async (
           end.latitude,
       },
     };
+
   } catch (error) {
     console.error(
       "Route Error:",
-      error.response?.data ||
       error.message
     );
 
-    throw new Error(
-      "Failed to fetch route details"
-    );
+
+    // Preserve structured location /
+    // route errors for the API layer.
+    if (
+      error.code ===
+        "LOCATION_REQUIRED" ||
+      error.code ===
+        "LOCATION_NOT_FOUND" ||
+      error.code ===
+        "ROUTE_NOT_FOUND"
+    ) {
+      throw error;
+    }
+
+
+    const wrappedError =
+      new Error(
+        "Failed to fetch route details."
+      );
+
+    wrappedError.code =
+      "ROUTE_SERVICE_ERROR";
+
+    throw wrappedError;
   }
 };
 
