@@ -1,11 +1,13 @@
 const {
-  correctLocationName,
+  getLocationCandidates,
 } = require("./services/llmLocationResolver");
 
-const runTest = async () => {
-  const result = await correctLocationName("puththalama");
 
-  console.log("Corrected Location:", result);
+const runTest = async () => {
+  const candidates = await getLocationCandidates("puththalama");
+
+  console.log("Location Candidates:", candidates);
 };
+
 
 runTest();
