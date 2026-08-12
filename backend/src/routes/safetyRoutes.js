@@ -375,6 +375,90 @@ const calculateRouteMatchScore = (
 };
 
 
+const getRouteFamilyName = (
+  routeName
+) =>
+  String(routeName || "")
+    .replace(
+      /\s*[-–—]?\s*segment\s*(?:no\.?\s*)?\d+\s*$/i,
+      ""
+    )
+    .replace(/\s+/g, " ")
+    .trim();
+
+
+const getDeterministicMode = (
+  values
+) => {
+
+  const counts = new Map();
+
+
+  values
+    .map(
+      (value) =>
+        String(value || "").trim()
+    )
+    .filter(Boolean)
+    .forEach(
+      (value) => {
+        counts.set(
+          value,
+          (counts.get(value) || 0) + 1
+        );
+      }
+    );
+
+
+  if (counts.size === 0) {
+    return "";
+  }
+
+
+  return [...counts.entries()]
+    .sort(
+      ([firstValue, firstCount], [secondValue, secondCount]) => {
+        if (secondCount !== firstCount) {
+          return secondCount - firstCount;
+        }
+
+        return firstValue.localeCompare(secondValue);
+      }
+    )[0][0];
+};
+
+
+const getRoundedAverage = (
+  values,
+  decimalPlaces
+) => {
+
+  const numbers =
+    values
+      .map(toNullableNumber)
+      .filter(
+        (value) => value !== null
+      );
+
+
+  if (numbers.length === 0) {
+    return null;
+  }
+
+
+  const average =
+    numbers.reduce(
+      (total, value) => total + value,
+      0
+    ) / numbers.length;
+
+
+  return Number(
+    average.toFixed(decimalPlaces)
+  );
+};
+
+
 const getRoadData = async (
   startLocation,
   endLocation
@@ -432,54 +516,182 @@ const getRoadData = async (
   }
 
 
-  scored.sort(
-    (
-      first,
-      second
-    ) => {
+  const highestScore =
+    Math.max(
+      ...scored.map(
+        (item) => item.score
+      )
+    );
 
-      if (
-        second.score !==
-        first.score
-      ) {
-        return (
-          second.score -
-          first.score
+
+  const bestMatches =
+    scored.filter(
+      (item) =>
+        item.score ===
+        highestScore
+    );
+
+
+  const routeFamilies = new Map();
+
+
+  bestMatches.forEach(
+    (item) => {
+      const routeName =
+        getField(
+          item.road,
+          [
+            "Route/Segment Name",
+          ]
+        );
+
+      const routeFamily =
+        getRouteFamilyName(
+          routeName
+        );
+
+      const routeFamilyKey =
+        normalize(routeFamily);
+
+
+      if (!routeFamilies.has(routeFamilyKey)) {
+        routeFamilies.set(
+          routeFamilyKey,
+          {
+            name: routeFamily,
+            rows: [],
+          }
         );
       }
 
 
-      const firstGradient =
-        toNumber(
-          getField(
-            first.road,
-            [
-              "Max Gradient (%)",
-            ]
-          )
-        );
-
-
-      const secondGradient =
-        toNumber(
-          getField(
-            second.road,
-            [
-              "Max Gradient (%)",
-            ]
-          )
-        );
-
-
-      return (
-        secondGradient -
-        firstGradient
-      );
+      routeFamilies
+        .get(routeFamilyKey)
+        .rows.push(item.road);
     }
   );
 
 
-  return scored[0].road;
+  const selectedRouteFamily =
+    [...routeFamilies.values()]
+      .sort(
+        (first, second) => {
+          if (
+            second.rows.length !==
+            first.rows.length
+          ) {
+            return (
+              second.rows.length -
+              first.rows.length
+            );
+          }
+
+          return first.name.localeCompare(
+            second.name
+          );
+        }
+      )[0];
+
+
+  const segments =
+    selectedRouteFamily.rows;
+
+
+  const gradients =
+    segments
+      .map(
+        (road) =>
+          toNullableNumber(
+            getField(
+              road,
+              [
+                "Max Gradient (%)",
+              ]
+            )
+          )
+      )
+      .filter(
+        (value) => value !== null
+      );
+
+
+  return {
+    ...segments[0],
+    "Route/Segment Name":
+      selectedRouteFamily.name,
+    "Max Gradient (%)":
+      gradients.length > 0
+        ? Math.max(...gradients)
+        : null,
+    "Average Elevation":
+      getRoundedAverage(
+        segments.map(
+          (road) =>
+            getField(
+              road,
+              [
+                "Average Elevation",
+              ]
+            )
+        ),
+        2
+      ),
+    "Surface Friction Index":
+      getRoundedAverage(
+        segments.map(
+          (road) =>
+            getField(
+              road,
+              [
+                "Surface Friction Index",
+              ]
+            )
+        ),
+        3
+      ),
+    "Terrain Type":
+      getDeterministicMode(
+        segments.map(
+          (road) =>
+            getField(
+              road,
+              [
+                "Terrain Type",
+              ]
+            )
+        )
+      ),
+    "Road Surface Condition":
+      getDeterministicMode(
+        segments.map(
+          (road) =>
+            getField(
+              road,
+              [
+                "Road Surface Condition",
+              ]
+            )
+        )
+      ),
+    "Typical Road Width":
+      getDeterministicMode(
+        segments.map(
+          (road) =>
+            getField(
+              road,
+              [
+                "Typical Road Width",
+              ]
+            )
+        )
+      ),
+    _aggregationType:
+      "route-family",
+    _segmentCount:
+      segments.length,
+    _matchedRouteFamily:
+      selectedRouteFamily.name,
+  };
 };
 
 
@@ -1543,6 +1755,14 @@ router.post(
 
           matchedRoad:
             matchedRoadName,
+
+          roadAggregation:
+            roadInfo._aggregationType ||
+            null,
+
+          aggregatedSegmentCount:
+            roadInfo._segmentCount ||
+            1,
 
           gradient:
             roadGradient,
