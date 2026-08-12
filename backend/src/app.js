@@ -19,22 +19,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// --- 3. MongoDB Connection ---
-if (process.env.MONGO_URI) {
-  mongoose
-    .connect(process.env.MONGO_URI)
-    .then(() => console.log("✅ Connected to MongoDB Atlas"))
-    .catch((err) =>
-      console.error("❌ MongoDB connection error:", err.message)
-    );
-} else {
-  console.warn("⚠️ MONGO_URI not found in .env. MongoDB features may be limited.");
-}
-
-// --- 4. Neo4j Knowledge Graph Connection ---
-verifyNeo4jConnection();
-
-// --- 5. API Endpoints ---
+// --- 3. API Endpoints ---
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
@@ -57,7 +42,7 @@ app.get("/", (req, res) => {
  */
 app.use("/api/safety", safetyRoutes);
 
-// --- 6. Global Error Handler ---
+// --- 4. Global Error Handler ---
 app.use((err, req, res, next) => {
   console.error("SERVER_ERROR:", err.stack);
 
@@ -68,13 +53,44 @@ app.use((err, req, res, next) => {
   });
 });
 
-// --- 7. Server Start ---
-const PORT = process.env.PORT || 5001;
+// --- 5. Infrastructure and Server Start ---
+const connectInfrastructure = async () => {
+  if (process.env.MONGO_URI) {
+    try {
+      await mongoose.connect(process.env.MONGO_URI);
+      console.log("✅ Connected to MongoDB Atlas");
+    } catch (error) {
+      console.error(
+        "❌ MongoDB connection error:",
+        error.message
+      );
+    }
+  } else {
+    console.warn("⚠️ MONGO_URI not found in .env. MongoDB features may be limited.");
+  }
 
-app.listen(PORT, () => {
-  console.log("\n=================================================");
-  console.log(`🚀 Server is live on http://localhost:${PORT}`);
-  console.log("🧠 Research Engine: Real ML + Neo4j GraphRAG");
-  console.log(`🔗 Active Endpoint: http://localhost:${PORT}/api/safety/recommend-vehicle`);
-  console.log("=================================================\n");
-});
+  await verifyNeo4jConnection();
+};
+
+
+const startServer = async () => {
+  await connectInfrastructure();
+
+  const PORT = process.env.PORT || 5001;
+
+  app.listen(PORT, () => {
+    console.log("\n=================================================");
+    console.log(`🚀 Server is live on http://localhost:${PORT}`);
+    console.log("🧠 Research Engine: Real ML + Neo4j GraphRAG");
+    console.log(`🔗 Active Endpoint: http://localhost:${PORT}/api/safety/recommend-vehicle`);
+    console.log("=================================================\n");
+  });
+};
+
+
+if (require.main === module) {
+  startServer();
+}
+
+
+module.exports = app;
