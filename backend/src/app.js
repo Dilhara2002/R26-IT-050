@@ -5,6 +5,7 @@
  * Handles:
  * - Hotel data APIs
  * - Safety recommendation engine
+ * - Itinerary APIs
  * - MongoDB connection
  * - Neo4j GraphRAG connection
  */
@@ -16,7 +17,10 @@ import dotenv from "dotenv";
 
 import hotelDataRoutes from "./routes/hotelData.routes.js";
 import safetyRoutes from "./routes/safetyRoutes.js";
+import itineraryRoutes from "./routes/itinerary.routes.js";
+
 import { verifyNeo4jConnection } from "./config/neo4j.js";
+
 
 dotenv.config();
 
@@ -37,18 +41,15 @@ app.use(express.json());
 // -----------------------------
 
 app.get("/", (req, res) => {
+
   res.status(200).json({
     success: true,
     message:
       "AI-Powered Safety-Aware Tourism Platform Backend is Running 🚀",
     status: "Healthy",
-    engine: "Real ML Inference + Neo4j GraphRAG",
-    endpoints: {
-      hotels: "/api",
-      safetyRecommendation:
-        "/api/safety/recommend-vehicle",
-    },
+    engine: "Real ML Inference + Neo4j GraphRAG"
   });
+
 });
 
 
@@ -56,51 +57,73 @@ app.get("/", (req, res) => {
 // Routes
 // -----------------------------
 
-// Existing hotel/activity APIs
+// Hotel APIs
 app.use("/api", hotelDataRoutes);
 
 
-// Safety analyzer APIs
-app.use("/api/safety", safetyRoutes);
+// Safety APIs
+app.use(
+  "/api/safety",
+  safetyRoutes
+);
+
+
+// Itinerary APIs
+app.use(
+  "/api/itinerary",
+  itineraryRoutes
+);
 
 
 // -----------------------------
-// Global Error Handler
+// Error Handler
 // -----------------------------
 
 app.use((err, req, res, next) => {
 
-  console.error("SERVER_ERROR:", err.stack);
+  console.error(
+    "SERVER_ERROR:",
+    err.stack
+  );
+
 
   res.status(500).json({
+
     success: false,
-    message: "Internal Server Error",
-    error: err.message,
+
+    message:
+      "Internal Server Error",
+
+    error:
+      err.message
+
   });
 
 });
 
 
 // -----------------------------
-// Database + Infrastructure
+// Infrastructure
 // -----------------------------
 
 const connectInfrastructure = async () => {
 
 
-  // MongoDB
-
   if (process.env.MONGO_URI) {
 
     try {
 
-      await mongoose.connect(process.env.MONGO_URI);
+      await mongoose.connect(
+        process.env.MONGO_URI
+      );
+
 
       console.log(
         "✅ Connected to MongoDB Atlas"
       );
 
-    } catch (error) {
+
+    } catch(error) {
 
       console.error(
         "❌ MongoDB connection error:",
@@ -109,17 +132,16 @@ const connectInfrastructure = async () => {
 
     }
 
+
   } else {
 
     console.warn(
-      "⚠️ MONGO_URI not found. MongoDB features may be limited."
+      "⚠️ MONGO_URI not found"
     );
 
   }
 
 
-
-  // Neo4j
 
   try {
 
@@ -129,14 +151,16 @@ const connectInfrastructure = async () => {
       "✅ Neo4j connection verified"
     );
 
-  } catch (error) {
+
+  } catch(error) {
 
     console.error(
-      "❌ Neo4j connection error:",
+      "❌ Neo4j error:",
       error.message
     );
 
   }
+
 
 };
 
@@ -152,23 +176,33 @@ const startServer = async () => {
   await connectInfrastructure();
 
 
-  const PORT = process.env.PORT || 5000;
+  const PORT =
+    process.env.PORT || 5000;
 
 
-  app.listen(PORT, () => {
+  app.listen(
+    PORT,
+    () => {
 
-    console.log(
-      `🚀 Server running on http://localhost:${PORT}`
-    );
-
-
-    console.log(
-      `🔗 Safety API:
-      http://localhost:${PORT}/api/safety/recommend-vehicle`
-    );
+      console.log(
+        `🚀 Server running on http://localhost:${PORT}`
+      );
 
 
-  });
+      console.log(
+        `🔗 Safety API:
+http://localhost:${PORT}/api/safety/recommend-vehicle`
+      );
+
+
+      console.log(
+        `🗺️ Itinerary API:
+http://localhost:${PORT}/api/itinerary`
+      );
+
+
+    }
+  );
 
 
 };
