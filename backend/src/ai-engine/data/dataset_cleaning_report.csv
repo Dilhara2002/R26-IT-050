@@ -1,0 +1,10 @@
+metric,value
+total_disaster_records,598
+final_training_rows,598
+repaired_source_rows,27
+exact_matches,113
+route_level_matches,22
+no_road_data_records,463
+high_risk_rows,317
+medium_risk_rows,224
+low_risk_rows,57

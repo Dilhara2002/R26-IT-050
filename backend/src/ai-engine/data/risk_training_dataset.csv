@@ -1,0 +1,599 @@
+route_code,route_name,road_segment,gradient,terrain,road_surface,elevation,friction,road_width,hazard_type,risk_factor,season,historical_occurrence_count,severity_level,risk_level,road_data_available,match_type,source_repaired
+A26,A26 Kandy-Mahiyangana (Bend 1),No Road Data Available,,Unknown,Unknown,,,Unknown,Rock Fall,Steep Gradient,Oct-Dec (Monsoon),12,High,High,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 2),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,45,Medium,Medium,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 3),No Road Data Available,,Unknown,Unknown,,,Unknown,Rock Fall,Unstable Topsoil,Oct-Dec (Monsoon),14,High,High,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 4),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,38,Medium,Medium,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 5),No Road Data Available,,Unknown,Unknown,,,Unknown,Landslide,Colluvium Soil,Oct-Dec (Monsoon),8,High,High,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 6),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,Poor Visibility,Nov-Feb,60,Low,Low,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 7),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Steep Gradient,Year-round,55,High,High,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 8),No Road Data Available,,Unknown,Unknown,,,Unknown,Rock Fall,Hanging Boulders,Oct-Dec (Monsoon),11,Medium,Medium,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 9),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,Poor Visibility,Nov-Feb,70,Low,Low,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 10),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,62,High,High,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 11),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Saturated Slope,Oct-Dec (Monsoon),9,Medium,Medium,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 12),No Road Data Available,,Unknown,Unknown,,,Unknown,Rock Fall,Exposed Bedrock,Oct-Dec (Monsoon),15,High,High,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 13),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,41,Medium,Medium,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 14),No Road Data Available,,Unknown,Unknown,,,Unknown,Rock Fall,Dip Slope Failure,Oct-Dec (Monsoon),22,High,High,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 15),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Poor Drainage,Oct-Dec (Monsoon),7,Medium,Medium,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 16),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,Poor Visibility,Nov-Feb,80,Medium,Medium,0,no-road-data,0
+A26,A26 Kandy-Mahiyangana (Bend 17),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,51,High,High,0,no-road-data,0
+A5,A5 Ramboda Pass (KM 40-42),A5 Peradeniya-Badulla Segment 40,2.0,Flat,Aspalt - Good,75.0,0.75,Medium,Landslide,Steep Gradient,May-Jul (Monsoon),18,High,High,1,exact,0
+A5,A5 Ramboda Pass (KM 42-44),A5 Peradeniya-Badulla Segment 42,2.0,Flat,Aspalt - Fair,50.0,0.64,Wide,Heavy Mist,Poor Visibility,Year-round,150,High,High,1,exact,0
+A5,A5 Ramboda Pass (KM 44-46),A5 Peradeniya-Badulla Segment 44,2.0,Flat,Aspalt - Good,35.0,0.74,Wide,Rock Fall,Highly Weathered Rock,May-Jul (Monsoon),24,High,High,1,exact,0
+A5,A5 Ramboda Pass (KM 46-48),A5 Peradeniya-Badulla Segment 46,2.0,Flat,Aspalt - Fair,25.0,0.63,Medium,Earthslip,Deforestation,May-Jul (Monsoon),12,Medium,Medium,1,exact,0
+A5,A5 Ramboda Pass (KM 48-50),A5 Peradeniya-Badulla Segment 48,2.0,Flat,Aspalt - Good,18.0,0.75,Medium,Heavy Mist,High Altitude,Year-round,180,High,High,1,exact,0
+A5,A5 Ramboda Pass (KM 50-52),A5 Peradeniya-Badulla Segment 50,2.0,Flat,Aspalt - Fair,14.0,0.65,Wide,Accident Blackspot,Wet Surface,May-Jul (Monsoon),65,Medium,Medium,1,exact,0
+A5,A5 Ramboda Pass (KM 52-54),A5 Peradeniya-Badulla Segment 52,2.0,Flat,Aspalt - Good,10.0,0.77,Wide,Landslide,Unstable Topsoil,May-Jul (Monsoon),14,High,High,1,exact,0
+A5,A5 Ramboda Pass (KM 54-56),A5 Peradeniya-Badulla Segment 54,2.0,Coastal,Aspalt - Fair,7.0,0.66,Medium,Heavy Mist,Poor Visibility,Year-round,160,High,High,1,exact,0
+A5,A5 Ramboda Pass (KM 56-58),A5 Peradeniya-Badulla Segment 56,2.0,Coastal,Aspalt - Good,5.0,0.79,Wide,Rock Fall,Loose Boulders,May-Jul (Monsoon),9,Medium,Medium,1,exact,0
+A5,A5 Ramboda Pass (KM 58-60),A5 Peradeniya-Badulla Segment 58,2.0,Coastal,Aspalt - Fair,4.0,0.67,Wide,Flash Flood,Poor Drainage,May-Jul (Monsoon),5,Low,Low,1,exact,0
+A5,A5 Ramboda Pass (KM 60-62),A5 Peradeniya-Badulla Segment 60,2.0,Coastal,Aspalt - Good,3.0,0.8,Wide,Accident Blackspot,Sharp Bend,Year-round,55,Medium,Medium,1,exact,0
+A5,A5 Ramboda Pass (KM 62-64),A5 Peradeniya-Badulla Segment 62,2.0,Coastal,Aspalt - Fair,2.0,0.68,Medium,Earthslip,Saturated Soil,May-Jul (Monsoon),21,High,High,1,exact,0
+A5,A5 Ramboda Pass (KM 64-66),A5 Peradeniya-Badulla Segment 64,1.0,Coastal,Aspalt - Good,2.0,0.82,Wide,Heavy Mist,High Altitude,Year-round,140,High,High,1,exact,0
+A5,A5 Ramboda Pass (KM 66-68),A5 Peradeniya-Badulla Segment 66,1.0,Coastal,Aspalt - Fair,2.0,0.65,Wide,Rock Fall,Weathered Rock,May-Jul (Monsoon),16,Medium,Medium,1,exact,0
+A5,A5 Ramboda Pass (KM 68-70),A5 Peradeniya-Badulla Segment 68,1.0,Coastal,Concrete,5.0,0.79,Wide,Accident Blackspot,Steep Gradient,Year-round,61,High,High,1,exact,0
+A5,A5 Ramboda Pass (KM 70-72),A5 Peradeniya-Badulla Segment 70,3.0,Flat,Aspalt - Fair,10.0,0.63,Medium,Heavy Mist,High Altitude,Year-round,135,High,High,1,exact,0
+A5,A5 Ramboda Pass (KM 72-74),A5 Peradeniya-Badulla Segment 72,1.0,Flat,Aspalt - Good,18.0,0.75,Wide,Landslide,Poor Drainage,May-Jul (Monsoon),11,Medium,Medium,1,exact,0
+A5,A5 Ramboda Pass (KM 74-76),A5 Peradeniya-Badulla Segment 74,3.0,Flat,Aspalt - Good,28.0,0.73,Wide,Earthslip,Deforestation,May-Jul (Monsoon),25,High,High,1,exact,0
+A5,A5 Ramboda Pass (KM 76-78),A5 Peradeniya-Badulla Segment 76,2.0,Flat,Aspalt - Good,40.0,0.74,Wide,Accident Blackspot,Sharp Bend,Year-round,49,Medium,Medium,1,exact,0
+A7,A7 Hatton-Nuwara Eliya (KM 40-42),No Road Data Available,,Unknown,Unknown,,,Unknown,Landslide,Slope Failure,May-Jul (Monsoon),21,High,High,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 42-44),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Soil Saturation,May-Jul (Monsoon),19,High,High,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 44-46),No Road Data Available,,Unknown,Unknown,,,Unknown,Rock Fall,Structural Fissures,May-Jul (Monsoon),27,High,High,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 46-48),No Road Data Available,,Unknown,Unknown,,,Unknown,Landslide,Steep Gradient,May-Jul (Monsoon),33,High,High,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 48-50),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,High Altitude,Year-round,85,Medium,Medium,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 50-52),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,64,High,High,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 52-54),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Residual Soil,May-Jul (Monsoon),14,Medium,Medium,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 54-56),No Road Data Available,,Unknown,Unknown,,,Unknown,Rock Fall,Exposed Bedrock,May-Jul (Monsoon),12,Medium,Medium,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 56-58),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Residual Soil,May-Jul (Monsoon),16,Medium,Medium,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 58-60),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,May-Jul (Monsoon),6,Low,Low,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 60-62),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Wet Surface,May-Jul (Monsoon),48,Medium,Medium,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 62-64),No Road Data Available,,Unknown,Unknown,,,Unknown,Landslide,Slope Erosion,May-Jul (Monsoon),15,Medium,Medium,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 64-66),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,Poor Visibility,Year-round,145,High,High,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 66-68),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Steep Gradient,Year-round,72,High,High,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 68-70),No Road Data Available,,Unknown,Unknown,,,Unknown,Landslide,Historical Failure,May-Jul (Monsoon),42,High,High,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 70-72),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,Poor Visibility,Year-round,110,High,High,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 72-74),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Unstable Topsoil,May-Jul (Monsoon),18,Medium,Medium,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 74-76),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,58,Medium,Medium,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 76-78),No Road Data Available,,Unknown,Unknown,,,Unknown,Rock Fall,Weathered Rock,May-Jul (Monsoon),9,Low,Low,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 78-80),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,High Altitude,Year-round,125,High,High,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 80-82),No Road Data Available,,Unknown,Unknown,,,Unknown,Landslide,Colluvium Soil,May-Jul (Monsoon),25,High,High,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 82-84),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,68,High,High,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 84-86),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Residual Soil,May-Jul (Monsoon),12,Medium,Medium,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 86-88),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,Poor Visibility,Year-round,125,High,High,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 88-90),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Wet Surface,May-Jul (Monsoon),50,Medium,Medium,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 90-92),No Road Data Available,,Unknown,Unknown,,,Unknown,Rock Fall,Structural Fissures,May-Jul (Monsoon),19,Medium,Medium,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 92-94),No Road Data Available,,Unknown,Unknown,,,Unknown,Landslide,Slope Failure,May-Jul (Monsoon),30,High,High,0,no-road-data,0
+A7,A7 Hatton-Nuwara Eliya (KM 94-96),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,Poor Visibility,Year-round,115,High,High,0,no-road-data,0
+A16,A16 Beragala-Haputale (KM 1-3),A16 Beragala-Haputale Segment 1,8.0,Mountainous,Aspalt - Good,1020.0,0.68,Medium,Heavy Mist,High Altitude,Oct-Dec (Monsoon),90,Medium,Medium,1,exact,0
+A16,A16 Beragala-Haputale (KM 3-5),A16 Beragala-Haputale Segment 3,11.0,Mountainous,Concrete,1075.0,0.78,Narrow,Earthslip,Steep Gradient,Oct-Dec (Monsoon),19,High,High,1,exact,0
+A16,A16 Beragala-Haputale (KM 5-7),A16 Beragala-Haputale Segment 5,14.0,Mountainous,Concrete,1150.0,0.8,Narrow,Rock Fall,Loose Boulders,Oct-Dec (Monsoon),11,Medium,Medium,1,exact,0
+A16,A16 Beragala-Haputale (KM 7-9),A16 Beragala-Haputale Segment 7,15.0,Mountainous,Aspalt - Fair,1245.0,0.49,Narrow,Accident Blackspot,Sharp Bend,Year-round,47,High,High,1,exact,0
+A16,A16 Beragala-HaliEla (KM 9-11),A16 Beragala-Haputale Segment 9,17.0,Mountainous,Gravel,1360.0,0.4,Narrow,Landslide,Head Scarp,Oct-Dec (Monsoon),28,High,High,1,exact,0
+A16,A16 Beragala-HaliEla (KM 11-13),A16 Beragala-Haputale Segment 11,16.0,Mountainous,Aspalt - Good,1400.0,0.64,Medium,Earthslip,Soil Saturation,Oct-Dec (Monsoon),14,Medium,Medium,1,exact,0
+A16,A16 Beragala-HaliEla (KM 13-15),A16 Beragala-Haputale Segment 13,12.0,Mountainous,Concrete,1335.0,0.77,Narrow,Heavy Mist,Poor Visibility,Oct-Feb,130,High,High,1,exact,0
+A16,A16 Beragala-HaliEla (KM 15-17),A16 Beragala-Haputale Segment 15,9.0,Mountainous,Aspalt - Fair,1250.0,0.54,Narrow,Accident Blackspot,Steep Gradient,Year-round,52,Medium,Medium,1,exact,0
+A16,A16 Beragala-Haputale (KM 17-19),A16 Beragala-Haputale Segment 17,7.0,Mountainous,Aspalt - Good,1145.0,0.69,Medium,Heavy Mist,High Altitude,Oct-Feb,66,Medium,Medium,1,exact,0
+A16,A16 Beragala-Haputale (KM 19-21),A16 Beragala-Haputale Segment 19,5.0,Hilly,Aspalt - Good,1020.0,0.71,Medium,Earthslip,Soil Saturation,Oct-Dec (Monsoon),15,Medium,Medium,1,exact,0
+A16,A16 Beragala-Haputale (KM 21-23),A16 Beragala-Haputale Segment 21,5.0,Hilly,Aspalt - Fair,1000.0,0.6,Medium,Rock Fall,Loose Boulders,Oct-Dec (Monsoon),12,Medium,Medium,1,exact,0
+A16,A16 Beragala-Haputale (KM 23-25),A16 Beragala-Haputale Segment 23,8.0,Mountainous,Aspalt - Good,1055.0,0.68,Medium,Accident Blackspot,Sharp Bend,Year-round,49,High,High,1,exact,0
+A16,A16 Beragala-Haputale (KM 25-27),A16 Beragala-Haputale Segment 25,11.0,Mountainous,Concrete,1125.0,0.79,Narrow,Earthslip,Steep Gradient,Oct-Dec (Monsoon),18,Medium,Medium,1,exact,0
+A16,A16 Beragala-Haputale (KM 27-29),A16 Beragala-Haputale Segment 27,12.0,Mountainous,Gravel,1205.0,0.44,Narrow,Heavy Mist,Poor Visibility,Oct-Feb,45,Low,Low,1,exact,0
+A23,A23 Ella-Wellawaya (KM 1-3),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,Poor Visibility,Oct-Jan,85,Medium,Medium,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 3-5),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,73,High,High,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 5-7),No Road Data Available,,Unknown,Unknown,,,Unknown,Rock Fall,Exposed Bedrock,Oct-Jan,16,Medium,Medium,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 7-9),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Unstable Topsoil,Oct-Jan,12,Medium,Medium,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 9-11),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight to Curve,Year-round,38,Medium,Medium,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 11-13),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Unstable Topsoil,Oct-Jan,31,High,High,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 13-15),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,Oct-Jan,10,Medium,Medium,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 15-17),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Steep Gradient,Year-round,66,High,High,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 17-19),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Colluvium Soil,Oct-Jan,14,Medium,Medium,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 19-21),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,Poor Visibility,Oct-Jan,40,Low,Low,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 21-23),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,44,Medium,Medium,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 23-25),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Proximity to Park,Year-round,22,Medium,Medium,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 25-27),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight to Curve,Year-round,48,Medium,Medium,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 27-29),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Seasonal Streams,Oct-Jan,7,Low,Low,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 29-31),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,42,Medium,Medium,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 31-33),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,18,Medium,Medium,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 33-35),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,Oct-Jan,9,Low,Low,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 35-37),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Unstable Topsoil,Oct-Jan,22,Medium,Medium,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 37-39),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Steep Gradient,Year-round,68,High,High,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 39-41),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,Poor Visibility,Oct-Jan,30,Low,Low,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 41-43),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,12,Low,Low,0,no-road-data,0
+A23,A23 Ella-Wellawaya (KM 43-45),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Wet Surface,Oct-Jan,35,Medium,Medium,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 10-12),No Road Data Available,,Unknown,Unknown,,,Unknown,Landslide,Historical Failure,May-Jul (Monsoon),36,High,High,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 12-14),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,52,High,High,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 14-16),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Soil Saturation,May-Jul (Monsoon),18,Medium,Medium,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 16-18),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,High Altitude,Year-round,88,Medium,Medium,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 18-20),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,May-Jul (Monsoon),9,Low,Low,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 20-22),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,45,Medium,Medium,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 22-24),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,71,High,High,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 24-26),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Poor Drainage,May-Jul (Monsoon),22,High,High,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 26-28),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,High Altitude,Year-round,145,High,High,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 28-30),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,68,High,High,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 30-32),No Road Data Available,,Unknown,Unknown,,,Unknown,Landslide,Soil Saturation,May-Jul (Monsoon),15,Medium,Medium,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 32-34),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,High Altitude,Year-round,95,Medium,Medium,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 34-36),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Wet Surface,May-Jul (Monsoon),48,Medium,Medium,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 36-38),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,May-Jul (Monsoon),12,Low,Low,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 38-40),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Unstable Topsoil,May-Jul (Monsoon),16,Medium,Medium,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 40-42),No Road Data Available,,Unknown,Unknown,,,Unknown,Landslide,Soil Saturation,May-Jul (Monsoon),17,Medium,Medium,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 42-44),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,58,High,High,0,no-road-data,0
+A7,A7 Ginigathena Road (KM 44-46),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,High Altitude,Year-round,110,High,High,0,no-road-data,0
+E01,E01 Southern Expressway (KM 5-10),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Normal Curve,May-Jul / Oct-Dec,55,High,High,0,no-road-data,1
+E01,E01 Southern Expressway (KM 10-15),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Reverse Curve,May-Jul / Oct-Dec,82,High,High,0,no-road-data,1
+E01,E01 Southern Expressway (KM 15-20),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,45,Medium,Medium,0,no-road-data,0
+E01,E01 Southern Expressway (KM 20-25),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Surface Water,May-Jul / Oct-Dec,33,Medium,Medium,0,no-road-data,1
+E01,E01 Southern Expressway (KM 25-30),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Low Lying Area,May-Jul (Monsoon),4,Low,Low,0,no-road-data,0
+E01,E01 Southern Expressway (KM 30-35),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Reverse Curve,May-Jul / Oct-Dec,76,High,High,0,no-road-data,1
+E01,E01 Southern Expressway (KM 35-40),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Driver Fatigue,Year-round,51,Medium,Medium,0,no-road-data,0
+E01,E01 Southern Expressway (KM 40-45),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Normal Curve,May-Jul / Oct-Dec,48,High,High,0,no-road-data,1
+E01,E01 Southern Expressway (KM 45-50),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Reverse Curve,May-Jul / Oct-Dec,69,High,High,0,no-road-data,1
+E01,E01 Southern Expressway (KM 50-55),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,72,High,High,0,no-road-data,0
+E01,E01 Southern Expressway (KM 55-60),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Basin Overflow,May-Jul (Monsoon),3,Low,Low,0,no-road-data,0
+E01,E01 Southern Expressway (KM 60-65),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Surface Water,May-Jul / Oct-Dec,39,Medium,Medium,0,no-road-data,1
+E01,E01 Southern Expressway (KM 65-70),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Reverse Curve,May-Jul / Oct-Dec,71,High,High,0,no-road-data,1
+E01,E01 Southern Expressway (KM 70-75),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Wet Surface,May-Jul / Oct-Dec,55,Medium,Medium,0,no-road-data,1
+E01,E01 Southern Expressway (KM 75-80),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,88,High,High,0,no-road-data,0
+E01,E01 Southern Expressway (KM 80-85),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Normal Curve,May-Jul / Oct-Dec,52,High,High,0,no-road-data,1
+E01,E01 Southern Expressway (KM 85-90),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,May-Jul (Monsoon),3,Low,Low,0,no-road-data,0
+E01,E01 Southern Expressway (KM 90-95),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Reverse Curve,May-Jul / Oct-Dec,64,High,High,0,no-road-data,1
+E01,E01 Southern Expressway (KM 95-100),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Reverse Curve,May-Jul / Oct-Dec,58,High,High,0,no-road-data,1
+E01,E01 Southern Expressway (KM 100-105),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,62,Medium,Medium,0,no-road-data,0
+E01,E01 Southern Expressway (KM 105-110),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Normal Curve,May-Jul / Oct-Dec,41,Medium,Medium,0,no-road-data,1
+E01,E01 Southern Expressway (KM 110-115),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Driver Fatigue,Year-round,77,High,High,0,no-road-data,0
+E01,E01 Southern Expressway (KM 115-120),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Surface Water,May-Jul / Oct-Dec,53,High,High,0,no-road-data,1
+E01,E01 Southern Expressway (KM 120-125),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Night Traffic,Year-round,49,Medium,Medium,0,no-road-data,0
+E01,E01 Southern Expressway (KM 125-130),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Reverse Curve,May-Jul / Oct-Dec,66,High,High,0,no-road-data,1
+E01,E01 Southern Expressway (KM 130-135),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Coastal Inundation,May-Jul (Monsoon),2,Low,Low,0,no-road-data,0
+E01,E01 Southern Expressway (KM 135-140),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Normal Curve,May-Jul / Oct-Dec,54,High,High,0,no-road-data,1
+E01,E01 Southern Expressway (KM 140-145),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Interchange Traffic,Year-round,44,Medium,Medium,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 1-3),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,45,Medium,Medium,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 3-5),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Aggressive Behavior,Year-round,110,High,High,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 5-7),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Unpaved Edges,Year-round,34,Medium,Medium,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 7-9),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,135,High,High,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 9-11),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Aggressive Behavior,Year-round,150,High,High,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 11-13),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Poor Lighting,Year-round,55,High,High,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 13-15),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,125,High,High,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 15-17),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Seasonal Streams,Oct-Jan,8,Low,Low,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 17-19),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,60,Medium,Medium,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 19-21),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,42,Medium,Medium,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 21-23),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,115,High,High,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 23-25),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Aggressive Behavior,Year-round,80,Medium,Medium,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 25-27),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Unpaved Edges,Year-round,39,Medium,Medium,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 27-29),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,140,High,High,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 29-31),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,48,Medium,Medium,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 31-33),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,105,High,High,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 33-35),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,Oct-Jan,5,Low,Low,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 35-37),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Night Traffic,Year-round,33,Medium,Medium,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 37-39),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Proximity to Park,Year-round,72,Medium,Medium,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 39-41),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,122,High,High,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 41-43),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,41,Medium,Medium,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 43-45),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Reserve Border,Year-round,68,Medium,Medium,0,no-road-data,0
+B35,B35 Buttala-Kataragama (KM 45-47),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Mixed Traffic,Year-round,37,Medium,Medium,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 176+100),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Complex Intersection,Year-round,62,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 176+700),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Highway Geometry,Year-round,58,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 177+000),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,65,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 298+400),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Driver Fatigue,Year-round,70,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 299+100),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,82,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 300+000),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,95,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 301+100),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Pedestrian Activity,Year-round,64,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 303+000),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,88,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 305+000),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Geometric Flaw,Year-round,72,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 307+000),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,69,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 308+100),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,75,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 309+000),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Cross Traffic,Year-round,67,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 312+200),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Geometric Flaw,Year-round,80,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 314+100),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Geometric Flaw,Year-round,76,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 315+500),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,61,Medium,Medium,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 318+200),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Pedestrian Activity,Year-round,84,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 320+000),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,92,High,High,0,no-road-data,0
+A1,A1 Colombo-Kandy (KM 34-36),A1 Colombo-Kandy Segment 34,4.0,Hilly,Aspalt - Fair,450.0,0.59,Medium,Accident Blackspot,Urban Traffic,Year-round,115,High,High,1,exact,0
+A1,A1 Colombo-Kandy (KM 36-38),A1 Colombo-Kandy Segment 36,6.0,Hilly,Aspalt - Good,430.0,0.68,Medium,Accident Blackspot,Pedestrian Activity,Year-round,98,High,High,1,exact,0
+A1,A1 Colombo-Kandy (KM 38-40),A1 Colombo-Kandy Segment 38,4.0,Hilly,Aspalt - Good,400.0,0.7,Wide,Accident Blackspot,Complex Junction,Year-round,105,High,High,1,exact,0
+A1,A1 Colombo-Kandy (KM 40-42),A1 Colombo-Kandy Segment 40,2.0,Hilly,Aspalt - Fair,370.0,0.61,Wide,Accident Blackspot,Mixed Traffic,Year-round,76,Medium,Medium,1,exact,0
+A1,A1 Colombo-Kandy (KM 42-44),A1 Colombo-Kandy Segment 42,4.0,Hilly,Aspalt - Good,350.0,0.72,Medium,Accident Blackspot,Unregulated Access,Year-round,92,High,High,1,exact,0
+A1,A1 Colombo-Kandy (KM 44-46),A1 Colombo-Kandy Segment 44,4.0,Hilly,Aspalt - Good,320.0,0.69,Wide,Accident Blackspot,Speeding,Year-round,85,High,High,1,exact,0
+A1,A1 Colombo-Kandy (KM 46-48),A1 Colombo-Kandy Segment 46,2.0,Hilly,Aspalt - Fair,290.0,0.62,Wide,Accident Blackspot,Complex Junction,Year-round,95,High,High,1,exact,0
+A1,A1 Colombo-Kandy (KM 48-50),A1 Colombo-Kandy Segment 48,2.0,Hilly,Aspalt - Good,260.0,0.75,Wide,Accident Blackspot,Mixed Traffic,Year-round,72,Medium,Medium,1,exact,0
+A1,A1 Colombo-Kandy (KM 50-52),A1 Colombo-Kandy Segment 50,1.0,Flat,Aspalt - Good,240.0,0.76,Wide,Accident Blackspot,Speeding,Year-round,88,High,High,1,exact,0
+A1,A1 Colombo-Kandy (KM 52-54),A1 Colombo-Kandy Segment 52,1.0,Flat,Aspalt - Fair,225.0,0.64,Wide,Accident Blackspot,Severe Congestion,Year-round,110,High,High,1,exact,0
+A1,A1 Colombo-Kandy (KM 54-56),A1 Colombo-Kandy Segment 54,3.0,Hilly,Concrete,230.0,0.78,Wide,Accident Blackspot,Mixed Traffic,Year-round,80,Medium,Medium,1,exact,0
+A1,A1 Colombo-Kandy (Kiribathgoda),Route Aggregate Profile,4.0,Hilly,Aspalt - Good,412.5,0.7,Wide,Accident Blackspot,Severe Congestion,Year-round,180,High,High,1,route-level,0
+A4,A4 Ratnapura (KM 64-66),A4 Colombo-Batticaloa Segment 64,2.0,Coastal,Aspalt - Good,8.0,0.76,Wide,Earthslip,Soil Saturation,May-Jul (Monsoon),12,Medium,Medium,1,exact,0
+A4,A4 Ratnapura (KM 66-68),A4 Colombo-Batticaloa Segment 66,2.0,Flat,Concrete,15.0,0.79,Wide,Landslide,Steep Gradient,May-Jul (Monsoon),18,High,High,1,exact,0
+A4,A4 Ratnapura (KM 68-70),A4 Colombo-Batticaloa Segment 68,3.0,Flat,Aspalt - Fair,22.0,0.62,Medium,Accident Blackspot,Sharp Bend,Year-round,45,Medium,Medium,1,exact,0
+A4,A4 Ratnapura (KM 70-72),A4 Colombo-Batticaloa Segment 70,2.0,Flat,Concrete,32.0,0.78,Wide,Earthslip,Poor Drainage,May-Jul (Monsoon),22,High,High,1,exact,0
+A4,A4 Ratnapura (KM 72-74),A4 Colombo-Batticaloa Segment 72,5.0,Hilly,Aspalt - Fair,45.0,0.58,Medium,Rock Fall,Colluvium Soil,May-Jul (Monsoon),9,Medium,Medium,1,exact,0
+A4,A4 Ratnapura (KM 74-76),A4 Colombo-Batticaloa Segment 74,6.0,Hilly,Concrete,65.0,0.79,Narrow,Accident Blackspot,High Speed,Year-round,51,High,High,1,exact,0
+A4,A4 Ratnapura (KM 76-78),A4 Colombo-Batticaloa Segment 76,4.0,Hilly,Aspalt - Good,85.0,0.7,Wide,Landslide,Saturated Slope,May-Jul (Monsoon),15,Medium,Medium,1,exact,0
+A4,A4 Ratnapura (KM 78-80),A4 Colombo-Batticaloa Segment 78,2.0,Hilly,Aspalt - Good,105.0,0.74,Wide,Earthslip,Unstable Topsoil,May-Jul (Monsoon),25,High,High,1,exact,0
+A4,A4 Ratnapura (KM 80-82),A4 Colombo-Batticaloa Segment 80,5.0,Hilly,Aspalt - Good,130.0,0.68,Medium,Flash Flood,Poor Drainage,May-Jul (Monsoon),8,Low,Low,1,exact,0
+A4,A4 Ratnapura (KM 82-84),A4 Colombo-Batticaloa Segment 82,5.0,Hilly,Aspalt - Fair,170.0,0.58,Medium,Accident Blackspot,Wet Surface,May-Jul (Monsoon),38,Medium,Medium,1,exact,0
+A4,A4 Ratnapura (KM 84-86),A4 Colombo-Batticaloa Segment 84,5.0,Hilly,Aspalt - Fair,210.0,0.57,Medium,Landslide,Historical Failure,May-Jul (Monsoon),33,High,High,1,exact,0
+A4,A4 Ratnapura (KM 86-88),A4 Colombo-Batticaloa Segment 86,3.0,Hilly,Concrete,250.0,0.77,Wide,Rock Fall,Weathered Rock,May-Jul (Monsoon),14,Medium,Medium,1,exact,0
+A4,A4 Ratnapura (KM 88-90),A4 Colombo-Batticaloa Segment 88,5.0,Hilly,Aspalt - Good,280.0,0.68,Medium,Earthslip,Deforestation,May-Jul (Monsoon),27,High,High,1,exact,0
+A4,A4 Ratnapura (KM 90-92),A4 Colombo-Batticaloa Segment 90,7.0,Hilly,Aspalt - Fair,310.0,0.56,Medium,Accident Blackspot,Steep Gradient,Year-round,62,High,High,1,exact,0
+A4,A4 Ratnapura (KM 92-94),A4 Colombo-Batticaloa Segment 92,5.0,Hilly,Concrete,335.0,0.78,Wide,Landslide,Slope Erosion,May-Jul (Monsoon),21,High,High,1,exact,0
+A4,A4 Ratnapura (KM 94-96),A4 Colombo-Batticaloa Segment 94,3.0,Hilly,Aspalt - Good,355.0,0.71,Wide,Heavy Mist,High Altitude,May-Jul (Monsoon),40,Low,Low,1,exact,0
+A4,A4 Ratnapura (KM 96-98),A4 Colombo-Batticaloa Segment 96,5.0,Hilly,Aspalt - Fair,375.0,0.59,Medium,Earthslip,Residual Soil,May-Jul (Monsoon),11,Medium,Medium,1,exact,0
+A4,A4 Ratnapura (KM 98-100),A4 Colombo-Batticaloa Segment 98,3.0,Hilly,Concrete,390.0,0.76,Wide,Accident Blackspot,Sharp Bend,Year-round,47,Medium,Medium,1,exact,0
+A4,A4 Ratnapura (KM 100-102),A4 Colombo-Batticaloa Segment 100,1.0,Hilly,Aspalt - Good,400.0,0.72,Wide,Landslide,Soil Saturation,May-Jul (Monsoon),19,High,High,1,exact,0
+A4,A4 Ratnapura (KM 102-104),A4 Colombo-Batticaloa Segment 102,1.0,Flat,Aspalt - Good,410.0,0.73,Wide,Flash Flood,River Overflow,May-Jul (Monsoon),16,Medium,Medium,1,exact,0
+A4,A4 Ratnapura (KM 104-106),A4 Colombo-Batticaloa Segment 104,1.0,Flat,Aspalt - Good,420.0,0.74,Wide,Accident Blackspot,Complex Intersection,Year-round,73,High,High,1,exact,0
+A4,A4 Ratnapura (KM 106-108),A4 Colombo-Batticaloa Segment 106,1.0,Flat,Aspalt - Good,430.0,0.75,Wide,Earthslip,Steep Gradient,May-Jul (Monsoon),28,High,High,1,exact,0
+A4,A4 Ratnapura (KM 108-110),A4 Colombo-Batticaloa Segment 108,1.0,Flat,Aspalt - Good,440.0,0.76,Wide,Rock Fall,Exposed Bedrock,May-Jul (Monsoon),15,High,High,1,exact,0
+A4,A4 Ratnapura (KM 110-112),A4 Colombo-Batticaloa Segment 110,1.0,Flat,Aspalt - Good,450.0,0.75,Wide,Landslide,Poor Drainage,May-Jul (Monsoon),13,Medium,Medium,1,exact,0
+A4,A4 Ratnapura (KM 112-114),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Accident Blackspot,High Speed,Year-round,55,Medium,Medium,1,route-level,0
+A4,A4 Ratnapura (KM 114-116),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Earthslip,Saturated Slope,May-Jul (Monsoon),24,High,High,1,route-level,0
+A4,A4 Ratnapura (KM 116-118),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Heavy Mist,Poor Visibility,May-Jul (Monsoon),65,Medium,Medium,1,route-level,0
+A4,A4 Ratnapura (KM 118-120),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Accident Blackspot,Sharp Bend,Year-round,68,High,High,1,route-level,0
+A4,A4 Ratnapura (KM 120-122),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Landslide,Colluvium Soil,May-Jul (Monsoon),31,High,High,1,route-level,0
+A4,A4 Ratnapura (KM 122-124),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Earthslip,Unstable Topsoil,May-Jul (Monsoon),17,Medium,Medium,1,route-level,0
+A4,A4 Ratnapura (KM 124-126),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Flash Flood,Poor Drainage,May-Jul (Monsoon),9,Low,Low,1,route-level,0
+A4,A4 Ratnapura (KM 126-128),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Accident Blackspot,Wet Surface,May-Jul (Monsoon),42,Medium,Medium,1,route-level,0
+A4,A4 Ratnapura (KM 128-130),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Rock Fall,Hanging Boulders,May-Jul (Monsoon),22,High,High,1,route-level,0
+A4,A4 Ratnapura (KM 130-132),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Landslide,Historical Failure,May-Jul (Monsoon),36,High,High,1,route-level,0
+A4,A4 Ratnapura (KM 132-134),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Earthslip,Soil Saturation,May-Jul (Monsoon),26,High,High,1,route-level,0
+A4,A4 Ratnapura (KM 134-136),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Accident Blackspot,Steep Gradient,Year-round,59,High,High,1,route-level,0
+A4,A4 Ratnapura (KM 136-138),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Heavy Mist,High Altitude,May-Jul (Monsoon),88,High,High,1,route-level,0
+A4,A4 Ratnapura (KM 138-140),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Landslide,Slope Failure,May-Jul (Monsoon),15,Medium,Medium,1,route-level,0
+A4,A4 Ratnapura (KM 140-142),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Earthslip,Deforestation,May-Jul (Monsoon),12,Medium,Medium,1,route-level,0
+A4,A4 Ratnapura (KM 142-144),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Accident Blackspot,Sharp Bend,Year-round,71,High,High,1,route-level,0
+A4,A4 Ratnapura (KM 144-146),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Rock Fall,Weathered Rock,May-Jul (Monsoon),8,Low,Low,1,route-level,0
+A4,A4 Ratnapura (KM 146-148),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Landslide,Saturated Soil,May-Jul (Monsoon),20,High,High,1,route-level,0
+A4,A4 Ratnapura (KM 148-150),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Earthslip,Colluvium Soil,May-Jul (Monsoon),29,High,High,1,route-level,0
+A4,A4 Ratnapura (KM 150-152),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Flash Flood,Seasonal Streams,May-Jul (Monsoon),6,Low,Low,1,route-level,0
+A4,A4 Ratnapura (KM 152-154),Route Aggregate Profile,3.0,Hilly,Aspalt - Good,150.0,0.715,Wide,Landslide,Potential Failure,May-Jul (Monsoon),34,High,High,1,route-level,0
+A1,A1 Kegalle (KM 56-58),A1 Colombo-Kandy Segment 56,5.0,Hilly,Aspalt - Fair,255.0,0.59,Medium,Landslide,Soil Saturation,May-Jul (Monsoon),19,High,High,1,exact,0
+A1,A1 Kegalle (KM 58-60),A1 Colombo-Kandy Segment 58,4.0,Hilly,Concrete,285.0,0.79,Medium,Accident Blackspot,Mixed Traffic,Year-round,82,High,High,1,exact,0
+A1,A1 Kegalle (KM 60-62),A1 Colombo-Kandy Segment 60,7.0,Hilly,Aspalt - Good,320.0,0.67,Medium,Earthslip,Residual Soil,May-Jul (Monsoon),14,Medium,Medium,1,exact,0
+A1,A1 Kegalle (KM 62-64),A1 Colombo-Kandy Segment 62,5.0,Hilly,Aspalt - Good,360.0,0.7,Wide,Accident Blackspot,Sharp Bend,Year-round,65,High,High,1,exact,0
+A1,A1 Kegalle (KM 64-66),A1 Colombo-Kandy Segment 64,6.0,Hilly,Aspalt - Good,405.0,0.69,Wide,Landslide,Slope Erosion,May-Jul (Monsoon),12,Medium,Medium,1,exact,0
+A1,A1 Kegalle (KM 66-68),A1 Colombo-Kandy Segment 66,5.0,Hilly,Aspalt - Good,450.0,0.71,Medium,Accident Blackspot,High Speed,Year-round,77,High,High,1,exact,0
+A1,A1 Kegalle (KM 68-70),A1 Colombo-Kandy Segment 68,8.0,Mountainous,Concrete,495.0,0.77,Narrow,Earthslip,Unstable Topsoil,May-Jul (Monsoon),22,High,High,1,exact,0
+A1,A1 Kegalle (KM 70-72),A1 Colombo-Kandy Segment 70,6.0,Mountainous,Aspalt - Fair,530.0,0.55,Medium,Accident Blackspot,Pedestrian Activity,Year-round,54,Medium,Medium,1,exact,0
+A1,A1 Kegalle (KM 72-74),A1 Colombo-Kandy Segment 72,6.0,Mountainous,Aspalt - Fair,565.0,0.56,Medium,Landslide,Steep Gradient,May-Jul (Monsoon),26,High,High,1,exact,0
+A1,A1 Kegalle (KM 74-76),A1 Colombo-Kandy Segment 74,8.0,Mountainous,Aspalt - Fair,595.0,0.54,Narrow,Accident Blackspot,Severe Congestion,Year-round,95,High,High,1,exact,0
+A1,A1 Kegalle (KM 76-78),A1 Colombo-Kandy Segment 76,7.0,Mountainous,Concrete,620.0,0.79,Narrow,Earthslip,Poor Drainage,May-Jul (Monsoon),15,Medium,Medium,1,exact,0
+A1,A1 Kegalle (KM 78-80),A1 Colombo-Kandy Segment 78,5.0,Hilly,Aspalt - Good,630.0,0.68,Medium,Accident Blackspot,Complex Junction,Year-round,88,High,High,1,exact,0
+A1,A1 Kegalle (KM 80-82),A1 Colombo-Kandy Segment 80,3.0,Hilly,Aspalt - Good,640.0,0.69,Wide,Landslide,Historical Failure,May-Jul (Monsoon),31,High,High,1,exact,0
+A1,A1 Kegalle (KM 82-84),A1 Colombo-Kandy Segment 82,5.0,Hilly,Concrete,620.0,0.78,Medium,Accident Blackspot,Wet Surface,May-Jul (Monsoon),49,Medium,Medium,1,exact,0
+A1,A1 Kegalle (KM 84-86),A1 Colombo-Kandy Segment 84,3.0,Hilly,Aspalt - Fair,600.0,0.59,Wide,Earthslip,Saturated Slope,May-Jul (Monsoon),25,High,High,1,exact,0
+A1,A1 Kegalle (KM 86-88),A1 Colombo-Kandy Segment 86,3.0,Hilly,Concrete,585.0,0.76,Wide,Flash Flood,Poor Drainage,May-Jul (Monsoon),7,Low,Low,1,exact,0
+A1,A1 Kegalle (KM 88-90),A1 Colombo-Kandy Segment 88,3.0,Hilly,Aspalt - Good,570.0,0.69,Medium,Accident Blackspot,High Speed,Year-round,85,High,High,1,exact,0
+A1,A1 Kegalle (KM 90-92),A1 Colombo-Kandy Segment 90,1.0,Hilly,Aspalt - Good,550.0,0.72,Wide,Landslide,Deforestation,May-Jul (Monsoon),16,Medium,Medium,1,exact,0
+A1,A1 Kegalle (KM 92-94),A1 Colombo-Kandy Segment 92,3.0,Hilly,Aspalt - Good,530.0,0.73,Wide,Accident Blackspot,Sharp Bend,Year-round,72,High,High,1,exact,0
+A1,A1 Kegalle (KM 94-96),A1 Colombo-Kandy Segment 94,1.0,Hilly,Aspalt - Fair,510.0,0.62,Wide,Earthslip,Colluvium Soil,May-Jul (Monsoon),13,Medium,Medium,1,exact,0
+A6,A6 Habarana (KM 90-92),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,85,High,High,0,no-road-data,0
+A6,A6 Habarana (KM 92-94),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Water Sources,Jul-Sep (Dry Season),115,High,High,0,no-road-data,0
+A6,A6 Habarana (KM 94-96),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,44,Medium,Medium,0,no-road-data,0
+A6,A6 Habarana (KM 96-98),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Proximity to Park,Year-round,130,High,High,0,no-road-data,0
+A6,A6 Habarana (KM 98-100),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,65,Medium,Medium,0,no-road-data,0
+A6,A6 Habarana (KM 100-102),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Night Traffic,Year-round,58,High,High,0,no-road-data,0
+A6,A6 Habarana (KM 102-104),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Aggressive Behavior,Year-round,105,High,High,0,no-road-data,0
+A6,A6 Habarana (KM 104-106),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,125,High,High,0,no-road-data,0
+A6,A6 Habarana (KM 106-108),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Unpaved Edges,Year-round,39,Medium,Medium,0,no-road-data,0
+A6,A6 Habarana (KM 108-110),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Water Sources,Jul-Sep (Dry Season),140,High,High,0,no-road-data,0
+A6,A6 Habarana (KM 110-112),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Reserve Border,Year-round,72,Medium,Medium,0,no-road-data,0
+A6,A6 Habarana (KM 112-114),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,66,High,High,0,no-road-data,0
+A6,A6 Habarana (KM 114-116),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,110,High,High,0,no-road-data,0
+A6,A6 Habarana (KM 116-118),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Aggressive Behavior,Year-round,80,Medium,Medium,0,no-road-data,0
+A6,A6 Habarana (KM 118-120),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Seasonal Streams,Oct-Jan,8,Low,Low,0,no-road-data,0
+A6,A6 Habarana (KM 120-122),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,135,High,High,0,no-road-data,0
+A6,A6 Habarana (KM 122-124),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Proximity to Park,Year-round,95,High,High,0,no-road-data,0
+A6,A6 Habarana (KM 124-126),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,48,Medium,Medium,0,no-road-data,0
+A6,A6 Habarana (KM 126-128),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,122,High,High,0,no-road-data,0
+A6,A6 Habarana (KM 128-130),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,68,Medium,Medium,0,no-road-data,0
+A11,A11 Polonnaruwa (KM 0-2),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,105,High,High,0,no-road-data,0
+A11,A11 Polonnaruwa (KM 2-4),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,41,Medium,Medium,0,no-road-data,0
+A11,A11 Polonnaruwa (KM 4-6),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Water Sources,Jul-Sep (Dry Season),120,High,High,0,no-road-data,0
+A11,A11 Polonnaruwa (KM 6-8),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,75,Medium,Medium,0,no-road-data,0
+A11,A11 Polonnaruwa (KM 8-10),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Night Traffic,Year-round,52,High,High,0,no-road-data,0
+A11,A11 Polonnaruwa (KM 10-12),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Aggressive Behavior,Year-round,135,High,High,0,no-road-data,0
+A11,A11 Polonnaruwa (KM 12-14),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Proximity to Park,Year-round,110,High,High,0,no-road-data,0
+A11,A11 Polonnaruwa (KM 14-16),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,Oct-Jan,9,Low,Low,0,no-road-data,0
+A11,A11 Polonnaruwa (KM 16-18),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,145,High,High,0,no-road-data,0
+A11,A11 Polonnaruwa (KM 18-20),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,46,Medium,Medium,0,no-road-data,0
+A11,A11 Polonnaruwa (KM 20-22),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,125,High,High,0,no-road-data,0
+A11,A11 Polonnaruwa (KM 22-24),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Reserve Border,Year-round,82,Medium,Medium,0,no-road-data,0
+A11,A11 Polonnaruwa (KM 24-26),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,38,Medium,Medium,0,no-road-data,0
+A11,A11 Polonnaruwa (KM 26-28),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Water Sources,Jul-Sep (Dry Season),115,High,High,0,no-road-data,0
+A11,A11 Polonnaruwa (KM 28-30),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Aggressive Behavior,Year-round,130,High,High,0,no-road-data,0
+A12,A12 Anuradhapura (KM 40-42),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,95,High,High,0,no-road-data,0
+A12,A12 Anuradhapura (KM 42-44),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Water Sources,Jul-Sep (Dry Season),125,High,High,0,no-road-data,0
+A12,A12 Anuradhapura (KM 44-46),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,42,Medium,Medium,0,no-road-data,0
+A12,A12 Anuradhapura (KM 46-48),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,Oct-Dec,18,Medium,Medium,0,no-road-data,0
+A12,A12 Anuradhapura (KM 48-50),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Proximity to Park,Year-round,110,High,High,0,no-road-data,0
+A12,A12 Anuradhapura (KM 50-52),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,65,Medium,Medium,0,no-road-data,0
+A12,A12 Anuradhapura (KM 52-54),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Night Traffic,Year-round,55,High,High,0,no-road-data,0
+A12,A12 Anuradhapura (KM 54-56),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Aggressive Behavior,Year-round,135,High,High,0,no-road-data,0
+A12,A12 Anuradhapura (KM 56-58),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,Oct-Dec,24,High,High,0,no-road-data,0
+A12,A12 Anuradhapura (KM 58-60),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,145,High,High,0,no-road-data,0
+A12,A12 Anuradhapura (KM 60-62),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,49,Medium,Medium,0,no-road-data,0
+A12,A12 Anuradhapura (KM 62-64),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Water Sources,Jul-Sep (Dry Season),120,High,High,0,no-road-data,0
+A12,A12 Anuradhapura (KM 64-66),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Reserve Border,Year-round,78,Medium,Medium,0,no-road-data,0
+A12,A12 Anuradhapura (KM 66-68),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,44,Medium,Medium,0,no-road-data,0
+A12,A12 Anuradhapura (KM 68-70),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Seasonal Streams,Oct-Dec,15,Medium,Medium,0,no-road-data,0
+A12,A12 Anuradhapura (KM 70-72),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,130,High,High,0,no-road-data,0
+A12,A12 Anuradhapura (KM 72-74),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Aggressive Behavior,Year-round,115,High,High,0,no-road-data,0
+A12,A12 Anuradhapura (KM 74-76),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Poor Lighting,Year-round,62,High,High,0,no-road-data,0
+A12,A12 Anuradhapura (KM 76-78),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Proximity to Park,Year-round,105,High,High,0,no-road-data,0
+A12,A12 Anuradhapura (KM 78-80),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,70,Medium,Medium,0,no-road-data,0
+B245,B245 Kaduwela (KM 1-2),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,May-Jul (Monsoon),42,High,High,0,no-road-data,0
+B245,B245 Kaduwela (KM 2-3),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Wet Surface,May-Jul (Monsoon),35,Medium,Medium,0,no-road-data,0
+B245,B245 Kaduwela (KM 3-4),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Retention Basin,May-Jul (Monsoon),55,High,High,0,no-road-data,0
+B245,B245 Kaduwela (KM 4-5),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,May-Jul (Monsoon),48,High,High,0,no-road-data,0
+B245,B245 Kaduwela (KM 5-6),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Severe Congestion,Year-round,65,Medium,Medium,0,no-road-data,0
+B245,B245 Kaduwela (KM 6-7),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Low Lying Area,May-Jul (Monsoon),38,High,High,0,no-road-data,0
+B245,B245 Kaduwela (KM 7-8),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,May-Jul (Monsoon),22,Medium,Medium,0,no-road-data,0
+B245,B245 Kaduwela (KM 8-9),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Complex Junction,Year-round,72,High,High,0,no-road-data,0
+B245,B245 Kaduwela (KM 9-10),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Retention Basin,May-Jul (Monsoon),51,High,High,0,no-road-data,0
+B245,B245 Kaduwela (KM 10-11),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Pedestrian Activity,Year-round,45,Medium,Medium,0,no-road-data,0
+A2,A2 Colombo-Galle (KM 10-12),A2 Colombo-Galle-Wellawaya Segment 10,1.0,Coastal,Aspalt - Good,16.0,0.74,Wide,Accident Blackspot,Severe Congestion,Year-round,135,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 12-14),A2 Colombo-Galle-Wellawaya Segment 12,2.0,Flat,Aspalt - Good,20.0,0.73,Wide,Accident Blackspot,Complex Junction,Year-round,120,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 14-16),A2 Colombo-Galle-Wellawaya Segment 14,2.0,Flat,Aspalt - Good,25.0,0.72,Medium,Accident Blackspot,Pedestrian Activity,Year-round,115,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 16-18),A2 Colombo-Galle-Wellawaya Segment 16,3.0,Flat,Aspalt - Fair,35.0,0.59,Medium,Flash Flood,Coastal Inundation,May-Jul (Monsoon),18,Medium,Medium,1,exact,0
+A2,A2 Colombo-Galle (KM 18-20),A2 Colombo-Galle-Wellawaya Segment 18,5.0,Hilly,Aspalt - Fair,50.0,0.58,Medium,Accident Blackspot,Mixed Traffic,Year-round,105,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 20-22),A2 Colombo-Galle-Wellawaya Segment 20,6.0,Hilly,Aspalt - Fair,70.0,0.57,Medium,Accident Blackspot,Unregulated Access,Year-round,98,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 22-24),A2 Colombo-Galle-Wellawaya Segment 22,6.0,Hilly,Aspalt - Good,100.0,0.68,Medium,Accident Blackspot,Speeding,Year-round,92,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 24-26),A2 Colombo-Galle-Wellawaya Segment 24,6.0,Hilly,Aspalt - Good,130.0,0.67,Medium,Flash Flood,Poor Drainage,May-Jul (Monsoon),12,Low,Low,1,exact,0
+A2,A2 Colombo-Galle (KM 26-28),A2 Colombo-Galle-Wellawaya Segment 26,7.0,Hilly,Aspalt - Fair,160.0,0.55,Medium,Accident Blackspot,Wet Surface,May-Jul (Monsoon),65,Medium,Medium,1,exact,0
+A2,A2 Colombo-Galle (KM 28-30),A2 Colombo-Galle-Wellawaya Segment 28,5.0,Hilly,Aspalt - Fair,185.0,0.57,Medium,Accident Blackspot,Complex Junction,Year-round,110,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 30-32),A2 Colombo-Galle-Wellawaya Segment 30,3.0,Hilly,Aspalt - Good,205.0,0.71,Wide,Accident Blackspot,Pedestrian Activity,Year-round,102,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 32-34),A2 Colombo-Galle-Wellawaya Segment 32,3.0,Flat,Aspalt - Good,215.0,0.73,Wide,Flash Flood,River Overflow,May-Jul (Monsoon),25,Medium,Medium,1,exact,0
+A2,A2 Colombo-Galle (KM 34-36),A2 Colombo-Galle-Wellawaya Segment 34,1.0,Flat,Aspalt - Fair,225.0,0.64,Wide,Accident Blackspot,Speeding,Year-round,88,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 36-38),A2 Colombo-Galle-Wellawaya Segment 36,3.0,Hilly,Aspalt - Good,240.0,0.71,Wide,Accident Blackspot,Mixed Traffic,Year-round,75,Medium,Medium,1,exact,0
+A2,A2 Colombo-Galle (KM 38-40),A2 Colombo-Galle-Wellawaya Segment 38,5.0,Hilly,Aspalt - Good,265.0,0.68,Medium,Accident Blackspot,Unregulated Access,Year-round,95,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 40-42),A2 Colombo-Galle-Wellawaya Segment 40,6.0,Hilly,Aspalt - Fair,295.0,0.56,Medium,Flash Flood,Coastal Inundation,May-Jul (Monsoon),10,Low,Low,1,exact,0
+A2,A2 Colombo-Galle (KM 42-44),A2 Colombo-Galle-Wellawaya Segment 42,7.0,Hilly,Aspalt - Fair,325.0,0.54,Medium,Accident Blackspot,Severe Congestion,Year-round,108,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 44-46),A2 Colombo-Galle-Wellawaya Segment 44,5.0,Hilly,Aspalt - Good,355.0,0.69,Wide,Accident Blackspot,Complex Junction,Year-round,115,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 46-48),A2 Colombo-Galle-Wellawaya Segment 46,3.0,Hilly,Aspalt - Good,385.0,0.72,Wide,Accident Blackspot,Pedestrian Activity,Year-round,98,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 48-50),A2 Colombo-Galle-Wellawaya Segment 48,5.0,Hilly,Concrete,415.0,0.78,Medium,Flash Flood,River Overflow,May-Jul (Monsoon),22,Medium,Medium,1,exact,0
+A2,A2 Colombo-Galle (KM 50-52),A2 Colombo-Galle-Wellawaya Segment 50,5.0,Hilly,Aspalt - Good,445.0,0.68,Medium,Accident Blackspot,Mixed Traffic,Year-round,105,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 52-54),A2 Colombo-Galle-Wellawaya Segment 52,6.0,Hilly,Aspalt - Fair,475.0,0.55,Medium,Accident Blackspot,Speeding,Year-round,92,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 54-56),A2 Colombo-Galle-Wellawaya Segment 54,4.0,Hilly,Aspalt - Fair,500.0,0.6,Wide,Accident Blackspot,Wet Surface,May-Jul (Monsoon),68,Medium,Medium,1,exact,0
+A2,A2 Colombo-Galle (KM 56-58),A2 Colombo-Galle-Wellawaya Segment 56,2.0,Hilly,Aspalt - Good,520.0,0.75,Wide,Accident Blackspot,Unregulated Access,Year-round,85,High,High,1,exact,0
+A2,A2 Colombo-Galle (KM 58-60),A2 Colombo-Galle-Wellawaya Segment 58,2.0,Flat,Aspalt - Fair,540.0,0.64,Wide,Flash Flood,Poor Drainage,May-Jul (Monsoon),15,Low,Low,1,exact,0
+A3,A3 Puttalam (KM 80-82),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,Oct-Dec,45,High,High,0,no-road-data,0
+A3,A3 Puttalam (KM 82-84),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Wet Surface,Oct-Dec,52,Medium,Medium,0,no-road-data,0
+A3,A3 Puttalam (KM 84-86),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Basin Overflow,Oct-Dec,58,High,High,0,no-road-data,0
+A3,A3 Puttalam (KM 86-88),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,75,High,High,0,no-road-data,0
+A3,A3 Puttalam (KM 88-90),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,Oct-Dec,42,High,High,0,no-road-data,0
+A3,A3 Puttalam (KM 90-92),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,65,Medium,Medium,0,no-road-data,0
+A3,A3 Puttalam (KM 92-94),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Low Lying Area,Oct-Dec,28,Medium,Medium,0,no-road-data,0
+A3,A3 Puttalam (KM 94-96),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Pedestrian Activity,Year-round,82,High,High,0,no-road-data,0
+A3,A3 Puttalam (KM 96-98),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,Oct-Dec,55,High,High,0,no-road-data,0
+A3,A3 Puttalam (KM 98-100),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Complex Junction,Year-round,68,Medium,Medium,0,no-road-data,0
+A3,A3 Puttalam (KM 100-102),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Seasonal Streams,Oct-Dec,32,Medium,Medium,0,no-road-data,0
+A3,A3 Puttalam (KM 102-104),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,88,High,High,0,no-road-data,0
+A3,A3 Puttalam (KM 104-106),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Basin Overflow,Oct-Dec,62,High,High,0,no-road-data,0
+A3,A3 Puttalam (KM 106-108),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Night Traffic,Year-round,58,Medium,Medium,0,no-road-data,0
+A3,A3 Puttalam (KM 108-110),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,Oct-Dec,48,High,High,0,no-road-data,0
+A3,A3 Puttalam (KM 110-112),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Mixed Traffic,Year-round,72,High,High,0,no-road-data,0
+A3,A3 Puttalam (KM 112-114),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Coastal Inundation,Oct-Dec,15,Low,Low,0,no-road-data,0
+A3,A3 Puttalam (KM 114-116),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Unpaved Edges,Year-round,45,Medium,Medium,0,no-road-data,0
+A3,A3 Puttalam (KM 116-118),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Low Lying Area,Oct-Dec,25,Medium,Medium,0,no-road-data,0
+A3,A3 Puttalam (KM 118-120),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Severe Congestion,Year-round,95,High,High,0,no-road-data,0
+E02,E02 Outer Circular (KM 0-2),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Normal Curve,May-Jul / Oct-Dec,45,High,High,0,no-road-data,1
+E02,E02 Outer Circular (KM 2-4),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Interchange Traffic,Year-round,52,Medium,Medium,0,no-road-data,0
+E02,E02 Outer Circular (KM 4-6),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Reverse Curve,May-Jul / Oct-Dec,68,High,High,0,no-road-data,1
+E02,E02 Outer Circular (KM 6-8),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,75,High,High,0,no-road-data,0
+E02,E02 Outer Circular (KM 8-10),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Surface Water,May-Jul / Oct-Dec,35,Medium,Medium,0,no-road-data,1
+E02,E02 Outer Circular (KM 10-12),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Low Lying Area,May-Jul (Monsoon),8,Low,Low,0,no-road-data,0
+E02,E02 Outer Circular (KM 12-14),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Normal Curve,May-Jul / Oct-Dec,55,High,High,0,no-road-data,1
+E02,E02 Outer Circular (KM 14-16),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Driver Fatigue,Year-round,48,Medium,Medium,0,no-road-data,0
+E02,E02 Outer Circular (KM 16-18),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Reverse Curve,May-Jul / Oct-Dec,72,High,High,0,no-road-data,1
+E02,E02 Outer Circular (KM 18-20),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,82,High,High,0,no-road-data,0
+E02,E02 Outer Circular (KM 20-22),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Surface Water,May-Jul / Oct-Dec,42,Medium,Medium,0,no-road-data,1
+E02,E02 Outer Circular (KM 22-24),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,May-Jul (Monsoon),12,Low,Low,0,no-road-data,0
+E02,E02 Outer Circular (KM 24-26),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Normal Curve,May-Jul / Oct-Dec,65,High,High,0,no-road-data,1
+E02,E02 Outer Circular (KM 26-28),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Interchange Traffic,Year-round,58,Medium,Medium,0,no-road-data,0
+E03,E03 Colombo-Katunayake (KM 0-2),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Interchange Traffic,Year-round,85,High,High,0,no-road-data,0
+E03,E03 Colombo-Katunayake (KM 2-4),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Surface Water,May-Jul / Oct-Dec,52,High,High,0,no-road-data,1
+E03,E03 Colombo-Katunayake (KM 4-6),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Low Lying Area,May-Jul (Monsoon),25,Medium,Medium,0,no-road-data,0
+E03,E03 Colombo-Katunayake (KM 6-8),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,65,Medium,Medium,0,no-road-data,0
+E03,E03 Colombo-Katunayake (KM 8-10),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Reverse Curve,May-Jul / Oct-Dec,75,High,High,0,no-road-data,1
+E03,E03 Colombo-Katunayake (KM 10-12),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,92,High,High,0,no-road-data,0
+E03,E03 Colombo-Katunayake (KM 12-14),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Normal Curve,May-Jul / Oct-Dec,48,Medium,Medium,0,no-road-data,1
+E03,E03 Colombo-Katunayake (KM 14-16),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,May-Jul (Monsoon),15,Low,Low,0,no-road-data,0
+E03,E03 Colombo-Katunayake (KM 16-18),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Driver Fatigue,Year-round,55,Medium,Medium,0,no-road-data,0
+E03,E03 Colombo-Katunayake (KM 18-20),No Road Data Available,,Unknown,Unknown,,,Unknown,Aquaplaning,Reverse Curve,May-Jul / Oct-Dec,68,High,High,0,no-road-data,1
+E03,E03 Colombo-Katunayake (KM 20-22),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Interchange Traffic,Year-round,78,High,High,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 0-2),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Urban Traffic,Year-round,65,High,High,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 2-4),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Steep Gradient,May-Jul (Monsoon),14,Medium,Medium,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 4-6),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Complex Junction,Year-round,51,Medium,Medium,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 6-8),No Road Data Available,,Unknown,Unknown,,,Unknown,Rock Fall,Exposed Bedrock,May-Jul (Monsoon),9,Low,Low,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 8-10),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,72,High,High,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 10-12),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,Oct-Dec,18,Medium,Medium,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 12-14),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,66,High,High,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 14-16),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Saturated Slope,May-Jul (Monsoon),24,High,High,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 16-18),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Pedestrian Activity,Year-round,45,Medium,Medium,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 18-20),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Low Lying Area,Oct-Dec,11,Low,Low,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 20-22),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,78,High,High,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 22-24),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Deforestation,May-Jul (Monsoon),16,Medium,Medium,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 24-26),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Severe Congestion,Year-round,88,High,High,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 26-28),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Retention Basin,Oct-Dec,21,Medium,Medium,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 28-30),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Wet Surface,May-Jul (Monsoon),39,Medium,Medium,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 30-32),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,14,Low,Low,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 32-34),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Mixed Traffic,Year-round,67,High,High,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 34-36),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,Oct-Dec,15,Low,Low,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 36-38),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Driver Fatigue,Year-round,48,Medium,Medium,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 38-40),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Proximity to Park,Year-round,31,Medium,Medium,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 40-42),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,73,High,High,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 42-44),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Basin Overflow,Oct-Dec,44,High,High,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 44-46),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Night Traffic,Year-round,52,Medium,Medium,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 46-48),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Water Sources,Jul-Sep (Dry Season),68,High,High,0,no-road-data,0
+A10,A10 Katugastota-Puttalam (KM 48-50),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Complex Junction,Year-round,81,High,High,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 0-2),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,105,High,High,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 2-4),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,45,Medium,Medium,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 4-6),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Water Sources,Jul-Sep (Dry Season),125,High,High,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 6-8),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Night Traffic,Year-round,66,High,High,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 8-10),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Aggressive Behavior,Year-round,140,High,High,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 10-12),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,Oct-Dec,18,Low,Low,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 12-14),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,55,Medium,Medium,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 14-16),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Proximity to Park,Year-round,115,High,High,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 16-18),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,82,High,High,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 18-20),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Reserve Border,Year-round,74,Medium,Medium,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 20-22),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,Oct-Dec,22,Medium,Medium,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 22-24),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Wet Surface,Oct-Dec,39,Medium,Medium,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 24-26),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,135,High,High,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 26-28),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Pedestrian Activity,Year-round,61,High,High,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 28-30),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,150,High,High,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 30-32),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Low Lying Area,Oct-Dec,14,Low,Low,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 32-34),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Driver Fatigue,Year-round,48,Medium,Medium,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 34-36),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Water Sources,Jul-Sep (Dry Season),88,Medium,Medium,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 36-38),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Unregulated Access,Year-round,75,High,High,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 38-40),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Basin Overflow,Oct-Dec,41,High,High,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 40-42),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,105,High,High,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 42-44),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Complex Junction,Year-round,58,Medium,Medium,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 44-46),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Proximity to Park,Year-round,62,Medium,Medium,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 46-48),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,Oct-Dec,25,Medium,Medium,0,no-road-data,0
+A11,A11 Habarana-Batticaloa (KM 48-50),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,88,High,High,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 0-2),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,Oct-Dec,45,High,High,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 2-4),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Wet Surface,Oct-Dec,36,Medium,Medium,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 4-6),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Basin Overflow,Oct-Dec,55,High,High,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 6-8),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,72,High,High,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 8-10),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,22,Low,Low,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 10-12),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Night Traffic,Year-round,48,Medium,Medium,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 12-14),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,Oct-Dec,18,Low,Low,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 14-16),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,85,High,High,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 16-18),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Proximity to Park,Year-round,51,Medium,Medium,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 18-20),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Mixed Traffic,Year-round,41,Medium,Medium,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 20-22),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Seasonal Streams,Oct-Dec,29,Medium,Medium,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 22-24),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Pedestrian Activity,Year-round,66,High,High,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 24-26),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Water Sources,Jul-Sep (Dry Season),110,High,High,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 26-28),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Unpaved Edges,Year-round,38,Medium,Medium,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 28-30),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Low Lying Area,Oct-Dec,12,Low,Low,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 30-32),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,135,High,High,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 32-34),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,78,High,High,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 34-36),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Reserve Border,Year-round,82,Medium,Medium,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 36-38),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Driver Fatigue,Year-round,45,Medium,Medium,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 38-40),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Retention Basin,Oct-Dec,48,High,High,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 40-42),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Aggressive Behavior,Year-round,125,High,High,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 42-44),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Complex Junction,Year-round,71,High,High,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 44-46),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,Oct-Dec,24,Medium,Medium,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 46-48),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,145,High,High,0,no-road-data,0
+A12,A12 Puttalam-Trincomalee (KM 48-50),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Severe Congestion,Year-round,92,High,High,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 0-2),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Urban Traffic,Year-round,85,High,High,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 2-4),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Residual Soil,May-Jul (Monsoon),16,Medium,Medium,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 4-6),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,68,High,High,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 6-8),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,May-Jul (Monsoon),11,Low,Low,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 8-10),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,92,High,High,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 10-12),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Unstable Topsoil,May-Jul (Monsoon),28,High,High,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 12-14),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Pedestrian Activity,Year-round,55,Medium,Medium,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 14-16),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,Oct-Dec,22,Medium,Medium,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 16-18),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Complex Junction,Year-round,88,High,High,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 18-20),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,18,Low,Low,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 20-22),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Wet Surface,May-Jul (Monsoon),49,Medium,Medium,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 22-24),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Saturated Slope,May-Jul (Monsoon),15,Medium,Medium,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 24-26),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,75,High,High,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 26-28),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Low Lying Area,Oct-Dec,14,Low,Low,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 28-30),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Night Traffic,Year-round,52,Medium,Medium,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 30-32),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Water Sources,Jul-Sep (Dry Season),125,High,High,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 32-34),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Driver Fatigue,Year-round,82,High,High,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 34-36),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Reserve Border,Year-round,68,Medium,Medium,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 36-38),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Basin Overflow,Oct-Dec,41,High,High,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 38-40),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Unpaved Edges,Year-round,45,Medium,Medium,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 40-42),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Aggressive Behavior,Year-round,140,High,High,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 42-44),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,77,High,High,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 44-46),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,135,High,High,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 46-48),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,Oct-Dec,26,Medium,Medium,0,no-road-data,0
+A6,A6 Ambepussa-Trinco (KM 48-50),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Severe Congestion,Year-round,95,High,High,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 0-2),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Coastal Inundation,Oct-Dec,55,High,High,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 2-4),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Urban Traffic,Year-round,62,Medium,Medium,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 4-6),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,Oct-Dec,68,High,High,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 6-8),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,85,High,High,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 8-10),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,22,Low,Low,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 10-12),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,Oct-Dec,31,Medium,Medium,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 12-14),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,58,Medium,Medium,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 14-16),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Lagoon Overflow,Oct-Dec,52,High,High,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 16-18),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Pedestrian Activity,Year-round,75,High,High,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 18-20),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Proximity to Park,Year-round,65,Medium,Medium,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 20-22),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Seasonal Streams,Oct-Dec,16,Low,Low,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 22-24),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Night Traffic,Year-round,44,Medium,Medium,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 24-26),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,115,High,High,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 26-28),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Unregulated Access,Year-round,82,High,High,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 28-30),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Retention Basin,Oct-Dec,48,High,High,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 30-32),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Aggressive Behavior,Year-round,130,High,High,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 32-34),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Wet Surface,Oct-Dec,41,Medium,Medium,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 34-36),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Water Sources,Jul-Sep (Dry Season),125,High,High,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 36-38),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Low Lying Area,Oct-Dec,28,Medium,Medium,0,no-road-data,0
+A15,A15 Batticaloa-Trinco (KM 38-40),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Driver Fatigue,Year-round,92,High,High,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 0-2),No Road Data Available,,Unknown,Unknown,,,Unknown,Landslide,Slope Failure,May-Jul (Monsoon),18,Medium,Medium,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 2-4),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,65,High,High,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 4-6),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Saturated Soil,May-Jul (Monsoon),26,High,High,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 6-8),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Mixed Traffic,Year-round,48,Medium,Medium,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 8-10),No Road Data Available,,Unknown,Unknown,,,Unknown,Rock Fall,Weathered Rock,May-Jul (Monsoon),11,Low,Low,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 10-12),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,82,High,High,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 12-14),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,May-Jul (Monsoon),22,Medium,Medium,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 14-16),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Wet Surface,May-Jul (Monsoon),39,Medium,Medium,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 16-18),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Reserve Border,Year-round,16,Low,Low,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 18-20),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Complex Junction,Year-round,75,High,High,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 20-22),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Basin Overflow,May-Jul (Monsoon),44,High,High,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 22-24),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Pedestrian Activity,Year-round,52,Medium,Medium,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 24-26),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Proximity to Park,Year-round,115,High,High,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 26-28),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,88,High,High,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 28-30),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,140,High,High,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 30-32),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,May-Jul (Monsoon),14,Low,Low,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 32-34),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,61,Medium,Medium,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 34-36),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Aggressive Behavior,Year-round,125,High,High,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 36-38),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Night Traffic,Year-round,72,High,High,0,no-road-data,0
+A18,A18 Pelmadulla-Nonagama (KM 38-40),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Seasonal Streams,May-Jul (Monsoon),28,Medium,Medium,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 200-202),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,85,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 202-204),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,62,Medium,Medium,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 204-206),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Pedestrian Activity,Year-round,78,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 206-208),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,Oct-Dec,15,Low,Low,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 208-210),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Geometric Flaw,Year-round,92,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 210-212),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Wet Surface,Oct-Dec,41,Medium,Medium,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 212-214),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,88,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 214-216),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Low Lying Area,Oct-Dec,22,Medium,Medium,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 216-218),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Cross Traffic,Year-round,75,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 218-220),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Night Traffic,Year-round,48,Medium,Medium,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 220-222),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,95,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 222-224),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Seasonal Streams,Oct-Dec,12,Low,Low,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 224-226),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Driver Fatigue,Year-round,82,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 226-228),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Unpaved Edges,Year-round,36,Medium,Medium,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 228-230),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Complex Junction,Year-round,77,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 230-232),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Retention Basin,Oct-Dec,26,Medium,Medium,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 232-234),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,88,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 234-236),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Mixed Traffic,Year-round,55,Medium,Medium,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 236-238),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,91,High,High,0,no-road-data,0
+A9,A9 Kandy-Jaffna (KM 238-240),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,Oct-Dec,48,High,High,0,no-road-data,0
+B-ROAD,B-Road Matale (Rattota-Laggala),No Road Data Available,,Unknown,Unknown,,,Unknown,Landslide,Steep Gradient,May-Jul (Monsoon),36,High,High,0,no-road-data,0
+B-ROAD,B-Road Matale (Rattota-Laggala),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Soil Saturation,May-Jul (Monsoon),28,High,High,0,no-road-data,0
+B-ROAD,B-Road Matale (Naula-Elahera),No Road Data Available,,Unknown,Unknown,,,Unknown,Rock Fall,Exposed Bedrock,May-Jul (Monsoon),18,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Matale (Naula-Elahera),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Sharp Bend,Year-round,65,High,High,0,no-road-data,0
+B-ROAD,B-Road Matale (Ukuwela-Elkaduwa),No Road Data Available,,Unknown,Unknown,,,Unknown,Landslide,Slope Erosion,May-Jul (Monsoon),32,High,High,0,no-road-data,0
+B-ROAD,B-Road Matale (Ukuwela-Elkaduwa),No Road Data Available,,Unknown,Unknown,,,Unknown,Heavy Mist,High Altitude,Year-round,88,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Matale (Dambulla-Bakamuna),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,115,High,High,0,no-road-data,0
+B-ROAD,B-Road Matale (Dambulla-Bakamuna),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,48,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Matale (Galewela-Palapathwela),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,May-Jul (Monsoon),14,Low,Low,0,no-road-data,0
+B-ROAD,B-Road Matale (Galewela-Palapathwela),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Unstable Topsoil,May-Jul (Monsoon),21,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Ampara (Ampara-Siyambalanduwa),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,Oct-Dec,68,High,High,0,no-road-data,0
+B-ROAD,B-Road Ampara (Ampara-Siyambalanduwa),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Straight Road,Year-round,75,High,High,0,no-road-data,0
+B-ROAD,B-Road Ampara (Akkaraipattu-Sagamam),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Basin Overflow,Oct-Dec,55,High,High,0,no-road-data,0
+B-ROAD,B-Road Ampara (Akkaraipattu-Sagamam),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Proximity to Park,Year-round,62,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Ampara (Dehiattakandiya-Maha Oya),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Low Lying Area,Oct-Dec,38,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Ampara (Dehiattakandiya-Maha Oya),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Wet Surface,Oct-Dec,41,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Batticaloa (Valaichchenai-Vakarai),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Coastal Inundation,Oct-Dec,72,High,High,0,no-road-data,0
+B-ROAD,B-Road Batticaloa (Valaichchenai-Vakarai),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,85,High,High,0,no-road-data,0
+B-ROAD,B-Road Batticaloa (Kalkudah-Pethalai),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Lagoon Overflow,Oct-Dec,34,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Batticaloa (Kalkudah-Pethalai),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Reserve Border,Year-round,25,Low,Low,0,no-road-data,0
+B-ROAD,B-Road Monaragala (Wellawaya-Monaragala),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Highway Blockage,Year-round,145,High,High,0,no-road-data,0
+B-ROAD,B-Road Monaragala (Wellawaya-Monaragala),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,High Speed,Year-round,82,High,High,0,no-road-data,0
+B-ROAD,B-Road Monaragala (Bibile-Medagama),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Seasonal Streams,Oct-Dec,18,Low,Low,0,no-road-data,0
+B-ROAD,B-Road Monaragala (Bibile-Medagama),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Residual Soil,Oct-Dec,22,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Monaragala (Thanamalwila-Lunugamvehera),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Aggressive Behavior,Year-round,135,High,High,0,no-road-data,0
+B-ROAD,B-Road Monaragala (Thanamalwila-Lunugamvehera),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Night Traffic,Year-round,58,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Hambantota (Hambantota-Gonnoruwa),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,Oct-Dec,35,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Hambantota (Hambantota-Gonnoruwa),No Road Data Available,,Unknown,Unknown,,,Unknown,Elephant Crossing,Wildlife Corridor,Year-round,72,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Hambantota (Weeraketiya-Walasmulla),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Unstable Topsoil,Oct-Dec,26,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Hambantota (Weeraketiya-Walasmulla),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Complex Junction,Year-round,68,High,High,0,no-road-data,0
+B-ROAD,B-Road Gampaha (Gampaha-Ja-Ela),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Retention Basin,May-Jul (Monsoon),85,High,High,0,no-road-data,0
+B-ROAD,B-Road Gampaha (Gampaha-Ja-Ela),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Severe Congestion,Year-round,115,High,High,0,no-road-data,0
+B-ROAD,B-Road Gampaha (Minuwangoda-Veyangoda),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,May-Jul (Monsoon),42,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Gampaha (Minuwangoda-Veyangoda),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Speeding,Year-round,88,High,High,0,no-road-data,0
+B-ROAD,B-Road Colombo (Hanwella-Pugoda),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,River Overflow,May-Jul (Monsoon),95,High,High,0,no-road-data,0
+B-ROAD,B-Road Colombo (Hanwella-Pugoda),No Road Data Available,,Unknown,Unknown,,,Unknown,Earthslip,Riverbank Erosion,May-Jul (Monsoon),32,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Colombo (Homagama-Padukka),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Low Lying Area,May-Jul (Monsoon),55,Medium,Medium,0,no-road-data,0
+B-ROAD,B-Road Colombo (Homagama-Padukka),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Mixed Traffic,Year-round,105,High,High,0,no-road-data,0
+B-ROAD,B-Road Colombo (Kottawa-Thalawatugoda),No Road Data Available,,Unknown,Unknown,,,Unknown,Flash Flood,Poor Drainage,May-Jul (Monsoon),28,Low,Low,0,no-road-data,0
+B-ROAD,B-Road Colombo (Kottawa-Thalawatugoda),No Road Data Available,,Unknown,Unknown,,,Unknown,Accident Blackspot,Severe Congestion,Year-round,120,High,High,0,no-road-data,0
