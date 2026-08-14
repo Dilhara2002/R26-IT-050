@@ -1,23 +1,23 @@
-const express = require("express");
+import express from "express";
+import fs from "fs";
+import path from "path";
+import readline from "readline";
+import { spawn } from "child_process";
+
+import {
+  getRouteDetails
+} from "../services/routeService.js";
+
+
+import {
+  getWeatherByCoordinates
+} from "../services/weatherService.js";
+
+
+import graphManager from "../ai-engine/knowledge-graph/graphManager.js";
+
+
 const router = express.Router();
-
-const fs = require("fs");
-const path = require("path");
-const readline = require("readline");
-const { spawn } = require("child_process");
-
-const {
-  getRouteDetails,
-} = require("../services/routeService");
-
-const {
-  getWeatherByCoordinates,
-} = require("../services/weatherService");
-
-const graphManager = require(
-  "../ai-engine/knowledge-graph/graphManager"
-);
-
 
 // ==================================================
 // Helpers
@@ -1996,5 +1996,4 @@ router.post(
 );
 
 
-module.exports =
-  router;
+export default router;

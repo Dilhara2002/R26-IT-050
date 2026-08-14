@@ -1,8 +1,8 @@
-const axios = require("axios");
+import axios from "axios";
 
-const {
-  getLocationCandidates,
-} = require("./llmLocationResolver");
+import {
+  getLocationCandidates
+} from "./llmLocationResolver.js";
 
 
 // ==================================================
@@ -997,6 +997,6 @@ const getRouteDetails = async (
 };
 
 
-module.exports = {
-  getRouteDetails,
+export {
+  getRouteDetails
 };

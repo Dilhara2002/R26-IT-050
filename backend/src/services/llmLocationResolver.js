@@ -1,7 +1,7 @@
-const ollama = require("ollama").default;
+import ollama from "ollama";
 
 
-const getLocationCandidates = async (location) => {
+export const getLocationCandidates = async (location) => {
 
   try {
 
@@ -73,7 +73,7 @@ Rules:
 
 
 
-  } catch(error) {
+  } catch (error) {
 
 
     console.log(
@@ -86,10 +86,4 @@ Rules:
 
   }
 
-};
-
-
-
-module.exports = {
-  getLocationCandidates,
 };
