@@ -1,4 +1,4 @@
-const { driver } = require("../../config/neo4j");
+import { driver } from "../../config/neo4j.js";
 
 
 // --------------------------------------------------
@@ -723,5 +723,4 @@ class GraphManager {
 }
 
 
-module.exports =
-  new GraphManager();
+export default new GraphManager();

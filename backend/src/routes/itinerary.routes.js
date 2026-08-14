@@ -1,7 +1,17 @@
-const express = require('express');
+import express from "express";
+
+import {
+  optimizeItinerary
+} from "../controllers/itinerary.controller.js";
+
+
 const router = express.Router();
-const itineraryController = require('../controllers/itinerary.controller');
 
-router.post('/optimize', itineraryController.optimizeItinerary);
 
-module.exports = router;
+router.post(
+  "/optimize",
+  optimizeItinerary
+);
+
+
+export default router;
