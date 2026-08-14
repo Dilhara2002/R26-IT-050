@@ -178,7 +178,7 @@ def run_genetic_algorithm(filtered_df, max_time_minutes, start_lat, start_lon):
     generations = 100
     
     # Initialize random population
-    population = [random.sample(all_indices, random.randint(1, min(4, len(all_indices)))) for _ in range(pop_size)]
+    population = [random.sample(all_indices, random.randint(1, min(6, len(all_indices)))) for _ in range(pop_size)]
     best_overall_route = []
     best_overall_fitness = -1
     best_overall_time = 0
