@@ -1,34 +1,17 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import React from "react";
+import { Text, View } from "react-native";
 
-// Reliable CDN links for Leaflet markers
-const customIcon = new L.Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-const ClickHandler = ({ setCoords }) => {
-  useMapEvents({
-    click(e) {
-      setCoords(e.latlng.lat, e.latlng.lng);
-    },
-  });
-  return null;
-};
-
-export default function MapPicker({ lat, lon, onSelect }) {
+export default function MapPicker({ lat, lon }) {
+  const delta = 0.08;
+  const src = `https://www.openstreetmap.org/export/embed.html?bbox=${lon - delta}%2C${lat - delta}%2C${lon + delta}%2C${lat + delta}&layer=mapnik&marker=${lat}%2C${lon}`;
   return (
-    <MapContainer center={[lat, lon]} zoom={12} style={{ height: '100%', width: '100%' }}>
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      <Marker position={[lat, lon]} icon={customIcon} />
-      <ClickHandler setCoords={onSelect} />
-    </MapContainer>
+    <View style={{ flex: 1 }}>
+      {React.createElement("iframe", {
+        src,
+        title: "Trip starting point map",
+        style: { border: 0, width: "100%", height: "100%" },
+      })}
+      <Text style={{ color: "#64748b", fontSize: 12, marginTop: 4 }}>Edit latitude and longitude below to move the web map.</Text>
+    </View>
   );
 }

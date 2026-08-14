@@ -1,8 +1,11 @@
-const fs = require("fs");
-const path = require("path");
-const readline = require("readline");
-const crypto = require("crypto");
-const { driver } = require("../config/neo4j");
+import fs from "fs";
+import path from "path";
+import readline from "readline";
+import crypto from "crypto";
+import { fileURLToPath } from "url";
+import { driver } from "../config/neo4j.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 
 // ==================================================

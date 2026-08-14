@@ -28,11 +28,14 @@ const itinerarySchema = new mongoose.Schema({
   },
 
 
-  optimizedRoute: {
-
-    type: [String]
-
-  },
+  optimizedRoute: [{
+    id: String,
+    name: { type: String, required: true },
+    latitude: Number,
+    longitude: Number,
+    durationMinutes: Number,
+    order: Number
+  }],
 
 
   aiSummary: {
@@ -75,7 +78,7 @@ const itinerarySchema = new mongoose.Schema({
   }
 
 
-});
+}, { timestamps: true });
 
 
 

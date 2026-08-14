@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import readline from "readline";
 import { spawn } from "child_process";
+import { fileURLToPath } from "url";
 
 import {
   getRouteDetails
@@ -18,6 +19,25 @@ import graphManager from "../ai-engine/knowledge-graph/graphManager.js";
 
 
 const router = express.Router();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+router.use("/vehicle-recommendations", (req, res, next) => {
+  const sendJson = res.json.bind(res);
+  res.json = (payload) => {
+    if (payload?.success === true) {
+      return sendJson({ success: true, data: payload, error: null });
+    }
+    return sendJson({
+      success: false,
+      data: null,
+      error: {
+        code: payload?.code || "SAFETY_RECOMMENDATION_ERROR",
+        message: payload?.message || payload?.error || "Safety recommendation failed.",
+      },
+    });
+  };
+  next();
+});
 
 // ==================================================
 // Helpers
@@ -1184,7 +1204,7 @@ const buildMLInput = (
 // ==================================================
 
 router.post(
-  "/recommend-vehicle",
+  ["/recommend-vehicle", "/vehicle-recommendations"],
   async (
     req,
     res

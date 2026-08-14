@@ -1,4 +1,4 @@
-import { driver } from "../config/neo4j.config.js";
+import { driver } from "../config/neo4j.js";
 
 export const createActivityGraph = async (rows) => {
   const session = driver.session();

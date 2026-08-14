@@ -2,12 +2,15 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "App.js",
+  "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "node --watch src/app.js",
-    "test": "node --test tests/*.test.js"
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test tests/*.test.js",
+    "python:itinerary": "python3 src/ai_service/app.py",
+    "graph:import-recommendations": "node src/scripts/importRecommendationGraphs.js",
+    "graph:import-safety": "node src/scripts/importToNeo4j.js"
   },
   "keywords": [],
   "author": "",

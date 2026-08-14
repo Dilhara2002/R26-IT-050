@@ -1,14 +1,12 @@
 import express from "express";
 import {
-  buildGraphFromDataset,
-  buildActivityGraph,
   generatePackageFromPrompt,
 } from "../controllers/hotelData.controller.js";
 
 const router = express.Router();
 
-router.post("/build-graph", buildGraphFromDataset);
-router.post("/build-activity-graph", buildActivityGraph);
+// Graph imports are intentionally not exposed as anonymous HTTP endpoints.
+router.post("/recommendations/packages", generatePackageFromPrompt);
 router.post("/generate-package", generatePackageFromPrompt);
 
 export default router;

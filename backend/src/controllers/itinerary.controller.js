@@ -2,6 +2,7 @@ import {
   generateItineraryFromAI
 } from "../services/itinerary.service.js";
 import Itinerary from "../models/Itinerary.js";
+import mongoose from "mongoose";
 
 
 export const optimizeItinerary = async (req, res) => {
@@ -17,15 +18,14 @@ export const optimizeItinerary = async (req, res) => {
 
 
 
-    if (!preferences || preferences.length === 0) {
+    if (!Array.isArray(preferences) || preferences.length === 0) {
 
       return res.status(400).json({
-
+        success: false,
+        data: null,
+        error: { code: "VALIDATION_ERROR", message: "Preferences are required" },
         status: "error",
-
-        message:
-          "Preferences are required"
-
+        message: "Preferences are required"
       });
 
     }
@@ -95,12 +95,14 @@ export const optimizeItinerary = async (req, res) => {
 
 
 
-      await newTrip.save();
+      if (mongoose.connection.readyState === 1) {
+        await newTrip.save();
 
 
-      console.log(
+        console.log(
         "New itinerary saved to database successfully!"
       );
+      }
 
     }
 
@@ -115,14 +117,15 @@ export const optimizeItinerary = async (req, res) => {
   } catch(error) {
 
 
-    return res.status(500).json({
-
-      status:
-        "error",
-
-      message:
-        error.message
-
+    return res.status(error.code === "ECONNABORTED" ? 504 : 503).json({
+      success: false,
+      data: null,
+      error: {
+        code: error.code === "ECONNABORTED" ? "OPTIMIZER_TIMEOUT" : "OPTIMIZER_UNAVAILABLE",
+        message: error.message
+      },
+      status: "error",
+      message: error.message
     });
 
 
