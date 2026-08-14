@@ -1,0 +1,1001 @@
+Route/Segment Name,Max Gradient (%),Terrain Type,Road Surface Condition,Average Elevation,Surface Friction Index,Typical Road Width,Terrain_Enc,Surface_Enc
+A1 Colombo-Kandy Segment 1,1,Coastal,Aspalt - Good,10,0.75,Wide,0,1
+A1 Colombo-Kandy Segment 2,1,Coastal,Aspalt - Good,12,0.74,Wide,0,1
+A1 Colombo-Kandy Segment 3,2,Flat,Aspalt - Fair,15,0.65,Wide,1,0
+A1 Colombo-Kandy Segment 4,1,Flat,Aspalt - Good,18,0.75,Wide,1,1
+A1 Colombo-Kandy Segment 5,2,Flat,Aspalt - Good,20,0.73,Wide,1,1
+A1 Colombo-Kandy Segment 6,3,Flat,Aspalt - Fair,25,0.62,Wide,1,0
+A1 Colombo-Kandy Segment 7,2,Flat,Aspalt - Good,30,0.72,Wide,1,1
+A1 Colombo-Kandy Segment 8,3,Hilly,Aspalt - Good,45,0.71,Wide,2,1
+A1 Colombo-Kandy Segment 9,4,Hilly,Aspalt - Fair,60,0.61,Medium,2,0
+A1 Colombo-Kandy Segment 10,4,Hilly,Aspalt - Good,75,0.74,Medium,2,1
+A1 Colombo-Kandy Segment 11,5,Hilly,Aspalt - Fair,90,0.6,Medium,2,0
+A1 Colombo-Kandy Segment 12,6,Hilly,Concrete,110,0.78,Medium,2,2
+A1 Colombo-Kandy Segment 13,5,Hilly,Aspalt - Good,130,0.72,Medium,2,1
+A1 Colombo-Kandy Segment 14,7,Hilly,Aspalt - Fair,150,0.58,Medium,2,0
+A1 Colombo-Kandy Segment 15,6,Hilly,Aspalt - Good,175,0.7,Medium,2,1
+A1 Colombo-Kandy Segment 16,8,Mountainous,Aspalt - Fair,200,0.55,Medium,3,0
+A1 Colombo-Kandy Segment 17,9,Mountainous,Concrete,230,0.77,Medium,3,2
+A1 Colombo-Kandy Segment 18,8,Mountainous,Aspalt - Good,260,0.69,Medium,3,1
+A1 Colombo-Kandy Segment 19,10,Mountainous,Aspalt - Fair,290,0.54,Narrow,3,0
+A1 Colombo-Kandy Segment 20,9,Mountainous,Aspalt - Fair,320,0.56,Medium,3,0
+A1 Colombo-Kandy Segment 21,11,Mountainous,Concrete,350,0.76,Narrow,3,2
+A1 Colombo-Kandy Segment 22,10,Mountainous,Aspalt - Good,380,0.68,Medium,3,1
+A1 Colombo-Kandy Segment 23,12,Mountainous,Aspalt - Fair,410,0.52,Narrow,3,0
+A1 Colombo-Kandy Segment 24,11,Mountainous,Aspalt - Fair,430,0.54,Medium,3,0
+A1 Colombo-Kandy Segment 25,10,Mountainous,Aspalt - Good,450,0.67,Medium,3,1
+A1 Colombo-Kandy Segment 26,12,Mountainous,Concrete,470,0.79,Narrow,3,2
+A1 Colombo-Kandy Segment 27,9,Mountainous,Aspalt - Good,485,0.68,Medium,3,1
+A1 Colombo-Kandy Segment 28,8,Mountainous,Aspalt - Fair,495,0.58,Medium,3,0
+A1 Colombo-Kandy Segment 29,7,Mountainous,Aspalt - Good,505,0.7,Wide,3,1
+A1 Colombo-Kandy Segment 30,6,Mountainous,Aspalt - Good,510,0.71,Wide,3,1
+A2 Colombo-Galle-Wellawaya Segment 1,0,Coastal,Aspalt - Good,5,0.8,Wide,0,1
+A2 Colombo-Galle-Wellawaya Segment 2,1,Coastal,Aspalt - Good,6,0.78,Wide,0,1
+A2 Colombo-Galle-Wellawaya Segment 3,1,Coastal,Aspalt - Fair,5,0.65,Wide,0,0
+A2 Colombo-Galle-Wellawaya Segment 4,0,Coastal,Aspalt - Good,7,0.79,Wide,0,1
+A2 Colombo-Galle-Wellawaya Segment 5,2,Coastal,Aspalt - Fair,8,0.64,Wide,0,0
+A2 Colombo-Galle-Wellawaya Segment 6,1,Coastal,Aspalt - Good,10,0.77,Wide,0,1
+A2 Colombo-Galle-Wellawaya Segment 7,2,Coastal,Aspalt - Good,12,0.76,Wide,0,1
+A2 Colombo-Galle-Wellawaya Segment 8,1,Coastal,Aspalt - Fair,14,0.63,Wide,0,0
+A2 Colombo-Galle-Wellawaya Segment 9,2,Coastal,Aspalt - Good,15,0.75,Wide,0,1
+A2 Colombo-Galle-Wellawaya Segment 10,1,Coastal,Aspalt - Good,16,0.74,Wide,0,1
+A2 Colombo-Galle-Wellawaya Segment 11,3,Flat,Aspalt - Fair,18,0.62,Wide,1,0
+A2 Colombo-Galle-Wellawaya Segment 12,2,Flat,Aspalt - Good,20,0.73,Wide,1,1
+A2 Colombo-Galle-Wellawaya Segment 13,3,Flat,Aspalt - Fair,22,0.6,Wide,1,0
+A2 Colombo-Galle-Wellawaya Segment 14,2,Flat,Aspalt - Good,25,0.72,Medium,1,1
+A2 Colombo-Galle-Wellawaya Segment 15,4,Flat,Aspalt - Good,30,0.71,Medium,1,1
+A2 Colombo-Galle-Wellawaya Segment 16,3,Flat,Aspalt - Fair,35,0.59,Medium,1,0
+A2 Colombo-Galle-Wellawaya Segment 17,4,Hilly,Aspalt - Good,40,0.7,Medium,2,1
+A2 Colombo-Galle-Wellawaya Segment 18,5,Hilly,Aspalt - Fair,50,0.58,Medium,2,0
+A2 Colombo-Galle-Wellawaya Segment 19,4,Hilly,Aspalt - Good,60,0.69,Medium,2,1
+A2 Colombo-Galle-Wellawaya Segment 20,6,Hilly,Aspalt - Fair,70,0.57,Medium,2,0
+A2 Colombo-Galle-Wellawaya Segment 21,5,Hilly,Concrete,85,0.8,Medium,2,2
+A2 Colombo-Galle-Wellawaya Segment 22,6,Hilly,Aspalt - Good,100,0.68,Medium,2,1
+A2 Colombo-Galle-Wellawaya Segment 23,7,Hilly,Aspalt - Fair,115,0.56,Medium,2,0
+A2 Colombo-Galle-Wellawaya Segment 24,6,Hilly,Aspalt - Good,130,0.67,Medium,2,1
+A2 Colombo-Galle-Wellawaya Segment 25,8,Hilly,Concrete,145,0.78,Medium,2,2
+A2 Colombo-Galle-Wellawaya Segment 26,7,Hilly,Aspalt - Fair,160,0.55,Medium,2,0
+A2 Colombo-Galle-Wellawaya Segment 27,6,Hilly,Aspalt - Good,175,0.66,Medium,2,1
+A2 Colombo-Galle-Wellawaya Segment 28,5,Hilly,Aspalt - Fair,185,0.57,Medium,2,0
+A2 Colombo-Galle-Wellawaya Segment 29,4,Hilly,Aspalt - Good,195,0.69,Wide,2,1
+A2 Colombo-Galle-Wellawaya Segment 30,3,Hilly,Aspalt - Good,205,0.71,Wide,2,1
+A4 Colombo-Batticaloa Segment 1,1,Flat,Aspalt - Good,20,0.76,Wide,1,1
+A4 Colombo-Batticaloa Segment 2,2,Flat,Aspalt - Good,25,0.75,Wide,1,1
+A4 Colombo-Batticaloa Segment 3,1,Flat,Aspalt - Fair,30,0.64,Wide,1,0
+A4 Colombo-Batticaloa Segment 4,2,Flat,Aspalt - Good,35,0.74,Wide,1,1
+A4 Colombo-Batticaloa Segment 5,3,Flat,Aspalt - Fair,45,0.62,Medium,1,0
+A4 Colombo-Batticaloa Segment 6,2,Flat,Aspalt - Good,55,0.73,Medium,1,1
+A4 Colombo-Batticaloa Segment 7,4,Hilly,Aspalt - Good,75,0.71,Medium,2,1
+A4 Colombo-Batticaloa Segment 8,5,Hilly,Aspalt - Fair,95,0.6,Medium,2,0
+A4 Colombo-Batticaloa Segment 9,4,Hilly,Aspalt - Good,120,0.7,Medium,2,1
+A4 Colombo-Batticaloa Segment 10,6,Hilly,Concrete,150,0.78,Medium,2,2
+A4 Colombo-Batticaloa Segment 11,7,Hilly,Aspalt - Fair,185,0.58,Medium,2,0
+A4 Colombo-Batticaloa Segment 12,6,Hilly,Aspalt - Good,220,0.69,Medium,2,1
+A4 Colombo-Batticaloa Segment 13,8,Mountainous,Aspalt - Fair,260,0.55,Medium,3,0
+A4 Colombo-Batticaloa Segment 14,9,Mountainous,Concrete,305,0.76,Medium,3,2
+A4 Colombo-Batticaloa Segment 15,10,Mountainous,Aspalt - Fair,355,0.53,Narrow,3,0
+A4 Colombo-Batticaloa Segment 16,11,Mountainous,Aspalt - Good,410,0.67,Medium,3,1
+A4 Colombo-Batticaloa Segment 17,12,Mountainous,Concrete,470,0.79,Narrow,3,2
+A4 Colombo-Batticaloa Segment 18,10,Mountainous,Aspalt - Fair,535,0.52,Medium,3,0
+A4 Colombo-Batticaloa Segment 19,13,Mountainous,Aspalt - Fair,605,0.5,Narrow,3,0
+A4 Colombo-Batticaloa Segment 20,12,Mountainous,Aspalt - Good,680,0.66,Medium,3,1
+A4 Colombo-Batticaloa Segment 21,14,Mountainous,Concrete,760,0.77,Narrow,3,2
+A4 Colombo-Batticaloa Segment 22,12,Mountainous,Aspalt - Fair,845,0.51,Medium,3,0
+A4 Colombo-Batticaloa Segment 23,15,Mountainous,Aspalt - Fair,935,0.49,Narrow,3,0
+A4 Colombo-Batticaloa Segment 24,14,Mountainous,Concrete,1025,0.8,Narrow,3,2
+A4 Colombo-Batticaloa Segment 25,12,Mountainous,Aspalt - Good,980,0.67,Medium,3,1
+A4 Colombo-Batticaloa Segment 26,10,Mountainous,Aspalt - Fair,910,0.54,Medium,3,0
+A4 Colombo-Batticaloa Segment 27,8,Mountainous,Aspalt - Good,830,0.69,Medium,3,1
+A4 Colombo-Batticaloa Segment 28,6,Hilly,Aspalt - Fair,740,0.58,Medium,2,0
+A4 Colombo-Batticaloa Segment 29,5,Hilly,Aspalt - Good,640,0.71,Wide,2,1
+A4 Colombo-Batticaloa Segment 30,3,Hilly,Aspalt - Good,530,0.74,Wide,2,1
+A5 Peradeniya-Badulla Segment 1,4,Hilly,Aspalt - Good,500,0.72,Medium,2,1
+A5 Peradeniya-Badulla Segment 2,5,Hilly,Aspalt - Fair,530,0.61,Medium,2,0
+A5 Peradeniya-Badulla Segment 3,4,Hilly,Aspalt - Good,565,0.7,Medium,2,1
+A5 Peradeniya-Badulla Segment 4,6,Hilly,Concrete,605,0.79,Medium,2,2
+A5 Peradeniya-Badulla Segment 5,7,Mountainous,Aspalt - Fair,650,0.57,Medium,3,0
+A5 Peradeniya-Badulla Segment 6,8,Mountainous,Aspalt - Good,700,0.68,Medium,3,1
+A5 Peradeniya-Badulla Segment 7,9,Mountainous,Aspalt - Fair,755,0.55,Narrow,3,0
+A5 Peradeniya-Badulla Segment 8,10,Mountainous,Concrete,815,0.76,Narrow,3,2
+A5 Peradeniya-Badulla Segment 9,11,Mountainous,Aspalt - Good,880,0.66,Medium,3,1
+A5 Peradeniya-Badulla Segment 10,12,Mountainous,Aspalt - Fair,950,0.53,Narrow,3,0
+A5 Peradeniya-Badulla Segment 11,13,Mountainous,Concrete,1025,0.78,Narrow,3,2
+A5 Peradeniya-Badulla Segment 12,14,Mountainous,Aspalt - Fair,1105,0.51,Narrow,3,0
+A5 Peradeniya-Badulla Segment 13,15,Mountainous,Concrete,1190,0.8,Narrow,3,2
+A5 Peradeniya-Badulla Segment 14,14,Mountainous,Aspalt - Good,1280,0.64,Medium,3,1
+A5 Peradeniya-Badulla Segment 15,16,Mountainous,Aspalt - Fair,1375,0.49,Narrow,3,0
+A5 Peradeniya-Badulla Segment 16,18,Mountainous,Concrete,1475,0.81,Narrow,3,2
+A5 Peradeniya-Badulla Segment 17,17,Mountainous,Aspalt - Fair,1580,0.47,Narrow,3,0
+A5 Peradeniya-Badulla Segment 18,19,Mountainous,Gravel,1690,0.42,Narrow,3,3
+A5 Peradeniya-Badulla Segment 19,20,Mountainous,Concrete,1805,0.82,Narrow,3,2
+A5 Peradeniya-Badulla Segment 20,18,Mountainous,Aspalt - Fair,1750,0.48,Narrow,3,0
+A5 Peradeniya-Badulla Segment 21,16,Mountainous,Aspalt - Good,1680,0.65,Medium,3,1
+A5 Peradeniya-Badulla Segment 22,15,Mountainous,Gravel,1600,0.44,Narrow,3,3
+A5 Peradeniya-Badulla Segment 23,14,Mountainous,Concrete,1515,0.77,Narrow,3,2
+A5 Peradeniya-Badulla Segment 24,12,Mountainous,Aspalt - Fair,1425,0.52,Narrow,3,0
+A5 Peradeniya-Badulla Segment 25,11,Mountainous,Aspalt - Good,1330,0.67,Medium,3,1
+A5 Peradeniya-Badulla Segment 26,10,Mountainous,Aspalt - Fair,1230,0.54,Medium,3,0
+A5 Peradeniya-Badulla Segment 27,9,Mountainous,Concrete,1125,0.75,Medium,3,2
+A5 Peradeniya-Badulla Segment 28,8,Mountainous,Aspalt - Good,1015,0.69,Medium,3,1
+A5 Peradeniya-Badulla Segment 29,7,Mountainous,Aspalt - Fair,900,0.58,Medium,3,0
+A5 Peradeniya-Badulla Segment 30,6,Hilly,Aspalt - Good,780,0.71,Wide,2,1
+A5 Peradeniya-Badulla Segment 31,5,Hilly,Concrete,660,0.78,Medium,2,2
+A5 Peradeniya-Badulla Segment 32,4,Hilly,Aspalt - Fair,540,0.6,Medium,2,0
+A5 Peradeniya-Badulla Segment 33,3,Hilly,Aspalt - Good,420,0.73,Wide,2,1
+A5 Peradeniya-Badulla Segment 34,2,Hilly,Aspalt - Good,300,0.74,Wide,2,1
+A5 Peradeniya-Badulla Segment 35,1,Flat,Aspalt - Fair,180,0.63,Wide,1,0
+A16 Beragala-Haputale Segment 1,8,Mountainous,Aspalt - Good,1020,0.68,Medium,3,1
+A16 Beragala-Haputale Segment 2,9,Mountainous,Aspalt - Fair,1045,0.55,Narrow,3,0
+A16 Beragala-Haputale Segment 3,11,Mountainous,Concrete,1075,0.78,Narrow,3,2
+A16 Beragala-Haputale Segment 4,12,Mountainous,Aspalt - Fair,1110,0.52,Narrow,3,0
+A16 Beragala-Haputale Segment 5,14,Mountainous,Concrete,1150,0.8,Narrow,3,2
+A16 Beragala-Haputale Segment 6,13,Mountainous,Aspalt - Good,1195,0.65,Medium,3,1
+A16 Beragala-Haputale Segment 7,15,Mountainous,Aspalt - Fair,1245,0.49,Narrow,3,0
+A16 Beragala-Haputale Segment 8,16,Mountainous,Concrete,1300,0.81,Narrow,3,2
+A16 Beragala-Haputale Segment 9,17,Mountainous,Gravel,1360,0.4,Narrow,3,3
+A16 Beragala-Haputale Segment 10,18,Mountainous,Concrete,1425,0.82,Narrow,3,2
+A16 Beragala-Haputale Segment 11,16,Mountainous,Aspalt - Good,1400,0.64,Medium,3,1
+A16 Beragala-Haputale Segment 12,14,Mountainous,Aspalt - Fair,1370,0.5,Narrow,3,0
+A16 Beragala-Haputale Segment 13,12,Mountainous,Concrete,1335,0.77,Narrow,3,2
+A16 Beragala-Haputale Segment 14,11,Mountainous,Aspalt - Good,1295,0.67,Medium,3,1
+A16 Beragala-Haputale Segment 15,9,Mountainous,Aspalt - Fair,1250,0.54,Narrow,3,0
+A16 Beragala-Haputale Segment 16,8,Mountainous,Concrete,1200,0.75,Medium,3,2
+A16 Beragala-Haputale Segment 17,7,Mountainous,Aspalt - Good,1145,0.69,Medium,3,1
+A16 Beragala-Haputale Segment 18,6,Hilly,Aspalt - Fair,1085,0.58,Medium,2,0
+A16 Beragala-Haputale Segment 19,5,Hilly,Aspalt - Good,1020,0.71,Medium,2,1
+A16 Beragala-Haputale Segment 20,4,Hilly,Concrete,950,0.78,Medium,2,2
+B036 Badulla-Andaulpotha Segment 1,5,Hilly,Aspalt - Good,650,0.7,Medium,2,1
+B036 Badulla-Andaulpotha Segment 2,6,Hilly,Aspalt - Fair,680,0.58,Narrow,2,0
+B036 Badulla-Andaulpotha Segment 3,8,Mountainous,Concrete,715,0.76,Narrow,3,2
+B036 Badulla-Andaulpotha Segment 4,9,Mountainous,Aspalt - Fair,755,0.54,Narrow,3,0
+B036 Badulla-Andaulpotha Segment 5,11,Mountainous,Aspalt - Good,800,0.67,Medium,3,1
+B036 Badulla-Andaulpotha Segment 6,12,Mountainous,Concrete,850,0.79,Narrow,3,2
+B036 Badulla-Andaulpotha Segment 7,14,Mountainous,Gravel,905,0.42,Narrow,3,3
+B036 Badulla-Andaulpotha Segment 8,15,Mountainous,Concrete,965,0.81,Narrow,3,2
+B036 Badulla-Andaulpotha Segment 9,13,Mountainous,Aspalt - Fair,1030,0.51,Narrow,3,0
+B036 Badulla-Andaulpotha Segment 10,11,Mountainous,Aspalt - Good,985,0.66,Medium,3,1
+B036 Badulla-Andaulpotha Segment 11,9,Mountainous,Concrete,935,0.75,Narrow,3,2
+B036 Badulla-Andaulpotha Segment 12,8,Mountainous,Aspalt - Fair,880,0.56,Narrow,3,0
+B036 Badulla-Andaulpotha Segment 13,6,Hilly,Gravel,820,0.44,Narrow,2,3
+B036 Badulla-Andaulpotha Segment 14,5,Hilly,Aspalt - Good,755,0.71,Medium,2,1
+B036 Badulla-Andaulpotha Segment 15,4,Hilly,Concrete,685,0.78,Medium,2,2
+B147 Haputale-Dambetenne Segment 1,10,Mountainous,Aspalt - Good,1435,0.68,Medium,3,1
+B147 Haputale-Dambetenne Segment 2,12,Mountainous,Aspalt - Fair,1465,0.52,Narrow,3,0
+B147 Haputale-Dambetenne Segment 3,14,Mountainous,Concrete,1500,0.8,Narrow,3,2
+B147 Haputale-Dambetenne Segment 4,16,Mountainous,Gravel,1540,0.38,Narrow,3,3
+B147 Haputale-Dambetenne Segment 5,18,Mountainous,Concrete,1585,0.83,Narrow,3,2
+B147 Haputale-Dambetenne Segment 6,19,Mountainous,Gravel,1635,0.36,Narrow,3,3
+B147 Haputale-Dambetenne Segment 7,17,Mountainous,Concrete,1690,0.82,Narrow,3,2
+B147 Haputale-Dambetenne Segment 8,15,Mountainous,Aspalt - Fair,1650,0.49,Narrow,3,0
+B147 Haputale-Dambetenne Segment 9,13,Mountainous,Aspalt - Good,1605,0.65,Medium,3,1
+B147 Haputale-Dambetenne Segment 10,11,Mountainous,Concrete,1555,0.77,Narrow,3,2
+B149 Hatton-Maskeliya Segment 1,6,Hilly,Aspalt - Good,1200,0.7,Medium,2,1
+B149 Hatton-Maskeliya Segment 2,8,Mountainous,Aspalt - Fair,1225,0.56,Narrow,3,0
+B149 Hatton-Maskeliya Segment 3,10,Mountainous,Concrete,1255,0.76,Narrow,3,2
+B149 Hatton-Maskeliya Segment 4,12,Mountainous,Aspalt - Fair,1290,0.52,Narrow,3,0
+B149 Hatton-Maskeliya Segment 5,14,Mountainous,Gravel,1330,0.4,Narrow,3,3
+B149 Hatton-Maskeliya Segment 6,15,Mountainous,Concrete,1375,0.8,Narrow,3,2
+B149 Hatton-Maskeliya Segment 7,17,Mountainous,Gravel,1425,0.37,Narrow,3,3
+B149 Hatton-Maskeliya Segment 8,18,Mountainous,Concrete,1480,0.82,Narrow,3,2
+B149 Hatton-Maskeliya Segment 9,16,Mountainous,Aspalt - Fair,1540,0.48,Narrow,3,0
+B149 Hatton-Maskeliya Segment 10,14,Mountainous,Aspalt - Good,1490,0.64,Medium,3,1
+B149 Hatton-Maskeliya Segment 11,12,Mountainous,Concrete,1435,0.78,Narrow,3,2
+B149 Hatton-Maskeliya Segment 12,10,Mountainous,Gravel,1375,0.43,Narrow,3,3
+B149 Hatton-Maskeliya Segment 13,8,Mountainous,Aspalt - Fair,1310,0.55,Narrow,3,0
+B149 Hatton-Maskeliya Segment 14,6,Hilly,Concrete,1240,0.75,Medium,2,2
+B149 Hatton-Maskeliya Segment 15,5,Hilly,Aspalt - Good,1165,0.71,Medium,2,1
+B195 Kandy-Kirimetiya Segment 1,4,Hilly,Aspalt - Good,500,0.71,Medium,2,1
+B195 Kandy-Kirimetiya Segment 2,5,Hilly,Aspalt - Fair,525,0.6,Narrow,2,0
+B195 Kandy-Kirimetiya Segment 3,7,Hilly,Concrete,555,0.77,Narrow,2,2
+B195 Kandy-Kirimetiya Segment 4,8,Mountainous,Aspalt - Fair,590,0.56,Narrow,3,0
+B195 Kandy-Kirimetiya Segment 5,10,Mountainous,Concrete,630,0.79,Narrow,3,2
+B195 Kandy-Kirimetiya Segment 6,12,Mountainous,Gravel,675,0.44,Narrow,3,3
+B195 Kandy-Kirimetiya Segment 7,14,Mountainous,Concrete,725,0.81,Narrow,3,2
+B195 Kandy-Kirimetiya Segment 8,15,Mountainous,Gravel,780,0.41,Narrow,3,3
+B195 Kandy-Kirimetiya Segment 9,13,Mountainous,Aspalt - Fair,840,0.5,Narrow,3,0
+B195 Kandy-Kirimetiya Segment 10,11,Mountainous,Aspalt - Good,890,0.66,Medium,3,1
+B195 Kandy-Kirimetiya Segment 11,9,Mountainous,Concrete,835,0.76,Narrow,3,2
+B195 Kandy-Kirimetiya Segment 12,7,Mountainous,Gravel,775,0.46,Narrow,3,3
+B195 Kandy-Kirimetiya Segment 13,6,Hilly,Aspalt - Fair,710,0.58,Narrow,2,0
+B195 Kandy-Kirimetiya Segment 14,4,Hilly,Concrete,640,0.74,Medium,2,2
+B195 Kandy-Kirimetiya Segment 15,3,Hilly,Aspalt - Good,565,0.72,Medium,2,1
+A1 Colombo-Kandy Segment 31,5,Hilly,Aspalt - Fair,490,0.6,Wide,2,0
+A1 Colombo-Kandy Segment 32,4,Hilly,Aspalt - Good,480,0.71,Wide,2,1
+A1 Colombo-Kandy Segment 33,3,Hilly,Aspalt - Good,465,0.74,Wide,2,1
+A1 Colombo-Kandy Segment 34,4,Hilly,Aspalt - Fair,450,0.59,Medium,2,0
+A1 Colombo-Kandy Segment 35,5,Hilly,Concrete,440,0.78,Medium,2,2
+A1 Colombo-Kandy Segment 36,6,Hilly,Aspalt - Good,430,0.68,Medium,2,1
+A1 Colombo-Kandy Segment 37,5,Hilly,Aspalt - Fair,415,0.56,Medium,2,0
+A1 Colombo-Kandy Segment 38,4,Hilly,Aspalt - Good,400,0.7,Wide,2,1
+A1 Colombo-Kandy Segment 39,3,Hilly,Aspalt - Good,385,0.73,Wide,2,1
+A1 Colombo-Kandy Segment 40,2,Hilly,Aspalt - Fair,370,0.61,Wide,2,0
+A1 Colombo-Kandy Segment 41,3,Hilly,Concrete,360,0.77,Wide,2,2
+A1 Colombo-Kandy Segment 42,4,Hilly,Aspalt - Good,350,0.72,Medium,2,1
+A1 Colombo-Kandy Segment 43,5,Hilly,Aspalt - Fair,335,0.58,Medium,2,0
+A1 Colombo-Kandy Segment 44,4,Hilly,Aspalt - Good,320,0.69,Wide,2,1
+A1 Colombo-Kandy Segment 45,3,Hilly,Aspalt - Good,305,0.74,Wide,2,1
+A1 Colombo-Kandy Segment 46,2,Hilly,Aspalt - Fair,290,0.62,Wide,2,0
+A1 Colombo-Kandy Segment 47,3,Hilly,Concrete,275,0.79,Wide,2,2
+A1 Colombo-Kandy Segment 48,2,Hilly,Aspalt - Good,260,0.75,Wide,2,1
+A1 Colombo-Kandy Segment 49,1,Flat,Aspalt - Fair,250,0.64,Wide,1,0
+A1 Colombo-Kandy Segment 50,1,Flat,Aspalt - Good,240,0.76,Wide,1,1
+A2 Colombo-Galle-Wellawaya Segment 31,2,Flat,Aspalt - Fair,210,0.62,Wide,1,0
+A2 Colombo-Galle-Wellawaya Segment 32,3,Flat,Aspalt - Good,215,0.73,Wide,1,1
+A2 Colombo-Galle-Wellawaya Segment 33,2,Flat,Aspalt - Good,220,0.75,Wide,1,1
+A2 Colombo-Galle-Wellawaya Segment 34,1,Flat,Aspalt - Fair,225,0.64,Wide,1,0
+A2 Colombo-Galle-Wellawaya Segment 35,2,Flat,Concrete,230,0.77,Wide,1,2
+A2 Colombo-Galle-Wellawaya Segment 36,3,Hilly,Aspalt - Good,240,0.71,Wide,2,1
+A2 Colombo-Galle-Wellawaya Segment 37,4,Hilly,Aspalt - Fair,250,0.59,Medium,2,0
+A2 Colombo-Galle-Wellawaya Segment 38,5,Hilly,Aspalt - Good,265,0.68,Medium,2,1
+A2 Colombo-Galle-Wellawaya Segment 39,4,Hilly,Concrete,280,0.78,Medium,2,2
+A2 Colombo-Galle-Wellawaya Segment 40,6,Hilly,Aspalt - Fair,295,0.56,Medium,2,0
+A2 Colombo-Galle-Wellawaya Segment 41,5,Hilly,Aspalt - Good,310,0.7,Medium,2,1
+A2 Colombo-Galle-Wellawaya Segment 42,7,Hilly,Aspalt - Fair,325,0.54,Medium,2,0
+A2 Colombo-Galle-Wellawaya Segment 43,6,Hilly,Concrete,340,0.79,Medium,2,2
+A2 Colombo-Galle-Wellawaya Segment 44,5,Hilly,Aspalt - Good,355,0.69,Wide,2,1
+A2 Colombo-Galle-Wellawaya Segment 45,4,Hilly,Aspalt - Fair,370,0.61,Wide,2,0
+A2 Colombo-Galle-Wellawaya Segment 46,3,Hilly,Aspalt - Good,385,0.72,Wide,2,1
+A2 Colombo-Galle-Wellawaya Segment 47,4,Hilly,Aspalt - Good,400,0.71,Medium,2,1
+A2 Colombo-Galle-Wellawaya Segment 48,5,Hilly,Concrete,415,0.78,Medium,2,2
+A2 Colombo-Galle-Wellawaya Segment 49,6,Hilly,Aspalt - Fair,430,0.58,Medium,2,0
+A2 Colombo-Galle-Wellawaya Segment 50,5,Hilly,Aspalt - Good,445,0.68,Medium,2,1
+A2 Colombo-Galle-Wellawaya Segment 51,7,Hilly,Concrete,460,0.8,Medium,2,2
+A2 Colombo-Galle-Wellawaya Segment 52,6,Hilly,Aspalt - Fair,475,0.55,Medium,2,0
+A2 Colombo-Galle-Wellawaya Segment 53,5,Hilly,Aspalt - Good,490,0.67,Medium,2,1
+A2 Colombo-Galle-Wellawaya Segment 54,4,Hilly,Aspalt - Fair,500,0.6,Wide,2,0
+A2 Colombo-Galle-Wellawaya Segment 55,3,Hilly,Aspalt - Good,510,0.73,Wide,2,1
+A2 Colombo-Galle-Wellawaya Segment 56,2,Hilly,Aspalt - Good,520,0.75,Wide,2,1
+A2 Colombo-Galle-Wellawaya Segment 57,3,Hilly,Concrete,530,0.77,Wide,2,2
+A2 Colombo-Galle-Wellawaya Segment 58,2,Flat,Aspalt - Fair,540,0.64,Wide,1,0
+A2 Colombo-Galle-Wellawaya Segment 59,1,Flat,Aspalt - Good,545,0.76,Wide,1,1
+A2 Colombo-Galle-Wellawaya Segment 60,1,Flat,Aspalt - Good,550,0.77,Wide,1,1
+A4 Colombo-Batticaloa Segment 31,2,Hilly,Aspalt - Fair,430,0.62,Wide,2,0
+A4 Colombo-Batticaloa Segment 32,3,Hilly,Aspalt - Good,350,0.73,Wide,2,1
+A4 Colombo-Batticaloa Segment 33,2,Hilly,Aspalt - Fair,280,0.65,Wide,2,0
+A4 Colombo-Batticaloa Segment 34,3,Flat,Aspalt - Good,220,0.74,Wide,1,1
+A4 Colombo-Batticaloa Segment 35,4,Flat,Concrete,180,0.78,Wide,1,2
+A4 Colombo-Batticaloa Segment 36,3,Flat,Aspalt - Fair,150,0.63,Medium,1,0
+A4 Colombo-Batticaloa Segment 37,2,Flat,Aspalt - Good,125,0.75,Medium,1,1
+A4 Colombo-Batticaloa Segment 38,1,Flat,Aspalt - Good,105,0.76,Medium,1,1
+A4 Colombo-Batticaloa Segment 39,2,Flat,Aspalt - Fair,90,0.64,Wide,1,0
+A4 Colombo-Batticaloa Segment 40,3,Flat,Concrete,75,0.77,Wide,1,2
+A4 Colombo-Batticaloa Segment 41,2,Flat,Aspalt - Good,65,0.74,Wide,1,1
+A4 Colombo-Batticaloa Segment 42,1,Flat,Aspalt - Good,55,0.75,Wide,1,1
+A4 Colombo-Batticaloa Segment 43,2,Flat,Aspalt - Fair,45,0.65,Wide,1,0
+A4 Colombo-Batticaloa Segment 44,1,Flat,Concrete,35,0.79,Wide,1,2
+A4 Colombo-Batticaloa Segment 45,2,Coastal,Aspalt - Good,30,0.76,Wide,0,1
+A4 Colombo-Batticaloa Segment 46,1,Coastal,Aspalt - Fair,25,0.66,Wide,0,0
+A4 Colombo-Batticaloa Segment 47,2,Coastal,Aspalt - Good,20,0.77,Wide,0,1
+A4 Colombo-Batticaloa Segment 48,1,Coastal,Concrete,18,0.78,Wide,0,2
+A4 Colombo-Batticaloa Segment 49,2,Coastal,Aspalt - Fair,15,0.64,Wide,0,0
+A4 Colombo-Batticaloa Segment 50,1,Coastal,Aspalt - Good,12,0.75,Wide,0,1
+A4 Colombo-Batticaloa Segment 51,2,Coastal,Aspalt - Good,10,0.76,Wide,0,1
+A4 Colombo-Batticaloa Segment 52,1,Coastal,Aspalt - Fair,9,0.65,Wide,0,0
+A4 Colombo-Batticaloa Segment 53,2,Coastal,Concrete,8,0.79,Wide,0,2
+A4 Colombo-Batticaloa Segment 54,1,Coastal,Aspalt - Good,7,0.77,Wide,0,1
+A4 Colombo-Batticaloa Segment 55,2,Coastal,Aspalt - Fair,6,0.66,Wide,0,0
+A4 Colombo-Batticaloa Segment 56,1,Coastal,Aspalt - Good,5,0.78,Wide,0,1
+A4 Colombo-Batticaloa Segment 57,2,Coastal,Concrete,4,0.8,Wide,0,2
+A4 Colombo-Batticaloa Segment 58,1,Coastal,Aspalt - Good,3,0.79,Wide,0,1
+A4 Colombo-Batticaloa Segment 59,1,Coastal,Aspalt - Fair,2,0.67,Wide,0,0
+A4 Colombo-Batticaloa Segment 60,0,Coastal,Aspalt - Good,2,0.8,Wide,0,1
+A5 Peradeniya-Badulla Segment 36,2,Flat,Aspalt - Good,150,0.74,Wide,1,1
+A5 Peradeniya-Badulla Segment 37,3,Flat,Concrete,125,0.77,Wide,1,2
+A5 Peradeniya-Badulla Segment 38,2,Flat,Aspalt - Fair,105,0.65,Medium,1,0
+A5 Peradeniya-Badulla Segment 39,1,Flat,Aspalt - Good,90,0.76,Medium,1,1
+A5 Peradeniya-Badulla Segment 40,2,Flat,Aspalt - Good,75,0.75,Medium,1,1
+A5 Peradeniya-Badulla Segment 41,3,Flat,Concrete,60,0.78,Wide,1,2
+A5 Peradeniya-Badulla Segment 42,2,Flat,Aspalt - Fair,50,0.64,Wide,1,0
+A5 Peradeniya-Badulla Segment 43,1,Flat,Aspalt - Good,40,0.75,Wide,1,1
+A5 Peradeniya-Badulla Segment 44,2,Flat,Aspalt - Good,35,0.74,Wide,1,1
+A5 Peradeniya-Badulla Segment 45,3,Flat,Concrete,30,0.77,Wide,1,2
+A5 Peradeniya-Badulla Segment 46,2,Flat,Aspalt - Fair,25,0.63,Medium,1,0
+A5 Peradeniya-Badulla Segment 47,1,Flat,Aspalt - Good,20,0.76,Medium,1,1
+A5 Peradeniya-Badulla Segment 48,2,Flat,Aspalt - Good,18,0.75,Medium,1,1
+A5 Peradeniya-Badulla Segment 49,3,Flat,Concrete,16,0.79,Wide,1,2
+A5 Peradeniya-Badulla Segment 50,2,Flat,Aspalt - Fair,14,0.65,Wide,1,0
+A5 Peradeniya-Badulla Segment 51,1,Flat,Aspalt - Good,12,0.76,Wide,1,1
+A5 Peradeniya-Badulla Segment 52,2,Flat,Aspalt - Good,10,0.77,Wide,1,1
+A5 Peradeniya-Badulla Segment 53,1,Flat,Concrete,8,0.78,Wide,1,2
+A5 Peradeniya-Badulla Segment 54,2,Coastal,Aspalt - Fair,7,0.66,Medium,0,0
+A5 Peradeniya-Badulla Segment 55,1,Coastal,Aspalt - Good,6,0.78,Medium,0,1
+A5 Peradeniya-Badulla Segment 56,2,Coastal,Aspalt - Good,5,0.79,Wide,0,1
+A5 Peradeniya-Badulla Segment 57,1,Coastal,Concrete,5,0.8,Wide,0,2
+A5 Peradeniya-Badulla Segment 58,2,Coastal,Aspalt - Fair,4,0.67,Wide,0,0
+A5 Peradeniya-Badulla Segment 59,1,Coastal,Aspalt - Good,4,0.79,Wide,0,1
+A5 Peradeniya-Badulla Segment 60,2,Coastal,Aspalt - Good,3,0.8,Wide,0,1
+A5 Peradeniya-Badulla Segment 61,1,Coastal,Concrete,3,0.81,Medium,0,2
+A5 Peradeniya-Badulla Segment 62,2,Coastal,Aspalt - Fair,2,0.68,Medium,0,0
+A5 Peradeniya-Badulla Segment 63,1,Coastal,Aspalt - Good,2,0.81,Wide,0,1
+A5 Peradeniya-Badulla Segment 64,1,Coastal,Aspalt - Good,2,0.82,Wide,0,1
+A5 Peradeniya-Badulla Segment 65,0,Coastal,Concrete,1,0.82,Wide,0,2
+B042 Bandarawela-Poonagala Segment 1,6,Hilly,Aspalt - Good,1200,0.7,Medium,2,1
+B042 Bandarawela-Poonagala Segment 2,8,Mountainous,Aspalt - Fair,1225,0.56,Narrow,3,0
+B042 Bandarawela-Poonagala Segment 3,10,Mountainous,Concrete,1250,0.76,Narrow,3,2
+B042 Bandarawela-Poonagala Segment 4,12,Mountainous,Aspalt - Fair,1280,0.52,Narrow,3,0
+B042 Bandarawela-Poonagala Segment 5,14,Mountainous,Gravel,1315,0.4,Narrow,3,3
+B042 Bandarawela-Poonagala Segment 6,15,Mountainous,Concrete,1355,0.8,Narrow,3,2
+B042 Bandarawela-Poonagala Segment 7,13,Mountainous,Aspalt - Fair,1390,0.5,Narrow,3,0
+B042 Bandarawela-Poonagala Segment 8,11,Mountainous,Aspalt - Good,1420,0.65,Medium,3,1
+B042 Bandarawela-Poonagala Segment 9,14,Mountainous,Concrete,1455,0.78,Narrow,3,2
+B042 Bandarawela-Poonagala Segment 10,16,Mountainous,Gravel,1490,0.38,Narrow,3,3
+B042 Bandarawela-Poonagala Segment 11,15,Mountainous,Concrete,1475,0.81,Narrow,3,2
+B042 Bandarawela-Poonagala Segment 12,13,Mountainous,Aspalt - Fair,1450,0.51,Narrow,3,0
+B042 Bandarawela-Poonagala Segment 13,11,Mountainous,Aspalt - Good,1415,0.66,Medium,3,1
+B042 Bandarawela-Poonagala Segment 14,9,Mountainous,Concrete,1380,0.75,Narrow,3,2
+B042 Bandarawela-Poonagala Segment 15,7,Hilly,Aspalt - Fair,1340,0.58,Medium,2,0
+B043 Bandarawela-Ettampitiya Segment 1,5,Hilly,Aspalt - Good,1200,0.71,Medium,2,1
+B043 Bandarawela-Ettampitiya Segment 2,7,Hilly,Aspalt - Fair,1180,0.58,Narrow,2,0
+B043 Bandarawela-Ettampitiya Segment 3,9,Mountainous,Concrete,1150,0.77,Narrow,3,2
+B043 Bandarawela-Ettampitiya Segment 4,10,Mountainous,Aspalt - Fair,1115,0.54,Narrow,3,0
+B043 Bandarawela-Ettampitiya Segment 5,12,Mountainous,Aspalt - Good,1080,0.67,Medium,3,1
+B043 Bandarawela-Ettampitiya Segment 6,11,Mountainous,Concrete,1050,0.78,Narrow,3,2
+B043 Bandarawela-Ettampitiya Segment 7,9,Mountainous,Gravel,1025,0.44,Narrow,3,3
+B043 Bandarawela-Ettampitiya Segment 8,8,Mountainous,Concrete,1005,0.75,Narrow,3,2
+B043 Bandarawela-Ettampitiya Segment 9,10,Mountainous,Aspalt - Fair,980,0.53,Narrow,3,0
+B043 Bandarawela-Ettampitiya Segment 10,12,Mountainous,Aspalt - Good,950,0.66,Medium,3,1
+B043 Bandarawela-Ettampitiya Segment 11,11,Mountainous,Concrete,920,0.76,Narrow,3,2
+B043 Bandarawela-Ettampitiya Segment 12,9,Mountainous,Gravel,895,0.45,Narrow,3,3
+B043 Bandarawela-Ettampitiya Segment 13,7,Hilly,Aspalt - Fair,875,0.57,Medium,2,0
+B043 Bandarawela-Ettampitiya Segment 14,6,Hilly,Concrete,860,0.74,Medium,2,2
+B043 Bandarawela-Ettampitiya Segment 15,5,Hilly,Aspalt - Good,850,0.7,Medium,2,1
+B113 Ella-Passara Segment 1,6,Hilly,Aspalt - Good,1000,0.7,Medium,2,1
+B113 Ella-Passara Segment 2,8,Mountainous,Aspalt - Fair,980,0.56,Narrow,3,0
+B113 Ella-Passara Segment 3,10,Mountainous,Concrete,955,0.76,Narrow,3,2
+B113 Ella-Passara Segment 4,12,Mountainous,Aspalt - Fair,925,0.52,Narrow,3,0
+B113 Ella-Passara Segment 5,14,Mountainous,Gravel,890,0.4,Narrow,3,3
+B113 Ella-Passara Segment 6,13,Mountainous,Concrete,860,0.79,Narrow,3,2
+B113 Ella-Passara Segment 7,11,Mountainous,Aspalt - Fair,835,0.51,Narrow,3,0
+B113 Ella-Passara Segment 8,9,Mountainous,Aspalt - Good,815,0.65,Medium,3,1
+B113 Ella-Passara Segment 9,10,Mountainous,Concrete,790,0.75,Narrow,3,2
+B113 Ella-Passara Segment 10,12,Mountainous,Gravel,760,0.42,Narrow,3,3
+B113 Ella-Passara Segment 11,14,Mountainous,Concrete,725,0.8,Narrow,3,2
+B113 Ella-Passara Segment 12,12,Mountainous,Aspalt - Fair,695,0.5,Narrow,3,0
+B113 Ella-Passara Segment 13,10,Mountainous,Aspalt - Good,670,0.66,Medium,3,1
+B113 Ella-Passara Segment 14,8,Mountainous,Concrete,650,0.74,Narrow,3,2
+B113 Ella-Passara Segment 15,6,Hilly,Aspalt - Fair,635,0.58,Medium,2,0
+B125 Galaha-Pupuressa Segment 1,8,Mountainous,Aspalt - Good,700,0.68,Medium,3,1
+B125 Galaha-Pupuressa Segment 2,10,Mountainous,Aspalt - Fair,725,0.54,Narrow,3,0
+B125 Galaha-Pupuressa Segment 3,12,Mountainous,Concrete,755,0.76,Narrow,3,2
+B125 Galaha-Pupuressa Segment 4,14,Mountainous,Aspalt - Fair,790,0.5,Narrow,3,0
+B125 Galaha-Pupuressa Segment 5,15,Mountainous,Gravel,830,0.38,Narrow,3,3
+B125 Galaha-Pupuressa Segment 6,13,Mountainous,Concrete,865,0.78,Narrow,3,2
+B125 Galaha-Pupuressa Segment 7,11,Mountainous,Aspalt - Good,895,0.65,Medium,3,1
+B125 Galaha-Pupuressa Segment 8,12,Mountainous,Concrete,925,0.77,Narrow,3,2
+B125 Galaha-Pupuressa Segment 9,14,Mountainous,Gravel,960,0.41,Narrow,3,3
+B125 Galaha-Pupuressa Segment 10,13,Mountainous,Concrete,985,0.79,Narrow,3,2
+B125 Galaha-Pupuressa Segment 11,11,Mountainous,Aspalt - Fair,1005,0.51,Narrow,3,0
+B125 Galaha-Pupuressa Segment 12,9,Mountainous,Aspalt - Good,1020,0.67,Medium,3,1
+B125 Galaha-Pupuressa Segment 13,8,Mountainous,Concrete,1030,0.75,Narrow,3,2
+B125 Galaha-Pupuressa Segment 14,6,Hilly,Aspalt - Fair,1035,0.59,Medium,2,0
+B125 Galaha-Pupuressa Segment 15,5,Hilly,Aspalt - Good,1040,0.71,Wide,2,1
+B172 Kadugannawa-Gampola Segment 1,4,Hilly,Aspalt - Good,400,0.72,Medium,2,1
+B172 Kadugannawa-Gampola Segment 2,5,Hilly,Aspalt - Fair,415,0.6,Medium,2,0
+B172 Kadugannawa-Gampola Segment 3,7,Hilly,Concrete,430,0.78,Medium,2,2
+B172 Kadugannawa-Gampola Segment 4,6,Hilly,Aspalt - Fair,445,0.58,Medium,2,0
+B172 Kadugannawa-Gampola Segment 5,5,Hilly,Aspalt - Good,460,0.7,Wide,2,1
+B172 Kadugannawa-Gampola Segment 6,7,Hilly,Concrete,475,0.79,Medium,2,2
+B172 Kadugannawa-Gampola Segment 7,8,Mountainous,Aspalt - Fair,490,0.56,Narrow,3,0
+B172 Kadugannawa-Gampola Segment 8,9,Mountainous,Concrete,510,0.77,Narrow,3,2
+B172 Kadugannawa-Gampola Segment 9,7,Mountainous,Aspalt - Good,525,0.68,Medium,3,1
+B172 Kadugannawa-Gampola Segment 10,6,Hilly,Aspalt - Fair,535,0.59,Medium,2,0
+B172 Kadugannawa-Gampola Segment 11,5,Hilly,Concrete,545,0.78,Wide,2,2
+B172 Kadugannawa-Gampola Segment 12,4,Hilly,Aspalt - Good,550,0.71,Wide,2,1
+B172 Kadugannawa-Gampola Segment 13,3,Hilly,Aspalt - Fair,555,0.62,Medium,2,0
+B172 Kadugannawa-Gampola Segment 14,4,Hilly,Concrete,560,0.79,Medium,2,2
+B172 Kadugannawa-Gampola Segment 15,3,Hilly,Aspalt - Good,565,0.73,Wide,2,1
+B332 Nuwara Eliya-Uda Pussellawa Segment 1,10,Mountainous,Aspalt - Good,1800,0.67,Medium,3,1
+B332 Nuwara Eliya-Uda Pussellawa Segment 2,12,Mountainous,Aspalt - Fair,1770,0.53,Narrow,3,0
+B332 Nuwara Eliya-Uda Pussellawa Segment 3,14,Mountainous,Concrete,1735,0.79,Narrow,3,2
+B332 Nuwara Eliya-Uda Pussellawa Segment 4,16,Mountainous,Gravel,1695,0.39,Narrow,3,3
+B332 Nuwara Eliya-Uda Pussellawa Segment 5,18,Mountainous,Concrete,1650,0.81,Narrow,3,2
+B332 Nuwara Eliya-Uda Pussellawa Segment 6,17,Mountainous,Gravel,1610,0.37,Narrow,3,3
+B332 Nuwara Eliya-Uda Pussellawa Segment 7,15,Mountainous,Concrete,1575,0.8,Narrow,3,2
+B332 Nuwara Eliya-Uda Pussellawa Segment 8,13,Mountainous,Aspalt - Fair,1545,0.5,Narrow,3,0
+B332 Nuwara Eliya-Uda Pussellawa Segment 9,11,Mountainous,Aspalt - Good,1520,0.65,Medium,3,1
+B332 Nuwara Eliya-Uda Pussellawa Segment 10,12,Mountainous,Concrete,1490,0.77,Narrow,3,2
+B332 Nuwara Eliya-Uda Pussellawa Segment 11,14,Mountainous,Gravel,1455,0.41,Narrow,3,3
+B332 Nuwara Eliya-Uda Pussellawa Segment 12,13,Mountainous,Concrete,1425,0.78,Narrow,3,2
+B332 Nuwara Eliya-Uda Pussellawa Segment 13,11,Mountainous,Aspalt - Fair,1400,0.52,Narrow,3,0
+B332 Nuwara Eliya-Uda Pussellawa Segment 14,9,Mountainous,Aspalt - Good,1380,0.66,Medium,3,1
+B332 Nuwara Eliya-Uda Pussellawa Segment 15,7,Hilly,Concrete,1365,0.76,Medium,2,2
+A1 Colombo-Kandy Segment 51,2,Flat,Aspalt - Good,235,0.75,Wide,1,1
+A1 Colombo-Kandy Segment 52,1,Flat,Aspalt - Fair,225,0.64,Wide,1,0
+A1 Colombo-Kandy Segment 53,2,Flat,Aspalt - Good,220,0.76,Wide,1,1
+A1 Colombo-Kandy Segment 54,3,Hilly,Concrete,230,0.78,Wide,2,2
+A1 Colombo-Kandy Segment 55,4,Hilly,Aspalt - Good,240,0.71,Wide,2,1
+A1 Colombo-Kandy Segment 56,5,Hilly,Aspalt - Fair,255,0.59,Medium,2,0
+A1 Colombo-Kandy Segment 57,6,Hilly,Aspalt - Good,270,0.68,Medium,2,1
+A1 Colombo-Kandy Segment 58,4,Hilly,Concrete,285,0.79,Medium,2,2
+A1 Colombo-Kandy Segment 59,5,Hilly,Aspalt - Fair,300,0.57,Medium,2,0
+A1 Colombo-Kandy Segment 60,7,Hilly,Aspalt - Good,320,0.67,Medium,2,1
+A1 Colombo-Kandy Segment 61,6,Hilly,Concrete,340,0.8,Medium,2,2
+A1 Colombo-Kandy Segment 62,5,Hilly,Aspalt - Good,360,0.7,Wide,2,1
+A1 Colombo-Kandy Segment 63,4,Hilly,Aspalt - Fair,380,0.6,Wide,2,0
+A1 Colombo-Kandy Segment 64,6,Hilly,Aspalt - Good,405,0.69,Wide,2,1
+A1 Colombo-Kandy Segment 65,7,Hilly,Concrete,430,0.78,Medium,2,2
+A1 Colombo-Kandy Segment 66,5,Hilly,Aspalt - Good,450,0.71,Medium,2,1
+A1 Colombo-Kandy Segment 67,6,Hilly,Aspalt - Fair,470,0.58,Medium,2,0
+A1 Colombo-Kandy Segment 68,8,Mountainous,Concrete,495,0.77,Narrow,3,2
+A1 Colombo-Kandy Segment 69,7,Mountainous,Aspalt - Good,515,0.66,Medium,3,1
+A1 Colombo-Kandy Segment 70,6,Mountainous,Aspalt - Fair,530,0.55,Medium,3,0
+A2 Colombo-Galle-Wellawaya Segment 61,2,Flat,Concrete,560,0.78,Wide,1,2
+A2 Colombo-Galle-Wellawaya Segment 62,1,Flat,Aspalt - Fair,575,0.65,Wide,1,0
+A2 Colombo-Galle-Wellawaya Segment 63,2,Flat,Aspalt - Good,590,0.75,Wide,1,1
+A2 Colombo-Galle-Wellawaya Segment 64,3,Flat,Concrete,605,0.77,Wide,1,2
+A2 Colombo-Galle-Wellawaya Segment 65,2,Flat,Aspalt - Good,620,0.74,Wide,1,1
+A2 Colombo-Galle-Wellawaya Segment 66,4,Hilly,Aspalt - Fair,640,0.6,Medium,2,0
+A2 Colombo-Galle-Wellawaya Segment 67,5,Hilly,Aspalt - Good,660,0.7,Medium,2,1
+A2 Colombo-Galle-Wellawaya Segment 68,3,Hilly,Concrete,680,0.79,Wide,2,2
+A2 Colombo-Galle-Wellawaya Segment 69,4,Hilly,Aspalt - Fair,700,0.58,Medium,2,0
+A2 Colombo-Galle-Wellawaya Segment 70,6,Hilly,Aspalt - Good,720,0.68,Medium,2,1
+A2 Colombo-Galle-Wellawaya Segment 71,5,Hilly,Concrete,740,0.78,Medium,2,2
+A2 Colombo-Galle-Wellawaya Segment 72,7,Hilly,Aspalt - Good,760,0.66,Medium,2,1
+A2 Colombo-Galle-Wellawaya Segment 73,6,Hilly,Aspalt - Fair,780,0.55,Narrow,2,0
+A2 Colombo-Galle-Wellawaya Segment 74,5,Hilly,Concrete,800,0.77,Medium,2,2
+A2 Colombo-Galle-Wellawaya Segment 75,4,Hilly,Aspalt - Good,820,0.69,Wide,2,1
+A2 Colombo-Galle-Wellawaya Segment 76,5,Hilly,Aspalt - Fair,840,0.59,Medium,2,0
+A2 Colombo-Galle-Wellawaya Segment 77,3,Hilly,Aspalt - Good,860,0.72,Wide,2,1
+A2 Colombo-Galle-Wellawaya Segment 78,2,Hilly,Concrete,875,0.79,Wide,2,2
+A2 Colombo-Galle-Wellawaya Segment 79,3,Hilly,Aspalt - Fair,890,0.62,Wide,2,0
+A2 Colombo-Galle-Wellawaya Segment 80,4,Hilly,Aspalt - Good,905,0.7,Medium,2,1
+A4 Colombo-Batticaloa Segment 61,1,Coastal,Aspalt - Fair,3,0.64,Wide,0,0
+A4 Colombo-Batticaloa Segment 62,2,Coastal,Concrete,5,0.78,Wide,0,2
+A4 Colombo-Batticaloa Segment 63,1,Coastal,Aspalt - Good,6,0.75,Wide,0,1
+A4 Colombo-Batticaloa Segment 64,2,Coastal,Aspalt - Good,8,0.76,Wide,0,1
+A4 Colombo-Batticaloa Segment 65,3,Flat,Aspalt - Fair,12,0.63,Medium,1,0
+A4 Colombo-Batticaloa Segment 66,2,Flat,Concrete,15,0.79,Wide,1,2
+A4 Colombo-Batticaloa Segment 67,1,Flat,Aspalt - Good,18,0.77,Wide,1,1
+A4 Colombo-Batticaloa Segment 68,3,Flat,Aspalt - Fair,22,0.62,Medium,1,0
+A4 Colombo-Batticaloa Segment 69,4,Flat,Aspalt - Good,28,0.72,Medium,1,1
+A4 Colombo-Batticaloa Segment 70,2,Flat,Concrete,32,0.78,Wide,1,2
+A4 Colombo-Batticaloa Segment 71,3,Flat,Aspalt - Good,38,0.73,Wide,1,1
+A4 Colombo-Batticaloa Segment 72,5,Hilly,Aspalt - Fair,45,0.58,Medium,2,0
+A4 Colombo-Batticaloa Segment 73,4,Hilly,Aspalt - Good,55,0.69,Medium,2,1
+A4 Colombo-Batticaloa Segment 74,6,Hilly,Concrete,65,0.79,Narrow,2,2
+A4 Colombo-Batticaloa Segment 75,5,Hilly,Aspalt - Fair,75,0.56,Medium,2,0
+A4 Colombo-Batticaloa Segment 76,4,Hilly,Aspalt - Good,85,0.7,Wide,2,1
+A4 Colombo-Batticaloa Segment 77,3,Hilly,Concrete,95,0.78,Wide,2,2
+A4 Colombo-Batticaloa Segment 78,2,Hilly,Aspalt - Good,105,0.74,Wide,2,1
+A4 Colombo-Batticaloa Segment 79,4,Hilly,Aspalt - Fair,115,0.6,Medium,2,0
+A4 Colombo-Batticaloa Segment 80,5,Hilly,Aspalt - Good,130,0.68,Medium,2,1
+A5 Peradeniya-Badulla Segment 66,1,Coastal,Aspalt - Fair,2,0.65,Wide,0,0
+A5 Peradeniya-Badulla Segment 67,2,Coastal,Aspalt - Good,4,0.77,Wide,0,1
+A5 Peradeniya-Badulla Segment 68,1,Coastal,Concrete,5,0.79,Wide,0,2
+A5 Peradeniya-Badulla Segment 69,2,Coastal,Aspalt - Good,6,0.76,Wide,0,1
+A5 Peradeniya-Badulla Segment 70,3,Flat,Aspalt - Fair,10,0.63,Medium,1,0
+A5 Peradeniya-Badulla Segment 71,2,Flat,Concrete,15,0.78,Wide,1,2
+A5 Peradeniya-Badulla Segment 72,1,Flat,Aspalt - Good,18,0.75,Wide,1,1
+A5 Peradeniya-Badulla Segment 73,2,Flat,Aspalt - Fair,22,0.64,Medium,1,0
+A5 Peradeniya-Badulla Segment 74,3,Flat,Aspalt - Good,28,0.73,Wide,1,1
+A5 Peradeniya-Badulla Segment 75,4,Flat,Concrete,35,0.79,Medium,1,2
+A5 Peradeniya-Badulla Segment 76,2,Flat,Aspalt - Good,40,0.74,Wide,1,1
+A5 Peradeniya-Badulla Segment 77,3,Flat,Aspalt - Fair,48,0.62,Medium,1,0
+A5 Peradeniya-Badulla Segment 78,5,Hilly,Aspalt - Good,58,0.7,Medium,2,1
+A5 Peradeniya-Badulla Segment 79,4,Hilly,Concrete,70,0.78,Wide,2,2
+A5 Peradeniya-Badulla Segment 80,6,Hilly,Aspalt - Fair,85,0.58,Narrow,2,0
+A5 Peradeniya-Badulla Segment 81,5,Hilly,Aspalt - Good,100,0.68,Medium,2,1
+A5 Peradeniya-Badulla Segment 82,4,Hilly,Concrete,115,0.77,Wide,2,2
+A5 Peradeniya-Badulla Segment 83,3,Hilly,Aspalt - Good,130,0.72,Wide,2,1
+A5 Peradeniya-Badulla Segment 84,5,Hilly,Aspalt - Fair,145,0.6,Medium,2,0
+A5 Peradeniya-Badulla Segment 85,6,Hilly,Aspalt - Good,160,0.69,Medium,2,1
+A16 Beragala-Haputale Segment 21,5,Hilly,Aspalt - Fair,1000,0.6,Medium,2,0
+A16 Beragala-Haputale Segment 22,6,Hilly,Concrete,1025,0.78,Narrow,2,2
+A16 Beragala-Haputale Segment 23,8,Mountainous,Aspalt - Good,1055,0.68,Medium,3,1
+A16 Beragala-Haputale Segment 24,9,Mountainous,Aspalt - Fair,1090,0.56,Narrow,3,0
+A16 Beragala-Haputale Segment 25,11,Mountainous,Concrete,1125,0.79,Narrow,3,2
+A16 Beragala-Haputale Segment 26,10,Mountainous,Aspalt - Good,1165,0.66,Medium,3,1
+A16 Beragala-Haputale Segment 27,12,Mountainous,Gravel,1205,0.44,Narrow,3,3
+A16 Beragala-Haputale Segment 28,14,Mountainous,Concrete,1245,0.8,Narrow,3,2
+A16 Beragala-Haputale Segment 29,13,Mountainous,Aspalt - Fair,1290,0.52,Narrow,3,0
+A16 Beragala-Haputale Segment 30,15,Mountainous,Concrete,1335,0.81,Narrow,3,2
+A16 Beragala-Haputale Segment 31,16,Mountainous,Gravel,1385,0.4,Narrow,3,3
+A16 Beragala-Haputale Segment 32,14,Mountainous,Aspalt - Good,1425,0.65,Medium,3,1
+A16 Beragala-Haputale Segment 33,12,Mountainous,Concrete,1410,0.77,Narrow,3,2
+A16 Beragala-Haputale Segment 34,10,Mountainous,Aspalt - Fair,1380,0.55,Medium,3,0
+A16 Beragala-Haputale Segment 35,9,Mountainous,Aspalt - Good,1345,0.67,Medium,3,1
+A16 Beragala-Haputale Segment 36,8,Mountainous,Concrete,1305,0.76,Narrow,3,2
+A16 Beragala-Haputale Segment 37,7,Mountainous,Aspalt - Fair,1260,0.58,Medium,3,0
+A16 Beragala-Haputale Segment 38,6,Hilly,Aspalt - Good,1215,0.7,Medium,2,1
+A16 Beragala-Haputale Segment 39,5,Hilly,Concrete,1160,0.78,Wide,2,2
+A16 Beragala-Haputale Segment 40,4,Hilly,Aspalt - Good,1105,0.72,Wide,2,1
+B005 Aladeniya-Iriyagama Segment 1,4,Hilly,Aspalt - Good,400,0.71,Medium,2,1
+B005 Aladeniya-Iriyagama Segment 2,5,Hilly,Aspalt - Fair,425,0.6,Narrow,2,0
+B005 Aladeniya-Iriyagama Segment 3,7,Hilly,Concrete,455,0.78,Narrow,2,2
+B005 Aladeniya-Iriyagama Segment 4,6,Hilly,Aspalt - Good,480,0.69,Medium,2,1
+B005 Aladeniya-Iriyagama Segment 5,8,Mountainous,Aspalt - Fair,510,0.56,Narrow,3,0
+B005 Aladeniya-Iriyagama Segment 6,9,Mountainous,Concrete,545,0.77,Narrow,3,2
+B005 Aladeniya-Iriyagama Segment 7,7,Mountainous,Gravel,575,0.45,Narrow,3,3
+B005 Aladeniya-Iriyagama Segment 8,6,Hilly,Aspalt - Good,590,0.68,Medium,2,1
+B005 Aladeniya-Iriyagama Segment 9,5,Hilly,Concrete,605,0.76,Medium,2,2
+B005 Aladeniya-Iriyagama Segment 10,4,Hilly,Aspalt - Fair,615,0.61,Medium,2,0
+B005 Aladeniya-Iriyagama Segment 11,3,Hilly,Aspalt - Good,620,0.72,Wide,2,1
+B005 Aladeniya-Iriyagama Segment 12,4,Hilly,Concrete,610,0.78,Medium,2,2
+B005 Aladeniya-Iriyagama Segment 13,5,Hilly,Aspalt - Fair,595,0.59,Narrow,2,0
+B005 Aladeniya-Iriyagama Segment 14,3,Hilly,Aspalt - Good,570,0.73,Medium,2,1
+B005 Aladeniya-Iriyagama Segment 15,2,Hilly,Concrete,540,0.79,Wide,2,2
+B007 Alawatugoda-Ankumbura Segment 1,5,Hilly,Aspalt - Good,480,0.7,Medium,2,1
+B007 Alawatugoda-Ankumbura Segment 2,7,Hilly,Aspalt - Fair,515,0.58,Narrow,2,0
+B007 Alawatugoda-Ankumbura Segment 3,8,Mountainous,Concrete,555,0.77,Narrow,3,2
+B007 Alawatugoda-Ankumbura Segment 4,10,Mountainous,Gravel,595,0.44,Narrow,3,3
+B007 Alawatugoda-Ankumbura Segment 5,11,Mountainous,Concrete,640,0.79,Narrow,3,2
+B007 Alawatugoda-Ankumbura Segment 6,9,Mountainous,Aspalt - Fair,685,0.55,Narrow,3,0
+B007 Alawatugoda-Ankumbura Segment 7,8,Mountainous,Aspalt - Good,725,0.66,Medium,3,1
+B007 Alawatugoda-Ankumbura Segment 8,10,Mountainous,Concrete,770,0.78,Narrow,3,2
+B007 Alawatugoda-Ankumbura Segment 9,12,Mountainous,Gravel,815,0.42,Narrow,3,3
+B007 Alawatugoda-Ankumbura Segment 10,11,Mountainous,Concrete,855,0.8,Narrow,3,2
+B007 Alawatugoda-Ankumbura Segment 11,9,Mountainous,Aspalt - Fair,890,0.54,Narrow,3,0
+B007 Alawatugoda-Ankumbura Segment 12,7,Mountainous,Aspalt - Good,920,0.67,Medium,3,1
+B007 Alawatugoda-Ankumbura Segment 13,6,Hilly,Concrete,940,0.76,Medium,2,2
+B007 Alawatugoda-Ankumbura Segment 14,5,Hilly,Aspalt - Fair,955,0.59,Medium,2,0
+B007 Alawatugoda-Ankumbura Segment 15,4,Hilly,Aspalt - Good,965,0.71,Wide,2,1
+B097 Demodera-Spring Valley Segment 1,8,Mountainous,Aspalt - Good,800,0.69,Medium,3,1
+B097 Demodera-Spring Valley Segment 2,10,Mountainous,Aspalt - Fair,835,0.56,Narrow,3,0
+B097 Demodera-Spring Valley Segment 3,12,Mountainous,Concrete,875,0.78,Narrow,3,2
+B097 Demodera-Spring Valley Segment 4,14,Mountainous,Gravel,920,0.41,Narrow,3,3
+B097 Demodera-Spring Valley Segment 5,16,Mountainous,Concrete,970,0.81,Narrow,3,2
+B097 Demodera-Spring Valley Segment 6,15,Mountainous,Aspalt - Fair,1025,0.5,Narrow,3,0
+B097 Demodera-Spring Valley Segment 7,13,Mountainous,Aspalt - Good,1080,0.65,Medium,3,1
+B097 Demodera-Spring Valley Segment 8,14,Mountainous,Concrete,1135,0.79,Narrow,3,2
+B097 Demodera-Spring Valley Segment 9,17,Mountainous,Gravel,1195,0.38,Narrow,3,3
+B097 Demodera-Spring Valley Segment 10,18,Mountainous,Concrete,1260,0.82,Narrow,3,2
+B097 Demodera-Spring Valley Segment 11,16,Mountainous,Aspalt - Fair,1220,0.48,Narrow,3,0
+B097 Demodera-Spring Valley Segment 12,14,Mountainous,Aspalt - Good,1175,0.66,Medium,3,1
+B097 Demodera-Spring Valley Segment 13,12,Mountainous,Concrete,1125,0.77,Narrow,3,2
+B097 Demodera-Spring Valley Segment 14,10,Mountainous,Gravel,1070,0.44,Narrow,3,3
+B097 Demodera-Spring Valley Segment 15,9,Mountainous,Concrete,1010,0.76,Narrow,3,2
+B097 Demodera-Spring Valley Segment 16,7,Mountainous,Aspalt - Fair,950,0.57,Medium,3,0
+B097 Demodera-Spring Valley Segment 17,6,Hilly,Aspalt - Good,885,0.7,Medium,2,1
+B097 Demodera-Spring Valley Segment 18,5,Hilly,Concrete,820,0.78,Wide,2,2
+B097 Demodera-Spring Valley Segment 19,4,Hilly,Aspalt - Fair,750,0.6,Medium,2,0
+B097 Demodera-Spring Valley Segment 20,3,Hilly,Aspalt - Good,680,0.72,Wide,2,1
+B104 Diyatalawa-Mirahawatta Segment 1,10,Mountainous,Aspalt - Good,1200,0.67,Medium,3,1
+B104 Diyatalawa-Mirahawatta Segment 2,12,Mountainous,Aspalt - Fair,1235,0.54,Narrow,3,0
+B104 Diyatalawa-Mirahawatta Segment 3,14,Mountainous,Concrete,1275,0.79,Narrow,3,2
+B104 Diyatalawa-Mirahawatta Segment 4,15,Mountainous,Gravel,1320,0.4,Narrow,3,3
+B104 Diyatalawa-Mirahawatta Segment 5,17,Mountainous,Concrete,1370,0.81,Narrow,3,2
+B104 Diyatalawa-Mirahawatta Segment 6,18,Mountainous,Gravel,1425,0.37,Narrow,3,3
+B104 Diyatalawa-Mirahawatta Segment 7,16,Mountainous,Concrete,1485,0.8,Narrow,3,2
+B104 Diyatalawa-Mirahawatta Segment 8,14,Mountainous,Aspalt - Fair,1535,0.49,Narrow,3,0
+B104 Diyatalawa-Mirahawatta Segment 9,12,Mountainous,Aspalt - Good,1505,0.66,Medium,3,1
+B104 Diyatalawa-Mirahawatta Segment 10,13,Mountainous,Concrete,1465,0.78,Narrow,3,2
+B104 Diyatalawa-Mirahawatta Segment 11,11,Mountainous,Gravel,1420,0.43,Narrow,3,3
+B104 Diyatalawa-Mirahawatta Segment 12,9,Mountainous,Concrete,1375,0.76,Narrow,3,2
+B104 Diyatalawa-Mirahawatta Segment 13,8,Mountainous,Aspalt - Fair,1325,0.56,Medium,3,0
+B104 Diyatalawa-Mirahawatta Segment 14,7,Mountainous,Aspalt - Good,1270,0.69,Medium,3,1
+B104 Diyatalawa-Mirahawatta Segment 15,6,Hilly,Concrete,1215,0.77,Wide,2,2
+B236 Koslande-Poonagala Segment 1,7,Mountainous,Aspalt - Good,700,0.68,Medium,3,1
+B236 Koslande-Poonagala Segment 2,9,Mountainous,Aspalt - Fair,740,0.55,Narrow,3,0
+B236 Koslande-Poonagala Segment 3,11,Mountainous,Concrete,785,0.77,Narrow,3,2
+B236 Koslande-Poonagala Segment 4,13,Mountainous,Gravel,835,0.42,Narrow,3,3
+B236 Koslande-Poonagala Segment 5,15,Mountainous,Concrete,890,0.8,Narrow,3,2
+B236 Koslande-Poonagala Segment 6,17,Mountainous,Gravel,950,0.39,Narrow,3,3
+B236 Koslande-Poonagala Segment 7,16,Mountainous,Concrete,1015,0.79,Narrow,3,2
+B236 Koslande-Poonagala Segment 8,14,Mountainous,Aspalt - Fair,1075,0.51,Narrow,3,0
+B236 Koslande-Poonagala Segment 9,12,Mountainous,Aspalt - Good,1130,0.65,Medium,3,1
+B236 Koslande-Poonagala Segment 10,13,Mountainous,Concrete,1180,0.78,Narrow,3,2
+B236 Koslande-Poonagala Segment 11,11,Mountainous,Gravel,1225,0.44,Narrow,3,3
+B236 Koslande-Poonagala Segment 12,9,Mountainous,Concrete,1260,0.76,Narrow,3,2
+B236 Koslande-Poonagala Segment 13,8,Mountainous,Aspalt - Fair,1285,0.57,Medium,3,0
+B236 Koslande-Poonagala Segment 14,6,Hilly,Aspalt - Good,1300,0.7,Medium,2,1
+B236 Koslande-Poonagala Segment 15,5,Hilly,Concrete,1310,0.78,Wide,2,2
+B025 Laxapana Approach Segment 1,6,Hilly,Aspalt - Good,1000,0.7,Medium,2,1
+B025 Laxapana Approach Segment 2,8,Mountainous,Aspalt - Fair,1025,0.57,Narrow,3,0
+B025 Laxapana Approach Segment 3,10,Mountainous,Concrete,1055,0.78,Narrow,3,2
+B025 Laxapana Approach Segment 4,12,Mountainous,Gravel,1090,0.43,Narrow,3,3
+B025 Laxapana Approach Segment 5,14,Mountainous,Concrete,1130,0.8,Narrow,3,2
+B025 Laxapana Approach Segment 6,16,Mountainous,Gravel,1175,0.39,Narrow,3,3
+B025 Laxapana Approach Segment 7,15,Mountainous,Concrete,1225,0.79,Narrow,3,2
+B025 Laxapana Approach Segment 8,13,Mountainous,Aspalt - Fair,1275,0.52,Narrow,3,0
+B025 Laxapana Approach Segment 9,11,Mountainous,Aspalt - Good,1320,0.66,Medium,3,1
+B025 Laxapana Approach Segment 10,12,Mountainous,Concrete,1360,0.77,Narrow,3,2
+B025 Laxapana Approach Segment 11,14,Mountainous,Gravel,1395,0.41,Narrow,3,3
+B025 Laxapana Approach Segment 12,13,Mountainous,Concrete,1425,0.78,Narrow,3,2
+B025 Laxapana Approach Segment 13,11,Mountainous,Aspalt - Fair,1450,0.54,Narrow,3,0
+B025 Laxapana Approach Segment 14,9,Mountainous,Aspalt - Good,1470,0.67,Medium,3,1
+B025 Laxapana Approach Segment 15,7,Mountainous,Concrete,1485,0.76,Medium,3,2
+B025 Laxapana Approach Segment 16,6,Hilly,Aspalt - Fair,1495,0.59,Wide,2,0
+B025 Laxapana Approach Segment 17,5,Hilly,Aspalt - Good,1500,0.71,Wide,2,1
+B025 Laxapana Approach Segment 18,4,Hilly,Concrete,1505,0.78,Wide,2,2
+B025 Laxapana Approach Segment 19,3,Hilly,Aspalt - Good,1510,0.73,Wide,2,1
+B025 Laxapana Approach Segment 20,2,Hilly,Aspalt - Fair,1515,0.62,Wide,2,0
+A1 Colombo-Kandy Segment 71,5,Mountainous,Aspalt - Good,550,0.67,Medium,3,1
+A1 Colombo-Kandy Segment 72,6,Mountainous,Aspalt - Fair,565,0.56,Medium,3,0
+A1 Colombo-Kandy Segment 73,7,Mountainous,Concrete,580,0.78,Narrow,3,2
+A1 Colombo-Kandy Segment 74,8,Mountainous,Aspalt - Fair,595,0.54,Narrow,3,0
+A1 Colombo-Kandy Segment 75,9,Mountainous,Aspalt - Good,610,0.66,Medium,3,1
+A1 Colombo-Kandy Segment 76,7,Mountainous,Concrete,620,0.79,Narrow,3,2
+A1 Colombo-Kandy Segment 77,6,Mountainous,Aspalt - Fair,625,0.55,Medium,3,0
+A1 Colombo-Kandy Segment 78,5,Hilly,Aspalt - Good,630,0.68,Medium,2,1
+A1 Colombo-Kandy Segment 79,4,Hilly,Concrete,635,0.77,Medium,2,2
+A1 Colombo-Kandy Segment 80,3,Hilly,Aspalt - Good,640,0.69,Wide,2,1
+A1 Colombo-Kandy Segment 81,4,Hilly,Aspalt - Fair,630,0.58,Wide,2,0
+A1 Colombo-Kandy Segment 82,5,Hilly,Concrete,620,0.78,Medium,2,2
+A1 Colombo-Kandy Segment 83,4,Hilly,Aspalt - Good,610,0.7,Medium,2,1
+A1 Colombo-Kandy Segment 84,3,Hilly,Aspalt - Fair,600,0.59,Wide,2,0
+A1 Colombo-Kandy Segment 85,2,Hilly,Aspalt - Good,590,0.71,Wide,2,1
+A1 Colombo-Kandy Segment 86,3,Hilly,Concrete,585,0.76,Wide,2,2
+A1 Colombo-Kandy Segment 87,4,Hilly,Aspalt - Fair,580,0.57,Medium,2,0
+A1 Colombo-Kandy Segment 88,3,Hilly,Aspalt - Good,570,0.69,Medium,2,1
+A1 Colombo-Kandy Segment 89,2,Hilly,Aspalt - Fair,560,0.6,Wide,2,0
+A1 Colombo-Kandy Segment 90,1,Hilly,Aspalt - Good,550,0.72,Wide,2,1
+A4 Colombo-Batticaloa Segment 81,4,Hilly,Aspalt - Good,150,0.69,Medium,2,1
+A4 Colombo-Batticaloa Segment 82,5,Hilly,Aspalt - Fair,170,0.58,Medium,2,0
+A4 Colombo-Batticaloa Segment 83,6,Hilly,Concrete,190,0.78,Narrow,2,2
+A4 Colombo-Batticaloa Segment 84,5,Hilly,Aspalt - Fair,210,0.57,Medium,2,0
+A4 Colombo-Batticaloa Segment 85,4,Hilly,Aspalt - Good,230,0.7,Wide,2,1
+A4 Colombo-Batticaloa Segment 86,3,Hilly,Concrete,250,0.77,Wide,2,2
+A4 Colombo-Batticaloa Segment 87,4,Hilly,Aspalt - Fair,265,0.59,Medium,2,0
+A4 Colombo-Batticaloa Segment 88,5,Hilly,Aspalt - Good,280,0.68,Medium,2,1
+A4 Colombo-Batticaloa Segment 89,6,Hilly,Concrete,295,0.79,Narrow,2,2
+A4 Colombo-Batticaloa Segment 90,7,Hilly,Aspalt - Fair,310,0.56,Medium,2,0
+A4 Colombo-Batticaloa Segment 91,6,Hilly,Aspalt - Good,325,0.67,Medium,2,1
+A4 Colombo-Batticaloa Segment 92,5,Hilly,Concrete,335,0.78,Wide,2,2
+A4 Colombo-Batticaloa Segment 93,4,Hilly,Aspalt - Fair,345,0.58,Wide,2,0
+A4 Colombo-Batticaloa Segment 94,3,Hilly,Aspalt - Good,355,0.71,Wide,2,1
+A4 Colombo-Batticaloa Segment 95,4,Hilly,Concrete,365,0.77,Medium,2,2
+A4 Colombo-Batticaloa Segment 96,5,Hilly,Aspalt - Fair,375,0.59,Medium,2,0
+A4 Colombo-Batticaloa Segment 97,4,Hilly,Aspalt - Good,385,0.69,Medium,2,1
+A4 Colombo-Batticaloa Segment 98,3,Hilly,Concrete,390,0.76,Wide,2,2
+A4 Colombo-Batticaloa Segment 99,2,Hilly,Aspalt - Fair,395,0.6,Wide,2,0
+A4 Colombo-Batticaloa Segment 100,1,Hilly,Aspalt - Good,400,0.72,Wide,2,1
+A5 Peradeniya-Badulla Segment 86,5,Hilly,Aspalt - Fair,180,0.58,Medium,2,0
+A5 Peradeniya-Badulla Segment 87,6,Hilly,Concrete,200,0.78,Narrow,2,2
+A5 Peradeniya-Badulla Segment 88,7,Hilly,Aspalt - Good,225,0.67,Medium,2,1
+A5 Peradeniya-Badulla Segment 89,6,Hilly,Aspalt - Fair,245,0.57,Medium,2,0
+A5 Peradeniya-Badulla Segment 90,5,Hilly,Concrete,265,0.79,Wide,2,2
+A5 Peradeniya-Badulla Segment 91,4,Hilly,Aspalt - Good,285,0.7,Wide,2,1
+A5 Peradeniya-Badulla Segment 92,3,Hilly,Aspalt - Fair,300,0.59,Wide,2,0
+A5 Peradeniya-Badulla Segment 93,4,Hilly,Concrete,315,0.78,Medium,2,2
+A5 Peradeniya-Badulla Segment 94,5,Hilly,Aspalt - Good,330,0.69,Medium,2,1
+A5 Peradeniya-Badulla Segment 95,6,Hilly,Aspalt - Fair,345,0.56,Medium,2,0
+A5 Peradeniya-Badulla Segment 96,7,Hilly,Concrete,360,0.8,Narrow,2,2
+A5 Peradeniya-Badulla Segment 97,8,Mountainous,Aspalt - Good,375,0.66,Medium,3,1
+A5 Peradeniya-Badulla Segment 98,9,Mountainous,Aspalt - Fair,390,0.54,Narrow,3,0
+A5 Peradeniya-Badulla Segment 99,8,Mountainous,Concrete,405,0.77,Narrow,3,2
+A5 Peradeniya-Badulla Segment 100,7,Mountainous,Aspalt - Good,420,0.68,Medium,3,1
+A5 Peradeniya-Badulla Segment 101,6,Hilly,Aspalt - Fair,430,0.57,Medium,2,0
+A5 Peradeniya-Badulla Segment 102,5,Hilly,Concrete,435,0.76,Wide,2,2
+A5 Peradeniya-Badulla Segment 103,4,Hilly,Aspalt - Good,440,0.71,Wide,2,1
+A5 Peradeniya-Badulla Segment 104,3,Hilly,Aspalt - Fair,445,0.59,Wide,2,0
+A5 Peradeniya-Badulla Segment 105,2,Hilly,Concrete,450,0.75,Wide,2,2
+B116 Embilmeegama-Penideniya Segment 1,4,Hilly,Aspalt - Good,480,0.72,Medium,2,1
+B116 Embilmeegama-Penideniya Segment 2,5,Hilly,Aspalt - Fair,485,0.61,Medium,2,0
+B116 Embilmeegama-Penideniya Segment 3,6,Hilly,Concrete,490,0.78,Medium,2,2
+B116 Embilmeegama-Penideniya Segment 4,7,Hilly,Aspalt - Fair,495,0.59,Narrow,2,0
+B116 Embilmeegama-Penideniya Segment 5,8,Mountainous,Concrete,505,0.79,Narrow,3,2
+B116 Embilmeegama-Penideniya Segment 6,6,Hilly,Aspalt - Good,515,0.69,Medium,2,1
+B116 Embilmeegama-Penideniya Segment 7,5,Hilly,Aspalt - Fair,520,0.58,Medium,2,0
+B116 Embilmeegama-Penideniya Segment 8,4,Hilly,Concrete,515,0.77,Medium,2,2
+B116 Embilmeegama-Penideniya Segment 9,3,Hilly,Aspalt - Good,510,0.71,Wide,2,1
+B116 Embilmeegama-Penideniya Segment 10,4,Hilly,Aspalt - Fair,505,0.6,Medium,2,0
+B116 Embilmeegama-Penideniya Segment 11,5,Hilly,Concrete,500,0.78,Medium,2,2
+B116 Embilmeegama-Penideniya Segment 12,4,Hilly,Aspalt - Good,495,0.7,Medium,2,1
+B116 Embilmeegama-Penideniya Segment 13,3,Hilly,Aspalt - Fair,490,0.62,Wide,2,0
+B116 Embilmeegama-Penideniya Segment 14,2,Hilly,Concrete,485,0.76,Wide,2,2
+B116 Embilmeegama-Penideniya Segment 15,1,Hilly,Aspalt - Good,480,0.74,Wide,2,1
+B122 Galagedara-Rambukkana Segment 1,6,Hilly,Aspalt - Good,300,0.7,Medium,2,1
+B122 Galagedara-Rambukkana Segment 2,8,Mountainous,Aspalt - Fair,315,0.57,Narrow,3,0
+B122 Galagedara-Rambukkana Segment 3,9,Mountainous,Concrete,330,0.78,Narrow,3,2
+B122 Galagedara-Rambukkana Segment 4,11,Mountainous,Aspalt - Fair,350,0.54,Narrow,3,0
+B122 Galagedara-Rambukkana Segment 5,12,Mountainous,Concrete,375,0.8,Narrow,3,2
+B122 Galagedara-Rambukkana Segment 6,10,Mountainous,Aspalt - Good,395,0.67,Medium,3,1
+B122 Galagedara-Rambukkana Segment 7,9,Mountainous,Aspalt - Fair,415,0.56,Medium,3,0
+B122 Galagedara-Rambukkana Segment 8,11,Mountainous,Concrete,440,0.79,Narrow,3,2
+B122 Galagedara-Rambukkana Segment 9,12,Mountainous,Aspalt - Fair,465,0.53,Narrow,3,0
+B122 Galagedara-Rambukkana Segment 10,10,Mountainous,Concrete,490,0.77,Medium,3,2
+B122 Galagedara-Rambukkana Segment 11,8,Mountainous,Aspalt - Good,505,0.68,Medium,3,1
+B122 Galagedara-Rambukkana Segment 12,7,Mountainous,Aspalt - Fair,515,0.58,Medium,3,0
+B122 Galagedara-Rambukkana Segment 13,6,Hilly,Concrete,510,0.76,Medium,2,2
+B122 Galagedara-Rambukkana Segment 14,5,Hilly,Aspalt - Good,500,0.71,Wide,2,1
+B122 Galagedara-Rambukkana Segment 15,6,Hilly,Aspalt - Fair,485,0.59,Medium,2,0
+B122 Galagedara-Rambukkana Segment 16,7,Hilly,Concrete,470,0.78,Medium,2,2
+B122 Galagedara-Rambukkana Segment 17,5,Hilly,Aspalt - Good,450,0.69,Medium,2,1
+B122 Galagedara-Rambukkana Segment 18,4,Hilly,Aspalt - Fair,435,0.6,Wide,2,0
+B122 Galagedara-Rambukkana Segment 19,3,Hilly,Concrete,420,0.75,Wide,2,2
+B122 Galagedara-Rambukkana Segment 20,2,Hilly,Aspalt - Good,410,0.73,Wide,2,1
+B132 Gampola-Craighead Segment 1,6,Hilly,Aspalt - Good,600,0.69,Medium,2,1
+B132 Gampola-Craighead Segment 2,8,Mountainous,Aspalt - Fair,625,0.55,Narrow,3,0
+B132 Gampola-Craighead Segment 3,10,Mountainous,Concrete,650,0.78,Narrow,3,2
+B132 Gampola-Craighead Segment 4,12,Mountainous,Aspalt - Fair,680,0.52,Narrow,3,0
+B132 Gampola-Craighead Segment 5,14,Mountainous,Gravel,715,0.4,Narrow,3,3
+B132 Gampola-Craighead Segment 6,15,Mountainous,Concrete,755,0.81,Narrow,3,2
+B132 Gampola-Craighead Segment 7,13,Mountainous,Gravel,795,0.38,Narrow,3,3
+B132 Gampola-Craighead Segment 8,11,Mountainous,Concrete,835,0.79,Narrow,3,2
+B132 Gampola-Craighead Segment 9,9,Mountainous,Aspalt - Fair,860,0.53,Medium,3,0
+B132 Gampola-Craighead Segment 10,7,Mountainous,Aspalt - Good,880,0.67,Medium,3,1
+B132 Gampola-Craighead Segment 11,8,Mountainous,Concrete,895,0.76,Narrow,3,2
+B132 Gampola-Craighead Segment 12,10,Mountainous,Gravel,915,0.42,Narrow,3,3
+B132 Gampola-Craighead Segment 13,9,Mountainous,Concrete,925,0.78,Narrow,3,2
+B132 Gampola-Craighead Segment 14,7,Mountainous,Aspalt - Fair,910,0.56,Medium,3,0
+B132 Gampola-Craighead Segment 15,5,Hilly,Aspalt - Good,895,0.7,Medium,2,1
+B154 Hindagala-Gampola Segment 1,4,Hilly,Aspalt - Good,450,0.72,Medium,2,1
+B154 Hindagala-Gampola Segment 2,6,Hilly,Aspalt - Fair,465,0.6,Medium,2,0
+B154 Hindagala-Gampola Segment 3,8,Mountainous,Concrete,485,0.78,Narrow,3,2
+B154 Hindagala-Gampola Segment 4,10,Mountainous,Aspalt - Fair,510,0.56,Narrow,3,0
+B154 Hindagala-Gampola Segment 5,9,Mountainous,Aspalt - Good,535,0.68,Medium,3,1
+B154 Hindagala-Gampola Segment 6,7,Mountainous,Concrete,550,0.77,Narrow,3,2
+B154 Hindagala-Gampola Segment 7,6,Hilly,Aspalt - Fair,545,0.58,Medium,2,0
+B154 Hindagala-Gampola Segment 8,5,Hilly,Aspalt - Good,535,0.7,Medium,2,1
+B154 Hindagala-Gampola Segment 9,4,Hilly,Concrete,520,0.79,Wide,2,2
+B154 Hindagala-Gampola Segment 10,3,Hilly,Aspalt - Fair,505,0.61,Wide,2,0
+B154 Hindagala-Gampola Segment 11,4,Hilly,Aspalt - Good,490,0.71,Medium,2,1
+B154 Hindagala-Gampola Segment 12,5,Hilly,Concrete,480,0.78,Medium,2,2
+B154 Hindagala-Gampola Segment 13,6,Hilly,Aspalt - Fair,470,0.59,Medium,2,0
+B154 Hindagala-Gampola Segment 14,4,Hilly,Aspalt - Good,465,0.69,Medium,2,1
+B154 Hindagala-Gampola Segment 15,3,Hilly,Concrete,460,0.76,Wide,2,2
+B205 Katugastota-Bambarella Segment 1,5,Hilly,Aspalt - Good,500,0.71,Medium,2,1
+B205 Katugastota-Bambarella Segment 2,7,Hilly,Aspalt - Fair,525,0.59,Narrow,2,0
+B205 Katugastota-Bambarella Segment 3,9,Mountainous,Concrete,555,0.78,Narrow,3,2
+B205 Katugastota-Bambarella Segment 4,11,Mountainous,Aspalt - Fair,590,0.55,Narrow,3,0
+B205 Katugastota-Bambarella Segment 5,13,Mountainous,Gravel,630,0.42,Narrow,3,3
+B205 Katugastota-Bambarella Segment 6,15,Mountainous,Concrete,675,0.8,Narrow,3,2
+B205 Katugastota-Bambarella Segment 7,16,Mountainous,Gravel,725,0.39,Narrow,3,3
+B205 Katugastota-Bambarella Segment 8,14,Mountainous,Concrete,770,0.79,Narrow,3,2
+B205 Katugastota-Bambarella Segment 9,12,Mountainous,Aspalt - Fair,815,0.52,Narrow,3,0
+B205 Katugastota-Bambarella Segment 10,10,Mountainous,Aspalt - Good,855,0.67,Medium,3,1
+B205 Katugastota-Bambarella Segment 11,12,Mountainous,Concrete,890,0.77,Narrow,3,2
+B205 Katugastota-Bambarella Segment 12,14,Mountainous,Gravel,930,0.4,Narrow,3,3
+B205 Katugastota-Bambarella Segment 13,15,Mountainous,Concrete,975,0.81,Narrow,3,2
+B205 Katugastota-Bambarella Segment 14,16,Mountainous,Gravel,1020,0.38,Narrow,3,3
+B205 Katugastota-Bambarella Segment 15,14,Mountainous,Concrete,1060,0.8,Narrow,3,2
+B205 Katugastota-Bambarella Segment 16,12,Mountainous,Aspalt - Fair,1100,0.51,Narrow,3,0
+B205 Katugastota-Bambarella Segment 17,10,Mountainous,Aspalt - Good,1085,0.66,Medium,3,1
+B205 Katugastota-Bambarella Segment 18,9,Mountainous,Concrete,1065,0.76,Narrow,3,2
+B205 Katugastota-Bambarella Segment 19,8,Mountainous,Gravel,1040,0.44,Narrow,3,3
+B205 Katugastota-Bambarella Segment 20,7,Mountainous,Concrete,1015,0.78,Narrow,3,2
+B205 Katugastota-Bambarella Segment 21,6,Hilly,Aspalt - Fair,990,0.57,Medium,2,0
+B205 Katugastota-Bambarella Segment 22,5,Hilly,Aspalt - Good,970,0.7,Medium,2,1
+B205 Katugastota-Bambarella Segment 23,4,Hilly,Concrete,955,0.77,Medium,2,2
+B205 Katugastota-Bambarella Segment 24,3,Hilly,Aspalt - Fair,945,0.6,Wide,2,0
+B205 Katugastota-Bambarella Segment 25,2,Hilly,Aspalt - Good,940,0.72,Wide,2,1
+B317 Nawalapitiya-Dimbula Segment 1,6,Hilly,Aspalt - Good,700,0.68,Medium,2,1
+B317 Nawalapitiya-Dimbula Segment 2,8,Mountainous,Aspalt - Fair,725,0.56,Narrow,3,0
+B317 Nawalapitiya-Dimbula Segment 3,10,Mountainous,Concrete,755,0.77,Narrow,3,2
+B317 Nawalapitiya-Dimbula Segment 4,12,Mountainous,Aspalt - Fair,790,0.53,Narrow,3,0
+B317 Nawalapitiya-Dimbula Segment 5,14,Mountainous,Gravel,830,0.41,Narrow,3,3
+B317 Nawalapitiya-Dimbula Segment 6,15,Mountainous,Concrete,875,0.8,Narrow,3,2
+B317 Nawalapitiya-Dimbula Segment 7,17,Mountainous,Gravel,925,0.38,Narrow,3,3
+B317 Nawalapitiya-Dimbula Segment 8,18,Mountainous,Concrete,980,0.82,Narrow,3,2
+B317 Nawalapitiya-Dimbula Segment 9,16,Mountainous,Aspalt - Fair,1035,0.49,Narrow,3,0
+B317 Nawalapitiya-Dimbula Segment 10,14,Mountainous,Aspalt - Good,1085,0.65,Medium,3,1
+B317 Nawalapitiya-Dimbula Segment 11,15,Mountainous,Concrete,1130,0.78,Narrow,3,2
+B317 Nawalapitiya-Dimbula Segment 12,17,Mountainous,Gravel,1180,0.39,Narrow,3,3
+B317 Nawalapitiya-Dimbula Segment 13,16,Mountainous,Concrete,1225,0.81,Narrow,3,2
+B317 Nawalapitiya-Dimbula Segment 14,14,Mountainous,Aspalt - Fair,1265,0.5,Narrow,3,0
+B317 Nawalapitiya-Dimbula Segment 15,12,Mountainous,Aspalt - Good,1300,0.66,Medium,3,1
+B317 Nawalapitiya-Dimbula Segment 16,11,Mountainous,Concrete,1285,0.77,Narrow,3,2
+B317 Nawalapitiya-Dimbula Segment 17,9,Mountainous,Gravel,1265,0.43,Narrow,3,3
+B317 Nawalapitiya-Dimbula Segment 18,8,Mountainous,Concrete,1240,0.76,Narrow,3,2
+B317 Nawalapitiya-Dimbula Segment 19,7,Mountainous,Aspalt - Fair,1210,0.55,Medium,3,0
+B317 Nawalapitiya-Dimbula Segment 20,6,Hilly,Aspalt - Good,1185,0.69,Medium,2,1
+B317 Nawalapitiya-Dimbula Segment 21,5,Hilly,Concrete,1160,0.78,Wide,2,2
+B317 Nawalapitiya-Dimbula Segment 22,4,Hilly,Aspalt - Fair,1140,0.61,Medium,2,0
+B317 Nawalapitiya-Dimbula Segment 23,3,Hilly,Aspalt - Good,1125,0.72,Wide,2,1
+B317 Nawalapitiya-Dimbula Segment 24,4,Hilly,Concrete,1115,0.77,Wide,2,2
+B317 Nawalapitiya-Dimbula Segment 25,2,Hilly,Aspalt - Good,1110,0.74,Wide,2,1
+B328 Norton-Maskeliya Segment 1,8,Mountainous,Aspalt - Good,1200,0.68,Medium,3,1
+B328 Norton-Maskeliya Segment 2,10,Mountainous,Aspalt - Fair,1220,0.56,Narrow,3,0
+B328 Norton-Maskeliya Segment 3,12,Mountainous,Concrete,1245,0.78,Narrow,3,2
+B328 Norton-Maskeliya Segment 4,14,Mountainous,Gravel,1275,0.41,Narrow,3,3
+B328 Norton-Maskeliya Segment 5,16,Mountainous,Concrete,1310,0.81,Narrow,3,2
+B328 Norton-Maskeliya Segment 6,15,Mountainous,Gravel,1345,0.38,Narrow,3,3
+B328 Norton-Maskeliya Segment 7,13,Mountainous,Concrete,1375,0.79,Narrow,3,2
+B328 Norton-Maskeliya Segment 8,11,Mountainous,Aspalt - Fair,1395,0.52,Narrow,3,0
+B328 Norton-Maskeliya Segment 9,9,Mountainous,Aspalt - Good,1410,0.66,Medium,3,1
+B328 Norton-Maskeliya Segment 10,10,Mountainous,Concrete,1425,0.77,Narrow,3,2
+B328 Norton-Maskeliya Segment 11,8,Mountainous,Gravel,1435,0.44,Narrow,3,3
+B328 Norton-Maskeliya Segment 12,7,Mountainous,Concrete,1445,0.76,Narrow,3,2
+B328 Norton-Maskeliya Segment 13,6,Hilly,Aspalt - Fair,1455,0.58,Medium,2,0
+B328 Norton-Maskeliya Segment 14,5,Hilly,Aspalt - Good,1460,0.7,Medium,2,1
+B328 Norton-Maskeliya Segment 15,4,Hilly,Concrete,1465,0.78,Wide,2,2
+B086 Dambagahapitiya-Meegahakiula Segment 1,8,Mountainous,Aspalt - Good,800,0.68,Medium,3,1
+B086 Dambagahapitiya-Meegahakiula Segment 2,10,Mountainous,Aspalt - Fair,825,0.55,Narrow,3,0
+B086 Dambagahapitiya-Meegahakiula Segment 3,12,Mountainous,Concrete,855,0.77,Narrow,3,2
+B086 Dambagahapitiya-Meegahakiula Segment 4,14,Mountainous,Gravel,890,0.4,Narrow,3,3
+B086 Dambagahapitiya-Meegahakiula Segment 5,16,Mountainous,Concrete,935,0.8,Narrow,3,2
+B086 Dambagahapitiya-Meegahakiula Segment 6,18,Mountainous,Gravel,985,0.37,Narrow,3,3
+B086 Dambagahapitiya-Meegahakiula Segment 7,15,Mountainous,Concrete,1025,0.79,Narrow,3,2
+B086 Dambagahapitiya-Meegahakiula Segment 8,13,Mountainous,Aspalt - Fair,1010,0.51,Narrow,3,0
+B086 Dambagahapitiya-Meegahakiula Segment 9,11,Mountainous,Aspalt - Good,990,0.65,Medium,3,1
+B086 Dambagahapitiya-Meegahakiula Segment 10,9,Mountainous,Concrete,960,0.76,Narrow,3,2
+A1 Colombo-Kandy Segment 91,2,Hilly,Aspalt - Fair,540,0.61,Wide,2,0
+A1 Colombo-Kandy Segment 92,3,Hilly,Aspalt - Good,530,0.73,Wide,2,1
+A1 Colombo-Kandy Segment 93,2,Hilly,Concrete,520,0.78,Wide,2,2
+A1 Colombo-Kandy Segment 94,1,Hilly,Aspalt - Fair,510,0.62,Wide,2,0
+A1 Colombo-Kandy Segment 95,2,Hilly,Aspalt - Good,500,0.74,Wide,2,1
+A1 Colombo-Kandy Segment 96,1,Flat,Aspalt - Fair,495,0.63,Wide,1,0
+A1 Colombo-Kandy Segment 97,2,Flat,Aspalt - Good,490,0.75,Wide,1,1
+A1 Colombo-Kandy Segment 98,1,Flat,Concrete,485,0.77,Wide,1,2
+A1 Colombo-Kandy Segment 99,2,Flat,Aspalt - Good,480,0.76,Wide,1,1
+A1 Colombo-Kandy Segment 100,1,Flat,Aspalt - Good,475,0.76,Wide,1,1
+A2 Colombo-Galle-Wellawaya Segment 81,5,Hilly,Aspalt - Fair,920,0.59,Wide,2,0
+A2 Colombo-Galle-Wellawaya Segment 82,4,Hilly,Concrete,935,0.77,Wide,2,2
+A2 Colombo-Galle-Wellawaya Segment 83,3,Hilly,Aspalt - Good,950,0.71,Wide,2,1
+A2 Colombo-Galle-Wellawaya Segment 84,2,Hilly,Aspalt - Good,965,0.72,Wide,2,1
+A2 Colombo-Galle-Wellawaya Segment 85,3,Hilly,Aspalt - Fair,980,0.61,Wide,2,0
+A2 Colombo-Galle-Wellawaya Segment 86,4,Hilly,Concrete,995,0.78,Wide,2,2
+A2 Colombo-Galle-Wellawaya Segment 87,5,Hilly,Aspalt - Good,1010,0.7,Medium,2,1
+A2 Colombo-Galle-Wellawaya Segment 88,4,Hilly,Aspalt - Fair,1020,0.58,Medium,2,0
+A2 Colombo-Galle-Wellawaya Segment 89,3,Hilly,Aspalt - Good,1030,0.69,Medium,2,1
+A2 Colombo-Galle-Wellawaya Segment 90,2,Hilly,Aspalt - Good,1040,0.7,Medium,2,1
+A4 Colombo-Batticaloa Segment 101,2,Flat,Aspalt - Fair,405,0.61,Wide,1,0
+A4 Colombo-Batticaloa Segment 102,1,Flat,Aspalt - Good,410,0.73,Wide,1,1
+A4 Colombo-Batticaloa Segment 103,2,Flat,Concrete,415,0.78,Wide,1,2
+A4 Colombo-Batticaloa Segment 104,1,Flat,Aspalt - Good,420,0.74,Wide,1,1
+A4 Colombo-Batticaloa Segment 105,2,Flat,Aspalt - Fair,425,0.62,Wide,1,0
+A4 Colombo-Batticaloa Segment 106,1,Flat,Aspalt - Good,430,0.75,Wide,1,1
+A4 Colombo-Batticaloa Segment 107,2,Flat,Concrete,435,0.77,Wide,1,2
+A4 Colombo-Batticaloa Segment 108,1,Flat,Aspalt - Good,440,0.76,Wide,1,1
+A4 Colombo-Batticaloa Segment 109,2,Flat,Aspalt - Fair,445,0.63,Wide,1,0
+A4 Colombo-Batticaloa Segment 110,1,Flat,Aspalt - Good,450,0.75,Wide,1,1
+A5 Peradeniya-Badulla Segment 106,1,Flat,Aspalt - Fair,455,0.61,Wide,1,0
+A5 Peradeniya-Badulla Segment 107,2,Flat,Aspalt - Good,460,0.72,Wide,1,1
+A5 Peradeniya-Badulla Segment 108,1,Flat,Concrete,465,0.78,Wide,1,2
+A5 Peradeniya-Badulla Segment 109,2,Flat,Aspalt - Good,470,0.73,Wide,1,1
+A5 Peradeniya-Badulla Segment 110,1,Flat,Aspalt - Fair,475,0.62,Wide,1,0
+A5 Peradeniya-Badulla Segment 111,2,Flat,Aspalt - Good,480,0.74,Wide,1,1
+A5 Peradeniya-Badulla Segment 112,1,Flat,Concrete,485,0.77,Wide,1,2
+A5 Peradeniya-Badulla Segment 113,2,Flat,Aspalt - Good,490,0.75,Wide,1,1
+A5 Peradeniya-Badulla Segment 114,1,Flat,Aspalt - Fair,495,0.63,Wide,1,0
+A5 Peradeniya-Badulla Segment 115,1,Flat,Aspalt - Good,500,0.76,Wide,1,1
+A16 Beragala-Haputale Segment 41,5,Hilly,Aspalt - Fair,1050,0.59,Wide,2,0
+A16 Beragala-Haputale Segment 42,6,Hilly,Concrete,995,0.78,Wide,2,2
+A16 Beragala-Haputale Segment 43,4,Hilly,Aspalt - Good,940,0.71,Wide,2,1
+A16 Beragala-Haputale Segment 44,5,Hilly,Aspalt - Fair,885,0.6,Medium,2,0
+A16 Beragala-Haputale Segment 45,7,Hilly,Concrete,830,0.79,Medium,2,2
+A16 Beragala-Haputale Segment 46,6,Hilly,Aspalt - Good,775,0.68,Medium,2,1
+A16 Beragala-Haputale Segment 47,5,Hilly,Aspalt - Fair,720,0.57,Medium,2,0
+A16 Beragala-Haputale Segment 48,4,Hilly,Concrete,665,0.77,Wide,2,2
+A16 Beragala-Haputale Segment 49,3,Hilly,Aspalt - Good,610,0.7,Wide,2,1
+A16 Beragala-Haputale Segment 50,2,Hilly,Aspalt - Fair,555,0.61,Wide,2,0
+B148 Harangala-Kalapitiya Segment 1,6,Hilly,Aspalt - Good,1100,0.69,Medium,2,1
+B148 Harangala-Kalapitiya Segment 2,8,Mountainous,Aspalt - Fair,1125,0.55,Narrow,3,0
+B148 Harangala-Kalapitiya Segment 3,10,Mountainous,Concrete,1150,0.78,Narrow,3,2
+B148 Harangala-Kalapitiya Segment 4,12,Mountainous,Gravel,1175,0.41,Narrow,3,3
+B148 Harangala-Kalapitiya Segment 5,14,Mountainous,Concrete,1205,0.8,Narrow,3,2
+B148 Harangala-Kalapitiya Segment 6,15,Mountainous,Aspalt - Fair,1235,0.52,Narrow,3,0
+B148 Harangala-Kalapitiya Segment 7,13,Mountainous,Aspalt - Good,1260,0.66,Medium,3,1
+B148 Harangala-Kalapitiya Segment 8,11,Mountainous,Concrete,1285,0.77,Narrow,3,2
+B148 Harangala-Kalapitiya Segment 9,9,Mountainous,Gravel,1305,0.43,Narrow,3,3
+B148 Harangala-Kalapitiya Segment 10,7,Mountainous,Aspalt - Good,1320,0.68,Medium,3,1
+B189 Kalugala-Polpitiya Segment 1,5,Hilly,Aspalt - Good,1000,0.71,Medium,2,1
+B189 Kalugala-Polpitiya Segment 2,7,Hilly,Aspalt - Fair,1030,0.57,Narrow,2,0
+B189 Kalugala-Polpitiya Segment 3,9,Mountainous,Concrete,1065,0.77,Narrow,3,2
+B189 Kalugala-Polpitiya Segment 4,11,Mountainous,Gravel,1105,0.42,Narrow,3,3
+B189 Kalugala-Polpitiya Segment 5,13,Mountainous,Concrete,1140,0.79,Narrow,3,2
+B189 Kalugala-Polpitiya Segment 6,14,Mountainous,Gravel,1180,0.39,Narrow,3,3
+B189 Kalugala-Polpitiya Segment 7,12,Mountainous,Concrete,1215,0.81,Narrow,3,2
+B189 Kalugala-Polpitiya Segment 8,10,Mountainous,Aspalt - Fair,1245,0.53,Narrow,3,0
+B189 Kalugala-Polpitiya Segment 9,8,Mountainous,Aspalt - Good,1270,0.67,Medium,3,1
+B189 Kalugala-Polpitiya Segment 10,6,Hilly,Concrete,1290,0.76,Medium,2,2
+B252 Lindula-Agras Segment 1,8,Mountainous,Aspalt - Good,1400,0.68,Medium,3,1
+B252 Lindula-Agras Segment 2,10,Mountainous,Aspalt - Fair,1435,0.54,Narrow,3,0
+B252 Lindula-Agras Segment 3,12,Mountainous,Concrete,1475,0.78,Narrow,3,2
+B252 Lindula-Agras Segment 4,15,Mountainous,Gravel,1515,0.4,Narrow,3,3
+B252 Lindula-Agras Segment 5,17,Mountainous,Concrete,1560,0.81,Narrow,3,2
+B252 Lindula-Agras Segment 6,18,Mountainous,Gravel,1610,0.37,Narrow,3,3
+B252 Lindula-Agras Segment 7,16,Mountainous,Concrete,1655,0.8,Narrow,3,2
+B252 Lindula-Agras Segment 8,14,Mountainous,Aspalt - Fair,1695,0.49,Narrow,3,0
+B252 Lindula-Agras Segment 9,11,Mountainous,Aspalt - Good,1730,0.65,Medium,3,1
+B252 Lindula-Agras Segment 10,9,Mountainous,Concrete,1760,0.75,Narrow,3,2
+B273 Maskeliya-Upcot Segment 1,7,Mountainous,Aspalt - Good,1250,0.69,Medium,3,1
+B273 Maskeliya-Upcot Segment 2,9,Mountainous,Aspalt - Fair,1280,0.56,Narrow,3,0
+B273 Maskeliya-Upcot Segment 3,11,Mountainous,Concrete,1315,0.78,Narrow,3,2
+B273 Maskeliya-Upcot Segment 4,13,Mountainous,Gravel,1355,0.41,Narrow,3,3
+B273 Maskeliya-Upcot Segment 5,16,Mountainous,Concrete,1400,0.8,Narrow,3,2
+B273 Maskeliya-Upcot Segment 6,15,Mountainous,Gravel,1445,0.39,Narrow,3,3
+B273 Maskeliya-Upcot Segment 7,12,Mountainous,Concrete,1485,0.79,Narrow,3,2
+B273 Maskeliya-Upcot Segment 8,10,Mountainous,Aspalt - Fair,1520,0.51,Narrow,3,0
+B273 Maskeliya-Upcot Segment 9,8,Mountainous,Aspalt - Good,1550,0.66,Medium,3,1
+B273 Maskeliya-Upcot Segment 10,6,Hilly,Concrete,1575,0.76,Medium,2,2
+B329 Norwood-Bogowantalawa Segment 1,6,Hilly,Aspalt - Good,1300,0.7,Medium,2,1
+B329 Norwood-Bogowantalawa Segment 2,8,Mountainous,Aspalt - Fair,1335,0.55,Narrow,3,0
+B329 Norwood-Bogowantalawa Segment 3,10,Mountainous,Concrete,1370,0.77,Narrow,3,2
+B329 Norwood-Bogowantalawa Segment 4,12,Mountainous,Gravel,1410,0.42,Narrow,3,3
+B329 Norwood-Bogowantalawa Segment 5,15,Mountainous,Concrete,1455,0.81,Narrow,3,2
+B329 Norwood-Bogowantalawa Segment 6,17,Mountainous,Gravel,1505,0.38,Narrow,3,3
+B329 Norwood-Bogowantalawa Segment 7,16,Mountainous,Concrete,1555,0.8,Narrow,3,2
+B329 Norwood-Bogowantalawa Segment 8,14,Mountainous,Aspalt - Fair,1600,0.5,Narrow,3,0
+B329 Norwood-Bogowantalawa Segment 9,11,Mountainous,Aspalt - Good,1635,0.65,Medium,3,1
+B329 Norwood-Bogowantalawa Segment 10,9,Mountainous,Concrete,1665,0.76,Narrow,3,2
+B330 Norwood-Upcot Segment 1,5,Hilly,Aspalt - Good,1300,0.71,Medium,2,1
+B330 Norwood-Upcot Segment 2,7,Mountainous,Aspalt - Fair,1325,0.57,Narrow,3,0
+B330 Norwood-Upcot Segment 3,9,Mountainous,Concrete,1355,0.78,Narrow,3,2
+B330 Norwood-Upcot Segment 4,11,Mountainous,Gravel,1390,0.43,Narrow,3,3
+B330 Norwood-Upcot Segment 5,13,Mountainous,Concrete,1430,0.79,Narrow,3,2
+B330 Norwood-Upcot Segment 6,15,Mountainous,Gravel,1475,0.39,Narrow,3,3
+B330 Norwood-Upcot Segment 7,12,Mountainous,Concrete,1515,0.81,Narrow,3,2
+B330 Norwood-Upcot Segment 8,10,Mountainous,Aspalt - Fair,1545,0.52,Narrow,3,0
+B330 Norwood-Upcot Segment 9,8,Mountainous,Aspalt - Good,1570,0.67,Medium,3,1
+B330 Norwood-Upcot Segment 10,6,Hilly,Concrete,1590,0.75,Medium,2,2
+B339 Olugantota-Pinnawala Segment 1,8,Mountainous,Aspalt - Good,1200,0.68,Medium,3,1
+B339 Olugantota-Pinnawala Segment 2,10,Mountainous,Aspalt - Fair,1240,0.54,Narrow,3,0
+B339 Olugantota-Pinnawala Segment 3,12,Mountainous,Concrete,1285,0.77,Narrow,3,2
+B339 Olugantota-Pinnawala Segment 4,14,Mountainous,Gravel,1335,0.41,Narrow,3,3
+B339 Olugantota-Pinnawala Segment 5,16,Mountainous,Concrete,1390,0.8,Narrow,3,2
+B339 Olugantota-Pinnawala Segment 6,15,Mountainous,Gravel,1445,0.38,Narrow,3,3
+B339 Olugantota-Pinnawala Segment 7,13,Mountainous,Concrete,1495,0.79,Narrow,3,2
+B339 Olugantota-Pinnawala Segment 8,11,Mountainous,Aspalt - Fair,1535,0.51,Narrow,3,0
+B339 Olugantota-Pinnawala Segment 9,9,Mountainous,Aspalt - Good,1570,0.65,Medium,3,1
+B339 Olugantota-Pinnawala Segment 10,7,Mountainous,Concrete,1600,0.76,Medium,3,2
+B102 Diyatalawa-Aluthwela Segment 1,6,Hilly,Aspalt - Good,1200,0.7,Medium,2,1
+B102 Diyatalawa-Aluthwela Segment 2,8,Mountainous,Aspalt - Fair,1225,0.56,Narrow,3,0
+B102 Diyatalawa-Aluthwela Segment 3,10,Mountainous,Concrete,1255,0.78,Narrow,3,2
+B102 Diyatalawa-Aluthwela Segment 4,12,Mountainous,Gravel,1290,0.42,Narrow,3,3
+B102 Diyatalawa-Aluthwela Segment 5,14,Mountainous,Concrete,1330,0.81,Narrow,3,2
+B102 Diyatalawa-Aluthwela Segment 6,13,Mountainous,Gravel,1365,0.39,Narrow,3,3
+B102 Diyatalawa-Aluthwela Segment 7,11,Mountainous,Concrete,1395,0.79,Narrow,3,2
+B102 Diyatalawa-Aluthwela Segment 8,9,Mountainous,Aspalt - Fair,1420,0.53,Narrow,3,0
+B102 Diyatalawa-Aluthwela Segment 9,7,Mountainous,Aspalt - Good,1440,0.67,Medium,3,1
+B102 Diyatalawa-Aluthwela Segment 10,5,Hilly,Concrete,1455,0.77,Medium,2,2
+B105 Diyatalawa-Welanhinna Segment 1,7,Mountainous,Aspalt - Good,1200,0.69,Medium,3,1
+B105 Diyatalawa-Welanhinna Segment 2,9,Mountainous,Aspalt - Fair,1230,0.55,Narrow,3,0
+B105 Diyatalawa-Welanhinna Segment 3,11,Mountainous,Concrete,1265,0.77,Narrow,3,2
+B105 Diyatalawa-Welanhinna Segment 4,13,Mountainous,Gravel,1305,0.4,Narrow,3,3
+B105 Diyatalawa-Welanhinna Segment 5,15,Mountainous,Concrete,1350,0.8,Narrow,3,2
+B105 Diyatalawa-Welanhinna Segment 6,14,Mountainous,Gravel,1390,0.38,Narrow,3,3
+B105 Diyatalawa-Welanhinna Segment 7,12,Mountainous,Concrete,1425,0.78,Narrow,3,2
+B105 Diyatalawa-Welanhinna Segment 8,10,Mountainous,Aspalt - Fair,1455,0.51,Narrow,3,0
+B105 Diyatalawa-Welanhinna Segment 9,8,Mountainous,Aspalt - Good,1480,0.66,Medium,3,1
+B105 Diyatalawa-Welanhinna Segment 10,6,Hilly,Concrete,1500,0.76,Medium,2,2
+B091 Daulagala-Watadeniya Segment 1,4,Hilly,Aspalt - Good,500,0.71,Medium,2,1
+B091 Daulagala-Watadeniya Segment 2,5,Hilly,Aspalt - Fair,520,0.6,Medium,2,0
+B091 Daulagala-Watadeniya Segment 3,6,Hilly,Concrete,545,0.78,Medium,2,2
+B091 Daulagala-Watadeniya Segment 4,7,Hilly,Aspalt - Fair,570,0.58,Narrow,2,0
+B091 Daulagala-Watadeniya Segment 5,9,Mountainous,Concrete,600,0.77,Narrow,3,2
+B091 Daulagala-Watadeniya Segment 6,8,Mountainous,Gravel,625,0.44,Narrow,3,3
+B091 Daulagala-Watadeniya Segment 7,6,Hilly,Concrete,645,0.79,Medium,2,2
+B091 Daulagala-Watadeniya Segment 8,5,Hilly,Aspalt - Fair,660,0.59,Medium,2,0
+B091 Daulagala-Watadeniya Segment 9,4,Hilly,Aspalt - Good,670,0.7,Wide,2,1
+B091 Daulagala-Watadeniya Segment 10,3,Hilly,Concrete,675,0.76,Wide,2,2
+B121 Gadaladeniya-Paranapattiya Segment 1,3,Hilly,Aspalt - Good,480,0.72,Medium,2,1
+B121 Gadaladeniya-Paranapattiya Segment 2,4,Hilly,Aspalt - Fair,495,0.61,Medium,2,0
+B121 Gadaladeniya-Paranapattiya Segment 3,5,Hilly,Concrete,515,0.78,Medium,2,2
+B121 Gadaladeniya-Paranapattiya Segment 4,6,Hilly,Aspalt - Fair,535,0.59,Narrow,2,0
+B121 Gadaladeniya-Paranapattiya Segment 5,7,Hilly,Concrete,560,0.77,Narrow,2,2
+B121 Gadaladeniya-Paranapattiya Segment 6,8,Mountainous,Gravel,585,0.45,Narrow,3,3
+B121 Gadaladeniya-Paranapattiya Segment 7,6,Hilly,Concrete,605,0.79,Medium,2,2
+B121 Gadaladeniya-Paranapattiya Segment 8,5,Hilly,Aspalt - Fair,620,0.6,Medium,2,0
+B121 Gadaladeniya-Paranapattiya Segment 9,4,Hilly,Aspalt - Good,630,0.71,Wide,2,1
+B121 Gadaladeniya-Paranapattiya Segment 10,2,Hilly,Concrete,635,0.76,Wide,2,2
+B135 Geli Oya-Embekke Segment 1,4,Hilly,Aspalt - Good,520,0.71,Medium,2,1
+B135 Geli Oya-Embekke Segment 2,5,Hilly,Aspalt - Fair,540,0.6,Medium,2,0
+B135 Geli Oya-Embekke Segment 3,7,Hilly,Concrete,565,0.78,Narrow,2,2
+B135 Geli Oya-Embekke Segment 4,8,Mountainous,Aspalt - Fair,595,0.57,Narrow,3,0
+B135 Geli Oya-Embekke Segment 5,10,Mountainous,Concrete,630,0.77,Narrow,3,2
+B135 Geli Oya-Embekke Segment 6,9,Mountainous,Gravel,660,0.43,Narrow,3,3
+B135 Geli Oya-Embekke Segment 7,7,Hilly,Concrete,685,0.79,Medium,2,2
+B135 Geli Oya-Embekke Segment 8,5,Hilly,Aspalt - Fair,705,0.59,Medium,2,0
+B135 Geli Oya-Embekke Segment 9,4,Hilly,Aspalt - Good,720,0.7,Wide,2,1
+B135 Geli Oya-Embekke Segment 10,3,Hilly,Concrete,730,0.76,Wide,2,2
+B242 Kudugala-Wattegama Segment 1,5,Hilly,Aspalt - Good,600,0.7,Medium,2,1
+B242 Kudugala-Wattegama Segment 2,6,Hilly,Aspalt - Fair,625,0.58,Medium,2,0
+B242 Kudugala-Wattegama Segment 3,8,Mountainous,Concrete,655,0.78,Narrow,3,2
+B242 Kudugala-Wattegama Segment 4,10,Mountainous,Aspalt - Fair,690,0.55,Narrow,3,0
+B242 Kudugala-Wattegama Segment 5,12,Mountainous,Concrete,730,0.77,Narrow,3,2
+B242 Kudugala-Wattegama Segment 6,11,Mountainous,Gravel,765,0.42,Narrow,3,3
+B242 Kudugala-Wattegama Segment 7,9,Mountainous,Concrete,795,0.79,Narrow,3,2
+B242 Kudugala-Wattegama Segment 8,7,Hilly,Aspalt - Fair,820,0.57,Medium,2,0
+B242 Kudugala-Wattegama Segment 9,5,Hilly,Aspalt - Good,840,0.69,Medium,2,1
+B242 Kudugala-Wattegama Segment 10,4,Hilly,Concrete,855,0.76,Wide,2,2
+B256 Madawala-Rajawella Segment 1,4,Hilly,Aspalt - Good,550,0.71,Medium,2,1
+B256 Madawala-Rajawella Segment 2,6,Hilly,Aspalt - Fair,570,0.59,Medium,2,0
+B256 Madawala-Rajawella Segment 3,7,Hilly,Concrete,595,0.78,Narrow,2,2
+B256 Madawala-Rajawella Segment 4,9,Mountainous,Aspalt - Fair,625,0.56,Narrow,3,0
+B256 Madawala-Rajawella Segment 5,11,Mountainous,Concrete,660,0.77,Narrow,3,2
+B256 Madawala-Rajawella Segment 6,10,Mountainous,Gravel,690,0.44,Narrow,3,3
+B256 Madawala-Rajawella Segment 7,8,Mountainous,Concrete,715,0.79,Narrow,3,2
+B256 Madawala-Rajawella Segment 8,6,Hilly,Aspalt - Fair,735,0.58,Medium,2,0
+B256 Madawala-Rajawella Segment 9,5,Hilly,Aspalt - Good,750,0.7,Wide,2,1
+B256 Madawala-Rajawella Segment 10,3,Hilly,Concrete,760,0.76,Wide,2,2
+B306 Nanu Oya-Hendeniya Segment 1,6,Hilly,Aspalt - Good,1400,0.69,Medium,2,1
+B306 Nanu Oya-Hendeniya Segment 2,8,Mountainous,Aspalt - Fair,1425,0.57,Narrow,3,0
+B306 Nanu Oya-Hendeniya Segment 3,10,Mountainous,Concrete,1455,0.78,Narrow,3,2
+B306 Nanu Oya-Hendeniya Segment 4,12,Mountainous,Aspalt - Fair,1490,0.54,Narrow,3,0
+B306 Nanu Oya-Hendeniya Segment 5,14,Mountainous,Concrete,1530,0.77,Narrow,3,2
+B306 Nanu Oya-Hendeniya Segment 6,13,Mountainous,Gravel,1565,0.41,Narrow,3,3
+B306 Nanu Oya-Hendeniya Segment 7,11,Mountainous,Concrete,1595,0.79,Narrow,3,2
+B306 Nanu Oya-Hendeniya Segment 8,9,Mountainous,Aspalt - Fair,1620,0.52,Medium,3,0
+B306 Nanu Oya-Hendeniya Segment 9,7,Mountainous,Aspalt - Good,1640,0.66,Medium,3,1
+B306 Nanu Oya-Hendeniya Segment 10,5,Hilly,Concrete,1655,0.75,Wide,2,2
