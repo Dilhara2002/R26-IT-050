@@ -1,4 +1,15 @@
-import { driver } from "../config/neo4j.config.js";
+import { driver } from "../config/neo4j.js";
+
+const serializeGraphValue = (value) => {
+  if (value && typeof value.toNumber === "function") return value.toNumber();
+  if (Array.isArray(value)) return value.map(serializeGraphValue);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, nested]) => [key, serializeGraphValue(nested)])
+    );
+  }
+  return value;
+};
 
 export const findMatchingPackages = async (preferences) => {
   const session = driver.session();
@@ -70,7 +81,7 @@ export const findMatchingPackages = async (preferences) => {
       }
     );
 
-    return result.records.map((record) => record.toObject());
+    return result.records.map((record) => serializeGraphValue(record.toObject()));
   } finally {
     await session.close();
   }

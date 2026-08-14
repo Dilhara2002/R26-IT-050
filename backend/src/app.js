@@ -1,302 +1,77 @@
-/**
- * Main Entry Point:
- * AI-Powered Safety-Aware Tourism Platform
- *
- * Handles:
- * - Hotel data APIs
- * - Safety recommendation engine
- * - Itinerary APIs
- * - MongoDB connection
- * - Neo4j GraphRAG connection
- */
-
-
-import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
-import dotenv from "dotenv";
-
+import express from "express";
 
 import hotelDataRoutes from "./routes/hotelData.routes.js";
-import safetyRoutes from "./routes/safetyRoutes.js";
 import itineraryRoutes from "./routes/itinerary.routes.js";
+import safetyRoutes from "./routes/safetyRoutes.js";
 
+const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:8081,http://localhost:19006")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
-import { verifyNeo4jConnection } from "./config/neo4j.js";
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(new Error("Origin is not allowed by CORS"));
+  },
+  credentials: false,
+};
 
-
-dotenv.config();
-
-
+const healthPayload = {
+  success: true,
+  data: {
+    status: "healthy",
+    service: "tourism-platform-api",
+  },
+  error: null,
+  // Compatibility fields for the existing regression suite and clients.
+  status: "Healthy",
+  endpoints: {
+    recommendations: "/api/recommendations/packages",
+    itineraryOptimization: "/api/itineraries/optimize",
+    safetyRecommendation: "/api/safety/recommend-vehicle",
+  },
+};
 
 const app = express();
 
+app.disable("x-powered-by");
+app.use(cors(corsOptions));
+app.use(express.json({ limit: "1mb" }));
 
-
-// -----------------------------
-// Middleware
-// -----------------------------
-
-app.use(cors());
-
-app.use(express.json());
-
-
-
-
-// -----------------------------
-// Health Check
-// -----------------------------
-
-app.get("/", (req, res) => {
-
-  res.status(200).json({
-
-    success: true,
-
-    message:
-      "AI-Powered Safety-Aware Tourism Platform Backend is Running 🚀",
-
-    status:
-      "Healthy",
-
-    engine:
-      "Real ML Inference + Neo4j GraphRAG"
-
-  });
-
+app.get(["/", "/api/health"], (req, res) => {
+  res.status(200).json(healthPayload);
 });
 
+app.use("/api", hotelDataRoutes);
+app.use("/api/itinerary", itineraryRoutes);
+app.use("/api/itineraries", itineraryRoutes);
+app.use("/api/safety", safetyRoutes);
 
-
-
-// -----------------------------
-// Routes
-// -----------------------------
-
-
-// Hotel APIs
-app.use(
-  "/api",
-  hotelDataRoutes
-);
-
-
-// Safety Analyzer APIs
-app.use(
-  "/api/safety",
-  safetyRoutes
-);
-
-
-// Itinerary APIs
-app.use(
-  "/api/itinerary",
-  itineraryRoutes
-);
-
-
-
-
-
-// -----------------------------
-// Global Error Handler
-// -----------------------------
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    data: null,
+    error: { code: "NOT_FOUND", message: "Endpoint not found." },
+  });
+});
 
 app.use((err, req, res, next) => {
-
-
-  console.error(
-    "SERVER_ERROR:",
-    err.stack
-  );
-
-
-  res.status(500).json({
-
+  console.error("SERVER_ERROR:", err.message);
+  res.status(err.message === "Origin is not allowed by CORS" ? 403 : 500).json({
     success: false,
-
-    message:
-      "Internal Server Error",
-
-    error:
-      err.message
-
+    data: null,
+    error: {
+      code: err.message === "Origin is not allowed by CORS" ? "CORS_DENIED" : "INTERNAL_ERROR",
+      message: err.message === "Origin is not allowed by CORS"
+        ? err.message
+        : "Internal Server Error",
+    },
   });
-
-
 });
-
-
-
-
-
-
-// -----------------------------
-// Infrastructure
-// -----------------------------
-
-
-const connectInfrastructure = async () => {
-
-
-
-  // MongoDB Connection
-
-  if (process.env.MONGO_URI) {
-
-
-    try {
-
-
-      await mongoose.connect(
-        process.env.MONGO_URI
-      );
-
-
-      console.log(
-        "✅ Connected to MongoDB Atlas"
-      );
-
-
-    } catch(error) {
-
-
-      console.error(
-
-        "❌ MongoDB connection error:",
-
-        error.message
-
-      );
-
-
-    }
-
-
-
-  } else {
-
-
-    console.warn(
-
-      "⚠️ MONGO_URI not found. MongoDB features may be limited."
-
-    );
-
-
-  }
-
-
-
-
-  // Neo4j Connection
-
-  try {
-
-
-    await verifyNeo4jConnection();
-
-
-    console.log(
-      "✅ Neo4j connection verified"
-    );
-
-
-  } catch(error) {
-
-
-    console.error(
-
-      "❌ Neo4j connection error:",
-
-      error.message
-
-    );
-
-
-  }
-
-
-
-};
-
-
-
-
-
-
-
-
-// -----------------------------
-// Start Server
-// -----------------------------
-
-
-const startServer = async () => {
-
-
-
-  await connectInfrastructure();
-
-
-
-  const PORT =
-    process.env.PORT || 5000;
-
-
-
-
-  app.listen(
-    PORT,
-    () => {
-
-
-      console.log(
-
-        `🚀 Server running on http://localhost:${PORT}`
-
-      );
-
-
-      console.log(
-
-        `🔗 Safety API:
-http://localhost:${PORT}/api/safety/recommend-vehicle`
-
-      );
-
-
-      console.log(
-
-        `🗺️ Itinerary API:
-http://localhost:${PORT}/api/itinerary`
-
-      );
-
-
-      console.log(
-
-        `🏨 Hotel API:
-http://localhost:${PORT}/api`
-
-      );
-
-
-    }
-
-  );
-
-
-};
-
-
-
-
-
-startServer();
-
-
-
 
 export default app;

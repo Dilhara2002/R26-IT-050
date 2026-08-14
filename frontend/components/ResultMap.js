@@ -19,6 +19,9 @@ export default function ResultMap({ location, itineraryData }) {
       {location && (
         <Marker coordinate={{ latitude: location.latitude, longitude: location.longitude }} title="You are here" pinColor="blue" />
       )}
+      {(itineraryData?.optimized_route || []).filter((stop) => stop && typeof stop === 'object' && Number.isFinite(stop.latitude) && Number.isFinite(stop.longitude)).map((stop, index) => (
+        <Marker key={stop.id || `${stop.name}-${index}`} coordinate={{ latitude: stop.latitude, longitude: stop.longitude }} title={`${index + 1}. ${stop.name}`} />
+      ))}
     </MapView>
   );
 }

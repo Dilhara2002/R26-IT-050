@@ -8,6 +8,7 @@ import warnings
 import math
 import random
 import requests
+from pathlib import Path
 
 warnings.filterwarnings('ignore')
 
@@ -22,8 +23,9 @@ def initialize_ai_engine():
     global PLACES_DF, TAGS_ENCODED, RF_MODEL, TFIDF_VECTORIZER
     
     try:
-        print("[INFO] Loading places dataset into memory from 'data/places.csv'...")
-        PLACES_DF = pd.read_csv('data/places.csv')
+        dataset_path = Path(__file__).resolve().parent / 'data' / 'places.csv'
+        print(f"[INFO] Loading places dataset into memory from '{dataset_path}'...")
+        PLACES_DF = pd.read_csv(dataset_path)
         
         # Data Cleaning
         PLACES_DF['Tags'] = PLACES_DF['Tags'].fillna('General')
@@ -216,7 +218,17 @@ def run_genetic_algorithm(filtered_df, max_time_minutes, start_lat, start_lon):
         best_overall_time, _ = evaluate_route(best_overall_route, filtered_df, start_lat, start_lon)
         penalty_hit = True 
         
-    optimal_places = [f"{filtered_df.iloc[idx]['Name']} ({int(filtered_df.iloc[idx]['Duration_Minutes'])} mins)" for idx in best_overall_route]
+    optimal_places = [
+        {
+            "id": str(filtered_df.iloc[idx].get('ID', filtered_df.iloc[idx].get('Name', idx))),
+            "name": str(filtered_df.iloc[idx]['Name']),
+            "latitude": float(filtered_df.iloc[idx]['Latitude']),
+            "longitude": float(filtered_df.iloc[idx]['Longitude']),
+            "durationMinutes": int(filtered_df.iloc[idx]['Duration_Minutes']),
+            "order": order + 1,
+        }
+        for order, idx in enumerate(best_overall_route)
+    ]
     return optimal_places, format_time_display(best_overall_time), penalty_hit
 
 # --- 4. EXPLAINABLE AI (XAI) TEXT FORMATTER ---
@@ -224,10 +236,11 @@ def generate_itinerary_summary(places, preferences, api_key):
     if not places or not api_key: return "Optimal itinerary generated."
     
     # Prompt is strictly constrained to text-formatting to explain the rationale
+    place_names = [place['name'] if isinstance(place, dict) else str(place) for place in places]
     prompt = f"""
     Act strictly as an Explainable AI (XAI) text-formatter for a Context-Aware Spatio-Temporal travel system. 
     User Preferences: {', '.join(preferences)}.
-    Optimized Route with Allocated Times: {', '.join(places)}.
+    Optimized Route: {', '.join(place_names)}.
     
     Task: Generate a structured summary explaining that the locations were selected via Machine Learning Quality filtering and Cosine Similarity mapping, and the routing sequence was optimized using a Genetic Algorithm. Keep it engaging and concise.
     """

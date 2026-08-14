@@ -13,7 +13,8 @@ export const generateItineraryFromAI = async (itineraryData) => {
     const response =
       await axios.post(
         `${pythonApiUrl}/api/optimize-itinerary`,
-        itineraryData
+        itineraryData,
+        { timeout: Number(process.env.PYTHON_AI_TIMEOUT_MS || 30000) }
       );
 
 
@@ -29,9 +30,11 @@ export const generateItineraryFromAI = async (itineraryData) => {
     );
 
 
-    throw new Error(
-      "Failed to generate itinerary from AI Engine"
+    const serviceError = new Error(
+      error.response?.data?.error?.message || "Failed to generate itinerary from AI Engine"
     );
+    serviceError.code = error.code;
+    throw serviceError;
 
 
   }

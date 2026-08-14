@@ -1,4 +1,4 @@
-import { driver } from "../config/neo4j.config.js";
+import { driver } from "../config/neo4j.js";
 
 export const createKnowledgeGraph = async (rows) => {
   const session = driver.session();

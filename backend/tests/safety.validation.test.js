@@ -1,8 +1,13 @@
-const test = require("node:test");
-const assert = require("node:assert/strict");
-const request = require("supertest");
+import test, { after } from "node:test";
+import assert from "node:assert/strict";
+import request from "supertest";
 
-const app = require("../src/app");
+import app from "../src/app.js";
+import { closeNeo4jConnection } from "../src/config/neo4j.js";
+
+after(async () => {
+  await closeNeo4jConnection();
+});
 
 
 const requestSafetyAnalysis = (

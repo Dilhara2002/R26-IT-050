@@ -41,7 +41,7 @@ export const buildActivityGraph = async (req, res) => {
   try {
     const filePath = path.join(
       __dirname,
-      "../data/activities_2000_graph_rag.csv"
+      "../data/Activities-Rag.csv"
     );
 
     console.log("ACTIVITY CSV PATH:", filePath);
@@ -66,11 +66,14 @@ export const buildActivityGraph = async (req, res) => {
 
 export const generatePackageFromPrompt = async (req, res) => {
   try {
+    const legacyResponse = req.path === "/generate-package";
     const { prompt } = req.body;
 
     if (!prompt) {
       return res.status(400).json({
-        error: "Prompt is required",
+        success: false,
+        data: null,
+        error: { code: "VALIDATION_ERROR", message: "Prompt is required" },
       });
     }
 
@@ -81,14 +84,15 @@ export const generatePackageFromPrompt = async (req, res) => {
     const packages = await findMatchingPackages(preferences);
 
     if (!packages.length) {
-      return res.json({
+      const data = {
         userPrompt: prompt,
         extractedPreferences: preferences,
         packageCount: 0,
         selectedPackage: null,
         itinerary: null,
         userFriendlyResponse: "Sorry, no matching tour package was found for your request.",
-      });
+      };
+      return res.json(legacyResponse ? { success: true, data, error: null, ...data } : { success: true, data, error: null });
     }
 
     const selectedPackage = packages[0];
@@ -118,9 +122,9 @@ export const generatePackageFromPrompt = async (req, res) => {
       whyThisPackageMatches: [
         `Located in ${selectedPackage.district}`,
         `Hotel grade matches ${selectedPackage.grade}`,
-        `Food preference matches ${preferences.foodType}`,
         `Activities match ${preferences.activityCategory}`,
-      ],
+        preferences.foodType ? `Food preference matches ${preferences.foodType}` : null,
+      ].filter(Boolean),
     };
 
     const userFriendlyResponse = `
@@ -132,25 +136,28 @@ Your trip includes ${preferences.activityCategory || "selected"} activities such
       .map((activity) => activity.name)
       .join(", ")}.
 
-This package was selected because it is located in ${selectedPackage.district}, matches the ${selectedPackage.grade} hotel grade, supports your ${preferences.foodType} food preference, and includes ${
+This package was selected because it is located in ${selectedPackage.district}, matches the ${selectedPackage.grade} hotel grade${preferences.foodType ? `, supports your ${preferences.foodType} food preference` : ""}, and includes ${
       preferences.activityCategory || "matching"
     } activities.
 `.trim();
 
     console.log("Sending response...");
 
-    return res.json({
+    const data = {
       userPrompt: prompt,
       extractedPreferences: preferences,
       packageCount: packages.length,
       selectedPackage,
       itinerary,
       userFriendlyResponse,
-    });
+    };
+    return res.json(legacyResponse ? { success: true, data, error: null, ...data } : { success: true, data, error: null });
   } catch (error) {
     console.error("ERROR:", error);
     return res.status(500).json({
-      error: error.message,
+      success: false,
+      data: null,
+      error: { code: "RECOMMENDATION_ERROR", message: error.message },
     });
   }
 };

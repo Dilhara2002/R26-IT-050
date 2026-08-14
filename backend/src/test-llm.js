@@ -1,6 +1,6 @@
-const {
+import {
   getLocationCandidates,
-} = require("./services/llmLocationResolver");
+} from "./services/llmLocationResolver.js";
 
 
 const runTest = async () => {

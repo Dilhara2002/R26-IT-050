@@ -1,4 +1,4 @@
-import { driver } from "../config/neo4j.config.js";
+import { driver } from "../config/neo4j.js";
 
 export const getGraphSchemaValues = async () => {
   const session = driver.session();
@@ -25,7 +25,15 @@ export const getGraphSchemaValues = async () => {
         collect(DISTINCT a.suitable_for) AS suitableFor
     `);
 
-    return result.records[0].toObject();
+    return result.records[0]?.toObject() || {
+      districts: [],
+      hotelCategories: [],
+      grades: [],
+      foodTypes: [],
+      activityCategories: [],
+      priceLevels: [],
+      suitableFor: [],
+    };
   } finally {
     await session.close();
   }
