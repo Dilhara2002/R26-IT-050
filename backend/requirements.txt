@@ -3,3 +3,9 @@ pandas==3.0.2
 scipy==1.18.0
 scikit-learn==1.7.2
 joblib==1.5.3
+Flask
+tensorflow
+Pillow
+flask-cors
+werkzeug
+
