@@ -83,27 +83,35 @@ export default function HomeScreen({ navigation }) {
     setLoading(true);
 
     try {
-      const res = await API.post("/optimize-itinerary", {
+      const res = await API.post("/optimize", {
         preferences: preferences,
         max_time_minutes: totalMinutes,
         current_lat: parseFloat(lat),
         current_lon: parseFloat(lon),
       });
 
-      setLoading(false);
-
-      if (res.data.status === "success") {
-        navigation.navigate("Result", { data: res.data.data });
+      if (res.data.status === "success" && res.data.data) {
+        navigation.navigate("ItineraryResult", {
+          data: res.data.data,
+          persistence: res.data.persistence,
+        });
       } else {
         Alert.alert("Try Again", res.data.message || "No suitable route found.");
       }
     } catch (err) {
-      setLoading(false);
-      console.log(err);
+      const serverMessage =
+        err.response?.data?.message ||
+        err.response?.data?.error;
+
       Alert.alert(
-        "Connection Error",
-        "Cannot connect to the Server. Check your IP and Wi-Fi."
+        err.response ? "Itinerary Error" : "Connection Error",
+        serverMessage ||
+          (err.response
+            ? "The itinerary could not be generated."
+            : "Cannot connect to the Node backend at the configured API URL.")
       );
+    } finally {
+      setLoading(false);
     }
   };
 

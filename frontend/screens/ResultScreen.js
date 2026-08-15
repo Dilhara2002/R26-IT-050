@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 
 export default function ResultScreen({ route, navigation }) {
-  const { data } = route.params;
+  const { data, persistence } = route.params;
 
   return (
     <ScrollView style={styles.page} contentContainerStyle={styles.content}>
@@ -24,6 +24,14 @@ export default function ResultScreen({ route, navigation }) {
             <Text style={styles.cardSub}>{data.estimated_time_required}</Text>
           </View>
         </View>
+
+        {persistence && (
+          <Text style={styles.persistenceText}>
+            {persistence.saved
+              ? "Saved to itinerary history."
+              : "Route generated successfully; itinerary history was not saved."}
+          </Text>
+        )}
 
         <Pressable
           onPress={() => navigation.navigate("Map", { itineraryData: data })}
@@ -79,6 +87,7 @@ const styles = StyleSheet.create({
   botIcon: { fontSize: 25 },
   cardTitle: { fontSize: 20, fontWeight: "900", color: "#0F172A" },
   cardSub: { color: "#64748B", marginTop: 3 },
+  persistenceText: { color: "#64748B", marginBottom: 16 },
   sectionTitle: { fontWeight: "800", color: "#0F172A", marginBottom: 12, fontSize: 17, marginTop: 10 },
   generateButton: { backgroundColor: "#2563EB", borderRadius: 20, paddingVertical: 18, alignItems: "center", justifyContent: "center", flexDirection: "row" },
   generateText: { color: "#FFFFFF", fontSize: 16, fontWeight: "900" },
