@@ -47,6 +47,21 @@ These findings do not prove that every POI is false. They mean that no record sh
 - `raw_record_hash` must preserve lineage to the immutable source record where applicable.
 - `label` and `label_definition_version` remain blank until the final target definition and labeling protocol are formally approved.
 
+## Kandy candidate staging
+
+`staging/poi_candidates_kandy_v1.csv` contains source-attributed collection candidates, not verified POIs. Every staged row has `verification_status=candidate_unverified`. The collector excludes accommodation, bare places of worship, and generic entities without attraction, heritage, historic, protected-site, or equivalent structured evidence. It does not supply ratings, rating counts, visit durations, quality labels, opening hours, unsupported districts, missing coordinates, descriptions, or review text. Duplicate detection combines normalized-name similarity with a 250-metre proximity threshold; possible duplicates remain as separate source records and are cross-referenced by `duplicate_cluster_id` and `duplicate_candidate_ids`.
+
+Candidates come only from OpenStreetMap via Overpass (ODbL 1.0; attribute OpenStreetMap contributors and retain object IDs/URLs) and Wikidata via the Wikidata Query Service (structured data under CC0 1.0; retain entity IDs/URLs). SLTDA may be consulted later as a manual verification source, but is not scraped by this collector.
+
+From the repository root, collect at most 20 Kandy candidates with bytecode disabled:
+
+```powershell
+$env:PYTHONDONTWRITEBYTECODE = "1"
+backend\.venv\Scripts\python.exe -B backend\src\ai_service\scripts\collect_poi_candidates.py --district Kandy --limit 20 --source both
+```
+
+To promote a candidate, manually verify its identity and each retained field against traceable evidence, assign a stable `poi_id`, map it into `verified/places_verified_v1.csv`, and populate all required provenance and coordinate-evidence fields. Record field-level decisions in `verified/verification_log.csv`; leave unsupported rating, duration, label, and other optional fields blank. Collection never promotes candidates automatically.
+
 ## Verification statuses
 
 The allowed verification statuses are:
