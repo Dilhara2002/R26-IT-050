@@ -1,4 +1,4 @@
-"""Collect unverified Kandy POI candidates from open structured-data sources."""
+"""Collect unverified Sri Lankan POI candidates from open structured-data sources."""
 
 from __future__ import annotations
 
@@ -23,21 +23,54 @@ from typing import Any
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 DEFAULT_OUTPUT = DATA_DIR / "staging" / "poi_candidates_kandy_v1.csv"
+DEFAULT_NATIONWIDE_OUTPUT = DATA_DIR / "staging" / "poi_candidates_sri_lanka_v1.csv"
 OVERPASS_URLS = (
-    "https://overpass.private.coffee/api/interpreter",
+    "https://lz4.overpass-api.de/api/interpreter",
     "https://overpass-api.de/api/interpreter",
 )
 WIKIDATA_SPARQL_URL = "https://query.wikidata.org/sparql"
 KANDY_WIKIDATA_ID = "Q723002"
 KANDY_OSM_RELATION_ID = 5_351_794
 KANDY_OSM_BBOX = "6.938773,80.421896,7.4898505,81.016526"
+SRI_LANKA_DISTRICTS = (
+    "Ampara",
+    "Anuradhapura",
+    "Badulla",
+    "Batticaloa",
+    "Colombo",
+    "Galle",
+    "Gampaha",
+    "Hambantota",
+    "Jaffna",
+    "Kalutara",
+    "Kandy",
+    "Kegalle",
+    "Kilinochchi",
+    "Kurunegala",
+    "Mannar",
+    "Matale",
+    "Matara",
+    "Monaragala",
+    "Mullaitivu",
+    "Nuwara Eliya",
+    "Polonnaruwa",
+    "Puttalam",
+    "Ratnapura",
+    "Trincomalee",
+    "Vavuniya",
+)
+DISTRICT_NAME_ALIASES = {
+    "Monaragala": {"monaragala", "moneragala"},
+    "Mullaitivu": {"mullaitivu", "mullaittivu"},
+    "Nuwara Eliya": {"nuwara eliya", "nuwaraeliya"},
+}
 USER_AGENT = (
-    "R26-IT-050-Kandy-POI-Candidate-Collector/1.0 "
+    "R26-IT-050-Sri-Lanka-POI-Candidate-Collector/1.1 "
     "(final-year academic research; local research project)"
 )
-REQUEST_TIMEOUT_SECONDS = 30
+REQUEST_TIMEOUT_SECONDS = 60
 MAX_ATTEMPTS = 3
-MIN_REQUEST_INTERVAL_SECONDS = 1.0
+MIN_REQUEST_INTERVAL_SECONDS = 5.0
 DUPLICATE_DISTANCE_METRES = 250.0
 VERIFICATION_STATUS = "candidate_unverified"
 
@@ -76,6 +109,8 @@ FIELDNAMES = [
     "longitude",
     "categories",
     "district",
+    "district_query_id",
+    "district_query_url",
     "source_name",
     "source_record_id",
     "source_url",
@@ -132,6 +167,7 @@ def request_json(
     headers: dict[str, str] | None = None,
 ) -> Any:
     """Request JSON with a timeout and bounded exponential retry."""
+    display_url = url.split("?", 1)[0]
     request_headers = {
         "Accept": "application/json",
         "User-Agent": USER_AGENT,
@@ -150,21 +186,26 @@ def request_json(
         except urllib.error.HTTPError as error:
             retryable = error.code in {429, 500, 502, 503, 504}
             detail = error.read(300).decode("utf-8", errors="replace").strip()
-            message = f"HTTP {error.code} from {url}"
+            message = f"HTTP {error.code} from {display_url}"
             if detail:
                 message += f": {detail}"
             if not retryable or attempt == MAX_ATTEMPTS:
                 raise RuntimeError(message) from error
             retry_after = error.headers.get("Retry-After", "")
-            delay = min(float(retry_after), 15.0) if retry_after.isdigit() else 2 ** (attempt - 1)
+            if retry_after.isdigit():
+                delay = min(float(retry_after), 30.0)
+            elif error.code == 429:
+                delay = min(5.0 * attempt, 15.0)
+            else:
+                delay = 2 ** (attempt - 1)
             print(f"Warning: {message}; retrying in {delay:g}s", file=sys.stderr)
             time.sleep(delay)
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as error:
             if attempt == MAX_ATTEMPTS:
-                raise RuntimeError(f"Request failed for {url}: {error}") from error
+                raise RuntimeError(f"Request failed for {display_url}: {error}") from error
             delay = 2 ** (attempt - 1)
             print(
-                f"Warning: request failed for {url}: {error}; retrying in {delay}s",
+                f"Warning: request failed for {display_url}: {error}; retrying in {delay}s",
                 file=sys.stderr,
             )
             time.sleep(delay)
@@ -219,35 +260,92 @@ def is_relevant_osm_candidate(tags: dict[str, str]) -> bool:
     return False
 
 
-def collect_osm(collected_at: str) -> list[dict[str, str]]:
-    """Collect named candidates inside the OSM Kandy District administrative area."""
-    query = f"""
-[out:json][timeout:25];
-area({3_600_000_000 + KANDY_OSM_RELATION_ID})->.kandy;
-(
-  nwr(area.kandy)({KANDY_OSM_BBOX})["name"]["tourism"~"^(aquarium|attraction|gallery|museum|theme_park|viewpoint|zoo)$"];
-  nwr(area.kandy)({KANDY_OSM_BBOX})["name"]["historic"~"^(archaeological_site|castle|fort|manor|monument|ruins)$"];
-  nwr(area.kandy)({KANDY_OSM_BBOX})["name"]["leisure"="nature_reserve"];
-  nwr(area.kandy)({KANDY_OSM_BBOX})["name"]["natural"~"^(cave_entrance|hot_spring|peak|waterfall)$"];
-);
-out tags center qt;
-""".strip()
+def district_slug(district: str) -> str:
+    return normalize_name(district).replace(" ", "-")
+
+
+def canonical_district_name(value: str) -> str | None:
+    normalized = normalize_name(value)
+    if normalized.endswith(" district"):
+        normalized = normalized[: -len(" district")].strip()
+    for district in SRI_LANKA_DISTRICTS:
+        accepted = {normalize_name(district)} | DISTRICT_NAME_ALIASES.get(district, set())
+        if normalized in accepted:
+            return district
+    return None
+
+
+def request_overpass(query: str) -> Any:
+    """Query a bounded list of public Overpass instances."""
     payload = urllib.parse.urlencode({"data": query}).encode("utf-8")
-    response: Any | None = None
     last_error: RuntimeError | None = None
     for endpoint in OVERPASS_URLS:
         try:
-            response = request_json(
+            return request_json(
                 endpoint,
                 data=payload,
                 headers={"Content-Type": "application/x-www-form-urlencoded; charset=utf-8"},
             )
-            break
         except RuntimeError as error:
             last_error = error
             print(f"Warning: Overpass endpoint failed: {error}", file=sys.stderr)
-    if response is None:
-        raise RuntimeError(f"all Overpass endpoints failed; last error: {last_error}")
+    raise RuntimeError(f"all Overpass endpoints failed; last error: {last_error}")
+
+
+def resolve_osm_districts(
+    district_names: Iterable[str],
+) -> dict[str, tuple[int, str]]:
+    """Resolve official district names to OSM relation IDs and source-provided bounds."""
+    requested = set(district_names)
+    query = """
+[out:json][timeout:25];
+relation["boundary"="administrative"]["admin_level"="5"]["ISO3166-2"~"^LK-"];
+out tags bb;
+""".strip()
+    response = request_overpass(query)
+    resolved: dict[str, tuple[int, str]] = {}
+    for element in response.get("elements", []):
+        tags = element.get("tags") or {}
+        district = canonical_district_name(tags.get("name:en") or tags.get("name") or "")
+        bounds = element.get("bounds") or {}
+        relation_id = element.get("id")
+        if district not in requested or not isinstance(relation_id, int):
+            continue
+        coordinates = (
+            bounds.get("minlat"),
+            bounds.get("minlon"),
+            bounds.get("maxlat"),
+            bounds.get("maxlon"),
+        )
+        if any(value is None for value in coordinates):
+            continue
+        bbox = ",".join(format_coordinate(float(value)) for value in coordinates)
+        current = resolved.get(district)
+        if current is None or relation_id < current[0]:
+            resolved[district] = (relation_id, bbox)
+    return resolved
+
+
+def collect_osm(
+    district: str,
+    relation_id: int,
+    bbox: str,
+    collected_at: str,
+) -> list[dict[str, str]]:
+    """Collect named candidates inside one OSM district administrative area."""
+    area_id = 3_600_000_000 + relation_id
+    query = f"""
+[out:json][timeout:55];
+area({area_id})->.district;
+(
+  nwr(area.district)({bbox})["name"]["tourism"~"^(aquarium|attraction|gallery|museum|theme_park|viewpoint|zoo)$"];
+  nwr(area.district)({bbox})["name"]["historic"~"^(archaeological_site|castle|fort|manor|monument|ruins)$"];
+  nwr(area.district)({bbox})["name"]["leisure"="nature_reserve"];
+  nwr(area.district)({bbox})["name"]["natural"~"^(cave_entrance|hot_spring|peak|waterfall)$"];
+);
+out tags center qt;
+""".strip()
+    response = request_overpass(query)
 
     candidates: list[dict[str, str]] = []
     for element in response.get("elements", []):
@@ -277,6 +375,8 @@ out tags center qt;
             for key in sorted(OSM_STRUCTURED_TAG_KEYS)
             if key in tags and str(tags[key]).strip()
         }
+        structured_tags["query_district_name"] = district
+        structured_tags["query_district_osm_relation_id"] = str(relation_id)
         candidates.append(
             {
                 "candidate_id": f"osm-{object_type}-{object_id}",
@@ -284,7 +384,9 @@ out tags center qt;
                 "latitude": format_coordinate(float(latitude)),
                 "longitude": format_coordinate(float(longitude)),
                 "categories": osm_categories(tags),
-                "district": "Kandy",
+                "district": district,
+                "district_query_id": f"relation/{relation_id}",
+                "district_query_url": f"https://www.openstreetmap.org/relation/{relation_id}",
                 "source_name": "OpenStreetMap",
                 "source_record_id": record_id,
                 "source_url": f"https://www.openstreetmap.org/{record_id}",
@@ -306,8 +408,48 @@ def parse_wikidata_point(value: str) -> tuple[float, float] | None:
     return float(match.group(2)), float(match.group(1))
 
 
-def collect_wikidata(collected_at: str) -> list[dict[str, str]]:
-    """Collect coordinate-bearing entities administratively located in Kandy District."""
+def resolve_wikidata_districts(district_names: Iterable[str]) -> dict[str, str]:
+    """Resolve official district names to Wikidata entities using English labels."""
+    requested = list(district_names)
+    labels = [
+        district + suffix
+        for district in requested
+        for suffix in (" District", " district")
+    ]
+    label_values = "\n    ".join(f"{json.dumps(label)}@en" for label in labels)
+    query = f"""
+SELECT DISTINCT ?district ?districtLabel WHERE {{
+  VALUES ?districtLabel {{
+    {label_values}
+  }}
+  ?district rdfs:label ?districtLabel;
+            wdt:P17 wd:Q854.
+}}
+ORDER BY ?district
+""".strip()
+    url = WIKIDATA_SPARQL_URL + "?" + urllib.parse.urlencode(
+        {"query": query, "format": "json"}
+    )
+    response = request_json(url)
+    resolved: dict[str, str] = {}
+    for binding in response.get("results", {}).get("bindings", []):
+        item_url = binding.get("district", {}).get("value", "")
+        entity_id = item_url.rsplit("/", 1)[-1]
+        label = binding.get("districtLabel", {}).get("value", "")
+        district = canonical_district_name(label)
+        if district in requested and re.fullmatch(r"Q\d+", entity_id):
+            current = resolved.get(district)
+            if current is None or int(entity_id[1:]) < int(current[1:]):
+                resolved[district] = entity_id
+    return resolved
+
+
+def collect_wikidata(
+    district: str,
+    district_wikidata_id: str,
+    collected_at: str,
+) -> list[dict[str, str]]:
+    """Collect coordinate-bearing entities administratively located in one district."""
     query = f"""
 SELECT ?item ?itemLabel (SAMPLE(?coordinate) AS ?coord)
        (GROUP_CONCAT(DISTINCT STR(?instance); separator="|") AS ?instance_ids)
@@ -316,7 +458,7 @@ SELECT ?item ?itemLabel (SAMPLE(?coordinate) AS ?coord)
        (GROUP_CONCAT(DISTINCT ?heritageLabel; separator="|") AS ?heritage_labels)
        (SAMPLE(STR(?article)) AS ?wikipedia_url)
 WHERE {{
-  ?item wdt:P131+ wd:{KANDY_WIKIDATA_ID};
+  ?item wdt:P131+ wd:{district_wikidata_id};
         wdt:P625 ?coordinate;
         wdt:P31 ?instance;
         rdfs:label ?itemLabel.
@@ -404,7 +546,8 @@ LIMIT 1000
             "heritage_designation_labels": heritage_labels,
             "instance_ids": sorted(instance_ids),
             "instance_labels": instance_labels,
-            "located_in_district_id": KANDY_WIKIDATA_ID,
+            "located_in_district_id": district_wikidata_id,
+            "query_district_name": district,
         }
         wikipedia_url = binding.get("wikipedia_url", {}).get("value", "")
         if wikipedia_url:
@@ -416,7 +559,11 @@ LIMIT 1000
                 "latitude": format_coordinate(latitude),
                 "longitude": format_coordinate(longitude),
                 "categories": "|".join(instance_labels),
-                "district": "Kandy",
+                "district": district,
+                "district_query_id": district_wikidata_id,
+                "district_query_url": (
+                    f"https://www.wikidata.org/wiki/{district_wikidata_id}"
+                ),
                 "source_name": "Wikidata",
                 "source_record_id": entity_id,
                 "source_url": f"https://www.wikidata.org/wiki/{entity_id}",
@@ -547,10 +694,114 @@ def write_csv(output: Path, candidates: list[dict[str, str]]) -> None:
             temporary.unlink()
 
 
+def scope_candidate_ids(candidates: list[dict[str, str]], district: str) -> None:
+    """Keep repeated boundary source records distinct in nationwide output."""
+    suffix = district_slug(district)
+    for candidate in candidates:
+        candidate["candidate_id"] = f"{candidate['candidate_id']}-{suffix}"
+
+
+def collect_nationwide(args: argparse.Namespace, collected_at: str) -> int:
+    districts = list(args.batch_districts or SRI_LANKA_DISTRICTS)
+    osm_metadata: dict[str, tuple[int, str]] = {}
+    wikidata_metadata: dict[str, str] = {}
+    metadata_failures: dict[str, str] = {}
+
+    if args.source in {"osm", "both"}:
+        try:
+            osm_metadata = resolve_osm_districts(districts)
+            print(f"Resolved {len(osm_metadata)} OSM district boundary record(s).")
+        except (RuntimeError, ValueError, TypeError) as error:
+            metadata_failures["OpenStreetMap"] = str(error)
+            print(f"Error resolving OSM districts: {error}", file=sys.stderr)
+    if args.source in {"wikidata", "both"}:
+        try:
+            wikidata_metadata = resolve_wikidata_districts(districts)
+            print(f"Resolved {len(wikidata_metadata)} Wikidata district record(s).")
+        except (RuntimeError, ValueError, TypeError) as error:
+            metadata_failures["Wikidata"] = str(error)
+            print(f"Error resolving Wikidata districts: {error}", file=sys.stderr)
+
+    district_groups: list[list[dict[str, str]]] = []
+    failures: list[str] = []
+    zero_districts: list[str] = []
+    for district in districts:
+        source_groups: list[list[dict[str, str]]] = []
+        if args.source in {"osm", "both"}:
+            metadata = osm_metadata.get(district)
+            if metadata is None:
+                detail = metadata_failures.get(
+                    "OpenStreetMap", "district boundary metadata was not resolved"
+                )
+                failures.append(f"{district}/OpenStreetMap: {detail}")
+            else:
+                relation_id, bbox = metadata
+                try:
+                    rows = collect_osm(
+                        district, relation_id, bbox, collected_at
+                    )
+                    source_groups.append(rows)
+                    print(f"{district}: {len(rows)} relevant OpenStreetMap candidate(s).")
+                except (RuntimeError, ValueError, TypeError) as error:
+                    failures.append(f"{district}/OpenStreetMap: {error}")
+                    print(
+                        f"Error collecting {district} from OpenStreetMap: {error}",
+                        file=sys.stderr,
+                    )
+
+        if args.source in {"wikidata", "both"}:
+            district_wikidata_id = wikidata_metadata.get(district)
+            if district_wikidata_id is None:
+                detail = metadata_failures.get(
+                    "Wikidata", "district entity metadata was not resolved"
+                )
+                failures.append(f"{district}/Wikidata: {detail}")
+            else:
+                try:
+                    rows = collect_wikidata(
+                        district, district_wikidata_id, collected_at
+                    )
+                    source_groups.append(rows)
+                    print(f"{district}: {len(rows)} relevant Wikidata candidate(s).")
+                except (RuntimeError, ValueError, TypeError) as error:
+                    failures.append(f"{district}/Wikidata: {error}")
+                    print(
+                        f"Error collecting {district} from Wikidata: {error}",
+                        file=sys.stderr,
+                    )
+
+        selected = interleave(source_groups, args.per_district_limit)
+        scope_candidate_ids(selected, district)
+        district_groups.append(selected)
+        if not selected:
+            zero_districts.append(district)
+        print(
+            f"{district}: retained {len(selected)} candidate(s) after the "
+            f"per-district limit of {args.per_district_limit}."
+        )
+
+    candidates = interleave(district_groups, args.global_limit)
+    add_duplicate_markers(candidates)
+    output = args.output or DEFAULT_NATIONWIDE_OUTPUT
+    write_csv(output, candidates)
+    duplicate_rows = sum(bool(row["duplicate_cluster_id"]) for row in candidates)
+    print(f"Wrote {len(candidates)} candidate(s) to {output.resolve()}.")
+    print(f"Duplicate detection flagged {duplicate_rows} row(s); no rows were merged or deleted.")
+    print("Zero-row districts: " + (", ".join(zero_districts) if zero_districts else "none"))
+    if failures:
+        print("Failed or incomplete district/source collections:", file=sys.stderr)
+        for failure in failures:
+            print(f"  - {failure}", file=sys.stderr)
+        return 1
+    print("Failed or incomplete district/source collections: none")
+    return 0
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Collect source-attributed, unverified POI candidates for the Kandy pilot. "
+            "Collect source-attributed, unverified POI candidates for Kandy or all "
+            "25 Sri Lankan districts. "
             "No candidate is promoted to the verified dataset."
         )
     )
@@ -568,8 +819,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         type=Path,
-        default=DEFAULT_OUTPUT,
-        help=f"Output CSV path (default: {DEFAULT_OUTPUT})",
+        default=None,
+        help=(
+            f"Output CSV path (Kandy default: {DEFAULT_OUTPUT}; nationwide default: "
+            f"{DEFAULT_NATIONWIDE_OUTPUT})"
+        ),
     )
     parser.add_argument(
         "--source",
@@ -577,11 +831,48 @@ def parse_args() -> argparse.Namespace:
         default="both",
         help="Open-data source to query (default: both)",
     )
+    parser.add_argument(
+        "--all-sri-lanka",
+        action="store_true",
+        help="Collect a sequential batch across all 25 official districts",
+    )
+    parser.add_argument(
+        "--per-district-limit",
+        type=int,
+        default=50,
+        help="Nationwide maximum rows retained per district after filtering (default: 50)",
+    )
+    parser.add_argument(
+        "--global-limit",
+        type=int,
+        default=1000,
+        help="Nationwide maximum total rows after district filtering (default: 1000)",
+    )
+    parser.add_argument(
+        "--batch-districts",
+        nargs="+",
+        choices=SRI_LANKA_DISTRICTS,
+        help="Optional official-district subset for a batch smoke test",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
+    if args.batch_districts and not args.all_sri_lanka:
+        print("Error: --batch-districts requires --all-sri-lanka.", file=sys.stderr)
+        return 2
+    if not 1 <= args.per_district_limit <= 500:
+        print("Error: --per-district-limit must be between 1 and 500.", file=sys.stderr)
+        return 2
+    if not 1 <= args.global_limit <= 10_000:
+        print("Error: --global-limit must be between 1 and 10000.", file=sys.stderr)
+        return 2
+
+    collected_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    if args.all_sri_lanka:
+        return collect_nationwide(args, collected_at)
+
     if args.district.strip().casefold() != "kandy":
         print(
             "Error: this bounded pilot collector supports only --district Kandy.",
@@ -592,18 +883,29 @@ def main() -> int:
         print("Error: --limit must be between 1 and 500.", file=sys.stderr)
         return 2
 
-    collected_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-    collectors: list[tuple[str, Callable[[str], list[dict[str, str]]]]] = []
+    collectors: list[tuple[str, Callable[[], list[dict[str, str]]]]] = []
     if args.source in {"osm", "both"}:
-        collectors.append(("OpenStreetMap", collect_osm))
+        collectors.append(
+            (
+                "OpenStreetMap",
+                lambda: collect_osm(
+                    "Kandy", KANDY_OSM_RELATION_ID, KANDY_OSM_BBOX, collected_at
+                ),
+            )
+        )
     if args.source in {"wikidata", "both"}:
-        collectors.append(("Wikidata", collect_wikidata))
+        collectors.append(
+            (
+                "Wikidata",
+                lambda: collect_wikidata("Kandy", KANDY_WIKIDATA_ID, collected_at),
+            )
+        )
 
     groups: list[list[dict[str, str]]] = []
     failures: list[str] = []
     for source_name, collector in collectors:
         try:
-            rows = collector(collected_at)
+            rows = collector()
             groups.append(rows)
             print(f"Collected {len(rows)} usable candidate(s) from {source_name}.")
         except (RuntimeError, ValueError, TypeError) as error:
@@ -616,9 +918,10 @@ def main() -> int:
 
     candidates = interleave(groups, args.limit)
     add_duplicate_markers(candidates)
-    write_csv(args.output, candidates)
+    output = args.output or DEFAULT_OUTPUT
+    write_csv(output, candidates)
     duplicate_rows = sum(bool(row["duplicate_cluster_id"]) for row in candidates)
-    print(f"Wrote {len(candidates)} candidate(s) to {args.output.resolve()}.")
+    print(f"Wrote {len(candidates)} candidate(s) to {output.resolve()}.")
     print(f"Duplicate detection flagged {duplicate_rows} row(s); no rows were merged or deleted.")
     if failures:
         print("Warning: output is partial because: " + "; ".join(failures), file=sys.stderr)
