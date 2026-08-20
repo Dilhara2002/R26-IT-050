@@ -39,7 +39,7 @@ def optimize_itinerary():
         if not user_preferences:
             return jsonify({"error": "Preferences are required."}), 400
             
-        # Step 1: ML Quality Filter & KNN Content Matching
+        # Step 1: Observed-rating screening and cosine-similarity matching
         filtered_places = filter_locations(user_preferences, user_lat, user_lon, radius_km)
         
         if filtered_places is None or filtered_places.empty:

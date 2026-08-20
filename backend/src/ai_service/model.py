@@ -1,242 +1,381 @@
-import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics import accuracy_score, f1_score
-import warnings
+from pathlib import Path
 import math
 import random
+import warnings
+
+import pandas as pd
 import requests
+from sklearn.metrics.pairwise import cosine_similarity
 
-warnings.filterwarnings('ignore')
 
-# --- GLOBAL VARIABLES ---
+warnings.filterwarnings("ignore")
+
+QUALITY_THRESHOLD = 3.9
+MAX_ROUTE_STOPS = 4
+TRAFFIC_BUFFER = 1.25
+AVERAGE_SPEED_KM_PER_MINUTE = 0.5  # Explicit assumption: about 30 km/h.
+DATASET_PATH = Path(__file__).resolve().parent / "data" / "places.csv"
+
 PLACES_DF = None
 TAGS_ENCODED = None
-RF_MODEL = None
-TFIDF_VECTORIZER = None
 
-# --- 1. INITIALIZATION & ML TRAINING PHASE ---
+
 def initialize_ai_engine():
-    global PLACES_DF, TAGS_ENCODED, RF_MODEL, TFIDF_VECTORIZER
-    
-    try:
-        print("[INFO] Loading places dataset into memory from 'data/places.csv'...")
-        PLACES_DF = pd.read_csv('data/places.csv')
-        
-        # Data Cleaning
-        PLACES_DF['Tags'] = PLACES_DF['Tags'].fillna('General')
-        PLACES_DF['Rating'] = PLACES_DF['Rating'].fillna(4.0)
-        
-        print("[INFO] Starting Machine Learning Training Phase (Supervised Learning)...")
-        
-        # Labeling for Quality Prediction (Threshold tuned for higher accuracy)
-        PLACES_DF['High_Quality'] = (PLACES_DF['Rating'] >= 3.9).astype(int)
-        
-        # Feature Engineering: TF-IDF Vectorization with N-grams
-        TFIDF_VECTORIZER = TfidfVectorizer(
-            tokenizer=lambda x: str(x).split('|'), 
-            token_pattern=None,
-            ngram_range=(1, 3) 
-        )
-        X = TFIDF_VECTORIZER.fit_transform(PLACES_DF['Tags'])
-        y = PLACES_DF['High_Quality']
-        
-        # Data Splitting
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=42)
-        
-        # Train Hyperparameter-Tuned Random Forest Model
-        RF_MODEL = RandomForestClassifier(
-            n_estimators=1000,       
-            max_features='sqrt',
-            max_depth=50,          
-            min_samples_split=2,     
-            min_samples_leaf=1,      
-            
-            random_state=42
-        )
-        
-        RF_MODEL.fit(X_train, y_train)
-        
-        # Evaluate metrics for presentation
-        y_pred = RF_MODEL.predict(X_test)
-        acc = accuracy_score(y_test, y_pred)
-        f1 = f1_score(y_test, y_pred, average='weighted')
-        
-        print("\n" + "="*50)
-        print(" 🚀 ML MODEL EVALUATION (SUPERVISED LEARNING) 🚀")
-        print("="*50)
-        print(f" Dataset Size    : {len(PLACES_DF)} locations")
-        print(f" Accuracy Score  : {acc * 100:.2f}%")
-        print(f" F1-Score        : {f1:.4f}")
-        print("="*50 + "\n")
-        
-        # Predict quality for the entire dataset
-        PLACES_DF['Predicted_Quality'] = RF_MODEL.predict(X)
-        TAGS_ENCODED = PLACES_DF['Tags'].str.get_dummies(sep='|')
-        
-        print("[SUCCESS] AI Engine initialized and ready.\n")
-        
-    except Exception as e:
-        print(f"[ERROR] Initialization failed: {str(e)}")
+    """Load runtime data and tag features without training a quality model."""
+    global PLACES_DF, TAGS_ENCODED
 
-# Immediate execution upon backend startup
+    try:
+        print(f"[INFO] Loading places dataset from '{DATASET_PATH}'...")
+        places = pd.read_csv(DATASET_PATH)
+        places["Tags"] = places["Tags"].fillna("General").astype(str)
+        # Invalid or absent observations stay missing rather than being imputed.
+        places["Rating"] = pd.to_numeric(places["Rating"], errors="coerce")
+
+        PLACES_DF = places
+        TAGS_ENCODED = places["Tags"].str.get_dummies(sep="|")
+        print("[SUCCESS] AI Engine data initialized; no model training performed.\n")
+        return True
+    except Exception as exc:
+        PLACES_DF = None
+        TAGS_ENCODED = None
+        print(f"[ERROR] Initialization failed: {exc}")
+        return False
+
+
+# Load immutable runtime inputs once at import/startup; this does not train a model.
 initialize_ai_engine()
 
-# --- HELPER FUNCTIONS ---
+
 def calculate_haversine_distance(lat1, lon1, lat2, lon2):
-    R = 6371.0 # Earth's radius in KM
+    radius_km = 6371.0
     lat1_rad, lon1_rad = math.radians(lat1), math.radians(lon1)
     lat2_rad, lon2_rad = math.radians(lat2), math.radians(lon2)
     dlat = lat2_rad - lat1_rad
     dlon = lon2_rad - lon1_rad
-    a = math.sin(dlat / 2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2)**2
+    a = (
+        math.sin(dlat / 2) ** 2
+        + math.cos(lat1_rad)
+        * math.cos(lat2_rad)
+        * math.sin(dlon / 2) ** 2
+    )
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    return R * c
+    return radius_km * c
+
 
 def format_time_display(total_minutes):
     hours = int(total_minutes // 60)
     mins = int(total_minutes % 60)
     return f"{hours}h {mins}m"
 
-# --- 2. FILTERING (CONTEXT-AWARE COMPOSITE FILTERING) ---
+
 def filter_locations(user_preferences, user_lat, user_lon, radius_km=15):
-    if PLACES_DF is None: return None
+    """Screen by observed quality, then rank by proximity and tag similarity."""
+    if PLACES_DF is None or TAGS_ENCODED is None:
+        return None
 
-    # Step A: Distance Calculation
-    distances = [calculate_haversine_distance(user_lat, user_lon, row['Latitude'], row['Longitude']) for _, row in PLACES_DF.iterrows()]
-    PLACES_DF['Distance_From_Start'] = distances
-    
-    # Step B: Dynamic Radius Expansion (Fail-safe for remote locations)
-    df_radius = PLACES_DF[PLACES_DF['Distance_From_Start'] <= radius_km].copy()
+    distances = [
+        calculate_haversine_distance(
+            user_lat, user_lon, row["Latitude"], row["Longitude"]
+        )
+        for _, row in PLACES_DF.iterrows()
+    ]
+    places_with_distance = PLACES_DF.copy()
+    places_with_distance["Distance_From_Start"] = distances
+
+    # Expand once as the existing fail-safe for remote starting locations.
+    df_radius = places_with_distance[
+        places_with_distance["Distance_From_Start"] <= radius_km
+    ].copy()
     if df_radius.empty:
-        df_radius = PLACES_DF[PLACES_DF['Distance_From_Start'] <= radius_km * 3].copy()
-        
-    if df_radius.empty: return None
+        df_radius = places_with_distance[
+            places_with_distance["Distance_From_Start"] <= radius_km * 3
+        ].copy()
+    if df_radius.empty:
+        return None
 
-    # Step C: Filter by ML Predicted Quality
-    df_quality = df_radius[df_radius['Predicted_Quality'] == 1].copy()
-    if len(df_quality) < 3: 
-        df_quality = df_radius.copy() # Fallback if not enough high-quality places
+    # This is observed-evidence screening, not an ML prediction. Unknown ratings
+    # remain eligible; only observed ratings below the threshold are screened.
+    rating_is_eligible = df_radius["Rating"].isna() | (
+        df_radius["Rating"] >= QUALITY_THRESHOLD
+    )
+    df_quality = df_radius[rating_is_eligible].copy()
+    if len(df_quality) < 3:
+        df_quality = df_radius.copy()
 
     valid_indices = df_quality.index
     tags_radius = TAGS_ENCODED.loc[valid_indices].copy()
 
-    # Step D: Preference Matching (Cosine Similarity)
+    # Preference matching uses cosine similarity over pipe-delimited tag features.
     user_vector = pd.DataFrame(0, index=[0], columns=TAGS_ENCODED.columns)
-    for pref in user_preferences:
-        for col in user_vector.columns:
-            if pref.lower() == col.lower(): user_vector[col] = 1
-            
-    similarities = cosine_similarity(user_vector, tags_radius)[0]
-    df_quality['Similarity_Score'] = similarities
-    
-    # Step E: Composite Scoring (60% Proximity, 40% Similarity)
-    safe_radius = max(df_quality['Distance_From_Start'].max(), 0.1) 
-    df_quality['Proximity_Score'] = 1 - (df_quality['Distance_From_Start'] / safe_radius)
-    df_quality['Composite_Score'] = (df_quality['Similarity_Score'] * 0.4) + (df_quality['Proximity_Score'] * 0.6)
-    
-    recommended = df_quality[df_quality['Similarity_Score'] > 0].sort_values(by='Composite_Score', ascending=False).reset_index(drop=True)
-    
+    normalized_preferences = {str(pref).lower() for pref in user_preferences}
+    for column in user_vector.columns:
+        if column.lower() in normalized_preferences:
+            user_vector[column] = 1
+
+    df_quality["Similarity_Score"] = cosine_similarity(
+        user_vector, tags_radius
+    )[0]
+
+    safe_radius = max(df_quality["Distance_From_Start"].max(), 0.1)
+    df_quality["Proximity_Score"] = 1 - (
+        df_quality["Distance_From_Start"] / safe_radius
+    )
+    # Declared architecture: 70% spatial proximity, 30% semantic similarity.
+    df_quality["Composite_Score"] = (
+        df_quality["Proximity_Score"] * 0.70
+        + df_quality["Similarity_Score"] * 0.30
+    )
+
+    recommended = df_quality[df_quality["Similarity_Score"] > 0].sort_values(
+        by="Composite_Score", ascending=False
+    )
     if recommended.empty:
-        recommended = df_quality.sort_values(by='Distance_From_Start').reset_index(drop=True)
-        
-    return recommended.head(15)
+        recommended = df_quality.sort_values(by="Distance_From_Start")
 
-# --- 3. OPTIMIZATION: GENETIC ALGORITHM (SPATIO-TEMPORAL ROUTING) ---
+    return recommended.reset_index(drop=True).head(15)
+
+
 def evaluate_route(route_indices, df, start_lat, start_lon):
-    if not route_indices: return 0, 0
-    total_time_mins = 0
-    total_similarity = 0
-    TRAFFIC_BUFFER = 1.25 
-    AVG_SPEED = 0.5 # Estimated speed (~30km/h)
-    
-    # Path from start point to first location
-    first_loc = df.iloc[route_indices[0]]
-    dist = calculate_haversine_distance(start_lat, start_lon, first_loc['Latitude'], first_loc['Longitude'])
-    total_time_mins += (dist / AVG_SPEED) * TRAFFIC_BUFFER
-    
-    # Calculate sequential route time
-    for i in range(len(route_indices)):
-        loc = df.iloc[route_indices[i]]
-        total_time_mins += loc['Duration_Minutes'] 
-        total_similarity += loc.get('Similarity_Score', 1) 
-        
-        if i < len(route_indices) - 1:
-            next_loc = df.iloc[route_indices[i+1]]
-            dist = calculate_haversine_distance(loc['Latitude'], loc['Longitude'], next_loc['Latitude'], next_loc['Longitude'])
-            total_time_mins += (dist / AVG_SPEED) * TRAFFIC_BUFFER
-            
-    return total_time_mins, total_similarity
+    """Return route minutes and summed relevance under explicit traffic assumptions."""
+    if not route_indices:
+        return 0, 0
 
-def run_genetic_algorithm(filtered_df, max_time_minutes, start_lat, start_lon):
-    if filtered_df is None or filtered_df.empty: return [], "0h 0m", False
-    
+    total_time_mins = 0.0
+    total_relevance = 0.0
+    first_loc = df.iloc[route_indices[0]]
+    distance = calculate_haversine_distance(
+        start_lat, start_lon, first_loc["Latitude"], first_loc["Longitude"]
+    )
+    total_time_mins += (
+        distance / AVERAGE_SPEED_KM_PER_MINUTE
+    ) * TRAFFIC_BUFFER
+
+    for position, route_index in enumerate(route_indices):
+        location = df.iloc[route_index]
+        total_time_mins += float(location["Duration_Minutes"])
+        relevance = location.get(
+            "Composite_Score", location.get("Similarity_Score", 1.0)
+        )
+        total_relevance += 0.0 if pd.isna(relevance) else float(relevance)
+
+        if position < len(route_indices) - 1:
+            next_location = df.iloc[route_indices[position + 1]]
+            distance = calculate_haversine_distance(
+                location["Latitude"],
+                location["Longitude"],
+                next_location["Latitude"],
+                next_location["Longitude"],
+            )
+            total_time_mins += (
+                distance / AVERAGE_SPEED_KM_PER_MINUTE
+            ) * TRAFFIC_BUFFER
+
+    return total_time_mins, total_relevance
+
+
+def repair_route(route, valid_indices, rng=None, max_stops=MAX_ROUTE_STOPS):
+    """Remove invalid/duplicate genes and guarantee a valid non-empty route."""
+    valid_indices = list(dict.fromkeys(valid_indices))
+    if not valid_indices:
+        return []
+
+    valid_set = set(valid_indices)
+    repaired = []
+    for index in route:
+        if index in valid_set and index not in repaired:
+            repaired.append(index)
+        if len(repaired) == min(max_stops, len(valid_indices)):
+            break
+
+    if not repaired:
+        chooser = rng if rng is not None else random
+        repaired = [chooser.choice(valid_indices)]
+    return repaired
+
+
+def crossover_routes(parent_a, parent_b, valid_indices, rng=None):
+    """Ordered crossover combining a prefix from one parent with the other."""
+    chooser = rng if rng is not None else random
+    parent_a = repair_route(parent_a, valid_indices, chooser)
+    parent_b = repair_route(parent_b, valid_indices, chooser)
+    target_length = min(
+        MAX_ROUTE_STOPS,
+        len(set(parent_a + parent_b)),
+        max(
+            1,
+            chooser.randint(
+                min(len(parent_a), len(parent_b)),
+                max(len(parent_a), len(parent_b)),
+            ),
+        ),
+    )
+    # When the child can hold multiple genes, reserve room for parent B so this
+    # is a genuine two-parent operator rather than a parent clone.
+    maximum_cut = min(len(parent_a), target_length - 1)
+    cut = chooser.randint(1, maximum_cut) if maximum_cut >= 1 else 1
+    child = parent_a[:cut]
+    child.extend(index for index in parent_b if index not in child)
+    if len(child) < target_length:
+        unused = [index for index in valid_indices if index not in child]
+        chooser.shuffle(unused)
+        child.extend(unused[: target_length - len(child)])
+    return repair_route(child[:target_length], valid_indices, chooser)
+
+
+def mutate_route(route, valid_indices, rng=None):
+    """Explore route membership and ordering while preserving all constraints."""
+    chooser = rng if rng is not None else random
+    route = repair_route(route, valid_indices, chooser)
+    if not route:
+        return []
+
+    unused = [index for index in valid_indices if index not in route]
+    operations = []
+    if len(route) > 1:
+        operations.extend(["swap", "remove"])
+    if unused:
+        operations.append("replace")
+        if len(route) < min(MAX_ROUTE_STOPS, len(valid_indices)):
+            operations.append("add")
+    if not operations:
+        return route
+
+    operation = chooser.choice(operations)
+    if operation == "swap":
+        first, second = chooser.sample(range(len(route)), 2)
+        route[first], route[second] = route[second], route[first]
+    elif operation == "replace":
+        route[chooser.randrange(len(route))] = chooser.choice(unused)
+    elif operation == "add":
+        route.insert(chooser.randrange(len(route) + 1), chooser.choice(unused))
+    elif operation == "remove":
+        route.pop(chooser.randrange(len(route)))
+
+    return repair_route(route, valid_indices, chooser)
+
+
+def _route_fitness(route, df, max_time_minutes, start_lat, start_lon):
+    route_time, relevance = evaluate_route(route, df, start_lat, start_lon)
+    if route_time > max_time_minutes:
+        return 0.0001 / (route_time + 1), route_time
+    fitness = (
+        (relevance * 100)
+        + (len(route) * 10)
+        + (1000 / (route_time + 1))
+    )
+    return fitness, route_time
+
+
+def _tournament_select(population, fitnesses, rng, tournament_size=3):
+    contestants = rng.sample(
+        list(zip(population, fitnesses)), min(tournament_size, len(population))
+    )
+    return max(contestants, key=lambda item: item[1])[0].copy()
+
+
+def run_genetic_algorithm(
+    filtered_df, max_time_minutes, start_lat, start_lon, random_seed=42
+):
+    """Optimize a unique 1-4 stop route using a deterministic, constrained GA."""
+    if filtered_df is None or filtered_df.empty:
+        return [], "0h 0m", False
+
+    rng = random.Random(random_seed)
     all_indices = list(range(len(filtered_df)))
-    pop_size = 100
+    max_stops = min(MAX_ROUTE_STOPS, len(all_indices))
+    population_size = 100
     generations = 100
-    
-    # Initialize random population
-    population = [random.sample(all_indices, random.randint(1, min(4, len(all_indices)))) for _ in range(pop_size)]
-    best_overall_route = []
-    best_overall_fitness = -1
-    best_overall_time = 0
+    elite_count = 5
+
+    # Seed every singleton so a feasible place cannot be missed by initialization.
+    population = [[index] for index in all_indices]
+    while len(population) < population_size:
+        route_length = rng.randint(1, max_stops)
+        population.append(rng.sample(all_indices, route_length))
+    population = population[:population_size]
+
+    best_route = []
+    best_fitness = -1.0
+    best_time = 0.0
 
     for _ in range(generations):
-        fitnesses = []
-        for route in population:
-            time, sim = evaluate_route(route, filtered_df, start_lat, start_lon)
-            
-            # Fitness logic: Reward similarity and time efficiency
-            if time <= max_time_minutes:
-                fitness = (sim * 100) + (1000 / (time + 1))
-            else:
-                fitness = 0.0001 / (time + 1) # Time penalty
-            
-            fitnesses.append(fitness)
-            if fitness > best_overall_fitness and time <= max_time_minutes:
-                best_overall_fitness, best_overall_route, best_overall_time = fitness, route, time
-                
-        # Crossover & Mutation
-        new_population = [best_overall_route] if best_overall_route else [population[0]]
-        while len(new_population) < pop_size:
-            parent = max(random.sample(list(zip(population, fitnesses)), 3), key=lambda x: x[1])[0].copy()
-            if random.random() < 0.3 and len(parent) > 1: # Mutation
-                i1, i2 = random.sample(range(len(parent)), 2)
-                parent[i1], parent[i2] = parent[i2], parent[i1]
-            new_population.append(parent)
+        evaluated = [
+            _route_fitness(
+                route, filtered_df, max_time_minutes, start_lat, start_lon
+            )
+            for route in population
+        ]
+        fitnesses = [item[0] for item in evaluated]
+
+        for route, (fitness, route_time) in zip(population, evaluated):
+            if route_time <= max_time_minutes and fitness > best_fitness:
+                best_route = route.copy()
+                best_fitness = fitness
+                best_time = route_time
+
+        ranked = sorted(
+            zip(population, fitnesses), key=lambda item: item[1], reverse=True
+        )
+        # Elitism preserves the best candidates unchanged between generations.
+        new_population = [route.copy() for route, _ in ranked[:elite_count]]
+        while len(new_population) < population_size:
+            parent_a = _tournament_select(population, fitnesses, rng)
+            parent_b = _tournament_select(population, fitnesses, rng)
+            child = crossover_routes(parent_a, parent_b, all_indices, rng)
+            if rng.random() < 0.35:
+                child = mutate_route(child, all_indices, rng)
+            new_population.append(repair_route(child, all_indices, rng))
         population = new_population
 
     penalty_hit = False
-    
-    # Graceful Time Fallback: Provide the closest single location if time is too short
-    if not best_overall_route:
-        best_overall_route = [min(all_indices, key=lambda x: evaluate_route([x], filtered_df, start_lat, start_lon)[0])]
-        best_overall_time, _ = evaluate_route(best_overall_route, filtered_df, start_lat, start_lon)
-        penalty_hit = True 
-        
-    optimal_places = [f"{filtered_df.iloc[idx]['Name']} ({int(filtered_df.iloc[idx]['Duration_Minutes'])} mins)" for idx in best_overall_route]
-    return optimal_places, format_time_display(best_overall_time), penalty_hit
+    # Existing graceful fallback: closest/quickest singleton when none is feasible.
+    if not best_route:
+        best_route = [
+            min(
+                all_indices,
+                key=lambda index: evaluate_route(
+                    [index], filtered_df, start_lat, start_lon
+                )[0],
+            )
+        ]
+        best_time, _ = evaluate_route(
+            best_route, filtered_df, start_lat, start_lon
+        )
+        penalty_hit = True
 
-# --- 4. EXPLAINABLE AI (XAI) TEXT FORMATTER ---
+    best_route = repair_route(best_route, all_indices, rng)
+    optimal_places = [
+        f"{filtered_df.iloc[index]['Name']} "
+        f"({int(filtered_df.iloc[index]['Duration_Minutes'])} mins)"
+        for index in best_route
+    ]
+    return optimal_places, format_time_display(best_time), penalty_hit
+
+
 def generate_itinerary_summary(places, preferences, api_key):
-    if not places or not api_key: return "Optimal itinerary generated."
-    
-    # Prompt is strictly constrained to text-formatting to explain the rationale
+    if not places or not api_key:
+        return "Optimal itinerary generated."
+
     prompt = f"""
-    Act strictly as an Explainable AI (XAI) text-formatter for a Context-Aware Spatio-Temporal travel system. 
+    Act strictly as an Explainable AI (XAI) text-formatter for a Context-Aware Spatio-Temporal travel system.
     User Preferences: {', '.join(preferences)}.
     Optimized Route with Allocated Times: {', '.join(places)}.
-    
-    Task: Generate a structured summary explaining that the locations were selected via Machine Learning Quality filtering and Cosine Similarity mapping, and the routing sequence was optimized using a Genetic Algorithm. Keep it engaging and concise.
+
+    Task: Generate a structured summary explaining that locations passed observed-rating quality screening (missing ratings remained eligible), preferences were matched using cosine similarity, and the routing sequence was optimized using a Genetic Algorithm. Keep it engaging and concise.
     """
-    
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={api_key}"
+
+    url = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        f"gemini-flash-latest:generateContent?key={api_key}"
+    )
     try:
-        response = requests.post(url, headers={'Content-Type': 'application/json'}, json={"contents": [{"parts": [{"text": prompt}]}]})
+        response = requests.post(
+            url,
+            headers={"Content-Type": "application/json"},
+            json={"contents": [{"parts": [{"text": prompt}]}]},
+        )
         if response.status_code == 200:
-            return response.json()['candidates'][0]['content']['parts'][0]['text']
+            return response.json()["candidates"][0]["content"]["parts"][0]["text"]
         return "This Context-Aware itinerary blends your selected interests while optimizing for travel time."
-    except: 
+    except requests.RequestException:
         return "This Context-Aware itinerary blends your selected interests while optimizing for travel time."
