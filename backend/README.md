@@ -180,6 +180,103 @@ The following files are retained for historical research reproducibility and are
 
 The active ML path is `src/routes/safetyRoutes.js` -> `src/ai-engine/scripts/predict_safety.py` -> `src/ai-engine/scripts/risk_model_v2.joblib`. `src/ai-engine/scripts/train_models_v2.py` is the active research-training script for the v2 artifact.
 
+
+## Dataset Provenance and Validity Limitations
+
+The Safety Analyzer currently relies on three primary local input datasets:
+
+- `src/ai-engine/data/Road Dataset.csv`
+- `src/ai-engine/data/Disaster Dataset.csv`
+- `src/ai-engine/data/vehicles.csv`
+
+Derived artifacts include:
+
+- `processed_roads.csv`
+- `processed_disasters.csv`
+- `processed_vehicles.csv`
+- `risk_training_dataset.csv`
+- `dataset_cleaning_report.csv`
+
+The processed datasets and training dataset are generated or transformed by project scripts. However, the original authoritative source, publication URL, collection date, licence, geographic/temporal collection methodology, and data-generation methodology for the three primary input datasets are not currently documented in this repository.
+
+Therefore, this project does not claim that the three source CSV files constitute independently verified, official, complete, or authoritative Sri Lankan road-safety ground truth.
+
+Repository history confirms when the datasets were added to this project, but Git history does not establish who originally collected the data or how the underlying measurements were produced.
+
+Earlier repository versions contained disaster records with advisory-authority fields such as `NBRO`, `DMC`, and `RDA/NBRO`. These values are treated only as dataset attributes and must not be interpreted as proof that the dataset was published, validated, or officially supplied by those organizations.
+
+### Risk Label Definition
+
+The ML target `risk_level` is derived deterministically from the `Severity Level` field in `Disaster Dataset.csv`.
+
+The deployed model uses the classes:
+
+- `Low`
+- `Medium`
+- `High`
+
+`severity_level` is retained only as metadata and is not included as an ML input feature, preventing direct target leakage.
+
+Because no authoritative external validation source for the severity labels is documented, `risk_level` should be interpreted as an internal proxy for historical hazard/risk severity rather than independently validated accident probability or objective road-safety ground truth.
+
+### Road-Profile Coverage
+
+The generated ML training dataset contains **598 records**.
+
+Road-profile coverage is:
+
+- **135 records (22.6%)** with available road-profile data.
+- **463 records (77.4%)** without matching numeric road-profile data.
+
+The disaster dataset contains 22 route families, while the current road dataset overlaps with only five:
+
+- `A1`
+- `A2`
+- `A4`
+- `A5`
+- `A16`
+
+The verified matching results are:
+
+- 113 exact matches;
+- 22 route-level matches; and
+- 463 records with no road-data coverage.
+
+The 463 uncovered rows are caused by source dataset coverage mismatch rather than a route-code join failure.
+
+### Missing Road-Data Handling
+
+When no road dataset coverage exists, the builder does not fabricate road measurements.
+
+Instead:
+
+- `gradient`, `elevation`, and `friction` remain missing;
+- unavailable categorical road fields are represented as `Unknown`;
+- `road_data_available` is set to `0`;
+- `match_type` records the matching condition.
+
+The ML preprocessing pipeline handles missing numeric values using median imputation and categorical values using most-frequent imputation.
+
+`road_data_available` is included as an ML feature so the model can distinguish records with road evidence from records where road-profile information is unavailable.
+
+Predictions for routes without road-profile coverage should therefore be interpreted primarily as historical hazard/risk classification with limited road-profile evidence.
+
+### Research Validity Scope
+
+The current implementation is a research prototype.
+
+The following limitations must be considered when interpreting results:
+
+- original dataset provenance is undocumented;
+- authenticity and generation methodology of the three primary input datasets are not independently established;
+- source severity labels have not been independently externally validated;
+- 77.4% of training records lack matching numeric road-profile data;
+- current road-profile matching is route-family based rather than geometry-based;
+- the dataset does not represent complete Sri Lankan road coverage;
+- reported ML metrics describe performance on the current research dataset rather than independently validated nationwide real-world road-safety accuracy.
+
+Future work should prioritize authoritative dataset sourcing, source citations and licences, independently validated risk labels, broader road-profile coverage, and geometry-based road-segment matching.
+
 ## Important Limitations
 
 - The model classifies historical hazard/risk severity rather than accident probability.

@@ -137,8 +137,20 @@ The current backend regression suite has eight tests protecting:
 ## 14. Limitations
 
 - The model is not an accident-probability model.
+- The original source, licence, collection date, publication date, and generation methodology of the three primary input datasets are not documented in this repository.
+- Repository evidence does not establish whether the primary road, disaster, and vehicle datasets are observed real-world data, manually curated data, synthetic/generated data, simulated data, augmented data, or a mixture.
+- The ML target `risk_level` is a deterministic transformation of the source `Severity Level` field and should be treated as an internal proxy for historical hazard/risk severity.
+- The source severity labels have not been independently externally validated.
+- The current training dataset contains 598 records.
+- Only 135 of 598 records (22.6%) have matching road-profile data.
+- 463 of 598 records (77.4%) have no matching numeric road-profile data.
+- The disaster dataset contains 22 route families, but only A1, A2, A4, A5, and A16 overlap with the current road dataset.
+- Verified matching produced 113 exact matches, 22 route-level matches, and 463 no-road-data records.
+- Missing road-profile measurements are not fabricated. Numeric road values remain missing and unavailable categorical fields are represented as `Unknown`.
 - The current road dataset has no geometry.
-- Route-family aggregation is an approximation.
+- Route-family aggregation is an approximation and is not equivalent to exact traversed-segment analysis.
+- The current datasets do not support a claim of complete nationwide Sri Lankan road coverage.
+- Model performance metrics describe performance on the current research dataset and must not be interpreted as independently validated nationwide road-safety accuracy.
 - Vehicle ranking is a heuristic based on available dataset attributes.
 - Location typo handling cannot guarantee every ambiguous input.
 - Graph reasoning is not full LLM GraphRAG.
