@@ -1,1 +1,3 @@
-verification_id,poi_id,field_checked,original_value,verified_value,status,evidence_url,checked_by,checked_at,notes
+﻿"verification_id","poi_id","field_checked","original_value","verified_value","status","evidence_url","checked_by","checked_at","notes"
+"review-club-sha-lanka-v1","osm-way-691531446-gampaha","poi_eligibility","tourism=attraction|amenity=car_rental","reject","preliminary_reject","https://www.openstreetmap.org/way/691531446","IT22224866","2026-08-20T13:17:58+05:30","Car-rental business; insufficient evidence as an itinerary POI."
+"review-ananda-college-v1","osm-node-618491025-colombo","poi_eligibility","historic=monument|amenity=school","manual_review","manual_review","https://www.openstreetmap.org/node/618491025","IT22224866","2026-08-20T13:17:58+05:30","Historically important school, but tourist access and itinerary suitability require independent evidence."
