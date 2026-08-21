@@ -18,6 +18,24 @@ const GEOAPIFY_URL =
 const OSRM_URL =
   "https://router.project-osrm.org/route/v1/driving";
 
+const GEOCODER_REQUEST_TIMEOUT_MS =
+  Number(
+    process.env.GEOCODER_REQUEST_TIMEOUT_MS ||
+    8000
+  );
+
+const ROUTING_REQUEST_TIMEOUT_MS =
+  Number(
+    process.env.ROUTING_REQUEST_TIMEOUT_MS ||
+    10000
+  );
+
+const OLLAMA_LOCATION_TIMEOUT_MS =
+  Number(
+    process.env.OLLAMA_LOCATION_TIMEOUT_MS ||
+    8000
+  );
+
 
 // A direct Nominatim match must be quite strong.
 // Otherwise we allow Geoapify to correct the text.
@@ -294,6 +312,42 @@ const getGeoapifyCandidateName = (
 };
 
 
+const getTimeoutError = (
+  message
+) => {
+  const error = new Error(message);
+
+  error.code = "GEOCODING_UNAVAILABLE";
+
+  return error;
+};
+
+
+const withTimeout = (
+  promise,
+  timeoutMs,
+  timeoutMessage
+) =>
+  new Promise(
+    (resolve, reject) => {
+      const timeout = setTimeout(
+        () => reject(
+          getTimeoutError(
+            timeoutMessage
+          )
+        ),
+        timeoutMs
+      );
+
+      Promise.resolve(promise)
+        .then(resolve, reject)
+        .finally(
+          () => clearTimeout(timeout)
+        );
+    }
+  );
+
+
 // ==================================================
 // Nominatim candidates
 // ==================================================
@@ -334,17 +388,18 @@ const getNominatimCandidates = async (
         },
 
         timeout:
-          8000,
+          GEOCODER_REQUEST_TIMEOUT_MS,
       }
     );
 
 
-  const places =
-    Array.isArray(
-      response.data
-    )
-      ? response.data
-      : [];
+  if (!Array.isArray(response.data)) {
+    throw getTimeoutError(
+      "Nominatim returned an invalid response."
+    );
+  }
+
+  const places = response.data;
 
 
   return places
@@ -453,14 +508,23 @@ const getGeoapifyCandidates = async (
         },
 
         timeout:
-          8000,
+          GEOCODER_REQUEST_TIMEOUT_MS,
       }
     );
 
 
-  const results =
-    response.data
-      ?.results || [];
+  if (
+    !response.data ||
+    !Array.isArray(
+      response.data.results
+    )
+  ) {
+    throw getTimeoutError(
+      "Geoapify returned an invalid response."
+    );
+  }
+
+  const results = response.data.results;
 
 
   return results
@@ -568,8 +632,12 @@ const geocodeWithOllamaCandidates =
 
     try {
       candidates =
-        await getLocationCandidates(
-          originalLocation
+        await withTimeout(
+          getLocationCandidates(
+            originalLocation
+          ),
+          OLLAMA_LOCATION_TIMEOUT_MS,
+          "Ollama location correction timed out."
         );
     } catch (error) {
       console.log(
@@ -703,6 +771,9 @@ const geocodeLocation = async (
   }
 
 
+  let receivedGeocoderResponse = false;
+  let geocoderFailure = null;
+
   // ----------------------------------------------
   // 1. Nominatim direct lookup
   // ----------------------------------------------
@@ -712,6 +783,8 @@ const geocodeLocation = async (
       await getNominatimCandidates(
         cleanLocation
       );
+
+    receivedGeocoderResponse = true;
 
 
     if (
@@ -739,6 +812,7 @@ const geocodeLocation = async (
       );
     }
   } catch (error) {
+    geocoderFailure = error;
     console.log(
       `Nominatim lookup failed for "${cleanLocation}":`,
       error.message
@@ -755,6 +829,10 @@ const geocodeLocation = async (
       await getGeoapifyCandidates(
         cleanLocation
       );
+
+    if (process.env.GEOAPIFY_API_KEY) {
+      receivedGeocoderResponse = true;
+    }
 
 
     if (
@@ -782,6 +860,8 @@ const geocodeLocation = async (
       );
     }
   } catch (error) {
+    geocoderFailure =
+      geocoderFailure || error;
     console.log(
       `Geoapify lookup failed for "${cleanLocation}":`,
       error.response?.data ||
@@ -817,6 +897,21 @@ const geocodeLocation = async (
       `Ollama fallback failed for "${cleanLocation}":`,
       error.message
     );
+  }
+
+
+  if (
+    !receivedGeocoderResponse &&
+    geocoderFailure
+  ) {
+    const error = new Error(
+      "Location lookup service is temporarily unavailable."
+    );
+
+    error.code =
+      "GEOCODING_UNAVAILABLE";
+
+    throw error;
   }
 
 
@@ -878,14 +973,29 @@ const getRouteDetails = async (
           },
 
           timeout:
-            10000,
+            ROUTING_REQUEST_TIMEOUT_MS,
         }
       );
 
 
+    if (
+      !Array.isArray(
+        response.data?.routes
+      )
+    ) {
+      const error = new Error(
+        "Routing service returned an invalid response."
+      );
+
+      error.code =
+        "ROUTE_SERVICE_ERROR";
+
+      throw error;
+    }
+
+
     const route =
-      response.data
-        ?.routes?.[0];
+      response.data.routes[0];
 
 
     if (!route) {
@@ -978,6 +1088,8 @@ const getRouteDetails = async (
       error.code ===
         "LOCATION_NOT_FOUND" ||
       error.code ===
+        "GEOCODING_UNAVAILABLE" ||
+      error.code ===
         "ROUTE_NOT_FOUND"
     ) {
       throw error;
@@ -999,4 +1111,7 @@ const getRouteDetails = async (
 
 module.exports = {
   getRouteDetails,
+  GEOCODER_REQUEST_TIMEOUT_MS,
+  ROUTING_REQUEST_TIMEOUT_MS,
+  OLLAMA_LOCATION_TIMEOUT_MS,
 };

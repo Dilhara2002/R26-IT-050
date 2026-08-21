@@ -1,5 +1,21 @@
 const axios = require("axios");
 
+const WEATHER_REQUEST_TIMEOUT_MS =
+  Number(
+    process.env.WEATHER_REQUEST_TIMEOUT_MS ||
+    8000
+  );
+
+
+const getUnavailableWeather = () => ({
+  status: "unavailable",
+  isRaining: null,
+  temperature: null,
+  weatherMain: null,
+  weatherDescription: null,
+  locationName: null,
+});
+
 const getWeatherByCoordinates = async (latitude, longitude) => {
   try {
     const apiKey = process.env.OPENWEATHER_API_KEY;
@@ -17,8 +33,24 @@ const getWeatherByCoordinates = async (latitude, longitude) => {
           appid: apiKey,
           units: "metric",
         },
+
+        timeout:
+          WEATHER_REQUEST_TIMEOUT_MS,
       }
     );
+
+    if (
+      !response.data ||
+      typeof response.data !== "object" ||
+      !Array.isArray(
+        response.data.weather
+      ) ||
+      !response.data.weather[0]
+    ) {
+      throw new Error(
+        "Weather API returned an invalid response."
+      );
+    }
 
     const weatherMain = response.data.weather?.[0]?.main || "";
     const weatherDescription = response.data.weather?.[0]?.description || "";
@@ -29,6 +61,7 @@ const getWeatherByCoordinates = async (latitude, longitude) => {
       response.data.rain !== undefined;
 
     return {
+      status: "available",
       isRaining,
       temperature: response.data.main?.temp,
       weatherMain,
@@ -38,16 +71,11 @@ const getWeatherByCoordinates = async (latitude, longitude) => {
   } catch (error) {
     console.error("Weather API Error:", error.response?.data || error.message);
 
-    return {
-      isRaining: false,
-      temperature: null,
-      weatherMain: "Unknown",
-      weatherDescription: "Weather data unavailable",
-      locationName: null,
-    };
+    return getUnavailableWeather();
   }
 };
 
 module.exports = {
   getWeatherByCoordinates,
+  WEATHER_REQUEST_TIMEOUT_MS,
 };

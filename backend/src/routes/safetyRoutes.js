@@ -18,6 +18,12 @@ const graphManager = require(
   "../ai-engine/knowledge-graph/graphManager"
 );
 
+const ML_PREDICTION_TIMEOUT_MS =
+  Number(
+    process.env.ML_PREDICTION_TIMEOUT_MS ||
+    15000
+  );
+
 
 // ==================================================
 // Helpers
@@ -970,6 +976,8 @@ const runRiskPrediction = (
 
       let settled = false;
 
+      let timeout;
+
 
       const rejectMlUnavailable = (
         message
@@ -980,6 +988,8 @@ const runRiskPrediction = (
         }
 
         settled = true;
+
+        clearTimeout(timeout);
 
         const error = new Error(
           message
@@ -1029,6 +1039,8 @@ const runRiskPrediction = (
             return;
           }
 
+          clearTimeout(timeout);
+
           if (
             code !== 0
           ) {
@@ -1074,6 +1086,22 @@ const runRiskPrediction = (
           }
 
         }
+      );
+
+
+      timeout = setTimeout(
+        () => {
+          if (settled) {
+            return;
+          }
+
+          pythonProcess.kill();
+
+          rejectMlUnavailable(
+            `ML prediction timed out after ${ML_PREDICTION_TIMEOUT_MS}ms.`
+          );
+        },
+        ML_PREDICTION_TIMEOUT_MS
       );
 
     }
@@ -1201,6 +1229,93 @@ const buildMLInput = (
 };
 
 
+const hasUsableRoadData = (
+  roadInfo
+) => {
+  const values = [
+    getField(
+      roadInfo,
+      [
+        "Max Gradient (%)",
+        "Average Elevation",
+        "Average Elevation (m)",
+        "Surface Friction Index",
+      ]
+    ),
+    getField(
+      roadInfo,
+      [
+        "Terrain Type",
+        "Road Surface Condition",
+        "Typical Road Width",
+        "Typical Road Width (m)",
+      ]
+    ),
+  ];
+
+  return values.some(
+    (value) =>
+      value !== null &&
+      value !== undefined &&
+      String(value).trim() !== ""
+  );
+};
+
+
+const defaultDependencies = {
+  getRouteDetails,
+  getWeatherByCoordinates,
+  getRoadData,
+  graphManager,
+  runRiskPrediction,
+};
+
+let routeDependencies = {
+  ...defaultDependencies,
+};
+
+
+const setDependenciesForTesting = (
+  overrides = {}
+) => {
+  routeDependencies = {
+    ...routeDependencies,
+    ...overrides,
+  };
+};
+
+
+const resetDependenciesForTesting = () => {
+  routeDependencies = {
+    ...defaultDependencies,
+  };
+};
+
+
+const getUnavailableWeather = () => ({
+  status: "unavailable",
+  isRaining: null,
+  temperature: null,
+  weatherMain: null,
+  weatherDescription: null,
+  locationName: null,
+});
+
+
+const sendControlledError = (
+  res,
+  status,
+  code,
+  message
+) =>
+  res.status(status).json({
+    success: false,
+    error: true,
+    code,
+    message,
+  });
+
+
 // ==================================================
 // Main API
 // ==================================================
@@ -1214,6 +1329,12 @@ router.post(
 
     try {
 
+      const requestBody =
+        req.body &&
+        typeof req.body === "object"
+          ? req.body
+          : {};
+
       const {
         budget,
         passengers,
@@ -1221,13 +1342,23 @@ router.post(
         endLocation,
         preferredCategory,
         preferredVehicle,
-      } = req.body;
+      } = requestBody;
 
 
       const requestedVehicleCategory =
         preferredCategory ||
         preferredVehicle ||
         "";
+
+      const cleanStartLocation =
+        typeof startLocation === "string"
+          ? startLocation.trim()
+          : "";
+
+      const cleanEndLocation =
+        typeof endLocation === "string"
+          ? endLocation.trim()
+          : "";
 
 
       // ------------------------------------------------
@@ -1237,8 +1368,8 @@ router.post(
       if (
         budget === undefined ||
         passengers === undefined ||
-        !startLocation ||
-        !endLocation
+        !cleanStartLocation ||
+        !cleanEndLocation
       ) {
 
         return res
@@ -1290,7 +1421,10 @@ router.post(
         !Number.isFinite(
           passengerCount
         ) ||
-        passengerCount <= 0
+        passengerCount <= 0 ||
+        !Number.isInteger(
+          passengerCount
+        )
       ) {
 
         return res
@@ -1310,11 +1444,57 @@ router.post(
       // Route service
       // ------------------------------------------------
 
-      const routeDetails =
-        await getRouteDetails(
-          startLocation,
-          endLocation
-        );
+      let routeDetails;
+
+      try {
+        routeDetails =
+          await routeDependencies.getRouteDetails(
+            cleanStartLocation,
+            cleanEndLocation
+          );
+      } catch (error) {
+        if (
+          error.code ===
+            "LOCATION_REQUIRED" ||
+          error.code ===
+            "LOCATION_NOT_FOUND"
+        ) {
+          return sendControlledError(
+            res,
+            422,
+            "LOCATION_UNRESOLVABLE",
+            "The start or destination location could not be resolved. Please check the location name and try again."
+          );
+        }
+
+        if (
+          error.code ===
+            "GEOCODING_UNAVAILABLE" ||
+          error.code ===
+            "ROUTE_SERVICE_ERROR"
+        ) {
+          return sendControlledError(
+            res,
+            503,
+            "LOCATION_SERVICE_UNAVAILABLE",
+            "The location and routing service is temporarily unavailable. Please try again."
+          );
+        }
+
+        if (
+          error.code ===
+            "ROUTE_NOT_FOUND"
+        ) {
+          return sendControlledError(
+            res,
+            422,
+            "ROUTE_NOT_FOUND",
+            "No drivable route was found between the resolved locations."
+          );
+        }
+
+        throw error;
+      }
 
 
       const distanceKm =
@@ -1350,34 +1530,60 @@ router.post(
       // It does NOT arbitrarily modify the ML score.
       // ------------------------------------------------
 
-      const weatherInfo =
-        await getWeatherByCoordinates(
-          routeDetails
-            .startCoordinates
-            .latitude,
+      let weatherInfo;
 
-          routeDetails
-            .startCoordinates
-            .longitude
+      try {
+        weatherInfo =
+          await routeDependencies.getWeatherByCoordinates(
+            routeDetails
+              .startCoordinates
+              .latitude,
+
+            routeDetails
+              .startCoordinates
+              .longitude
+          );
+      } catch (error) {
+        console.error(
+          "Weather lookup failed. Continuing without weather context:",
+          error.message
         );
+
+        weatherInfo =
+          getUnavailableWeather();
+      }
 
 
       const isRaining =
-        Boolean(
-          weatherInfo
-            ?.isRaining
-        );
+        weatherInfo?.isRaining ??
+        null;
 
 
       // ------------------------------------------------
       // Road dataset
       // ------------------------------------------------
 
-      const roadInfo =
-        await getRoadData(
-          startLocation,
-          endLocation
+      let roadInfo;
+
+      try {
+        roadInfo =
+          await routeDependencies.getRoadData(
+            cleanStartLocation,
+            cleanEndLocation
+          );
+      } catch (error) {
+        console.error(
+          "Road data lookup failed:",
+          error.message
         );
+
+        return sendControlledError(
+          res,
+          503,
+          "ROAD_DATA_UNAVAILABLE",
+          "The road dataset is temporarily unavailable. Please try again."
+        );
+      }
 
 
       if (
@@ -1391,9 +1597,19 @@ router.post(
               false,
 
             message:
-              `No supported road dataset match was found for ${startLocation} to ${endLocation}.`,
+          `No supported road dataset match was found for ${cleanStartLocation} to ${cleanEndLocation}.`,
           });
 
+      }
+
+
+      if (!hasUsableRoadData(roadInfo)) {
+        return sendControlledError(
+          res,
+          422,
+          "ROAD_DATA_INCOMPLETE",
+          "The matched road does not contain enough data for a safety analysis."
+        );
       }
 
 
@@ -1435,10 +1651,10 @@ router.post(
           fetchedGraphContext,
           fetchedGraphReasoning,
         ] = await Promise.all([
-          graphManager.getMLRiskContext(
+          routeDependencies.graphManager.getMLRiskContext(
             matchedRoadName
           ),
-          graphManager.getSafetyReasoning(
+          routeDependencies.graphManager.getSafetyReasoning(
             matchedRoadName
           ),
         ]);
@@ -1480,7 +1696,7 @@ router.post(
       try {
 
         riskPrediction =
-          await runRiskPrediction(
+          await routeDependencies.runRiskPrediction(
             mlInput
           );
 
@@ -1496,13 +1712,12 @@ router.post(
             error.message
           );
 
-          return res.status(503).json({
-            success: false,
-            error: true,
-            code: "ML_UNAVAILABLE",
-            message:
-              "The route risk prediction service is temporarily unavailable. Please try again.",
-          });
+          return sendControlledError(
+            res,
+            503,
+            "ML_UNAVAILABLE",
+            "The route risk prediction service is temporarily unavailable. Please try again."
+          );
 
         }
 
@@ -2017,24 +2232,15 @@ router.post(
 
       console.error(
         "Safety Route Error:",
-        error
+        error.message
       );
 
-
-      return res
-        .status(500)
-        .json({
-
-          success:
-            false,
-
-          message:
-            "Internal server error.",
-
-          error:
-            error.message,
-
-        });
+      return sendControlledError(
+        res,
+        500,
+        "SAFETY_ANALYSIS_FAILED",
+        "Unable to complete the safety analysis. Please try again."
+      );
 
     }
   }
@@ -2046,4 +2252,7 @@ module.exports =
 
 module.exports.__test = {
   calculateVehicleSuitability,
+  setDependenciesForTesting,
+  resetDependenciesForTesting,
+  ML_PREDICTION_TIMEOUT_MS,
 };

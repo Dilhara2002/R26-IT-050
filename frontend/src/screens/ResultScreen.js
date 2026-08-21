@@ -279,9 +279,11 @@ export default function ResultScreen({
 
         <Text style={styles.text}>
           Rain Detected:{" "}
-          {result?.analysis?.rainDetected
-            ? "Yes"
-            : "No"}
+          {result?.analysis?.rainDetected === null
+            ? "Unavailable"
+            : result?.analysis?.rainDetected
+              ? "Yes"
+              : "No"}
         </Text>
       </View>
 

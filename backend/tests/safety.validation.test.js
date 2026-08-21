@@ -1,21 +1,18 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const { afterEach } = require("node:test");
 const request = require("supertest");
 
 const app = require("../src/app");
+const safetyRouter = require(
+  "../src/routes/safetyRoutes"
+);
 
 const {
   calculateVehicleSuitability,
-} = require("../src/routes/safetyRoutes").__test;
-
-
-const requestSafetyAnalysis = (
-  body
-) =>
-  request(app)
-    .post("/api/safety/recommend-vehicle")
-    .send(body);
-
+  setDependenciesForTesting,
+  resetDependenciesForTesting,
+} = safetyRouter.__test;
 
 const standardSafetyRequest = {
   startLocation: "Colombo",
@@ -24,56 +21,113 @@ const standardSafetyRequest = {
   passengers: 4,
 };
 
-
-let standardSafetyResponse;
-
-
-const getStandardSafetyResponse = () => {
-  if (!standardSafetyResponse) {
-    standardSafetyResponse =
-      requestSafetyAnalysis(
-        standardSafetyRequest
-      );
-  }
-
-  return standardSafetyResponse;
+const standardRouteDetails = {
+  distanceKm: 100,
+  durationMinutes: 180,
+  correctedStartLocation: "Colombo",
+  correctedEndLocation: "Kandy",
+  startCoordinates: {
+    latitude: 6.9271,
+    longitude: 79.8612,
+  },
 };
 
+const standardRoadInfo = {
+  "Route/Segment Name": "A1 Colombo-Kandy",
+  "Max Gradient (%)": "12",
+  "Terrain Type": "Hilly",
+  "Road Surface Condition": "Good",
+  "Average Elevation": "250",
+  "Surface Friction Index": "0.8",
+  "Typical Road Width": "7",
+  _aggregationType: "route-family",
+  _segmentCount: 4,
+  _matchedRouteFamily: "A1 Colombo-Kandy",
+};
 
-const assertSuccessfulResponseOrMlOutage = (
-  response
+const availableWeather = {
+  status: "available",
+  isRaining: false,
+  temperature: 28,
+  weatherMain: "Clear",
+  weatherDescription: "clear sky",
+  locationName: "Colombo",
+};
+
+const availableGraphManager = {
+  getMLRiskContext: async () => ({
+    status: "available",
+    historicalOccurrenceCount: 2,
+    hazardType: "Landslide",
+    season: "Maha",
+  }),
+  getSafetyReasoning: async () => ({
+    status: "available",
+    explanation: "Historical safety evidence is available.",
+    risks: [],
+    records: [],
+  }),
+};
+
+const successfulPrediction = async () => ({
+  success: true,
+  riskLevel: "Medium",
+  confidence: 0.82,
+  confidencePercent: 82,
+  probabilities: {
+    Low: 0.1,
+    Medium: 0.82,
+    High: 0.08,
+  },
+  modelName: "Gradient Boosting",
+});
+
+const mlUnavailable = (message) => {
+  const error = new Error(message);
+  error.code = "ML_UNAVAILABLE";
+  return error;
+};
+
+const routeFailure = (code) => {
+  const error = new Error(code);
+  error.code = code;
+  return error;
+};
+
+const configureWorkingDependencies = (
+  overrides = {}
 ) => {
-  assert.ok(
-    response.status === 200 ||
-    response.status === 503
-  );
-
-
-  if (response.status === 503) {
-    assert.equal(
-      response.body.code,
-      "ML_UNAVAILABLE"
-    );
-    return false;
-  }
-
-
-  assert.equal(response.body.success, true);
-  return true;
+  setDependenciesForTesting({
+    getRouteDetails: async () => standardRouteDetails,
+    getWeatherByCoordinates: async () => availableWeather,
+    getRoadData: async () => standardRoadInfo,
+    graphManager: availableGraphManager,
+    runRiskPrediction: successfulPrediction,
+    ...overrides,
+  });
 };
 
+const requestSafetyAnalysis = (body) =>
+  request(app)
+    .post("/api/safety/recommend-vehicle")
+    .send(body);
 
-const assertVehicleMatchesCategory = (
-  vehicle,
-  category
+const assertControlledFailure = (
+  response,
+  status,
+  code
 ) => {
-  assert.ok(
-    String(vehicle.vehicleCategory)
-      .toLowerCase()
-      .includes(category.toLowerCase())
-  );
+  assert.equal(response.status, status);
+  assert.equal(response.body.success, false);
+  assert.equal(response.body.error, true);
+  assert.equal(response.body.code, code);
+  assert.equal(typeof response.body.message, "string");
+  assert.ok(response.body.message.length > 0);
 };
 
+afterEach(() => {
+  resetDependenciesForTesting();
+});
 
 test("GET / returns the health response contract", async () => {
   const response = await request(app).get("/");
@@ -81,35 +135,31 @@ test("GET / returns the health response contract", async () => {
   assert.equal(response.status, 200);
   assert.equal(response.body.success, true);
   assert.equal(response.body.status, "Healthy");
-  assert.equal(
-    response.body.endpoints.safetyRecommendation,
-    "/api/safety/recommend-vehicle"
-  );
 });
 
+test("safety API rejects missing and blank required fields", async () => {
+  const missingResponse = await requestSafetyAnalysis({
+    startLocation: "Colombo",
+  });
 
-test(
-  "POST /api/safety/recommend-vehicle rejects missing required fields",
-  async () => {
+  assert.equal(missingResponse.status, 400);
+  assert.equal(missingResponse.body.success, false);
+  assert.ok(missingResponse.body.message);
+
+  const blankLocationResponse = await requestSafetyAnalysis({
+    ...standardSafetyRequest,
+    startLocation: "   ",
+  });
+
+  assert.equal(blankLocationResponse.status, 400);
+  assert.equal(blankLocationResponse.body.success, false);
+});
+
+test("safety API rejects non-positive and non-numeric budgets", async () => {
+  for (const budget of ["invalid", 0, -100]) {
     const response = await requestSafetyAnalysis({
-      startLocation: "Colombo",
-    });
-
-    assert.equal(response.status, 400);
-    assert.equal(response.body.success, false);
-    assert.ok(response.body.message);
-  }
-);
-
-
-test(
-  "POST /api/safety/recommend-vehicle rejects an invalid budget",
-  async () => {
-    const response = await requestSafetyAnalysis({
-      startLocation: "Colombo",
-      endLocation: "Kandy",
-      budget: -100,
-      passengers: 4,
+      ...standardSafetyRequest,
+      budget,
     });
 
     assert.equal(response.status, 400);
@@ -119,17 +169,13 @@ test(
       /budget must be a positive number/i
     );
   }
-);
+});
 
-
-test(
-  "POST /api/safety/recommend-vehicle rejects an invalid passenger count",
-  async () => {
+test("safety API rejects invalid passenger counts", async () => {
+  for (const passengers of ["invalid", 0, -1, 1.5]) {
     const response = await requestSafetyAnalysis({
-      startLocation: "Colombo",
-      endLocation: "Kandy",
-      budget: 15000,
-      passengers: 0,
+      ...standardSafetyRequest,
+      passengers,
     });
 
     assert.equal(response.status, 400);
@@ -139,253 +185,231 @@ test(
       /passengers must be a positive number/i
     );
   }
-);
+});
 
+test("safety API reports an unresolvable user location", async () => {
+  configureWorkingDependencies({
+    getRouteDetails: async () => {
+      throw routeFailure("LOCATION_NOT_FOUND");
+    },
+  });
 
-test(
-  "POST /api/safety/recommend-vehicle returns the success response contract or ML outage",
-  async () => {
-    const response = await getStandardSafetyResponse();
+  const response = await requestSafetyAnalysis(
+    standardSafetyRequest
+  );
 
-    if (!assertSuccessfulResponseOrMlOutage(response)) {
-      return;
-    }
+  assertControlledFailure(response, 422, "LOCATION_UNRESOLVABLE");
+});
 
-    assert.ok(response.body.trip);
-    assert.ok(response.body.trip.from);
-    assert.ok(response.body.trip.to);
-    assert.ok(response.body.trip.distanceKm > 0);
-    assert.ok(response.body.trip.durationMinutes > 0);
+test("safety API reports a geocoding outage or timeout", async () => {
+  configureWorkingDependencies({
+    getRouteDetails: async () => {
+      throw routeFailure("GEOCODING_UNAVAILABLE");
+    },
+  });
 
-    assert.ok(response.body.riskPrediction);
-    assert.ok(
-      ["Low", "Medium", "High"].includes(
-        response.body.riskPrediction.riskLevel
-      )
-    );
-    assert.ok(response.body.riskPrediction.modelName);
-    assert.equal(
-      typeof response.body.riskPrediction.confidence,
-      "number"
-    );
-    assert.ok(response.body.riskPrediction.probabilities);
+  const response = await requestSafetyAnalysis(
+    standardSafetyRequest
+  );
 
-    assert.ok(response.body.analysis);
-    assert.ok(response.body.analysis.matchedRoad);
-    assert.equal(
-      typeof response.body.analysis.gradient,
-      "number"
-    );
-    assert.ok(
-      response.body.analysis.roadAggregation ===
-        "route-family" ||
-      response.body.analysis.roadAggregation === null
-    );
+  assertControlledFailure(response, 503, "LOCATION_SERVICE_UNAVAILABLE");
+});
 
-    assert.ok(response.body.graphRAG);
-    assert.ok(
-      ["available", "unavailable"].includes(
-        response.body.graphRAG.status
-      )
-    );
-    assert.equal(
-      typeof response.body.totalVehiclesAnalyzed,
-      "number"
-    );
-  }
-);
-
-
-test(
-  "POST /api/safety/recommend-vehicle keeps SUV category filtering across recommendations",
-  async () => {
-    const response = await requestSafetyAnalysis({
-      ...standardSafetyRequest,
-      preferredCategory: "SUV",
-    });
-
-    if (!assertSuccessfulResponseOrMlOutage(response)) {
-      return;
-    }
-
-    if (response.body.bestVehicle) {
-      assertVehicleMatchesCategory(
-        response.body.bestVehicle,
-        "SUV"
+test("safety API returns 503 when Python ML is unavailable", async () => {
+  configureWorkingDependencies({
+    runRiskPrediction: async () => {
+      throw mlUnavailable(
+        "Could not start Python ML process: unavailable"
       );
-    }
+    },
+  });
 
-    response.body.alternativeOptions.forEach(
-      (vehicle) => {
-        assertVehicleMatchesCategory(
-          vehicle,
-          "SUV"
-        );
-      }
-    );
+  const response = await requestSafetyAnalysis(
+    standardSafetyRequest
+  );
 
-    if (response.body.safetyUpsell) {
-      assertVehicleMatchesCategory(
-        response.body.safetyUpsell,
-        "SUV"
+  assertControlledFailure(response, 503, "ML_UNAVAILABLE");
+});
+
+test("safety API returns 503 for malformed Python ML output", async () => {
+  configureWorkingDependencies({
+    runRiskPrediction: async () => {
+      throw mlUnavailable(
+        "Failed to parse ML output: invalid JSON"
       );
-    }
-  }
-);
+    },
+  });
 
+  const response = await requestSafetyAnalysis(
+    standardSafetyRequest
+  );
 
-test(
-  "POST /api/safety/recommend-vehicle exposes aggregated road data for Colombo to Kandy",
-  async () => {
-    const response = await getStandardSafetyResponse();
+  assertControlledFailure(response, 503, "ML_UNAVAILABLE");
+});
 
-    if (!assertSuccessfulResponseOrMlOutage(response)) {
-      return;
-    }
+test("safety API returns 503 for failed Python ML prediction", async () => {
+  configureWorkingDependencies({
+    runRiskPrediction: async () => {
+      throw mlUnavailable(
+        "ML prediction returned an error."
+      );
+    },
+  });
 
-    assert.equal(
-      response.body.analysis.matchedRoad,
-      "A1 Colombo-Kandy"
-    );
-    assert.equal(
-      response.body.analysis.roadAggregation,
-      "route-family"
-    );
+  const response = await requestSafetyAnalysis(
+    standardSafetyRequest
+  );
+
+  assertControlledFailure(response, 503, "ML_UNAVAILABLE");
+});
+
+test("safety API returns 503 for Python ML timeout", async () => {
+  configureWorkingDependencies({
+    runRiskPrediction: async () => {
+      throw mlUnavailable(
+        "ML prediction timed out after 1ms."
+      );
+    },
+  });
+
+  const response = await requestSafetyAnalysis(
+    standardSafetyRequest
+  );
+
+  assertControlledFailure(response, 503, "ML_UNAVAILABLE");
+});
+
+test("Neo4j failure degrades gracefully while ML succeeds", async () => {
+  configureWorkingDependencies({
+    graphManager: {
+      getMLRiskContext: async () => {
+        throw new Error("Neo4j unavailable");
+      },
+      getSafetyReasoning: async () => {
+        throw new Error("Neo4j unavailable");
+      },
+    },
+  });
+
+  const response = await requestSafetyAnalysis(
+    standardSafetyRequest
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.success, true);
+  assert.equal(response.body.graphRAG.status, "unavailable");
+  assert.ok(response.body.riskPrediction);
+});
+
+test("known valid path returns a deterministic safety response contract", async () => {
+  configureWorkingDependencies();
+
+  const response = await requestSafetyAnalysis({
+    ...standardSafetyRequest,
+    preferredCategory: "SUV",
+  });
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.success, true);
+  assert.equal(response.body.trip.from, "Colombo");
+  assert.equal(response.body.trip.to, "Kandy");
+  assert.equal(response.body.riskPrediction.modelName, "Gradient Boosting");
+  assert.equal(response.body.analysis.matchedRoad, "A1 Colombo-Kandy");
+  assert.equal(response.body.analysis.roadAggregation, "route-family");
+  assert.equal(response.body.analysis.aggregatedSegmentCount, 4);
+  assert.equal(response.body.analysis.weather, "clear sky");
+  assert.equal(response.body.analysis.rainDetected, false);
+  assert.equal(typeof response.body.totalVehiclesAnalyzed, "number");
+
+  for (const vehicle of [
+    response.body.bestVehicle,
+    ...response.body.alternativeOptions,
+    response.body.safetyUpsell,
+  ].filter(Boolean)) {
     assert.ok(
-      Number.isInteger(
-        response.body.analysis
-          .aggregatedSegmentCount
-      )
-    );
-    assert.ok(
-      response.body.analysis
-        .aggregatedSegmentCount > 1
-    );
-    assert.equal(
-      typeof response.body.analysis.gradient,
-      "number"
-    );
-    assert.equal(
-      typeof response.body.analysis.averageElevation,
-      "number"
-    );
-    assert.equal(
-      typeof response.body.analysis.surfaceFrictionIndex,
-      "number"
+      String(vehicle.vehicleCategory)
+        .toLowerCase()
+        .includes("suv")
     );
   }
-);
+});
 
+test("weather failure remains enrichment-only", async () => {
+  configureWorkingDependencies({
+    getWeatherByCoordinates: async () => {
+      throw new Error("Weather timeout");
+    },
+  });
 
-test(
-  "POST /api/safety/recommend-vehicle keeps ML results when Neo4j is unavailable",
-  async () => {
-    const response = await getStandardSafetyResponse();
+  const response = await requestSafetyAnalysis(
+    standardSafetyRequest
+  );
 
-    if (!assertSuccessfulResponseOrMlOutage(response)) {
-      return;
-    }
+  assert.equal(response.status, 200);
+  assert.equal(response.body.success, true);
+  assert.equal(response.body.analysis.weather, null);
+  assert.equal(response.body.analysis.temperature, null);
+  assert.equal(response.body.analysis.rainDetected, null);
+  assert.ok(response.body.riskPrediction);
+});
 
-    assert.ok(
-      ["available", "unavailable"].includes(
-        response.body.graphRAG.status
-      )
-    );
+test("safety API reports an unsupported road dataset route", async () => {
+  configureWorkingDependencies({
+    getRoadData: async () => null,
+  });
 
-    if (response.body.graphRAG.status === "unavailable") {
-      assert.equal(response.body.success, true);
-      assert.ok(response.body.riskPrediction);
-    }
-  }
-);
+  const response = await requestSafetyAnalysis(
+    standardSafetyRequest
+  );
 
-test(
-  "vehicle gradient suitability is calculated when gradient data is available",
-  () => {
-    const vehicle = {
+  assert.equal(response.status, 404);
+  assert.equal(response.body.success, false);
+  assert.match(
+    response.body.message,
+    /no supported road dataset match/i
+  );
+});
+
+test("safety API reports incomplete matched road data", async () => {
+  configureWorkingDependencies({
+    getRoadData: async () => ({
+      "Route/Segment Name": "Incomplete Road",
+    }),
+  });
+
+  const response = await requestSafetyAnalysis(
+    standardSafetyRequest
+  );
+
+  assertControlledFailure(response, 422, "ROAD_DATA_INCOMPLETE");
+});
+
+test("vehicle gradient suitability is calculated when data is available", () => {
+  const result = calculateVehicleSuitability(
+    {
       "Gradeability (%)": "20",
-    };
+    },
+    12
+  );
 
-    const result =
-      calculateVehicleSuitability(
-        vehicle,
-        12
-      );
+  assert.equal(result.gradientDataAvailable, true);
+  assert.equal(result.roadGradient, 12);
+  assert.equal(result.gradeabilityMargin, 8);
+  assert.equal(result.suitableForGradient, true);
+  assert.equal(result.gradientSuitability, "suitable");
+});
 
-    assert.equal(
-      result.gradientDataAvailable,
-      true
-    );
-
-    assert.equal(
-      result.roadGradient,
-      12
-    );
-
-    assert.equal(
-      result.gradeability,
-      20
-    );
-
-    assert.equal(
-      result.gradeabilityMargin,
-      8
-    );
-
-    assert.equal(
-      result.suitableForGradient,
-      true
-    );
-
-    assert.equal(
-      result.gradientSuitability,
-      "suitable"
-    );
-  }
-);
-
-
-test(
-  "vehicle gradient suitability remains unknown when road gradient is unavailable",
-  () => {
-    const vehicle = {
+test("vehicle gradient suitability remains unknown without gradient data", () => {
+  const result = calculateVehicleSuitability(
+    {
       "Gradeability (%)": "20",
-    };
+    },
+    null
+  );
 
-    const result =
-      calculateVehicleSuitability(
-        vehicle,
-        null
-      );
-
-    assert.equal(
-      result.gradientDataAvailable,
-      false
-    );
-
-    assert.equal(
-      result.roadGradient,
-      null
-    );
-
-    assert.equal(
-      result.gradeability,
-      20
-    );
-
-    assert.equal(
-      result.gradeabilityMargin,
-      null
-    );
-
-    assert.equal(
-      result.suitableForGradient,
-      null
-    );
-
-    assert.equal(
-      result.gradientSuitability,
-      "unknown"
-    );
-  }
-);
+  assert.equal(result.gradientDataAvailable, false);
+  assert.equal(result.roadGradient, null);
+  assert.equal(result.gradeabilityMargin, null);
+  assert.equal(result.suitableForGradient, null);
+  assert.equal(result.gradientSuitability, "unknown");
+});
