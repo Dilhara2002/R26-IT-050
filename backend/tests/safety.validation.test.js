@@ -1,6 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { afterEach } = require("node:test");
+const path = require("node:path");
 const request = require("supertest");
 
 const app = require("../src/app");
@@ -12,6 +13,10 @@ const {
   calculateVehicleSuitability,
   setDependenciesForTesting,
   resetDependenciesForTesting,
+  getRoadData,
+  loadStaticCsvData,
+  resetStaticDataCacheForTesting,
+  getStaticDataCacheStateForTesting,
 } = safetyRouter.__test;
 
 const standardSafetyRequest = {
@@ -150,6 +155,73 @@ test("GET / returns the health response contract", async () => {
   assert.equal(response.status, 200);
   assert.equal(response.body.success, true);
   assert.equal(response.body.status, "Healthy");
+});
+
+test("static road and vehicle datasets are parsed once per process", async () => {
+  resetStaticDataCacheForTesting();
+
+  const firstRoad = await getRoadData(
+    "Colombo",
+    "Kandy"
+  );
+
+  const afterFirstRoad =
+    getStaticDataCacheStateForTesting();
+
+  const secondRoad = await getRoadData(
+    "Colombo",
+    "Kandy"
+  );
+
+  assert.deepEqual(secondRoad, firstRoad);
+  assert.deepEqual(
+    getStaticDataCacheStateForTesting(),
+    afterFirstRoad
+  );
+
+  const vehiclePath = path.join(
+    __dirname,
+    "../src/ai-engine/data/processed_vehicles.csv"
+  );
+
+  const firstVehicles =
+    await loadStaticCsvData(vehiclePath);
+
+  const secondVehicles =
+    await loadStaticCsvData(vehiclePath);
+
+  assert.strictEqual(secondVehicles, firstVehicles);
+  assert.deepEqual(
+    getStaticDataCacheStateForTesting(),
+    {
+      cachedFileCount: 2,
+      pendingLoadCount: 0,
+      parseCount: 2,
+    }
+  );
+});
+
+test("failed static dataset reads are not cached", async () => {
+  resetStaticDataCacheForTesting();
+
+  await assert.rejects(
+    () => loadStaticCsvData(
+      path.join(
+        __dirname,
+        "missing-static-dataset.csv"
+      )
+    ),
+    /CSV file not found/
+  );
+
+  assert.deepEqual(
+    getStaticDataCacheStateForTesting(),
+    {
+      cachedFileCount: 0,
+      pendingLoadCount: 0,
+      parseCount: 0,
+    }
+  );
 });
 
 test("safety API rejects missing and blank required fields", async () => {

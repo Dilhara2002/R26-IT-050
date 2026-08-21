@@ -63,6 +63,12 @@ The successful API response includes a compact `explanation` object. It separate
 
 The trace documents evidence and rules available for a request. It is not a causal explanation or proof of a safety outcome.
 
+## 4.2 Runtime Data Access
+
+The backend lazily caches successful parses of `processed_roads.csv` and `processed_vehicles.csv` for the lifetime of one backend process. This removes repeated CSV file I/O and parsing without changing road matching, pricing, filtering, or ranking semantics. Failed reads are not cached, and a backend restart intentionally refreshes static data.
+
+The Node endpoint continues to launch one bounded Python subprocess per prediction request. `predict_safety.py` loads the artifact once within that process, but subprocess startup and model loading still occur for each request. A persistent inference service would be a separate architectural decision and is intentionally not introduced for this local research prototype. Live weather, route, geocoding, and Neo4j requests are not cached by this task.
+
 ## 5. Knowledge Graph Evidence
 
 Neo4j stores route and historical hazard context. It supports the ML input and user-facing historical evidence, but does not replace the ML classifier.

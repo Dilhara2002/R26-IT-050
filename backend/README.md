@@ -126,6 +126,12 @@ Candidates must meet similarity checks and be geocoded before use. This approach
 
 The response exposes the aggregation type and number of segments used. Route-family aggregation is an approximation, not a replacement for geometry-based road matching.
 
+### Runtime Data Access
+
+`processed_roads.csv` and `processed_vehicles.csv` are static prototype datasets. They are parsed lazily once per backend process and then reused for later requests. Only successful parses are cached; a failed read is retried on the next request. Restart the backend after intentionally changing either file.
+
+Live geocoding, routing, weather, and Neo4j retrieval are not cached by this layer. Weather remains live enrichment context. Python inference still starts one bounded subprocess per prediction request; the artifact is loaded once within that subprocess. A persistent Python inference service is intentionally out of scope for this local research-prototype architecture.
+
 ### Vehicle Recommendation
 
 Vehicle candidates are filtered by:

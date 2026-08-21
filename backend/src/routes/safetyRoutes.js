@@ -276,6 +276,80 @@ const loadCsvData = async (
 };
 
 
+// Static research datasets are immutable for the lifetime of a
+// local/demo process. Cache successful parses only; a failed read is
+// deliberately retried on the next request so it is not hidden.
+const staticDataCache =
+  new Map();
+
+const staticDataLoading =
+  new Map();
+
+let staticDataParseCount = 0;
+
+
+const loadStaticCsvData = async (
+  filePath
+) => {
+  const cacheKey =
+    path.resolve(filePath);
+
+  if (
+    staticDataCache.has(cacheKey)
+  ) {
+    return staticDataCache.get(cacheKey);
+  }
+
+  if (
+    staticDataLoading.has(cacheKey)
+  ) {
+    return staticDataLoading.get(cacheKey);
+  }
+
+  const loadingPromise =
+    loadCsvData(filePath)
+      .then((rows) => {
+        staticDataCache.set(
+          cacheKey,
+          rows
+        );
+
+        staticDataParseCount += 1;
+
+        return rows;
+      })
+      .finally(() => {
+        staticDataLoading.delete(
+          cacheKey
+        );
+      });
+
+  staticDataLoading.set(
+    cacheKey,
+    loadingPromise
+  );
+
+  return loadingPromise;
+};
+
+
+const resetStaticDataCacheForTesting = () => {
+  staticDataCache.clear();
+  staticDataLoading.clear();
+  staticDataParseCount = 0;
+};
+
+
+const getStaticDataCacheStateForTesting = () => ({
+  cachedFileCount:
+    staticDataCache.size,
+  pendingLoadCount:
+    staticDataLoading.size,
+  parseCount:
+    staticDataParseCount,
+});
+
+
 // ==================================================
 // Road matching
 // ==================================================
@@ -478,7 +552,7 @@ const getRoadData = async (
 
 
   const roads =
-    await loadCsvData(
+    await loadStaticCsvData(
       roadPath
     );
 
@@ -2039,7 +2113,7 @@ router.post(
 
 
       const vehicles =
-        await loadCsvData(
+        await loadStaticCsvData(
           vehiclePath
         );
 
@@ -2606,5 +2680,9 @@ module.exports.__test = {
   calculateVehicleSuitability,
   setDependenciesForTesting,
   resetDependenciesForTesting,
+  getRoadData,
+  loadStaticCsvData,
+  resetStaticDataCacheForTesting,
+  getStaticDataCacheStateForTesting,
   ML_PREDICTION_TIMEOUT_MS,
 };
