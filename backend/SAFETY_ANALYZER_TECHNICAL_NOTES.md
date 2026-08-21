@@ -11,7 +11,7 @@ The Safety Analyzer supports a Sri Lankan tourism vehicle-recommendation workflo
 
 ## 2. ML Approach
 
-The deployed artifact is a **Random Forest** classifier. Its target classes are **Low**, **Medium**, and **High**. It classifies historical route hazard/risk severity; it does **not** estimate accident probability.
+The deployed artifact is a **Gradient Boosting** classifier selected by the reproducible v2 workflow. Its target classes are **Low**, **Medium**, and **High**. It classifies historical route hazard/risk severity; it does **not** estimate accident probability.
 
 ### Dataset Features
 
@@ -24,18 +24,18 @@ The deployed artifact is a **Random Forest** classifier. Its target classes are 
 
 ## 3. Model Selection and Recorded Evidence
 
-Training uses an unseen-route holdout (`GroupShuffleSplit`) and 5-fold `GroupKFold`, grouping records by `route_code` so a route is not shared across evaluation groups. A separate repeated unseen-route stability comparison evaluates Random Forest and Gradient Boosting over 10 grouped splits.
+Training first creates one final unseen-route holdout with `GroupShuffleSplit`, grouping records by `route_code`. That holdout is excluded from all candidate comparison and selection. The development routes are used for 5-fold `GroupKFold` comparison of all candidates; the top two by CV Macro F1 are then evaluated with repeated unseen-route `GroupShuffleSplit` stability analysis over 10 development-only splits. The final holdout is evaluated once only after the deployment architecture is selected, then that architecture is refit on all 598 rows.
 
 The active model artifact records **598 training rows** and **22 route groups**.
 
 Recorded repeated-stability results (`model_stability_summary.csv`):
 
-| Model | Mean test Macro F1 | Test Macro F1 SD | Mean train-test gap | Selected |
+| Model | Mean development validation Macro F1 | Validation Macro F1 SD | Mean train-validation gap | Selected |
 | --- | ---: | ---: | ---: | --- |
-| Random Forest | 0.8406 | 0.0524 | 0.0602 | Yes |
-| Gradient Boosting | 0.8341 | 0.0568 | 0.1121 | No |
+| Gradient Boosting | 0.8408 | 0.0332 | 0.1111 | Yes |
+| Random Forest | 0.8218 | 0.0357 | 0.0822 | No |
 
-Random Forest was selected because the recorded repeated unseen-route comparison gave it the higher mean test Macro F1 and lower generalization gap. The single recorded GroupKFold comparison also contains these Random Forest values: CV Macro F1 `0.7723 ± 0.0649`, untouched-test Macro F1 `0.8614`, and untouched-test accuracy `0.8758`. These values are evaluation evidence for this dataset, not an accident-probability claim.
+Gradient Boosting was selected because it had the highest repeated development validation Macro F1. Its shortlisted CV Macro F1 was `0.7742 ± 0.0682`; its final untouched-holdout Macro F1 was `0.8780` and accuracy was `0.8820`. These values are evaluation evidence for this dataset, not an accident-probability claim.
 
 ## 4. Active Model Artifact Path
 

@@ -4,7 +4,7 @@
 
 This Express backend supports a Sri Lankan tourism safety-aware vehicle recommendation workflow. It combines:
 
-- route risk classification with a deployed Random Forest model;
+- route risk classification with the deployed model selected by the reproducible v2 workflow;
 - Neo4j historical safety evidence;
 - vehicle suitability, category filtering, pricing, and risk-aware ranking; and
 - route, location-resolution, and current weather context.
@@ -96,7 +96,7 @@ User location input
   -> route-family road dataset aggregation
   -> weather context
   -> Neo4j historical context
-  -> Random Forest risk classification
+  -> selected v2 risk-model classification
   -> risk-aware vehicle filtering and ranking
   -> API response
 ```

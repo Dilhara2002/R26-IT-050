@@ -1967,7 +1967,9 @@ router.post(
             "Displayed as current trip context; not used as an unvalidated manual ML score multiplier.",
 
           predictionSource:
-            "Python Random Forest risk classifier",
+            `Python ${
+              riskPrediction.modelName
+            } risk classifier`,
 
           graphContext:
             graphContext,
