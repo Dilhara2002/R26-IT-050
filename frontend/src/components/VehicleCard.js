@@ -64,25 +64,39 @@ export default function VehicleCard({
           </Text>
 
           <Text style={styles.text}>
-            Required Road Gradient: {suitability.roadGradient}%
+            Required Road Gradient:{" "}
+            {suitability.roadGradient ?? "Unavailable"}
+            {suitability.roadGradient !== null &&
+              suitability.roadGradient !== undefined
+              ? "%"
+              : ""}
           </Text>
 
           <Text style={styles.text}>
-            Capability Margin: {suitability.gradeabilityMargin}%
+            Capability Margin:{" "}
+            {suitability.gradeabilityMargin ?? "Unavailable"}
+            {suitability.gradeabilityMargin !== null &&
+              suitability.gradeabilityMargin !== undefined
+              ? "%"
+              : ""}
           </Text>
 
           <Text
             style={[
               styles.text,
-              suitability.suitableForGradient
+              suitability.suitableForGradient === true
                 ? styles.suitable
-                : styles.unsuitable,
+                : suitability.suitableForGradient === false
+                  ? styles.unsuitable
+                  : null,
             ]}
           >
             Road Suitability:{" "}
-            {suitability.suitableForGradient
+            {suitability.suitableForGradient === true
               ? "Suitable"
-              : "Not Suitable"}
+              : suitability.suitableForGradient === false
+                ? "Not Suitable"
+                : "Unknown (gradient unavailable)"}
           </Text>
         </>
       )}

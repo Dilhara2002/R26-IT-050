@@ -927,6 +927,307 @@ const compareVehiclesByRisk = (
 };
 
 
+const getRiskRankingCriteria = (
+  riskLevel
+) => {
+  const normalizedRiskLevel =
+    String(riskLevel || "")
+      .toLowerCase()
+      .trim();
+
+  if (normalizedRiskLevel === "low") {
+    return [
+      "lower estimated hire price",
+      "higher gradeability margin",
+    ];
+  }
+
+  if (normalizedRiskLevel === "high") {
+    return [
+      "higher gradeability margin",
+      "higher maximum torque",
+      "larger engine capacity",
+      "lower estimated hire price",
+    ];
+  }
+
+  return [
+    "higher gradeability margin",
+    "higher maximum torque",
+    "lower estimated hire price",
+  ];
+};
+
+
+const buildVehicleRecommendationExplanation = (
+  {
+    vehicle,
+    userBudget,
+    passengerCount,
+    requestedVehicleCategory,
+    riskLevel,
+  }
+) => {
+  if (!vehicle) {
+    return {
+      status: "no_match",
+      decisionType:
+        "deterministic_vehicle_filtering_and_ranking",
+      reason:
+        "No vehicle met the current budget, passenger, category, and road-gradient requirements.",
+    };
+  }
+
+  const suitability =
+    vehicle.vehicleSuitability || {};
+
+  const categoryRequested =
+    Boolean(requestedVehicleCategory);
+
+  const categoryMatch =
+    !categoryRequested ||
+    String(vehicle.vehicleCategory)
+      .toLowerCase()
+      .includes(
+        String(requestedVehicleCategory)
+          .toLowerCase()
+      );
+
+  const gradientKnown =
+    suitability.gradientDataAvailable ===
+    true;
+
+  const gradientReason =
+    gradientKnown
+      ? `Its gradeability exceeds the known route gradient by ${suitability.gradeabilityMargin} percentage points.`
+      : "Route gradient data is unavailable, so gradient suitability was not used to reject this vehicle.";
+
+  const categoryReason =
+    categoryRequested
+      ? `It matches the requested ${requestedVehicleCategory} category.`
+      : "No vehicle category preference was requested.";
+
+  return {
+    status: "selected",
+    decisionType:
+      "deterministic_vehicle_filtering_and_ranking",
+    filters: {
+      budgetMatch:
+        vehicle.estimatedHirePrice <=
+        userBudget,
+      passengerCapacityMatch:
+        vehicle.seatingCapacity >=
+        passengerCount,
+      requestedCategory:
+        requestedVehicleCategory ||
+        null,
+      categoryMatch,
+      gradientDataAvailable:
+        gradientKnown,
+      gradientSuitability:
+        suitability.gradientSuitability ||
+        "unknown",
+      gradeability:
+        suitability.gradeability ??
+        null,
+      routeGradient:
+        suitability.roadGradient ??
+        null,
+      gradeabilityMargin:
+        suitability.gradeabilityMargin ??
+        null,
+    },
+    ranking: {
+      riskLevel,
+      criteria:
+        getRiskRankingCriteria(
+          riskLevel
+        ),
+      note:
+        "These are transparent ranking rules using vehicle dataset attributes; they do not prove crash safety.",
+    },
+    reason:
+      `Matches the budget and passenger capacity requirements. ${categoryReason} ${gradientReason}`,
+  };
+};
+
+
+const buildSafetyUpsellExplanation = (
+  {
+    safetyUpsell,
+    bestVehicle,
+    userBudget,
+    roadGradient,
+  }
+) => {
+  if (roadGradient === null) {
+    return {
+      status: "not_available",
+      reason:
+        "No stronger road-capability upsell is generated because route gradient data is unavailable.",
+    };
+  }
+
+  if (!safetyUpsell) {
+    return {
+      status: "not_available",
+      reason:
+        "No qualifying stronger road-capability option was found within the 30% upsell limit.",
+    };
+  }
+
+  const bestMargin =
+    bestVehicle?.vehicleSuitability
+      ?.gradeabilityMargin ??
+    null;
+
+  const upsellMargin =
+    safetyUpsell.vehicleSuitability
+      ?.gradeabilityMargin ??
+    null;
+
+  return {
+    status: "available",
+    decisionType:
+      "deterministic_stronger_road_capability_option",
+    priceDifferenceFromBudget:
+      Number(
+        (
+          safetyUpsell.estimatedHirePrice -
+          userBudget
+        ).toFixed(2)
+      ),
+    priceDifferenceFromBestVehicle:
+      bestVehicle
+        ? Number(
+            (
+              safetyUpsell.estimatedHirePrice -
+              bestVehicle.estimatedHirePrice
+            ).toFixed(2)
+          )
+        : null,
+    routeGradient:
+      roadGradient,
+    gradeabilityMargin:
+      upsellMargin,
+    gradeabilityMarginImprovement:
+      bestMargin !== null &&
+      upsellMargin !== null
+        ? Number(
+            (
+              upsellMargin - bestMargin
+            ).toFixed(2)
+          )
+        : null,
+    reason:
+      "This option is above the requested budget but within the 30% upsell limit and meets the known route-gradient requirement with stronger gradeability evidence.",
+    limitation:
+      "Stronger road capability is based on gradeability and available vehicle attributes; it is not a claim of proven crash safety.",
+  };
+};
+
+
+const buildRiskExplanation = (
+  {
+    riskPrediction,
+    mlInput,
+    weatherInfo,
+    graphContext,
+    graphReasoning,
+    roadInfo,
+  }
+) => {
+  const graphStatus =
+    graphReasoning?.status ||
+    graphContext?.status ||
+    (
+      graphContext?.matchType ===
+      "unavailable"
+        ? "unavailable"
+        : "available"
+    );
+
+  return {
+    risk: {
+      predictedLevel:
+        riskPrediction.riskLevel,
+      modelName:
+        riskPrediction.modelName,
+      confidence:
+        riskPrediction.confidence ??
+        null,
+      confidenceType:
+        riskPrediction.confidenceType ||
+        (
+          riskPrediction.confidence === null ||
+          riskPrediction.confidence === undefined
+            ? "unavailable"
+            : "predicted_class_probability"
+        ),
+      confidenceInterpretation:
+        riskPrediction.confidenceInterpretation ||
+        "Probability assigned by the classifier to the predicted class; it is not a calibrated real-world accident or disaster probability.",
+      modelInputs:
+        riskPrediction.inputFeatures ||
+        mlInput,
+      modelInputNote:
+        "These are the feature values supplied to the deployed classifier for this request.",
+      limitations: [
+        "The predicted class is a historical hazard/risk severity classification, not an accident probability.",
+        "The explanation trace reports available inputs and rules; it does not prove causal relationships.",
+      ],
+    },
+    contextualEvidence: {
+      weather: {
+        status:
+          weatherInfo?.status ||
+          "unavailable",
+        isEnrichmentOnly: true,
+        usedAsModelInput: false,
+        rainDetected:
+          weatherInfo?.isRaining ??
+          null,
+        description:
+          weatherInfo?.weatherDescription ??
+          null,
+        note:
+          "Weather is displayed as current trip context and is not an input to the deployed risk classifier.",
+      },
+      neo4j: {
+        status: graphStatus,
+        retrievalContextAvailable:
+          graphStatus === "available",
+        graphValuesCanPopulateModelInputs: true,
+        modelInputFields: [
+          "historical_occurrence_count",
+          "hazard_type",
+          "season",
+        ],
+        note:
+          "Retrieved graph values can populate named classifier inputs when available; historical graph reasoning does not independently generate or override the model prediction.",
+      },
+      roadContext: {
+        matchedRoad:
+          getField(
+            roadInfo,
+            [
+              "Route/Segment Name",
+            ]
+          ),
+        aggregationType:
+          roadInfo._aggregationType ||
+          null,
+        segmentCount:
+          roadInfo._segmentCount ||
+          1,
+        note:
+          "Road-profile values are route-family aggregates where available; they are not exact GPS traversed-segment measurements.",
+      },
+    },
+  };
+};
+
+
 // ==================================================
 // Python ML inference
 // ==================================================
@@ -2021,6 +2322,34 @@ router.post(
         null;
 
 
+      const explanation = {
+        ...buildRiskExplanation({
+          riskPrediction,
+          mlInput,
+          weatherInfo,
+          graphContext,
+          graphReasoning,
+          roadInfo,
+        }),
+        vehicleRecommendation:
+          buildVehicleRecommendationExplanation({
+            vehicle: bestVehicle,
+            userBudget,
+            passengerCount,
+            requestedVehicleCategory,
+            riskLevel:
+              riskPrediction.riskLevel,
+          }),
+        safetyUpsell:
+          buildSafetyUpsellExplanation({
+            safetyUpsell,
+            bestVehicle,
+            userBudget,
+            roadGradient,
+          }),
+      };
+
+
       // ------------------------------------------------
       // API response
       // ------------------------------------------------
@@ -2065,6 +2394,10 @@ router.post(
             riskPrediction
               .riskLevel,
 
+          predictedRiskLevel:
+            riskPrediction
+              .riskLevel,
+
           confidence:
             riskPrediction
               .confidence,
@@ -2072,6 +2405,21 @@ router.post(
           confidencePercent:
             riskPrediction
               .confidencePercent,
+
+          confidenceType:
+            riskPrediction
+              .confidenceType ||
+            (
+              riskPrediction.confidence === null ||
+              riskPrediction.confidence === undefined
+                ? "unavailable"
+                : "predicted_class_probability"
+            ),
+
+          confidenceInterpretation:
+            riskPrediction
+              .confidenceInterpretation ||
+            "Probability assigned by the classifier to the predicted class; it is not a calibrated real-world accident or disaster probability.",
 
           probabilities:
             riskPrediction
@@ -2197,6 +2545,10 @@ router.post(
 
         graphRAG:
           graphReasoning,
+
+
+        explanation:
+          explanation,
 
 
         bestSafetyMatch:

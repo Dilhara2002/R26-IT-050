@@ -99,6 +99,20 @@ export default function ResultScreen({
   const probabilities =
     riskPrediction?.probabilities || {};
 
+  const explanation =
+    result?.explanation || {};
+
+  const riskExplanation =
+    explanation?.risk || {};
+
+  const vehicleExplanation =
+    explanation?.vehicleRecommendation ||
+    null;
+
+  const upsellExplanation =
+    explanation?.safetyUpsell ||
+    null;
+
   const bestVehicle =
     result?.bestVehicle ||
     result?.bestSafetyMatch ||
@@ -166,6 +180,12 @@ export default function ResultScreen({
               {confidence}%
             </Text>
           )}
+
+        <Text style={styles.modelText}>
+          {riskExplanation?.confidenceInterpretation ||
+            riskPrediction?.confidenceInterpretation ||
+            "Model confidence is the classifier's predicted-class probability, not a real-world accident probability."}
+        </Text>
 
         <Text style={styles.modelText}>
           Model:{" "}
@@ -254,7 +274,11 @@ export default function ResultScreen({
 
         <Text style={styles.text}>
           Gradient:{" "}
-          {result?.analysis?.gradient}%
+          {result?.analysis?.gradient ?? "Unavailable"}
+          {result?.analysis?.gradient !== null &&
+            result?.analysis?.gradient !== undefined
+            ? "%"
+            : ""}
         </Text>
 
         <Text style={styles.text}>
@@ -269,7 +293,8 @@ export default function ResultScreen({
 
         <Text style={styles.text}>
           Weather:{" "}
-          {result?.analysis?.weather}
+          {result?.analysis?.weather ||
+            "Unavailable"}
         </Text>
 
         <Text style={styles.text}>
@@ -284,6 +309,11 @@ export default function ResultScreen({
             : result?.analysis?.rainDetected
               ? "Yes"
               : "No"}
+        </Text>
+
+        <Text style={styles.contextNote}>
+          Weather is current trip context and is not an input
+          to the risk classifier.
         </Text>
       </View>
 
@@ -316,6 +346,28 @@ export default function ResultScreen({
         </View>
       )}
 
+      {vehicleExplanation && (
+        <View style={styles.explanationCard}>
+          <Text style={styles.explanationTitle}>
+            Why This Vehicle
+          </Text>
+
+          <Text style={styles.text}>
+            {vehicleExplanation.reason}
+          </Text>
+
+          {vehicleExplanation?.ranking?.criteria && (
+            <Text style={styles.contextNote}>
+              Ranking for {vehicleExplanation.ranking.riskLevel} risk:
+              {" "}
+              {vehicleExplanation.ranking.criteria.join(
+                ", then "
+              )}.
+            </Text>
+          )}
+        </View>
+      )}
+
 
       {result?.alternativeOptions?.map(
         (vehicle, index) => (
@@ -329,11 +381,32 @@ export default function ResultScreen({
 
 
       {result?.safetyUpsell && (
-        <VehicleCard
-          title="Safer / Higher Capability Option"
-          vehicle={result.safetyUpsell}
-        />
+        <>
+          <VehicleCard
+            title="Higher Road-Capability Option"
+            vehicle={result.safetyUpsell}
+          />
+
+          {upsellExplanation?.reason && (
+            <View style={styles.explanationCard}>
+              <Text style={styles.explanationTitle}>
+                Why This Option Is Shown
+              </Text>
+
+              <Text style={styles.text}>
+                {upsellExplanation.reason}
+              </Text>
+            </View>
+          )}
+        </>
       )}
+
+      {!result?.safetyUpsell &&
+        upsellExplanation?.reason && (
+          <Text style={styles.contextNote}>
+            {upsellExplanation.reason}
+          </Text>
+        )}
 
 
       {/* -----------------------------------------
@@ -359,6 +432,12 @@ export default function ResultScreen({
           Graph Match Type:{" "}
           {result?.graphRAG?.matchType ||
             "Unknown"}
+        </Text>
+
+        <Text style={styles.graphMeta}>
+          Historical graph context supports retrieval and may
+          populate named model inputs when available; it does not
+          independently override the classifier result.
         </Text>
       </View>
 
@@ -530,6 +609,29 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.text,
     lineHeight: 21,
+  },
+
+  explanationCard: {
+    backgroundColor: "#F8FAFC",
+    borderColor: colors.border,
+    borderWidth: 1,
+    padding: 16,
+    borderRadius: 16,
+    marginTop: 14,
+  },
+
+  explanationTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: colors.primaryDark,
+    marginBottom: 7,
+  },
+
+  contextNote: {
+    fontSize: 13,
+    color: colors.muted,
+    lineHeight: 19,
+    marginTop: 6,
   },
 
   graphCard: {

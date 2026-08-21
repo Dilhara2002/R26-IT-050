@@ -147,7 +147,20 @@ This ranking is not proof that a particular vehicle is objectively safer. The da
 
 ### Weather Context
 
-Weather is returned as current trip context. It is not used as an arbitrary manual multiplier on the ML risk score.
+Weather is returned as current trip context. It is not used as an arbitrary manual multiplier on the ML risk score or as a deployed ML input. If weather is unavailable, the API returns unavailable/null context rather than implying that no rain was detected.
+
+### Explainability Trace
+
+Successful safety responses include an `explanation` object that separates:
+
+- the predicted class, model name, and exact feature values supplied to the deployed classifier;
+- classifier confidence, defined as the probability assigned by the classifier to its predicted class;
+- contextual weather, route-family road aggregation, and Neo4j retrieval status; and
+- deterministic vehicle filtering, risk-aware ranking, and stronger road-capability upsell rules.
+
+Classifier confidence is **not calibrated real-world accident or disaster probability**, certainty, or model accuracy. The trace describes available model inputs and deterministic recommendation rules; it does not establish causal proof.
+
+Neo4j retrieval can populate the named ML inputs `historical_occurrence_count`, `hazard_type`, and `season` when graph data is available. Its user-facing historical reasoning is retrieval context and does not independently generate or override the classifier prediction.
 
 ## Automated Tests
 
@@ -160,13 +173,10 @@ npm test
 The suite covers:
 
 - health endpoint contract;
-- required-field validation;
-- invalid budget validation;
-- invalid passenger-count validation;
-- successful response or controlled ML outage contract;
-- vehicle category filtering;
-- route-family aggregation; and
-- Neo4j graceful-degradation contract.
+- controlled input, location, road-data, and ML failure responses;
+- Neo4j and weather graceful degradation;
+- deterministic explanation metadata and recommendation-rule traces; and
+- known and unavailable road-gradient behavior.
 
 ## Legacy / Research Artifacts
 

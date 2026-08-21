@@ -46,7 +46,22 @@ src/ai-engine/scripts/train_models_v2.py
   -> src/routes/safetyRoutes.js
 ```
 
-`predict_safety.py` loads the v2 artifact and returns the predicted class, class probabilities, and model metadata to the route endpoint.
+`predict_safety.py` loads the v2 artifact and returns the predicted class, class probabilities, model metadata, and exact input feature values to the route endpoint.
+
+### Confidence Interpretation
+
+When the selected classifier supports `predict_proba()`, `confidence` is the probability assigned by that classifier to its predicted class. It is exposed as `confidenceType: "predicted_class_probability"`. It is not calibrated real-world accident/disaster probability, certainty, or model accuracy. The current workflow does not perform probability calibration.
+
+## 4.1 Explainability Trace
+
+The successful API response includes a compact `explanation` object. It separates:
+
+- `risk.modelInputs`: the values supplied to the deployed classifier;
+- `contextualEvidence.weather`: current enrichment context, explicitly marked as not used as an ML input;
+- `contextualEvidence.neo4j`: retrieval status and the graph-derived fields that can populate named ML inputs (`historical_occurrence_count`, `hazard_type`, and `season`); and
+- `vehicleRecommendation` and `safetyUpsell`: deterministic budget, passenger, category, gradient, and ranking-rule evidence.
+
+The trace documents evidence and rules available for a request. It is not a causal explanation or proof of a safety outcome.
 
 ## 5. Knowledge Graph Evidence
 
@@ -97,7 +112,7 @@ This does not establish empirically proven crash safety. The dataset does not pr
 
 ## 9. Weather
 
-Weather is returned as current trip context. It is not currently applied as an arbitrary manual multiplier to the ML risk score.
+Weather is returned as current trip context. It is not a deployed ML input and is not applied as an arbitrary manual multiplier to the ML risk score. Unavailable weather remains null/unavailable rather than being represented as no rain.
 
 ## 10. Failure Handling
 
@@ -107,16 +122,16 @@ Weather is returned as current trip context. It is not currently applied as an a
 
 ## 11. Automated Validation
 
-The current backend regression suite has eight tests protecting:
+The current backend regression suite has 17 deterministic tests protecting:
 
 1. health endpoint response;
 2. required-field validation;
 3. invalid budget validation;
 4. invalid passenger-count validation;
-5. success response or controlled ML-outage contract;
-6. vehicle-category filtering;
-7. route-family aggregation; and
-8. Neo4j graceful degradation.
+5. controlled location, road-data, and ML dependency failures;
+6. Neo4j and weather graceful degradation;
+7. risk and vehicle explanation traces; and
+8. known and unavailable gradient behavior.
 
 ## 12. Reproducibility
 
@@ -125,7 +140,7 @@ The current backend regression suite has eight tests protecting:
 - The backend defaults to `backend/.venv/bin/python`.
 - `PYTHON_BIN` can explicitly override that interpreter.
 - The latest recorded `npm audit` and `npm audit --omit=dev` checkpoint reported zero known vulnerabilities.
-- The latest recorded `npm test` checkpoint passed all eight tests.
+- The latest recorded `npm test` checkpoint passed all 17 tests.
 
 ## 13. Frontend Integration Notes
 
@@ -154,6 +169,8 @@ The current backend regression suite has eight tests protecting:
 - Vehicle ranking is a heuristic based on available dataset attributes.
 - Location typo handling cannot guarantee every ambiguous input.
 - Graph reasoning is not full LLM GraphRAG.
+- Classifier confidence is not calibrated real-world accident/disaster probability or model accuracy.
+- Explainability traces describe available model inputs and deterministic rules; they do not prove causal safety relationships.
 
 ## What this component can claim
 

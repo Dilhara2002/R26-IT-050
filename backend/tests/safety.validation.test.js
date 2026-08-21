@@ -80,6 +80,21 @@ const successfulPrediction = async () => ({
     High: 0.08,
   },
   modelName: "Gradient Boosting",
+  confidenceType: "predicted_class_probability",
+  confidenceInterpretation:
+    "Probability assigned by this classifier to the predicted class; it is not a calibrated real-world accident or disaster probability.",
+  inputFeatures: {
+    gradient: 12,
+    elevation: 250,
+    friction: 0.8,
+    historical_occurrence_count: 2,
+    road_data_available: 1,
+    terrain: "Hilly",
+    road_surface: "Good",
+    road_width: "7",
+    hazard_type: "Landslide",
+    season: "Maha",
+  },
 });
 
 const mlUnavailable = (message) => {
@@ -299,15 +314,23 @@ test("Neo4j failure degrades gracefully while ML succeeds", async () => {
   assert.equal(response.body.success, true);
   assert.equal(response.body.graphRAG.status, "unavailable");
   assert.ok(response.body.riskPrediction);
+  assert.equal(
+    response.body.explanation.contextualEvidence.neo4j.status,
+    "unavailable"
+  );
+  assert.equal(
+    response.body.explanation.contextualEvidence.neo4j
+      .retrievalContextAvailable,
+    false
+  );
 });
 
 test("known valid path returns a deterministic safety response contract", async () => {
   configureWorkingDependencies();
 
-  const response = await requestSafetyAnalysis({
-    ...standardSafetyRequest,
-    preferredCategory: "SUV",
-  });
+  const response = await requestSafetyAnalysis(
+    standardSafetyRequest
+  );
 
   assert.equal(response.status, 200);
   assert.equal(response.body.success, true);
@@ -320,6 +343,53 @@ test("known valid path returns a deterministic safety response contract", async 
   assert.equal(response.body.analysis.weather, "clear sky");
   assert.equal(response.body.analysis.rainDetected, false);
   assert.equal(typeof response.body.totalVehiclesAnalyzed, "number");
+  assert.equal(
+    response.body.riskPrediction.confidenceType,
+    "predicted_class_probability"
+  );
+  assert.match(
+    response.body.riskPrediction.confidenceInterpretation,
+    /not a calibrated real-world accident/i
+  );
+  assert.equal(
+    response.body.explanation.risk.modelInputs.gradient,
+    12
+  );
+  assert.equal(
+    response.body.explanation.contextualEvidence.weather
+      .usedAsModelInput,
+    false
+  );
+  assert.equal(
+    response.body.explanation.contextualEvidence.neo4j
+      .graphValuesCanPopulateModelInputs,
+    true
+  );
+  assert.ok(
+    response.body.explanation.vehicleRecommendation.reason
+  );
+  assert.equal(
+    response.body.explanation.vehicleRecommendation.status,
+    "selected"
+  );
+  assert.equal(
+    response.body.explanation.vehicleRecommendation.filters
+      .gradientSuitability,
+    "suitable"
+  );
+
+});
+
+test("vehicle category filtering remains active in the explanation path", async () => {
+  configureWorkingDependencies();
+
+  const response = await requestSafetyAnalysis({
+    ...standardSafetyRequest,
+    budget: 50000,
+    preferredCategory: "SUV",
+  });
+
+  assert.equal(response.status, 200);
 
   for (const vehicle of [
     response.body.bestVehicle,
@@ -351,6 +421,71 @@ test("weather failure remains enrichment-only", async () => {
   assert.equal(response.body.analysis.temperature, null);
   assert.equal(response.body.analysis.rainDetected, null);
   assert.ok(response.body.riskPrediction);
+  assert.equal(
+    response.body.explanation.contextualEvidence.weather.status,
+    "unavailable"
+  );
+  assert.equal(
+    response.body.explanation.contextualEvidence.weather
+      .usedAsModelInput,
+    false
+  );
+});
+
+test("unknown gradient remains explicit and prevents an upsell explanation", async () => {
+  configureWorkingDependencies({
+    getRoadData: async () => ({
+      ...standardRoadInfo,
+      "Max Gradient (%)": null,
+      "Average Elevation": null,
+      "Surface Friction Index": null,
+    }),
+  });
+
+  const response = await requestSafetyAnalysis(
+    standardSafetyRequest
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.success, true);
+  assert.equal(response.body.analysis.gradient, null);
+  assert.equal(
+    response.body.explanation.vehicleRecommendation.filters
+      .gradientSuitability,
+    "unknown"
+  );
+  assert.equal(response.body.safetyUpsell, null);
+  assert.equal(
+    response.body.explanation.safetyUpsell.status,
+    "not_available"
+  );
+  assert.match(
+    response.body.explanation.safetyUpsell.reason,
+    /gradient data is unavailable/i
+  );
+});
+
+test("known gradient can explain a stronger road-capability upsell", async () => {
+  configureWorkingDependencies();
+
+  const response = await requestSafetyAnalysis({
+    ...standardSafetyRequest,
+    budget: 11000,
+  });
+
+  assert.equal(response.status, 200);
+  assert.ok(response.body.safetyUpsell);
+  assert.equal(
+    response.body.explanation.safetyUpsell.status,
+    "available"
+  );
+  assert.equal(
+    response.body.explanation.safetyUpsell.routeGradient,
+    12
+  );
+  assert.ok(
+    response.body.explanation.safetyUpsell.reason
+  );
 });
 
 test("safety API reports an unsupported road dataset route", async () => {

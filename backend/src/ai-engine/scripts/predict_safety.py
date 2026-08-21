@@ -226,6 +226,18 @@ def predict_risk(input_data):
         )
 
         result[
+            "confidenceType"
+        ] = "predicted_class_probability"
+
+        result[
+            "confidenceInterpretation"
+        ] = (
+            "Probability assigned by this classifier to "
+            "the predicted class; it is not a calibrated "
+            "real-world accident or disaster probability."
+        )
+
+        result[
             "probabilities"
         ] = probability_map
 
@@ -237,6 +249,17 @@ def predict_risk(input_data):
         result[
             "confidencePercent"
         ] = None
+
+        result[
+            "confidenceType"
+        ] = "unavailable"
+
+        result[
+            "confidenceInterpretation"
+        ] = (
+            "Classifier confidence is unavailable because "
+            "this model does not provide class probabilities."
+        )
 
         result[
             "probabilities"
