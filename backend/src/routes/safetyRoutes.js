@@ -764,9 +764,15 @@ const calculateVehicleSuitability = (
     );
 
 
+  const gradientDataAvailable =
+    roadGradient !== null;
+
+
   const margin =
-    gradeability -
-    roadGradient;
+    gradientDataAvailable
+      ? gradeability -
+        roadGradient
+      : null;
 
 
   return {
@@ -775,14 +781,30 @@ const calculateVehicleSuitability = (
 
     roadGradient,
 
+    gradientDataAvailable,
+
     gradeabilityMargin:
-      Number(
-        margin.toFixed(2)
-      ),
+      margin !== null
+        ? Number(
+            margin.toFixed(2)
+          )
+        : null,
 
     suitableForGradient:
-      gradeability >=
-      roadGradient,
+      gradientDataAvailable
+        ? gradeability >=
+          roadGradient
+        : null,
+
+    gradientSuitability:
+      gradientDataAvailable
+        ? (
+            gradeability >=
+            roadGradient
+              ? "suitable"
+              : "unsuitable"
+          )
+        : "unknown",
 
   };
 };
@@ -1507,7 +1529,7 @@ router.post(
 
 
       const roadGradient =
-        toNumber(
+        toNullableNumber(
           getField(
             roadInfo,
             [
@@ -1640,11 +1662,16 @@ router.post(
                   .suitableForGradient;
 
 
+              const passesGradientCheck =
+                suitableForGradient !==
+                false;
+
+
               return (
                 matchesBudget &&
                 matchesPassengers &&
                 matchesPreference &&
-                suitableForGradient
+                passesGradientCheck
               );
 
             }
@@ -1734,7 +1761,14 @@ router.post(
                   .suitableForGradient;
 
 
+              const gradientDataAvailable =
+                vehicle
+                  .vehicleSuitability
+                  .gradientDataAvailable;
+
+
               const betterCapability =
+                gradientDataAvailable &&
                 bestVehicle
                   ? vehicle
                       .vehicleSuitability
@@ -1743,7 +1777,7 @@ router.post(
                     bestVehicle
                       .vehicleSuitability
                       .gradeabilityMargin
-                  : true;
+                  : gradientDataAvailable;
 
 
               return (
@@ -1751,7 +1785,8 @@ router.post(
                 withinUpsellLimit &&
                 enoughSeats &&
                 matchesPreference &&
-                gradientSuitable &&
+                gradientDataAvailable &&
+                gradientSuitable === true &&
                 betterCapability
               );
 
@@ -1852,6 +1887,14 @@ router.post(
 
           gradient:
             roadGradient,
+
+          gradientDataAvailable:
+            roadGradient !== null,
+
+          gradientAnalysisStatus:
+            roadGradient !== null
+              ? "available"
+              : "unavailable",
 
           terrain:
             getField(
@@ -1998,3 +2041,7 @@ router.post(
 
 module.exports =
   router;
+
+module.exports.__test = {
+  calculateVehicleSuitability,
+};

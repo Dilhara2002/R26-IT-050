@@ -4,6 +4,10 @@ const request = require("supertest");
 
 const app = require("../src/app");
 
+const {
+  calculateVehicleSuitability,
+} = require("../src/routes/safetyRoutes").__test;
+
 
 const requestSafetyAnalysis = (
   body
@@ -292,5 +296,96 @@ test(
       assert.equal(response.body.success, true);
       assert.ok(response.body.riskPrediction);
     }
+  }
+);
+
+test(
+  "vehicle gradient suitability is calculated when gradient data is available",
+  () => {
+    const vehicle = {
+      "Gradeability (%)": "20",
+    };
+
+    const result =
+      calculateVehicleSuitability(
+        vehicle,
+        12
+      );
+
+    assert.equal(
+      result.gradientDataAvailable,
+      true
+    );
+
+    assert.equal(
+      result.roadGradient,
+      12
+    );
+
+    assert.equal(
+      result.gradeability,
+      20
+    );
+
+    assert.equal(
+      result.gradeabilityMargin,
+      8
+    );
+
+    assert.equal(
+      result.suitableForGradient,
+      true
+    );
+
+    assert.equal(
+      result.gradientSuitability,
+      "suitable"
+    );
+  }
+);
+
+
+test(
+  "vehicle gradient suitability remains unknown when road gradient is unavailable",
+  () => {
+    const vehicle = {
+      "Gradeability (%)": "20",
+    };
+
+    const result =
+      calculateVehicleSuitability(
+        vehicle,
+        null
+      );
+
+    assert.equal(
+      result.gradientDataAvailable,
+      false
+    );
+
+    assert.equal(
+      result.roadGradient,
+      null
+    );
+
+    assert.equal(
+      result.gradeability,
+      20
+    );
+
+    assert.equal(
+      result.gradeabilityMargin,
+      null
+    );
+
+    assert.equal(
+      result.suitableForGradient,
+      null
+    );
+
+    assert.equal(
+      result.gradientSuitability,
+      "unknown"
+    );
   }
 );
