@@ -397,6 +397,38 @@ test("Neo4j failure degrades gracefully while ML succeeds", async () => {
   );
 });
 
+test("graph outage responses do not expose internal query errors", async () => {
+  configureWorkingDependencies({
+    graphManager: {
+      getMLRiskContext: async () => ({
+        matchType: "unavailable",
+        historicalOccurrenceCount: null,
+        hazardType: "Unknown",
+        season: "Unknown",
+      }),
+      getSafetyReasoning: async () => ({
+        status: "unavailable",
+        explanation:
+          "Historical safety evidence is temporarily unavailable.",
+        error:
+          "Neo4j connection failed at bolt://internal-host:7687",
+      }),
+    },
+  });
+
+  const response = await requestSafetyAnalysis(
+    standardSafetyRequest
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.graphRAG.status, "unavailable");
+  assert.equal("error" in response.body.graphRAG, false);
+  assert.doesNotMatch(
+    JSON.stringify(response.body),
+    /internal-host|bolt:\/\//i
+  );
+});
+
 test("known valid path returns a deterministic safety response contract", async () => {
   configureWorkingDependencies();
 

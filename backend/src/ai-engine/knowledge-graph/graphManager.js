@@ -442,10 +442,6 @@ class GraphManager {
 
         explanation:
           "Historical safety evidence is temporarily unavailable.",
-
-        error:
-          graphResult.error ||
-          null,
       };
     }
 

@@ -1677,6 +1677,22 @@ const getUnavailableWeather = () => ({
 });
 
 
+const sanitizeGraphReasoningForResponse = (
+  reasoning
+) => {
+  if (!reasoning) {
+    return reasoning;
+  }
+
+  const {
+    error,
+    ...safeReasoning
+  } = reasoning;
+
+  return safeReasoning;
+};
+
+
 const sendControlledError = (
   res,
   status,
@@ -2041,7 +2057,10 @@ router.post(
 
 
         if (fetchedGraphReasoning) {
-          graphReasoning = fetchedGraphReasoning;
+          graphReasoning =
+            sanitizeGraphReasoningForResponse(
+              fetchedGraphReasoning
+            );
         }
 
       } catch (error) {
