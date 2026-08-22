@@ -375,11 +375,15 @@ test("unavailable comparison falls back to the map-capable default analyzed rout
     passengers: 2,
   });
   assert.equal(response.status, 200);
+  assert.equal(response.body.success, true);
   assert.equal(response.body.routeResult.mode, "default-analyzed-route");
   assert.equal(response.body.routeResult.comparisonAvailable, false);
   assert.equal(response.body.routeResult.routeGeometryAvailable, true);
   assert.deepEqual(response.body.routeResult.geometry.coordinates,
     [[79, 6], [80, 7]]);
+  assert.equal(response.body.routeResult.distanceKm, 42);
+  assert.equal(response.body.routeResult.durationMinutes, 55);
+  assert.equal(response.body.routeResult.predictedRiskLevel, "Medium");
   assert.equal(response.body.routeResult.vehicleUsesSelectedRoute, true);
   assert.equal(response.body.vehicleIntegration.routeId, "default");
   assert.ok(response.body.bestVehicle);
