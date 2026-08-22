@@ -1,40 +1,27 @@
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, ActivityIndicator, Text, Pressable } from "react-native";
-import * as Location from "expo-location";
+import React from "react";
+import { View, StyleSheet, Text, Pressable } from "react-native";
 
 // Auto-resolves to ResultMap.js on Mobile, and ResultMap.web.js on Web
 import ResultMap from "../components/ResultMap";
 
 export default function MapScreen({ route, navigation }) {
-  const { itineraryData } = route.params || {};
-  const [location, setLocation] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setLoading(false);
-        return;
-      }
-      let userLocation = await Location.getCurrentPositionAsync({});
-      setLocation(userLocation.coords);
-      setLoading(false);
-    })();
-  }, []);
-
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#1D4ED8" />
-        <Text style={styles.loadingText}>Loading Interactive Map...</Text>
-      </View>
-    );
-  }
+  const { optimizedStops = [], startingLocation = null } = route.params || {};
+  const hasStructuredStops = Array.isArray(optimizedStops) && optimizedStops.length > 0;
 
   return (
     <View style={styles.container}>
-      <ResultMap location={location} itineraryData={itineraryData} />
+      <ResultMap
+        startingLocation={startingLocation}
+        optimizedStops={optimizedStops}
+      />
+
+      {!hasStructuredStops && (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyStateText}>
+            Structured itinerary stops are unavailable for this result.
+          </Text>
+        </View>
+      )}
       
       <View style={styles.floatingCard}>
         <Text style={styles.cardTitle}>Live Route View</Text>
@@ -53,8 +40,19 @@ export default function MapScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#EAF2FF' },
-  loadingText: { marginTop: 10, color: '#1D4ED8', fontWeight: 'bold' },
+  emptyState: {
+    position: 'absolute',
+    bottom: 30,
+    alignSelf: 'center',
+    width: '90%',
+    maxWidth: 400,
+    backgroundColor: '#FFF7ED',
+    borderColor: '#FED7AA',
+    borderWidth: 1,
+    borderRadius: 16,
+    padding: 14,
+  },
+  emptyStateText: { color: '#9A3412', textAlign: 'center', fontWeight: '600' },
   floatingCard: {
     position: 'absolute',
     top: 50,

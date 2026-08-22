@@ -36,11 +36,14 @@ def make_places(ratings=None):
 def make_ga_places(count=6, duration=20):
     return pd.DataFrame(
         {
+            "Place_ID": [1000 + index for index in range(count)],
             "Name": [f"GA Place {index}" for index in range(count)],
             "Latitude": [7.2906 + (index * 0.0002) for index in range(count)],
             "Longitude": [80.6337 for _ in range(count)],
+            "Tags": ["Nature|Culture" for _ in range(count)],
             "Duration_Minutes": [duration for _ in range(count)],
             "Similarity_Score": [0.5 + (index * 0.02) for index in range(count)],
+            "Proximity_Score": [0.9 - (index * 0.02) for index in range(count)],
             "Composite_Score": [0.6 + (index * 0.03) for index in range(count)],
         }
     )
@@ -120,7 +123,7 @@ class ModelTestCase(unittest.TestCase):
             [0, 1, 2, 99], [2, 3, 4, 4], list(range(5)), random.Random(7)
         )
         self.assertTrue(child)
-        self.assertLessEqual(len(child), 4)
+        self.assertLessEqual(len(child), model.MAX_ROUTE_STOPS)
         self.assertEqual(len(child), len(set(child)))
         self.assertTrue(set(child).issubset(set(range(5))))
 
@@ -129,16 +132,111 @@ class ModelTestCase(unittest.TestCase):
             [0, 1, 1, 99], list(range(5)), random.Random(3)
         )
         self.assertTrue(mutated)
-        self.assertLessEqual(len(mutated), 4)
+        self.assertLessEqual(len(mutated), model.MAX_ROUTE_STOPS)
         self.assertEqual(len(mutated), len(set(mutated)))
         self.assertTrue(set(mutated).issubset(set(range(5))))
 
-    def test_ga_has_unique_locations_and_at_most_four_stops(self):
+    def test_ga_has_unique_locations_and_adaptive_capacity(self):
         result, _, _ = model.run_genetic_algorithm(
-            make_ga_places(), 180, 7.2906, 80.6337, random_seed=12
+            make_ga_places(count=10, duration=30),
+            360,
+            7.2906,
+            80.6337,
+            random_seed=12,
         )
-        self.assertLessEqual(len(result), 4)
+        self.assertGreater(len(result), 4)
+        self.assertLessEqual(len(result), 8)
         self.assertEqual(len(result), len(set(result)))
+
+    def test_time_budgets_use_adaptive_capacity_and_consistent_accounting(self):
+        places = make_ga_places(count=10, duration=45)
+        results = []
+        for budget in (120, 240, 360, 480):
+            result = model.run_genetic_algorithm_details(
+                places,
+                budget,
+                7.2906,
+                80.6337,
+                random_seed=17,
+                user_preferences=["Nature"],
+            )
+            results.append(result)
+            self.assertGreaterEqual(len(result["optimized_route"]), 1)
+            self.assertLessEqual(len(result["optimized_route"]), 8)
+            self.assertEqual(
+                len(result["optimized_route"]),
+                len(set(result["optimized_route"])),
+            )
+            self.assertLessEqual(result["planned_time_minutes"], budget)
+            self.assertEqual(
+                result["planned_time_minutes"],
+                result["visit_time_minutes"] + result["travel_time_minutes"],
+            )
+            self.assertEqual(
+                result["remaining_time_minutes"],
+                budget - result["planned_time_minutes"],
+            )
+            self.assertAlmostEqual(
+                result["time_utilization_percent"],
+                result["planned_time_minutes"] / budget * 100,
+                delta=0.6,
+            )
+
+        stop_counts = [len(result["optimized_route"]) for result in results]
+        planned_times = [result["planned_time_minutes"] for result in results]
+        self.assertEqual(stop_counts, sorted(stop_counts))
+        self.assertEqual(planned_times, sorted(planned_times))
+        self.assertGreater(stop_counts[-1], stop_counts[0])
+
+    def test_irrelevant_stops_are_not_added_only_to_fill_budget(self):
+        places = make_ga_places(count=8, duration=45)
+        places.loc[:3, ["Similarity_Score", "Composite_Score"]] = [0.9, 0.9]
+        places.loc[4:, ["Similarity_Score", "Composite_Score"]] = [0.0, 0.0]
+        result = model.run_genetic_algorithm_details(
+            places, 480, 7.2906, 80.6337, random_seed=21
+        )
+        selected_names = {stop["name"] for stop in result["optimized_stops"]}
+        self.assertTrue(selected_names)
+        self.assertTrue(
+            selected_names.issubset({f"GA Place {index}" for index in range(4)})
+        )
+
+    def test_optimized_stops_match_route_and_have_truthful_numeric_locations(self):
+        places = make_ga_places(count=7, duration=35)
+        # A duplicate identity/location must never be selected twice.
+        places.loc[6, "Place_ID"] = places.loc[5, "Place_ID"]
+        places.loc[6, ["Latitude", "Longitude"]] = places.loc[
+            5, ["Latitude", "Longitude"]
+        ]
+        result = model.run_genetic_algorithm_details(
+            places,
+            300,
+            7.2906,
+            80.6337,
+            random_seed=33,
+            user_preferences=["Nature"],
+        )
+        stops = result["optimized_stops"]
+        route_from_stops = [
+            f"{stop['name']} ({stop['duration_minutes']} mins)" for stop in stops
+        ]
+        self.assertEqual(route_from_stops, result["optimized_route"])
+        self.assertEqual(
+            [stop["sequence"] for stop in stops], list(range(1, len(stops) + 1))
+        )
+        self.assertTrue(
+            all(
+                isinstance(stop["latitude"], float)
+                and isinstance(stop["longitude"], float)
+                for stop in stops
+            )
+        )
+        self.assertEqual(len({stop["place_id"] for stop in stops}), len(stops))
+        self.assertEqual(
+            len({(stop["latitude"], stop["longitude"]) for stop in stops}),
+            len(stops),
+        )
+        self.assertTrue(all(stop["matched_preferences"] == ["Nature"] for stop in stops))
 
     def test_ga_is_deterministic_for_fixed_seed(self):
         places = make_ga_places()
@@ -188,8 +286,7 @@ class ModelTestCase(unittest.TestCase):
         payload = response.get_json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(payload["status"], "success")
-        self.assertEqual(
-            set(payload["data"]),
+        self.assertTrue(
             {
                 "starting_location",
                 "search_radius_km",
@@ -199,7 +296,17 @@ class ModelTestCase(unittest.TestCase):
                 "time_limit_exceeded",
                 "optimized_route",
                 "ai_summary",
-            },
+            }.issubset(payload["data"])
+        )
+        self.assertTrue(
+            {
+                "optimized_stops",
+                "planned_time_minutes",
+                "visit_time_minutes",
+                "travel_time_minutes",
+                "remaining_time_minutes",
+                "time_utilization_percent",
+            }.issubset(payload["data"])
         )
 
 
