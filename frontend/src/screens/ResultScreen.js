@@ -120,7 +120,13 @@ export default function ResultScreen({
     null;
 
   const routeResult = result?.routeResult || null;
-  const comparisonAvailable = Boolean(routeResult?.comparisonAvailable);
+  const isRecommendedRoute =
+    routeResult?.selectedRouteMode === "lower-risk-recommended";
+  const isAnalyzedRoute =
+    routeResult?.selectedRouteMode === "default-analyzed-route";
+  const comparisonAvailable = Boolean(
+    routeResult?.comparisonAvailable && isRecommendedRoute
+  );
   const selectedRoute = routeResult;
 
   const openSelectedRoute = async () => {
@@ -264,7 +270,7 @@ export default function ResultScreen({
 
       <View style={styles.summaryCard}>
         <Text style={styles.cardTitle}>
-          {comparisonAvailable
+          {isRecommendedRoute
             ? "Recommended Lower-Risk Route"
             : "Analyzed Route"}
         </Text>
@@ -283,7 +289,7 @@ export default function ResultScreen({
                 Compared with fastest route: {result?.comparison?.extraMinutesVsFastest ?? 0} mins, {result?.comparison?.extraDistanceKmVsFastest ?? 0} km
               </Text>
             )}
-            {!comparisonAvailable && (
+            {isAnalyzedRoute && (
               <Text style={styles.noticeText}>
                 Alternative lower-risk comparison unavailable.
               </Text>
