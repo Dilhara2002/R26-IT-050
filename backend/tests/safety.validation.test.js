@@ -201,6 +201,9 @@ test("route endpoint selects lower-risk distinct evidence and returns map geomet
   const response = await requestRouteRecommendation();
   assert.equal(response.status, 200);
   assert.equal(response.body.recommendedRoute.routeId, "lower");
+  assert.equal(response.body.routeResult.mode, "lower-risk-recommended");
+  assert.equal(response.body.routeResult.comparisonAvailable, true);
+  assert.equal(response.body.routeResult.routeGeometryAvailable, true);
   assert.deepEqual(response.body.recommendedRoute.geometry.coordinates, [[79, 6], [81, 7]]);
   assert.equal(response.body.recommendedRoute.roadEvidenceCoverage,
     "partial-provider-label-coverage");
@@ -229,7 +232,11 @@ test("route endpoint handles one route and does not rank duplicate or insufficie
   assert.equal(response.body.comparison.evaluatedRouteCount, 1);
   assert.equal(response.body.alternatives[1].evidenceAvailable, false);
   assert.equal(response.body.alternatives[2].roadEvidenceCoverage, "unavailable");
-  assert.equal(response.body.recommendedRoute.geometry, null);
+  assert.equal(response.body.recommendedRoute, null);
+  assert.equal(response.body.routeResult.mode, "default-analyzed-route");
+  assert.equal(response.body.routeResult.comparisonAvailable, false);
+  assert.equal(response.body.routeResult.geometry, null);
+  assert.equal(response.body.routeResult.routeGeometryAvailable, false);
 });
 
 test("route endpoint returns controlled no-route and outage failures", async () => {
@@ -338,7 +345,44 @@ test("default selected route uses the shared vehicle recommendation behavior", a
   assert.equal(response.status, 200);
   assert.equal(response.body.vehicleIntegration.routeId, "fast");
   assert.equal(response.body.vehicleIntegration.gradient, 12);
-  assert.equal(response.body.vehicleIntegration.usesRecommendedRoute, true);
+  assert.equal(response.body.vehicleIntegration.usesRecommendedRoute, false);
+  assert.equal(response.body.vehicleIntegration.usesSelectedRoute, true);
+});
+
+test("unavailable comparison falls back to the map-capable default analyzed route", async () => {
+  setDependenciesForTesting({
+    getRouteAlternatives: async () => [{
+      routeId: "default",
+      isFastestRoute: true,
+      distanceKm: 42,
+      durationMinutes: 55,
+      roadNames: [],
+      geometry: { type: "LineString", coordinates: [[79, 6], [80, 7]] },
+      correctedStartLocation: "Kandy",
+      correctedEndLocation: "Kaduwela",
+    }],
+    getRoadDataByRouteLabels: async () => null,
+    getRoadData: async () => standardRoadInfo,
+    getWeatherByCoordinates: async () => availableWeather,
+    graphManager: availableGraphManager,
+    runRiskPrediction: successfulPrediction,
+  });
+
+  const response = await requestRouteRecommendation({
+    startingLocation: "Kandy",
+    destination: "Kaduwela",
+    budget: 1000000,
+    passengers: 2,
+  });
+  assert.equal(response.status, 200);
+  assert.equal(response.body.routeResult.mode, "default-analyzed-route");
+  assert.equal(response.body.routeResult.comparisonAvailable, false);
+  assert.equal(response.body.routeResult.routeGeometryAvailable, true);
+  assert.deepEqual(response.body.routeResult.geometry.coordinates,
+    [[79, 6], [80, 7]]);
+  assert.equal(response.body.routeResult.vehicleUsesSelectedRoute, true);
+  assert.equal(response.body.vehicleIntegration.routeId, "default");
+  assert.ok(response.body.bestVehicle);
 });
 
 test("GET / returns the health response contract", async () => {

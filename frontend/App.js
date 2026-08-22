@@ -8,7 +8,6 @@ import {
 
 import {
   getLowerRiskRoute,
-  getVehicleRecommendation,
 } from "./src/api/safetyApi";
 import { colors } from "./src/styles/colors";
 
@@ -48,46 +47,7 @@ export default function App() {
         preferredCategory: form.preferredCategory.trim(),
       };
 
-      const routeRecommendation = await getLowerRiskRoute(requestPayload);
-      const response = await getVehicleRecommendation(requestPayload);
-
-      if (response?.success !== false) {
-        response.routeRecommendation = routeRecommendation;
-
-        const routeVehicle = routeRecommendation?.vehicleIntegration;
-        const recommendedRoute = routeRecommendation?.recommendedRoute;
-        if (routeVehicle?.usesRecommendedRoute && recommendedRoute) {
-          response.bestVehicle = routeVehicle.bestVehicle;
-          response.bestSafetyMatch = routeVehicle.bestVehicle;
-          response.alternativeOptions = routeVehicle.alternatives;
-          response.safetyUpsell =
-            routeVehicle.higherRoadCapabilityOption;
-          response.riskPrediction = {
-            ...response.riskPrediction,
-            riskLevel: recommendedRoute.predictedRiskLevel,
-            predictedRiskLevel: recommendedRoute.predictedRiskLevel,
-            confidence: recommendedRoute.confidence,
-            confidencePercent: recommendedRoute.confidencePercent,
-            probabilities: recommendedRoute.classProbabilities,
-            modelName: recommendedRoute.modelName,
-          };
-          response.trip = {
-            ...response.trip,
-            distanceKm: recommendedRoute.distanceKm,
-            durationMinutes: recommendedRoute.durationMinutes,
-          };
-          response.analysis = {
-            ...response.analysis,
-            gradient: routeVehicle.gradient,
-            gradientDataAvailable:
-              routeVehicle.gradientDataAvailable,
-          };
-          response.explanation = {
-            ...response.explanation,
-            ...routeVehicle.explanation,
-          };
-        }
-      }
+      const response = await getLowerRiskRoute(requestPayload);
 
       console.log(
         "Recommendation API Response:",
@@ -124,10 +84,11 @@ export default function App() {
       }
 
 
-      // Validate the v2 backend response
-      if (!response.riskPrediction) {
+      // A routed trip remains displayable even when the available
+      // research evidence cannot support risk/vehicle evaluation.
+      if (!response.routeResult) {
         setErrorMessage(
-          "The backend returned an invalid recommendation response."
+          "The backend returned an invalid route analysis response."
         );
 
         setResult(null);

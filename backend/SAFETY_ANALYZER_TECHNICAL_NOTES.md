@@ -39,6 +39,15 @@ the client. Known gradient therefore affects suitability exactly as in the
 legacy endpoint; unknown gradient remains null, does not reject vehicles, and
 suppresses the higher-capability upsell.
 
+The frontend submits its five normal form values once. The combined response
+always identifies the selected state structurally. Two or more distinct
+evaluable candidates produce `lower-risk-recommended`; otherwise the default
+OSRM candidate is retained as `default-analyzed-route` and is evaluated with
+the established start/destination route-family fallback when provider step
+labels are insufficient. Geometry availability is independent of comparison
+availability, so the default route remains map-capable whenever OSRM supplied
+its GeoJSON line.
+
 Limitations include OSRM returning a single candidate, missing provider road
 labels, limited documented CSV route-family coverage, partial matching, and
 the absence of comprehensive live traffic/incident evidence. Therefore this

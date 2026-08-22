@@ -119,11 +119,12 @@ export default function ResultScreen({
     result?.bestSafetyMatch ||
     null;
 
-  const routeRecommendation = result?.routeRecommendation || null;
-  const recommendedRoute = routeRecommendation?.recommendedRoute || null;
+  const routeResult = result?.routeResult || null;
+  const comparisonAvailable = Boolean(routeResult?.comparisonAvailable);
+  const selectedRoute = routeResult;
 
-  const openRecommendedRoute = async () => {
-    const coordinates = recommendedRoute?.geometry?.coordinates;
+  const openSelectedRoute = async () => {
+    const coordinates = selectedRoute?.geometry?.coordinates;
     if (!Array.isArray(coordinates) || coordinates.length < 2) return;
     const sampleIndexes = [
       0,
@@ -263,39 +264,47 @@ export default function ResultScreen({
 
       <View style={styles.summaryCard}>
         <Text style={styles.cardTitle}>
-          Recommended Lower-Risk Route
+          {comparisonAvailable
+            ? "Recommended Lower-Risk Route"
+            : "Analyzed Route"}
         </Text>
 
-        {recommendedRoute ? (
+        {selectedRoute ? (
           <>
-            <Text style={styles.text}>Risk: {recommendedRoute.predictedRiskLevel}</Text>
-            <Text style={styles.text}>Model Confidence: {recommendedRoute.confidencePercent ?? "Unavailable"}%</Text>
-            <Text style={styles.text}>Distance: {recommendedRoute.distanceKm} km</Text>
-            <Text style={styles.text}>Duration: {recommendedRoute.durationMinutes} mins</Text>
-            <Text style={styles.text}>Evidence Coverage: {recommendedRoute.roadEvidenceCoverage}</Text>
-            <Text style={styles.text}>
-              Compared with fastest route: {routeRecommendation.comparison?.extraMinutesVsFastest ?? 0} mins, {routeRecommendation.comparison?.extraDistanceKmVsFastest ?? 0} km
-            </Text>
-            <Text style={styles.contextNote}>{routeRecommendation.explanation?.reason}</Text>
-            <Text style={styles.contextNote}>{routeRecommendation.explanation?.limitation}</Text>
-            {!routeRecommendation.vehicleIntegration?.selectedRouteContextApplied && (
-              <Text style={styles.contextNote}>
-                {routeRecommendation.vehicleIntegration?.limitation}
+            <Text style={styles.text}>From: {selectedRoute.startLocation}</Text>
+            <Text style={styles.text}>To: {selectedRoute.endLocation}</Text>
+            <Text style={styles.text}>Risk: {selectedRoute.predictedRiskLevel}</Text>
+            <Text style={styles.text}>Model Confidence: {selectedRoute.confidencePercent ?? "Unavailable"}%</Text>
+            <Text style={styles.text}>Distance: {selectedRoute.distanceKm} km</Text>
+            <Text style={styles.text}>Duration: {selectedRoute.durationMinutes} mins</Text>
+            <Text style={styles.text}>Evidence Status: {selectedRoute.evidenceStatus}</Text>
+            {comparisonAvailable && (
+              <Text style={styles.text}>
+                Compared with fastest route: {result?.comparison?.extraMinutesVsFastest ?? 0} mins, {result?.comparison?.extraDistanceKmVsFastest ?? 0} km
               </Text>
             )}
-            {recommendedRoute.geometry ? (
-              <TouchableOpacity style={styles.button} onPress={openRecommendedRoute}>
-                <Text style={styles.buttonText}>View Route on Map</Text>
+            {!comparisonAvailable && (
+              <Text style={styles.noticeText}>
+                Alternative lower-risk comparison unavailable.
+              </Text>
+            )}
+            <Text style={styles.contextNote}>{selectedRoute.explanation}</Text>
+            {!selectedRoute.vehicleUsesSelectedRoute && (
+              <Text style={styles.contextNote}>
+                Route-specific vehicle evidence is unavailable.
+              </Text>
+            )}
+            {selectedRoute.routeGeometryAvailable ? (
+              <TouchableOpacity style={styles.button} onPress={openSelectedRoute}>
+                <Text style={styles.buttonText}>Show Route Map</Text>
               </TouchableOpacity>
             ) : (
-              <Text style={styles.contextNote}>Map geometry is unavailable for this route.</Text>
+              <Text style={styles.contextNote}>Route geometry is unavailable.</Text>
             )}
           </>
         ) : (
           <Text style={styles.noticeText}>
-            {routeRecommendation?.explanation?.reason ||
-              routeRecommendation?.message ||
-              "Alternative route safety comparison is unavailable."}
+            Route analysis is unavailable.
           </Text>
         )}
       </View>
@@ -384,13 +393,15 @@ export default function ResultScreen({
       ----------------------------------------- */}
 
       <Text style={styles.sectionTitle}>
-        Vehicle Recommendation for Recommended Route
+        Vehicle Recommendation for {comparisonAvailable
+          ? "Recommended Route"
+          : "Analyzed Route"}
       </Text>
 
       <Text style={styles.contextNote}>
-        {routeRecommendation?.vehicleIntegration?.usesRecommendedRoute
-          ? "Vehicle recommendation is based on the road context of the recommended evaluated route."
-          : routeRecommendation?.vehicleIntegration?.limitation ||
+        {routeResult?.vehicleUsesSelectedRoute
+          ? `Vehicle recommendation is based on the road context of the ${comparisonAvailable ? "recommended evaluated" : "analyzed"} route.`
+          : result?.vehicleIntegration?.limitation ||
             "Route-specific vehicle evidence is unavailable."}
       </Text>
 

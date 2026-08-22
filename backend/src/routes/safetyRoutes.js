@@ -2074,14 +2074,82 @@ router.post("/recommend-route", async (req, res) => {
   }
 
   evaluated.sort(compareEvaluatedRoutes);
-  const recommendedRoute = evaluated[0] || null;
-  const fastestRoute = alternatives.find((route) => route.isFastestRoute) || alternatives[0];
-  const selectedContext = recommendedRoute
-    ? evaluatedContexts.get(recommendedRoute.routeId)
+  const comparisonAvailable = evaluated.length >= 2;
+  const defaultCandidate = candidates[0];
+  const fastestRoute = alternatives.find((route) => route.isFastestRoute) ||
+    toPublicCandidate(defaultCandidate);
+  let selectedRoute = comparisonAvailable ? evaluated[0] :
+    alternatives.find((route) => route.routeId === defaultCandidate.routeId);
+  let selectedContext = selectedRoute
+    ? evaluatedContexts.get(selectedRoute.routeId)
     : null;
+
+  if (!comparisonAvailable && !selectedContext) {
+    let defaultRoadInfo;
+    try {
+      defaultRoadInfo = await routeDependencies.getRoadData(
+        startLocation,
+        endLocation
+      );
+    } catch (error) {
+      return sendControlledError(res, 503, "ROAD_DATA_UNAVAILABLE",
+        "The road dataset is temporarily unavailable.");
+    }
+
+    if (defaultRoadInfo && hasUsableRoadData(defaultRoadInfo)) {
+      const family = getField(defaultRoadInfo, ["Route/Segment Name"]);
+      let graphContext = { status: "unavailable" };
+      try {
+        graphContext = await routeDependencies.graphManager
+          .getMLRiskContext(family) || graphContext;
+      } catch (error) {
+        // Graph evidence remains optional context.
+      }
+
+      let prediction;
+      try {
+        prediction = await routeDependencies.runRiskPrediction(
+          buildMLInput(defaultRoadInfo, graphContext)
+        );
+      } catch (error) {
+        return sendControlledError(res, 503, "ML_UNAVAILABLE",
+          "The route risk prediction service is temporarily unavailable.");
+      }
+
+      selectedContext = {
+        roadInfo: defaultRoadInfo,
+        riskPrediction: prediction,
+        graphContext,
+      };
+      selectedRoute = toPublicCandidate({
+        ...defaultCandidate,
+        predictedRiskLevel: prediction.riskLevel,
+        confidence: prediction.confidence,
+        confidencePercent: prediction.confidencePercent,
+        classProbabilities: prediction.probabilities,
+        modelName: prediction.modelName,
+        evidenceAvailable: true,
+        matchedRoadFamilies: family ? [family] : [],
+        roadEvidenceCoverage: "default-route-family-evidence",
+        matchMethod: "start-destination-route-family",
+        limitations: [
+          "Distinct alternative evidence was unavailable; this is the default analyzed route.",
+        ],
+      });
+    }
+  }
+
+  if (!selectedRoute) {
+    selectedRoute = toPublicCandidate(defaultCandidate);
+  }
+
+  const selectedRouteMode = comparisonAvailable
+    ? "lower-risk-recommended"
+    : "default-analyzed-route";
+  const recommendedRoute = comparisonAvailable ? selectedRoute : null;
   const vehicleResult = vehicleRequested && selectedContext
     ? await getVehicleRecommendationForContext({
-      distanceKm: recommendedRoute.distanceKm,
+      distanceKm: selectedRoute.distanceKm,
       roadInfo: selectedContext.roadInfo,
       riskPrediction: selectedContext.riskPrediction,
       userBudget,
@@ -2090,27 +2158,85 @@ router.post("/recommend-route", async (req, res) => {
     })
     : null;
 
+  let weatherInfo = getUnavailableWeather();
+  if (defaultCandidate.startCoordinates) {
+    try {
+      weatherInfo = await routeDependencies.getWeatherByCoordinates(
+        defaultCandidate.startCoordinates.latitude,
+        defaultCandidate.startCoordinates.longitude
+      );
+    } catch (error) {
+      weatherInfo = getUnavailableWeather();
+    }
+  }
+
+  let graphReasoning = {
+    status: "unavailable",
+    explanation: "Neo4j safety reasoning is currently unavailable.",
+  };
+  const selectedFamily = selectedContext
+    ? getField(selectedContext.roadInfo, ["Route/Segment Name"])
+    : "";
+  if (selectedFamily) {
+    try {
+      graphReasoning = sanitizeGraphReasoningForResponse(
+        await routeDependencies.graphManager.getSafetyReasoning(selectedFamily)
+      ) || graphReasoning;
+    } catch (error) {
+      // Graph explanation remains optional.
+    }
+  }
+
+  const routeExplanation = comparisonAvailable
+    ? "This route was recommended because it had the lower evaluated risk under the deterministic comparison of available alternatives."
+    : "The trip route was analyzed successfully, but a distinct lower-risk alternative could not be established from the available route-family safety evidence.";
+
   return res.json({
     success: true,
+    routeResult: {
+      mode: selectedRouteMode,
+      selectedRouteMode,
+      comparisonAvailable,
+      routeGeometryAvailable: Boolean(selectedRoute.geometry),
+      vehicleUsesSelectedRoute: Boolean(vehicleResult),
+      routeId: selectedRoute.routeId,
+      startLocation: defaultCandidate.correctedStartLocation || startLocation,
+      endLocation: defaultCandidate.correctedEndLocation || endLocation,
+      distanceKm: selectedRoute.distanceKm,
+      durationMinutes: selectedRoute.durationMinutes,
+      geometry: selectedRoute.geometry,
+      predictedRiskLevel: selectedRoute.predictedRiskLevel,
+      confidence: selectedRoute.confidence,
+      confidencePercent: selectedRoute.confidencePercent,
+      classProbabilities: selectedRoute.classProbabilities,
+      modelName: selectedRoute.modelName,
+      evidenceAvailable: selectedRoute.evidenceAvailable,
+      evidenceStatus: selectedRoute.roadEvidenceCoverage,
+      matchedRoadFamilies: selectedRoute.matchedRoadFamilies,
+      explanation: routeExplanation,
+    },
     recommendedRoute,
     alternatives,
     comparison: {
       candidateRouteCount: alternatives.length,
       evaluatedRouteCount: evaluated.length,
+      comparisonAvailable,
       fastestRouteId: fastestRoute?.routeId || null,
       recommendedRouteId: recommendedRoute?.routeId || null,
-      extraMinutesVsFastest: recommendedRoute
-        ? recommendedRoute.durationMinutes - fastestRoute.durationMinutes : null,
-      extraDistanceKmVsFastest: recommendedRoute
-        ? Number((recommendedRoute.distanceKm - fastestRoute.distanceKm).toFixed(2)) : null,
+      selectedRouteId: selectedRoute.routeId,
+      extraMinutesVsFastest: comparisonAvailable
+        ? selectedRoute.durationMinutes - fastestRoute.durationMinutes : null,
+      extraDistanceKmVsFastest: comparisonAvailable
+        ? Number((selectedRoute.distanceKm - fastestRoute.distanceKm).toFixed(2)) : null,
     },
     vehicleIntegration: {
-      usesRecommendedRoute: Boolean(vehicleResult),
+      usesRecommendedRoute: Boolean(vehicleResult && comparisonAvailable),
+      usesSelectedRoute: Boolean(vehicleResult),
       selectedRouteContextApplied: Boolean(vehicleResult),
-      routeId: vehicleResult ? recommendedRoute.routeId : null,
-      evidenceStatus: recommendedRoute?.roadEvidenceCoverage || "unavailable",
+      routeId: vehicleResult ? selectedRoute.routeId : null,
+      evidenceStatus: selectedRoute.roadEvidenceCoverage || "unavailable",
       status: vehicleResult
-        ? "recommended-route-context-applied"
+        ? "selected-route-context-applied"
         : "not-requested-or-no-evaluable-route",
       limitation: vehicleResult
         ? null
@@ -2125,13 +2251,44 @@ router.post("/recommend-route", async (req, res) => {
       explanation: vehicleResult?.explanation || null,
     },
     explanation: {
-      title: "Recommended Lower-Risk Route",
-      reason: recommendedRoute
-        ? "The recommendation is the lower predicted risk among alternatives with distinct, usable route-family evidence. Risk class is compared before class probabilities, duration and distance."
-        : "Alternative route safety comparison is unavailable because sufficient distinct road evidence could not be matched.",
+      title: comparisonAvailable
+        ? "Recommended Lower-Risk Route"
+        : "Analyzed Route",
+      reason: routeExplanation,
       graphRankingUsage: "Neo4j may populate classifier inputs when available; raw graph counts are not used as a cross-route ranking tie-breaker.",
       limitation: "This research prototype recommends a lower-risk route among evaluated alternatives; it does not guarantee route safety.",
+      ...(vehicleResult?.explanation || {}),
     },
+    riskPrediction: selectedContext ? {
+      ...selectedContext.riskPrediction,
+      predictedRiskLevel: selectedContext.riskPrediction.riskLevel,
+      predictionScope: "Route-level risk classification",
+    } : null,
+    trip: {
+      from: defaultCandidate.correctedStartLocation || startLocation,
+      to: defaultCandidate.correctedEndLocation || endLocation,
+      distanceKm: selectedRoute.distanceKm,
+      durationMinutes: selectedRoute.durationMinutes,
+    },
+    analysis: selectedContext ? {
+      matchedRoad: selectedFamily,
+      gradient: vehicleResult?.roadGradient ?? null,
+      gradientDataAvailable: vehicleResult
+        ? vehicleResult.roadGradient !== null
+        : toNullableNumber(getField(selectedContext.roadInfo, ["Max Gradient (%)"])) !== null,
+      terrain: getField(selectedContext.roadInfo, ["Terrain Type"], "Unknown"),
+      roadSurface: getField(selectedContext.roadInfo, ["Road Surface Condition"], "Unknown"),
+      weather: weatherInfo?.weatherDescription ?? null,
+      temperature: weatherInfo?.temperature ?? null,
+      rainDetected: weatherInfo?.isRaining ?? null,
+      graphContext: selectedContext.graphContext,
+    } : null,
+    graphRAG: graphReasoning,
+    bestVehicle: vehicleResult?.bestVehicle || null,
+    bestSafetyMatch: vehicleResult?.bestVehicle || null,
+    alternativeOptions: vehicleResult?.alternativeOptions || [],
+    safetyUpsell: vehicleResult?.safetyUpsell || null,
+    vehicleExplanation: vehicleResult?.explanation || null,
   });
 });
 

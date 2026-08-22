@@ -37,6 +37,14 @@ shared vehicle recommendation logic. Client-supplied gradient, terrain, or
 risk values are ignored. The existing vehicle endpoint remains backward
 compatible and uses the same vehicle helper.
 
+The form uses one combined `recommend-route` request for route risk and vehicle
+output. `routeResult.selectedRouteMode` is `lower-risk-recommended` only when
+at least two candidates have distinct evaluable evidence. Otherwise it is
+`default-analyzed-route`: the normal OSRM route, its real geometry, its risk
+classification, and its backend road context remain in the response. An
+unavailable alternative comparison therefore does not mean that the analyzed
+route or its map is unavailable.
+
 ## Requirements
 
 - Node.js and npm
