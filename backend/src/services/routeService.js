@@ -936,7 +936,7 @@ const geocodeLocation = async (
 // Route calculation
 // ==================================================
 
-const getRouteDetails = async (
+const getRouteAlternatives = async (
   startLocation,
   endLocation
 ) => {
@@ -963,13 +963,16 @@ const getRouteDetails = async (
         {
           params: {
             overview:
-              "false",
+              "full",
 
             alternatives:
-              "false",
+              "true",
 
             steps:
-              "false",
+              "true",
+
+            geometries:
+              "geojson",
           },
 
           timeout:
@@ -994,11 +997,7 @@ const getRouteDetails = async (
     }
 
 
-    const route =
-      response.data.routes[0];
-
-
-    if (!route) {
+    if (response.data.routes.length === 0) {
       const error =
         new Error(
           "No route found between the resolved locations."
@@ -1011,22 +1010,7 @@ const getRouteDetails = async (
     }
 
 
-    return {
-      distanceKm:
-        Number(
-          (
-            route.distance /
-            1000
-          ).toFixed(2)
-        ),
-
-      durationMinutes:
-        Number(
-          (
-            route.duration /
-            60
-          ).toFixed(0)
-        ),
+    const sharedLocationDetails = {
 
       startLocationLabel:
         start.label,
@@ -1073,6 +1057,27 @@ const getRouteDetails = async (
       },
     };
 
+    return response.data.routes.map((route, index) => ({
+      routeId: `osrm-${index + 1}`,
+      provider: "OSRM",
+      isFastestRoute: index === 0,
+      distanceKm: Number((route.distance / 1000).toFixed(2)),
+      durationMinutes: Number((route.duration / 60).toFixed(0)),
+      geometry:
+        route.geometry?.type === "LineString" &&
+        Array.isArray(route.geometry.coordinates)
+          ? route.geometry
+          : null,
+      roadNames: [...new Set(
+        (route.legs || [])
+          .flatMap((leg) => leg.steps || [])
+          .flatMap((step) => [step.ref, step.name])
+          .map((label) => String(label || "").trim())
+          .filter(Boolean)
+      )],
+      ...sharedLocationDetails,
+    }));
+
   } catch (error) {
     console.error(
       "Route Error:",
@@ -1109,8 +1114,23 @@ const getRouteDetails = async (
 };
 
 
+const getRouteDetails = async (
+  startLocation,
+  endLocation
+) => {
+  const alternatives =
+    await getRouteAlternatives(
+      startLocation,
+      endLocation
+    );
+
+  return alternatives[0];
+};
+
+
 module.exports = {
   getRouteDetails,
+  getRouteAlternatives,
   GEOCODER_REQUEST_TIMEOUT_MS,
   ROUTING_REQUEST_TIMEOUT_MS,
   OLLAMA_LOCATION_TIMEOUT_MS,

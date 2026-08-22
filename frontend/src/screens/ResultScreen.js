@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   View,
+  Linking,
 } from "react-native";
 
 import { colors } from "../styles/colors";
@@ -117,6 +118,27 @@ export default function ResultScreen({
     result?.bestVehicle ||
     result?.bestSafetyMatch ||
     null;
+
+  const routeRecommendation = result?.routeRecommendation || null;
+  const recommendedRoute = routeRecommendation?.recommendedRoute || null;
+
+  const openRecommendedRoute = async () => {
+    const coordinates = recommendedRoute?.geometry?.coordinates;
+    if (!Array.isArray(coordinates) || coordinates.length < 2) return;
+    const sampleIndexes = [
+      0,
+      Math.floor((coordinates.length - 1) / 3),
+      Math.floor(((coordinates.length - 1) * 2) / 3),
+      coordinates.length - 1,
+    ];
+    const points = sampleIndexes.map((index) => coordinates[index]);
+    const [origin, ...rest] = points;
+    const destination = rest.pop();
+    const waypoints = rest.map(([longitude, latitude]) =>
+      `${latitude},${longitude}`).join("|");
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${origin[1]},${origin[0]}&destination=${destination[1]},${destination[0]}&waypoints=${encodeURIComponent(waypoints)}&travelmode=driving`;
+    await Linking.openURL(url);
+  };
 
 
   return (
@@ -239,6 +261,45 @@ export default function ResultScreen({
         )}
       </View>
 
+      <View style={styles.summaryCard}>
+        <Text style={styles.cardTitle}>
+          Recommended Lower-Risk Route
+        </Text>
+
+        {recommendedRoute ? (
+          <>
+            <Text style={styles.text}>Risk: {recommendedRoute.predictedRiskLevel}</Text>
+            <Text style={styles.text}>Model Confidence: {recommendedRoute.confidencePercent ?? "Unavailable"}%</Text>
+            <Text style={styles.text}>Distance: {recommendedRoute.distanceKm} km</Text>
+            <Text style={styles.text}>Duration: {recommendedRoute.durationMinutes} mins</Text>
+            <Text style={styles.text}>Evidence Coverage: {recommendedRoute.roadEvidenceCoverage}</Text>
+            <Text style={styles.text}>
+              Compared with fastest route: {routeRecommendation.comparison?.extraMinutesVsFastest ?? 0} mins, {routeRecommendation.comparison?.extraDistanceKmVsFastest ?? 0} km
+            </Text>
+            <Text style={styles.contextNote}>{routeRecommendation.explanation?.reason}</Text>
+            <Text style={styles.contextNote}>{routeRecommendation.explanation?.limitation}</Text>
+            {!routeRecommendation.vehicleIntegration?.selectedRouteContextApplied && (
+              <Text style={styles.contextNote}>
+                {routeRecommendation.vehicleIntegration?.limitation}
+              </Text>
+            )}
+            {recommendedRoute.geometry ? (
+              <TouchableOpacity style={styles.button} onPress={openRecommendedRoute}>
+                <Text style={styles.buttonText}>View Route on Map</Text>
+              </TouchableOpacity>
+            ) : (
+              <Text style={styles.contextNote}>Map geometry is unavailable for this route.</Text>
+            )}
+          </>
+        ) : (
+          <Text style={styles.noticeText}>
+            {routeRecommendation?.explanation?.reason ||
+              routeRecommendation?.message ||
+              "Alternative route safety comparison is unavailable."}
+          </Text>
+        )}
+      </View>
+
 
       {/* -----------------------------------------
           TRIP SUMMARY
@@ -323,7 +384,14 @@ export default function ResultScreen({
       ----------------------------------------- */}
 
       <Text style={styles.sectionTitle}>
-        Vehicle Recommendation
+        Vehicle Recommendation for Recommended Route
+      </Text>
+
+      <Text style={styles.contextNote}>
+        {routeRecommendation?.vehicleIntegration?.usesRecommendedRoute
+          ? "Vehicle recommendation is based on the road context of the recommended evaluated route."
+          : routeRecommendation?.vehicleIntegration?.limitation ||
+            "Route-specific vehicle evidence is unavailable."}
       </Text>
 
 

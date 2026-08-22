@@ -11,6 +11,32 @@ This Express backend supports a Sri Lankan tourism safety-aware vehicle recommen
 
 The ML model classifies a route's historical hazard/risk severity as **Low**, **Medium**, or **High**. It does **not** predict accident probability.
 
+## Recommended Lower-Risk Route
+
+`POST /api/safety/recommend-route` accepts `startingLocation` and
+`destination`. It uses the existing location-resolution flow and requests
+alternatives, step road labels, and GeoJSON geometry from OSRM. Candidates are
+evaluated only when provider road labels match a supported route family in the
+cached road dataset. A candidate mapped to evidence already used by another
+alternative is marked insufficient for distinct comparison rather than being
+given a fabricated score.
+
+Evaluable routes reuse the deployed Gradient Boosting classifier. Ranking is
+deterministic: predicted risk class, lower High-class probability, lower
+Medium-class probability, duration, distance, then route ID. Neo4j may
+populate classifier inputs, but graph counts are not used as a separate route
+tie-break because their cross-route comparability is not assured. Coverage is
+reported explicitly as full provider-label coverage, partial provider-label
+coverage, or unavailable.
+
+This research prototype recommends a lower-risk route only among alternatives
+with usable, distinct evidence. It does not identify or guarantee a safest
+route. When budget and passenger preferences are included, the same request
+passes the winning route's private, backend-validated road context into the
+shared vehicle recommendation logic. Client-supplied gradient, terrain, or
+risk values are ignored. The existing vehicle endpoint remains backward
+compatible and uses the same vehicle helper.
+
 ## Requirements
 
 - Node.js and npm

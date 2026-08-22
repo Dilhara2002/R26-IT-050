@@ -9,6 +9,42 @@ The Safety Analyzer supports a Sri Lankan tourism vehicle-recommendation workflo
 - vehicle suitability and recommendation; and
 - route and current-weather context.
 
+### Alternative-route comparison
+
+OSRM alternative retrieval uses the existing bounded routing request with
+`alternatives=true`, step labels, and full GeoJSON geometry. Responses are
+normalized to route ID, distance, duration, geometry, fastest-route status,
+and an internal road-label list; raw provider payloads are not returned.
+
+Road evidence is matched conservatively from OSRM step labels by an explicit
+A/B road code or at least two meaningful family-name tokens. The established
+route-family aggregation remains maximum known gradient, averages for numeric
+elevation/friction, and deterministic modes for categorical characteristics.
+Coverage describes provider-label matching, not GPS-level segment coverage.
+Partial matching is exposed. Unmatched candidates and candidates sharing the
+same evidence family are not ranked as if they had distinct evidence.
+
+The deployed model and feature schema are unchanged. Route ranking compares
+risk class, High probability, Medium probability, duration, distance, and
+route ID. Confidence remains predicted-class probability, not accident
+probability. Neo4j may populate classifier inputs but is not an independent
+ranking tie-breaker. The frontend opens an external directions map using
+waypoints sampled from the returned OSRM geometry; the external provider may
+recalculate travel between those points.
+
+When valid budget/passenger inputs are present, the selected candidate's
+in-memory `roadInfo` and prediction objects are passed directly to the shared
+vehicle recommendation helper. No route safety values are accepted back from
+the client. Known gradient therefore affects suitability exactly as in the
+legacy endpoint; unknown gradient remains null, does not reject vehicles, and
+suppresses the higher-capability upsell.
+
+Limitations include OSRM returning a single candidate, missing provider road
+labels, limited documented CSV route-family coverage, partial matching, and
+the absence of comprehensive live traffic/incident evidence. Therefore this
+is a lower-risk recommendation among evaluated alternatives, never a claim of
+the safest or guaranteed-safe route.
+
 ## 2. ML Approach
 
 The deployed artifact is a **Gradient Boosting** classifier selected by the reproducible v2 workflow. Its target classes are **Low**, **Medium**, and **High**. It classifies historical route hazard/risk severity; it does **not** estimate accident probability.

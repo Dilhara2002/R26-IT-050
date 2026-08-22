@@ -6,7 +6,10 @@ import {
   Alert,
 } from "react-native";
 
-import { getVehicleRecommendation } from "./src/api/safetyApi";
+import {
+  getLowerRiskRoute,
+  getVehicleRecommendation,
+} from "./src/api/safetyApi";
 import { colors } from "./src/styles/colors";
 
 import HomeScreen from "./src/screens/HomeScreen";
@@ -37,13 +40,54 @@ export default function App() {
       setResult(null);
       setErrorMessage("");
 
-      const response = await getVehicleRecommendation({
+      const requestPayload = {
         budget: Number(form.budget),
         passengers: Number(form.passengers),
         startLocation: form.startLocation.trim(),
         endLocation: form.endLocation.trim(),
         preferredCategory: form.preferredCategory.trim(),
-      });
+      };
+
+      const routeRecommendation = await getLowerRiskRoute(requestPayload);
+      const response = await getVehicleRecommendation(requestPayload);
+
+      if (response?.success !== false) {
+        response.routeRecommendation = routeRecommendation;
+
+        const routeVehicle = routeRecommendation?.vehicleIntegration;
+        const recommendedRoute = routeRecommendation?.recommendedRoute;
+        if (routeVehicle?.usesRecommendedRoute && recommendedRoute) {
+          response.bestVehicle = routeVehicle.bestVehicle;
+          response.bestSafetyMatch = routeVehicle.bestVehicle;
+          response.alternativeOptions = routeVehicle.alternatives;
+          response.safetyUpsell =
+            routeVehicle.higherRoadCapabilityOption;
+          response.riskPrediction = {
+            ...response.riskPrediction,
+            riskLevel: recommendedRoute.predictedRiskLevel,
+            predictedRiskLevel: recommendedRoute.predictedRiskLevel,
+            confidence: recommendedRoute.confidence,
+            confidencePercent: recommendedRoute.confidencePercent,
+            probabilities: recommendedRoute.classProbabilities,
+            modelName: recommendedRoute.modelName,
+          };
+          response.trip = {
+            ...response.trip,
+            distanceKm: recommendedRoute.distanceKm,
+            durationMinutes: recommendedRoute.durationMinutes,
+          };
+          response.analysis = {
+            ...response.analysis,
+            gradient: routeVehicle.gradient,
+            gradientDataAvailable:
+              routeVehicle.gradientDataAvailable,
+          };
+          response.explanation = {
+            ...response.explanation,
+            ...routeVehicle.explanation,
+          };
+        }
+      }
 
       console.log(
         "Recommendation API Response:",

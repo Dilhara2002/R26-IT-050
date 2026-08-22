@@ -17,6 +17,7 @@ const {
   loadStaticCsvData,
   resetStaticDataCacheForTesting,
   getStaticDataCacheStateForTesting,
+  compareEvaluatedRoutes,
 } = safetyRouter.__test;
 
 const standardSafetyRequest = {
@@ -132,6 +133,13 @@ const requestSafetyAnalysis = (body) =>
     .post("/api/safety/recommend-vehicle")
     .send(body);
 
+const requestRouteRecommendation = (body = {
+  startingLocation: "Colombo",
+  destination: "Kandy",
+}) => request(app)
+  .post("/api/safety/recommend-route")
+  .send(body);
+
 const assertControlledFailure = (
   response,
   status,
@@ -147,6 +155,190 @@ const assertControlledFailure = (
 
 afterEach(() => {
   resetDependenciesForTesting();
+});
+
+test("route comparator ranks risk class, probabilities, duration and distance deterministically", () => {
+  const routes = [
+    { routeId: "high", predictedRiskLevel: "High", classProbabilities: { High: 0.6 }, durationMinutes: 80, distanceKm: 70 },
+    { routeId: "medium-b", predictedRiskLevel: "Medium", classProbabilities: { High: 0.2, Medium: 0.7 }, durationMinutes: 70, distanceKm: 60 },
+    { routeId: "medium-a", predictedRiskLevel: "Medium", classProbabilities: { High: 0.1, Medium: 0.8 }, durationMinutes: 90, distanceKm: 80 },
+  ];
+  assert.deepEqual(routes.sort(compareEvaluatedRoutes).map((route) => route.routeId),
+    ["medium-a", "medium-b", "high"]);
+
+  const tied = [
+    { routeId: "long", predictedRiskLevel: "Low", classProbabilities: { High: 0.01, Medium: 0.09 }, durationMinutes: 50, distanceKm: 30 },
+    { routeId: "short", predictedRiskLevel: "Low", classProbabilities: { High: 0.01, Medium: 0.09 }, durationMinutes: 40, distanceKm: 35 },
+  ];
+  assert.equal(tied.sort(compareEvaluatedRoutes)[0].routeId, "short");
+});
+
+test("route endpoint selects lower-risk distinct evidence and returns map geometry comparison", async () => {
+  setDependenciesForTesting({
+    getRouteAlternatives: async () => [
+      { routeId: "fast", isFastestRoute: true, distanceKm: 100, durationMinutes: 100, roadNames: ["A1"], geometry: { type: "LineString", coordinates: [[79, 6], [80, 7]] } },
+      { routeId: "lower", isFastestRoute: false, distanceKm: 112, durationMinutes: 116, roadNames: ["A2", "Unmapped connector"], geometry: { type: "LineString", coordinates: [[79, 6], [81, 7]] } },
+    ],
+    getRoadDataByRouteLabels: async (labels) => ({
+      ...standardRoadInfo,
+      "Route/Segment Name": labels[0],
+      _matchedRouteFamily: labels[0],
+      _matchedLabelCount: 1,
+      _routeLabelCount: labels.length,
+    }),
+    graphManager: availableGraphManager,
+    runRiskPrediction: async (input) => input.terrain === "Hilly" && input.gradient === 12
+      ? successfulPrediction()
+      : successfulPrediction(),
+  });
+  let call = 0;
+  setDependenciesForTesting({
+    runRiskPrediction: async () => (++call === 1
+      ? { ...(await successfulPrediction()), riskLevel: "High", probabilities: { Low: 0.1, Medium: 0.2, High: 0.7 } }
+      : { ...(await successfulPrediction()), riskLevel: "Low", probabilities: { Low: 0.8, Medium: 0.15, High: 0.05 } }),
+  });
+
+  const response = await requestRouteRecommendation();
+  assert.equal(response.status, 200);
+  assert.equal(response.body.recommendedRoute.routeId, "lower");
+  assert.deepEqual(response.body.recommendedRoute.geometry.coordinates, [[79, 6], [81, 7]]);
+  assert.equal(response.body.recommendedRoute.roadEvidenceCoverage,
+    "partial-provider-label-coverage");
+  assert.equal(response.body.comparison.extraMinutesVsFastest, 16);
+  assert.equal(response.body.comparison.extraDistanceKmVsFastest, 12);
+});
+
+test("route endpoint handles one route and does not rank duplicate or insufficient evidence", async () => {
+  setDependenciesForTesting({
+    getRouteAlternatives: async () => [
+      { routeId: "one", isFastestRoute: true, distanceKm: 10, durationMinutes: 20, roadNames: ["A1"], geometry: null },
+      { routeId: "duplicate", distanceKm: 12, durationMinutes: 24, roadNames: ["A1"], geometry: null },
+      { routeId: "unknown", distanceKm: 13, durationMinutes: 25, roadNames: [], geometry: null },
+    ],
+    getRoadDataByRouteLabels: async (labels) => labels.length ? {
+      ...standardRoadInfo,
+      _matchedRouteFamily: "A1 Colombo-Kandy",
+      _matchedLabelCount: 1,
+      _routeLabelCount: 1,
+    } : null,
+    graphManager: availableGraphManager,
+    runRiskPrediction: successfulPrediction,
+  });
+  const response = await requestRouteRecommendation();
+  assert.equal(response.status, 200);
+  assert.equal(response.body.comparison.evaluatedRouteCount, 1);
+  assert.equal(response.body.alternatives[1].evidenceAvailable, false);
+  assert.equal(response.body.alternatives[2].roadEvidenceCoverage, "unavailable");
+  assert.equal(response.body.recommendedRoute.geometry, null);
+});
+
+test("route endpoint returns controlled no-route and outage failures", async () => {
+  setDependenciesForTesting({ getRouteAlternatives: async () => [] });
+  assertControlledFailure(await requestRouteRecommendation(), 422, "ROUTE_NOT_FOUND");
+
+  setDependenciesForTesting({ getRouteAlternatives: async () => {
+    throw routeFailure("ROUTE_SERVICE_ERROR");
+  } });
+  assertControlledFailure(await requestRouteRecommendation(), 503, "ROUTE_SERVICE_UNAVAILABLE");
+});
+
+test("non-default selected route drives vehicle gradient and ignores client evidence", async () => {
+  let predictionCall = 0;
+  setDependenciesForTesting({
+    getRouteAlternatives: async () => [
+      { routeId: "fast", isFastestRoute: true, distanceKm: 100, durationMinutes: 100, roadNames: ["A1"], geometry: null },
+      { routeId: "selected", distanceKm: 110, durationMinutes: 115, roadNames: ["A2"], geometry: null },
+    ],
+    getRoadDataByRouteLabels: async (labels) => ({
+      ...standardRoadInfo,
+      "Max Gradient (%)": labels[0] === "A2" ? "7" : "12",
+      _matchedRouteFamily: labels[0],
+      _matchedLabelCount: 1,
+      _routeLabelCount: 1,
+    }),
+    graphManager: availableGraphManager,
+    runRiskPrediction: async () => (++predictionCall === 1
+      ? { ...(await successfulPrediction()), riskLevel: "High", probabilities: { Low: 0.1, Medium: 0.2, High: 0.7 } }
+      : { ...(await successfulPrediction()), riskLevel: "Low", probabilities: { Low: 0.8, Medium: 0.15, High: 0.05 } }),
+  });
+
+  const response = await requestRouteRecommendation({
+    startingLocation: "Colombo",
+    destination: "Kandy",
+    budget: 1000000,
+    passengers: 2,
+    gradient: 99,
+    riskLevel: "High",
+  });
+  assert.equal(response.status, 200);
+  assert.equal(response.body.recommendedRoute.routeId, "selected");
+  assert.equal(response.body.vehicleIntegration.usesRecommendedRoute, true);
+  assert.equal(response.body.vehicleIntegration.routeId, "selected");
+  assert.equal(response.body.vehicleIntegration.gradient, 7);
+  assert.equal(
+    response.body.vehicleIntegration.bestVehicle.vehicleSuitability.roadGradient,
+    7
+  );
+  assert.equal(response.body.recommendedRoute.predictedRiskLevel, "Low");
+});
+
+test("selected route with unknown gradient keeps suitability unknown and suppresses upsell", async () => {
+  setDependenciesForTesting({
+    getRouteAlternatives: async () => [
+      { routeId: "selected", isFastestRoute: true, distanceKm: 50, durationMinutes: 60, roadNames: ["A1"], geometry: null },
+    ],
+    getRoadDataByRouteLabels: async () => ({
+      ...standardRoadInfo,
+      "Max Gradient (%)": null,
+      _matchedRouteFamily: "A1",
+      _matchedLabelCount: 1,
+      _routeLabelCount: 1,
+    }),
+    graphManager: availableGraphManager,
+    runRiskPrediction: successfulPrediction,
+  });
+
+  const response = await requestRouteRecommendation({
+    startingLocation: "Colombo",
+    destination: "Kandy",
+    budget: 1000000,
+    passengers: 2,
+  });
+  assert.equal(response.status, 200);
+  assert.equal(response.body.vehicleIntegration.gradient, null);
+  assert.equal(response.body.vehicleIntegration.gradientDataAvailable, false);
+  assert.ok(response.body.vehicleIntegration.bestVehicle);
+  assert.equal(
+    response.body.vehicleIntegration.bestVehicle.vehicleSuitability.gradientSuitability,
+    "unknown"
+  );
+  assert.equal(response.body.vehicleIntegration.higherRoadCapabilityOption, null);
+});
+
+test("default selected route uses the shared vehicle recommendation behavior", async () => {
+  setDependenciesForTesting({
+    getRouteAlternatives: async () => [
+      { routeId: "fast", isFastestRoute: true, distanceKm: 100, durationMinutes: 100, roadNames: ["A1"], geometry: null },
+    ],
+    getRoadDataByRouteLabels: async () => ({
+      ...standardRoadInfo,
+      _matchedRouteFamily: "A1",
+      _matchedLabelCount: 1,
+      _routeLabelCount: 1,
+    }),
+    graphManager: availableGraphManager,
+    runRiskPrediction: successfulPrediction,
+  });
+  const response = await requestRouteRecommendation({
+    startingLocation: "Colombo",
+    destination: "Kandy",
+    budget: 15000,
+    passengers: 4,
+  });
+  assert.equal(response.status, 200);
+  assert.equal(response.body.vehicleIntegration.routeId, "fast");
+  assert.equal(response.body.vehicleIntegration.gradient, 12);
+  assert.equal(response.body.vehicleIntegration.usesRecommendedRoute, true);
 });
 
 test("GET / returns the health response contract", async () => {

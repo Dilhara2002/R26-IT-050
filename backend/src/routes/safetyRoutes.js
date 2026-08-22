@@ -8,6 +8,7 @@ const { spawn } = require("child_process");
 
 const {
   getRouteDetails,
+  getRouteAlternatives,
 } = require("../services/routeService");
 
 const {
@@ -771,6 +772,81 @@ const getRoadData = async (
       segments.length,
     _matchedRouteFamily:
       selectedRouteFamily.name,
+  };
+};
+
+
+const getRoadDataByRouteLabels = async (
+  routeLabels = []
+) => {
+  const labels = routeLabels
+    .map(normalize)
+    .filter(Boolean);
+
+  if (labels.length === 0) {
+    return null;
+  }
+
+  const roadPath = path.join(
+    __dirname,
+    "../ai-engine/data/processed_roads.csv"
+  );
+  const roads = await loadStaticCsvData(roadPath);
+  const families = new Map();
+
+  roads.forEach((road) => {
+    const family = getRouteFamilyName(
+      getField(road, ["Route/Segment Name"])
+    );
+    const normalizedFamily = normalize(family);
+    const code = normalizedFamily.split(" ")[0];
+    const familyTokens = getMeaningfulTokens(family);
+    const matchedLabels = labels.filter((label) =>
+      (code && /^[ab]\d+$/i.test(code) &&
+        new RegExp(`(^| )${code}( |$)`, "i").test(label)) ||
+      familyTokens.filter((token) => label.includes(token)).length >= 2
+    );
+
+    if (matchedLabels.length === 0) return;
+    const key = normalize(family);
+    if (!families.has(key)) {
+      families.set(key, { name: family, rows: [], matchedLabels: new Set() });
+    }
+    families.get(key).rows.push(road);
+    matchedLabels.forEach((label) => families.get(key).matchedLabels.add(label));
+  });
+
+  const matches = [...families.values()].sort((a, b) =>
+    b.matchedLabels.size - a.matchedLabels.size ||
+    b.rows.length - a.rows.length ||
+    a.name.localeCompare(b.name)
+  );
+  if (matches.length === 0) return null;
+
+  const selected = matches[0];
+  const gradients = selected.rows
+    .map((road) => toNullableNumber(getField(road, ["Max Gradient (%)"])))
+    .filter((value) => value !== null);
+
+  return {
+    ...selected.rows[0],
+    "Route/Segment Name": selected.name,
+    "Max Gradient (%)": gradients.length ? Math.max(...gradients) : null,
+    "Average Elevation": getRoundedAverage(selected.rows.map((road) =>
+      getField(road, ["Average Elevation"])), 2),
+    "Surface Friction Index": getRoundedAverage(selected.rows.map((road) =>
+      getField(road, ["Surface Friction Index"])), 3),
+    "Terrain Type": getDeterministicMode(selected.rows.map((road) =>
+      getField(road, ["Terrain Type"]))),
+    "Road Surface Condition": getDeterministicMode(selected.rows.map((road) =>
+      getField(road, ["Road Surface Condition"]))),
+    "Typical Road Width": getDeterministicMode(selected.rows.map((road) =>
+      getField(road, ["Typical Road Width"]))),
+    _aggregationType: "route-family",
+    _segmentCount: selected.rows.length,
+    _matchedRouteFamily: selected.name,
+    _matchedLabelCount: selected.matchedLabels.size,
+    _routeLabelCount: labels.length,
   };
 };
 
@@ -1639,8 +1715,10 @@ const hasUsableRoadData = (
 
 const defaultDependencies = {
   getRouteDetails,
+  getRouteAlternatives,
   getWeatherByCoordinates,
   getRoadData,
+  getRoadDataByRouteLabels,
   graphManager,
   runRiskPrediction,
 };
@@ -1705,6 +1783,357 @@ const sendControlledError = (
     code,
     message,
   });
+
+
+const RISK_ORDER = {
+  Low: 0,
+  Medium: 1,
+  High: 2,
+};
+
+
+const compareEvaluatedRoutes = (first, second) => {
+  const firstRisk = RISK_ORDER[first.predictedRiskLevel] ?? 99;
+  const secondRisk = RISK_ORDER[second.predictedRiskLevel] ?? 99;
+  return firstRisk - secondRisk ||
+    Number(first.classProbabilities?.High || 0) -
+      Number(second.classProbabilities?.High || 0) ||
+    Number(first.classProbabilities?.Medium || 0) -
+      Number(second.classProbabilities?.Medium || 0) ||
+    first.durationMinutes - second.durationMinutes ||
+    first.distanceKm - second.distanceKm ||
+    first.routeId.localeCompare(second.routeId);
+};
+
+
+const toPublicCandidate = (route) => ({
+  routeId: route.routeId,
+  distanceKm: route.distanceKm,
+  durationMinutes: route.durationMinutes,
+  geometry: route.geometry || null,
+  isFastestRoute: Boolean(route.isFastestRoute),
+  predictedRiskLevel: route.predictedRiskLevel || null,
+  confidence: route.confidence ?? null,
+  confidencePercent: route.confidencePercent ?? null,
+  classProbabilities: route.classProbabilities || null,
+  modelName: route.modelName || null,
+  evidenceAvailable: Boolean(route.evidenceAvailable),
+  matchedRoadFamilies: route.matchedRoadFamilies || [],
+  roadEvidenceCoverage: route.roadEvidenceCoverage || "unavailable",
+  matchMethod: route.matchMethod || "provider-road-label-to-route-family",
+  limitations: route.limitations || [],
+});
+
+
+const getVehicleRecommendationForContext = async ({
+  distanceKm,
+  roadInfo,
+  riskPrediction,
+  userBudget,
+  passengerCount,
+  requestedVehicleCategory,
+}) => {
+  const vehiclePath = path.join(
+    __dirname,
+    "../ai-engine/data/processed_vehicles.csv"
+  );
+  const vehicles = await loadStaticCsvData(vehiclePath);
+  const roadGradient = toNullableNumber(
+    getField(roadInfo, ["Max Gradient (%)"])
+  );
+  const analyzedVehicles = vehicles.map((vehicle) => {
+    const estimatedHirePrice = calculateHirePrice(vehicle, distanceKm);
+    const suitability = calculateVehicleSuitability(vehicle, roadGradient);
+    const seatingCapacity = toNumber(getField(vehicle, [
+      "Seating Capacity",
+      "MaxPassengers",
+      "Max Passengers",
+    ]));
+    const vehicleCategory = getField(vehicle, [
+      "Vehicle Category",
+      "VehicleCategory",
+      "Category",
+    ], "Unknown");
+
+    return {
+      ...vehicle,
+      estimatedHirePrice,
+      calculatedCost: estimatedHirePrice,
+      seatingCapacity,
+      vehicleCategory,
+      vehicleSuitability: suitability,
+      priceFormula: "BaseHireCharge + (DistanceKM × RentalPricePerKM)",
+      recommendationType: "Rule-based vehicle suitability + dataset pricing",
+    };
+  });
+
+  const matchesPreference = (vehicle) => requestedVehicleCategory
+    ? String(vehicle.vehicleCategory).toLowerCase().includes(
+      String(requestedVehicleCategory).toLowerCase()
+    )
+    : true;
+
+  const recommended = analyzedVehicles
+    .filter((vehicle) => {
+      const price = Number(vehicle.estimatedHirePrice);
+      return Number.isFinite(price) &&
+        price <= userBudget &&
+        vehicle.seatingCapacity >= passengerCount &&
+        matchesPreference(vehicle) &&
+        vehicle.vehicleSuitability.suitableForGradient !== false;
+    })
+    .sort((first, second) => compareVehiclesByRisk(
+      first,
+      second,
+      riskPrediction.riskLevel
+    ));
+  const bestVehicle = recommended[0] || null;
+
+  const safetyUpsell = analyzedVehicles
+    .filter((vehicle) => {
+      const price = Number(vehicle.estimatedHirePrice);
+      const suitability = vehicle.vehicleSuitability;
+      const betterCapability = suitability.gradientDataAvailable && bestVehicle
+        ? suitability.gradeabilityMargin >
+          bestVehicle.vehicleSuitability.gradeabilityMargin
+        : suitability.gradientDataAvailable;
+      return Number.isFinite(price) &&
+        price > userBudget &&
+        price <= userBudget * 1.3 &&
+        vehicle.seatingCapacity >= passengerCount &&
+        matchesPreference(vehicle) &&
+        suitability.gradientDataAvailable &&
+        suitability.suitableForGradient === true &&
+        betterCapability;
+    })
+    .sort((first, second) => compareVehiclesByRisk(
+      first,
+      second,
+      riskPrediction.riskLevel
+    ))[0] || null;
+
+  return {
+    bestVehicle,
+    alternativeOptions: recommended.slice(1, 3),
+    safetyUpsell,
+    analyzedVehicles,
+    recommended,
+    roadGradient,
+    explanation: {
+      vehicleRecommendation: buildVehicleRecommendationExplanation({
+        vehicle: bestVehicle,
+        userBudget,
+        passengerCount,
+        requestedVehicleCategory,
+        riskLevel: riskPrediction.riskLevel,
+      }),
+      safetyUpsell: buildSafetyUpsellExplanation({
+        safetyUpsell,
+        bestVehicle,
+        userBudget,
+        roadGradient,
+      }),
+    },
+  };
+};
+
+
+router.post("/recommend-route", async (req, res) => {
+  const startLocation = String(
+    req.body?.startingLocation || req.body?.startLocation || ""
+  ).trim();
+  const endLocation = String(
+    req.body?.destination || req.body?.endLocation || ""
+  ).trim();
+  const vehicleRequested =
+    req.body?.budget !== undefined &&
+    req.body?.passengers !== undefined;
+  const userBudget = Number(req.body?.budget);
+  const passengerCount = Number(req.body?.passengers);
+  const requestedVehicleCategory = String(
+    req.body?.preferredCategory || req.body?.preferredVehicle || ""
+  ).trim();
+
+  if (!startLocation || !endLocation) {
+    return sendControlledError(res, 400, "INVALID_REQUEST",
+      "startingLocation and destination are required.");
+  }
+
+  if (vehicleRequested && (
+    !Number.isFinite(userBudget) || userBudget <= 0 ||
+    !Number.isInteger(passengerCount) || passengerCount <= 0
+  )) {
+    return sendControlledError(res, 400, "INVALID_VEHICLE_REQUEST",
+      "budget and passengers must be positive numbers, and passengers must be an integer.");
+  }
+
+  let candidates;
+  try {
+    candidates = await routeDependencies.getRouteAlternatives(
+      startLocation,
+      endLocation
+    );
+  } catch (error) {
+    if (error.code === "ROUTE_NOT_FOUND") {
+      return sendControlledError(res, 422, "ROUTE_NOT_FOUND",
+        "No drivable route was found between the resolved locations.");
+    }
+    if (["LOCATION_REQUIRED", "LOCATION_NOT_FOUND"].includes(error.code)) {
+      return sendControlledError(res, 422, "LOCATION_UNRESOLVABLE",
+        "The start or destination location could not be resolved.");
+    }
+    return sendControlledError(res, 503, "ROUTE_SERVICE_UNAVAILABLE",
+      "Alternative route comparison is temporarily unavailable.");
+  }
+
+  if (!Array.isArray(candidates) || candidates.length === 0) {
+    return sendControlledError(res, 422, "ROUTE_NOT_FOUND",
+      "No route alternatives were returned.");
+  }
+
+  const usedFamilies = new Set();
+  const evaluated = [];
+  const evaluatedContexts = new Map();
+  const alternatives = [];
+
+  for (const candidate of candidates) {
+    let roadInfo = null;
+    try {
+      roadInfo = await routeDependencies.getRoadDataByRouteLabels(
+        candidate.roadNames || []
+      );
+    } catch (error) {
+      return sendControlledError(res, 503, "ROAD_DATA_UNAVAILABLE",
+        "The road dataset is temporarily unavailable.");
+    }
+
+    const family = roadInfo?._matchedRouteFamily;
+    if (!roadInfo || !hasUsableRoadData(roadInfo) || !family) {
+      alternatives.push(toPublicCandidate({
+        ...candidate,
+        evidenceAvailable: false,
+        limitations: ["Sufficient route-family evidence could not be matched from provider road labels."],
+      }));
+      continue;
+    }
+
+    const familyKey = normalize(family);
+    if (usedFamilies.has(familyKey)) {
+      alternatives.push(toPublicCandidate({
+        ...candidate,
+        evidenceAvailable: false,
+        matchedRoadFamilies: [family],
+        roadEvidenceCoverage: "insufficient-for-distinct-comparison",
+        limitations: ["This alternative maps to the same route-family evidence as another candidate, so no distinct risk prediction was assigned."],
+      }));
+      continue;
+    }
+    usedFamilies.add(familyKey);
+
+    let graphContext = { status: "unavailable" };
+    try {
+      graphContext = await routeDependencies.graphManager.getMLRiskContext(family) || graphContext;
+    } catch (error) {
+      // Graph evidence remains optional context.
+    }
+
+    let prediction;
+    try {
+      prediction = await routeDependencies.runRiskPrediction(
+        buildMLInput(roadInfo, graphContext)
+      );
+    } catch (error) {
+      return sendControlledError(res, 503, "ML_UNAVAILABLE",
+        "The route risk prediction service is temporarily unavailable.");
+    }
+
+    const coverage = roadInfo._matchedLabelCount === roadInfo._routeLabelCount
+      ? "full-provider-label-coverage"
+      : "partial-provider-label-coverage";
+    const route = toPublicCandidate({
+      ...candidate,
+      predictedRiskLevel: prediction.riskLevel,
+      confidence: prediction.confidence,
+      confidencePercent: prediction.confidencePercent,
+      classProbabilities: prediction.probabilities,
+      modelName: prediction.modelName,
+      evidenceAvailable: true,
+      matchedRoadFamilies: [family],
+      roadEvidenceCoverage: coverage,
+      limitations: coverage.startsWith("partial")
+        ? ["Only some provider road labels matched the supported route-family dataset."]
+        : [],
+    });
+    evaluated.push(route);
+    evaluatedContexts.set(route.routeId, {
+      roadInfo,
+      riskPrediction: prediction,
+      graphContext,
+    });
+    alternatives.push(route);
+  }
+
+  evaluated.sort(compareEvaluatedRoutes);
+  const recommendedRoute = evaluated[0] || null;
+  const fastestRoute = alternatives.find((route) => route.isFastestRoute) || alternatives[0];
+  const selectedContext = recommendedRoute
+    ? evaluatedContexts.get(recommendedRoute.routeId)
+    : null;
+  const vehicleResult = vehicleRequested && selectedContext
+    ? await getVehicleRecommendationForContext({
+      distanceKm: recommendedRoute.distanceKm,
+      roadInfo: selectedContext.roadInfo,
+      riskPrediction: selectedContext.riskPrediction,
+      userBudget,
+      passengerCount,
+      requestedVehicleCategory,
+    })
+    : null;
+
+  return res.json({
+    success: true,
+    recommendedRoute,
+    alternatives,
+    comparison: {
+      candidateRouteCount: alternatives.length,
+      evaluatedRouteCount: evaluated.length,
+      fastestRouteId: fastestRoute?.routeId || null,
+      recommendedRouteId: recommendedRoute?.routeId || null,
+      extraMinutesVsFastest: recommendedRoute
+        ? recommendedRoute.durationMinutes - fastestRoute.durationMinutes : null,
+      extraDistanceKmVsFastest: recommendedRoute
+        ? Number((recommendedRoute.distanceKm - fastestRoute.distanceKm).toFixed(2)) : null,
+    },
+    vehicleIntegration: {
+      usesRecommendedRoute: Boolean(vehicleResult),
+      selectedRouteContextApplied: Boolean(vehicleResult),
+      routeId: vehicleResult ? recommendedRoute.routeId : null,
+      evidenceStatus: recommendedRoute?.roadEvidenceCoverage || "unavailable",
+      status: vehicleResult
+        ? "recommended-route-context-applied"
+        : "not-requested-or-no-evaluable-route",
+      limitation: vehicleResult
+        ? null
+        : "Route-linked vehicle recommendation requires valid vehicle preferences and an evaluable recommended route.",
+      bestVehicle: vehicleResult?.bestVehicle || null,
+      alternatives: vehicleResult?.alternativeOptions || [],
+      higherRoadCapabilityOption: vehicleResult?.safetyUpsell || null,
+      gradient: vehicleResult?.roadGradient ?? null,
+      gradientDataAvailable: vehicleResult
+        ? vehicleResult.roadGradient !== null
+        : false,
+      explanation: vehicleResult?.explanation || null,
+    },
+    explanation: {
+      title: "Recommended Lower-Risk Route",
+      reason: recommendedRoute
+        ? "The recommendation is the lower predicted risk among alternatives with distinct, usable route-family evidence. Risk class is compared before class probabilities, duration and distance."
+        : "Alternative route safety comparison is unavailable because sufficient distinct road evidence could not be matched.",
+      graphRankingUsage: "Neo4j may populate classifier inputs when available; raw graph counts are not used as a cross-route ranking tie-breaker.",
+      limitation: "This research prototype recommends a lower-risk route among evaluated alternatives; it does not guarantee route safety.",
+    },
+  });
+});
 
 
 // ==================================================
@@ -2124,295 +2553,24 @@ router.post(
       // Vehicle dataset
       // ------------------------------------------------
 
-      const vehiclePath =
-        path.join(
-          __dirname,
-          "../ai-engine/data/processed_vehicles.csv"
-        );
-
-
-      const vehicles =
-        await loadStaticCsvData(
-          vehiclePath
-        );
-
-
-      const roadGradient =
-        toNullableNumber(
-          getField(
-            roadInfo,
-            [
-              "Max Gradient (%)",
-            ]
-          )
-        );
-
-
-      const analyzedVehicles =
-        vehicles.map(
-          (vehicle) => {
-
-            const estimatedHirePrice =
-              calculateHirePrice(
-                vehicle,
-                distanceKm
-              );
-
-
-            const suitability =
-              calculateVehicleSuitability(
-                vehicle,
-                roadGradient
-              );
-
-
-            const seatingCapacity =
-              toNumber(
-                getField(
-                  vehicle,
-                  [
-                    "Seating Capacity",
-                    "MaxPassengers",
-                    "Max Passengers",
-                  ]
-                )
-              );
-
-
-            const vehicleCategory =
-              getField(
-                vehicle,
-                [
-                  "Vehicle Category",
-                  "VehicleCategory",
-                  "Category",
-                ],
-                "Unknown"
-              );
-
-
-            return {
-
-              ...vehicle,
-
-              estimatedHirePrice,
-
-              calculatedCost:
-                estimatedHirePrice,
-
-              seatingCapacity,
-
-              vehicleCategory,
-
-              vehicleSuitability:
-                suitability,
-
-              priceFormula:
-                "BaseHireCharge + (DistanceKM × RentalPricePerKM)",
-
-              recommendationType:
-                "Rule-based vehicle suitability + dataset pricing",
-
-            };
-
-          }
-        );
-
-
-      // ------------------------------------------------
-      // Budget / passenger / preference filtering
-      // ------------------------------------------------
-
-      const recommended =
-        analyzedVehicles
-          .filter(
-            (vehicle) => {
-
-              const price =
-                Number(
-                  vehicle
-                    .estimatedHirePrice
-                );
-
-
-              const matchesBudget =
-                Number.isFinite(
-                  price
-                ) &&
-                price <=
-                  userBudget;
-
-
-              const matchesPassengers =
-                vehicle
-                  .seatingCapacity >=
-                passengerCount;
-
-
-              const matchesPreference =
-                requestedVehicleCategory
-                  ? String(
-                      vehicle
-                        .vehicleCategory
-                    )
-                      .toLowerCase()
-                      .includes(
-                        String(
-                          requestedVehicleCategory
-                        )
-                          .toLowerCase()
-                      )
-                  : true;
-
-
-              const suitableForGradient =
-                vehicle
-                  .vehicleSuitability
-                  .suitableForGradient;
-
-
-              const passesGradientCheck =
-                suitableForGradient !==
-                false;
-
-
-              return (
-                matchesBudget &&
-                matchesPassengers &&
-                matchesPreference &&
-                passesGradientCheck
-              );
-
-            }
-          )
-          .sort(
-            (
-              first,
-              second
-            ) =>
-              compareVehiclesByRisk(
-                first,
-                second,
-                riskPrediction.riskLevel
-              )
-          );
-
-
-      const bestVehicle =
-        recommended[0] ||
-        null;
-
-
-      // ------------------------------------------------
-      // Upsell
-      //
-      // A vehicle outside budget by max 30% that has
-      // stronger road capability than the current match.
-      // ------------------------------------------------
-
-      const safetyUpsell =
-        analyzedVehicles
-          .filter(
-            (vehicle) => {
-
-              const price =
-                Number(
-                  vehicle
-                    .estimatedHirePrice
-                );
-
-
-              if (
-                !Number.isFinite(
-                  price
-                )
-              ) {
-                return false;
-              }
-
-
-              const aboveBudget =
-                price >
-                userBudget;
-
-
-              const withinUpsellLimit =
-                price <=
-                userBudget *
-                  1.3;
-
-
-              const enoughSeats =
-                vehicle
-                  .seatingCapacity >=
-                passengerCount;
-
-
-              const matchesPreference =
-                requestedVehicleCategory
-                  ? String(
-                      vehicle
-                        .vehicleCategory
-                    )
-                      .toLowerCase()
-                      .includes(
-                        String(
-                          requestedVehicleCategory
-                        )
-                          .toLowerCase()
-                      )
-                  : true;
-
-
-              const gradientSuitable =
-                vehicle
-                  .vehicleSuitability
-                  .suitableForGradient;
-
-
-              const gradientDataAvailable =
-                vehicle
-                  .vehicleSuitability
-                  .gradientDataAvailable;
-
-
-              const betterCapability =
-                gradientDataAvailable &&
-                bestVehicle
-                  ? vehicle
-                      .vehicleSuitability
-                      .gradeabilityMargin
-                    >
-                    bestVehicle
-                      .vehicleSuitability
-                      .gradeabilityMargin
-                  : gradientDataAvailable;
-
-
-              return (
-                aboveBudget &&
-                withinUpsellLimit &&
-                enoughSeats &&
-                matchesPreference &&
-                gradientDataAvailable &&
-                gradientSuitable === true &&
-                betterCapability
-              );
-
-            }
-          )
-          .sort(
-            (
-              first,
-              second
-            ) =>
-              compareVehiclesByRisk(
-                first,
-                second,
-                riskPrediction.riskLevel
-              )
-          )[0] ||
-        null;
+      const vehicleResult =
+        await getVehicleRecommendationForContext({
+          distanceKm,
+          roadInfo,
+          riskPrediction,
+          userBudget,
+          passengerCount,
+          requestedVehicleCategory,
+        });
+
+      const {
+        bestVehicle,
+        alternativeOptions,
+        safetyUpsell,
+        analyzedVehicles,
+        recommended,
+        roadGradient,
+      } = vehicleResult;
 
 
       const explanation = {
@@ -2424,22 +2582,7 @@ router.post(
           graphReasoning,
           roadInfo,
         }),
-        vehicleRecommendation:
-          buildVehicleRecommendationExplanation({
-            vehicle: bestVehicle,
-            userBudget,
-            passengerCount,
-            requestedVehicleCategory,
-            riskLevel:
-              riskPrediction.riskLevel,
-          }),
-        safetyUpsell:
-          buildSafetyUpsellExplanation({
-            safetyUpsell,
-            bestVehicle,
-            userBudget,
-            roadGradient,
-          }),
+        ...vehicleResult.explanation,
       };
 
 
@@ -2653,10 +2796,7 @@ router.post(
 
 
         alternativeOptions:
-          recommended.slice(
-            1,
-            3
-          ),
+          alternativeOptions,
 
 
         safetyUpsell:
@@ -2703,5 +2843,7 @@ module.exports.__test = {
   loadStaticCsvData,
   resetStaticDataCacheForTesting,
   getStaticDataCacheStateForTesting,
+  getRoadDataByRouteLabels,
+  compareEvaluatedRoutes,
   ML_PREDICTION_TIMEOUT_MS,
 };

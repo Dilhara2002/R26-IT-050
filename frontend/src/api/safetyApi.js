@@ -51,3 +51,25 @@ export const getVehicleRecommendation = async (payload) => {
     };
   }
 };
+
+export const getLowerRiskRoute = async (payload) => {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/safety/recommend-route`,
+      {
+        ...payload,
+        startingLocation: payload.startLocation,
+        destination: payload.endLocation,
+      },
+      { timeout: 20000 }
+    );
+    return response.data;
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.message ||
+        "Alternative route safety comparison is unavailable.",
+    };
+  }
+};
