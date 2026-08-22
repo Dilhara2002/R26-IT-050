@@ -6,7 +6,11 @@ from flask_cors import CORS
 load_dotenv()
 
 # Import core AI logic from model.py
-from model import filter_locations, run_genetic_algorithm, generate_itinerary_summary
+from model import (
+    filter_locations,
+    run_genetic_algorithm_details,
+    generate_itinerary_summary,
+)
 
 app = Flask(__name__)
 CORS(app) # Enables CORS for all routes so Web Browsers can connect
@@ -46,9 +50,15 @@ def optimize_itinerary():
             return jsonify({"error": f"No matching locations found within {radius_km}km radius."}), 404
             
         # Step 2: Genetic Algorithm for Spatio-Temporal Routing
-        optimal_places, estimated_time, penalty_hit = run_genetic_algorithm(
-            filtered_places, max_time_minutes, user_lat, user_lon
+        optimization = run_genetic_algorithm_details(
+            filtered_places,
+            max_time_minutes,
+            user_lat,
+            user_lon,
+            user_preferences=user_preferences,
         )
+        optimal_places = optimization["optimized_route"]
+        penalty_hit = optimization["time_limit_exceeded"]
 
         # Step 3: XAI Formatting via Gemini API
         xai_summary = ""
@@ -68,9 +78,15 @@ def optimize_itinerary():
                 "search_radius_km": radius_km, 
                 "user_preferences": user_preferences,
                 "max_time_allocated_mins": max_time_minutes,
-                "estimated_time_required": estimated_time,
+                "estimated_time_required": optimization["estimated_time_required"],
                 "time_limit_exceeded": penalty_hit,
                 "optimized_route": optimal_places,
+                "optimized_stops": optimization["optimized_stops"],
+                "planned_time_minutes": optimization["planned_time_minutes"],
+                "visit_time_minutes": optimization["visit_time_minutes"],
+                "travel_time_minutes": optimization["travel_time_minutes"],
+                "remaining_time_minutes": optimization["remaining_time_minutes"],
+                "time_utilization_percent": optimization["time_utilization_percent"],
                 "ai_summary": xai_summary 
             }
         }), 200

@@ -34,7 +34,10 @@ export default function ResultScreen({ route, navigation }) {
         )}
 
         <Pressable
-          onPress={() => navigation.navigate("Map", { itineraryData: data })}
+          onPress={() => navigation.navigate("Map", {
+            optimizedStops: data.optimized_stops,
+            startingLocation: data.starting_location,
+          })}
           style={({ pressed }) => [
             styles.generateButton,
             pressed && styles.pressed,
