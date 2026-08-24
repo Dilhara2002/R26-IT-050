@@ -18,6 +18,9 @@ const GEOAPIFY_URL =
 const OSRM_URL =
   "https://router.project-osrm.org/route/v1/driving";
 
+const ROUTING_REQUEST_TIMEOUT_MS =
+  Number(process.env.ROUTING_REQUEST_TIMEOUT_MS || 10000);
+
 
 // A direct Nominatim match must be quite strong.
 // Otherwise we allow Geoapify to correct the text.
@@ -841,162 +844,126 @@ const geocodeLocation = async (
 // Route calculation
 // ==================================================
 
-const getRouteDetails = async (
-  startLocation,
-  endLocation
-) => {
+const mapOsrmRoutes = (routes, start, end) =>
+  routes.map((route, index) => ({
+    routeId: `osrm-${index + 1}`,
+    provider: "OSRM",
+    isFastestRoute: index === 0,
+    distanceKm: Number((route.distance / 1000).toFixed(2)),
+    durationMinutes: Number((route.duration / 60).toFixed(0)),
+    geometry:
+      route.geometry?.type === "LineString" &&
+      Array.isArray(route.geometry.coordinates)
+        ? route.geometry
+        : null,
+    roadNames: [...new Set(
+      (route.legs || [])
+        .flatMap((leg) => leg.steps || [])
+        .flatMap((step) => [step.ref, step.name])
+        .map((label) => String(label || "").trim())
+        .filter(Boolean)
+    )],
+    startLocationLabel: start.label,
+    endLocationLabel: end.label,
+    correctedStartLocation: start.correctedName,
+    correctedEndLocation: end.correctedName,
+    startLocationSource: start.source,
+    endLocationSource: end.source,
+    startLocationSimilarity: start.similarity ?? null,
+    endLocationSimilarity: end.similarity ?? null,
+    startCoordinates: {
+      longitude: start.longitude,
+      latitude: start.latitude,
+    },
+    endCoordinates: {
+      longitude: end.longitude,
+      latitude: end.latitude,
+    },
+  }));
+
+const requestRouteAlternatives = async (start, end) => {
+  const coordinates =
+    `${start.longitude},${start.latitude};${end.longitude},${end.latitude}`;
+  const response = await axios.get(`${OSRM_URL}/${coordinates}`, {
+    params: {
+      overview: "full",
+      alternatives: "true",
+      steps: "true",
+      geometries: "geojson",
+    },
+    timeout: ROUTING_REQUEST_TIMEOUT_MS,
+  });
+
+  if (!Array.isArray(response.data?.routes)) {
+    const error = new Error("Routing service returned an invalid response.");
+    error.code = "ROUTE_SERVICE_ERROR";
+    throw error;
+  }
+  if (response.data.routes.length === 0) {
+    const error = new Error("No route found between the supplied locations.");
+    error.code = "ROUTE_NOT_FOUND";
+    throw error;
+  }
+  return mapOsrmRoutes(response.data.routes, start, end);
+};
+
+const getRouteAlternativesByCoordinates = async (start, end) => {
   try {
-    const start =
-      await geocodeLocation(
-        startLocation
-      );
-
-
-    const end =
-      await geocodeLocation(
-        endLocation
-      );
-
-
-    const coordinates =
-      `${start.longitude},${start.latitude};${end.longitude},${end.latitude}`;
-
-
-    const response =
-      await axios.get(
-        `${OSRM_URL}/${coordinates}`,
-        {
-          params: {
-            overview:
-              "false",
-
-            alternatives:
-              "false",
-
-            steps:
-              "false",
-          },
-
-          timeout:
-            10000,
-        }
-      );
-
-
-    const route =
-      response.data
-        ?.routes?.[0];
-
-
-    if (!route) {
-      const error =
-        new Error(
-          "No route found between the resolved locations."
-        );
-
-      error.code =
-        "ROUTE_NOT_FOUND";
-
-      throw error;
-    }
-
-
-    return {
-      distanceKm:
-        Number(
-          (
-            route.distance /
-            1000
-          ).toFixed(2)
-        ),
-
-      durationMinutes:
-        Number(
-          (
-            route.duration /
-            60
-          ).toFixed(0)
-        ),
-
-      startLocationLabel:
-        start.label,
-
-      endLocationLabel:
-        end.label,
-
-      correctedStartLocation:
-        start.correctedName ||
-        startLocation,
-
-      correctedEndLocation:
-        end.correctedName ||
-        endLocation,
-
-      startLocationSource:
-        start.source,
-
-      endLocationSource:
-        end.source,
-
-      startLocationSimilarity:
-        start.similarity ??
-        null,
-
-      endLocationSimilarity:
-        end.similarity ??
-        null,
-
-      startCoordinates: {
-        longitude:
-          start.longitude,
-
-        latitude:
-          start.latitude,
+    return await requestRouteAlternatives(
+      {
+        longitude: start.lon,
+        latitude: start.lat,
+        label: start.name,
+        correctedName: start.name,
+        source: "request-coordinates",
       },
-
-      endCoordinates: {
-        longitude:
-          end.longitude,
-
-        latitude:
-          end.latitude,
-      },
-    };
-
-  } catch (error) {
-    console.error(
-      "Route Error:",
-      error.message
+      {
+        longitude: end.lon,
+        latitude: end.lat,
+        label: end.name,
+        correctedName: end.name,
+        source: "request-coordinates",
+      }
     );
-
-
-    // Preserve structured location /
-    // route errors for the API layer.
-    if (
-      error.code ===
-        "LOCATION_REQUIRED" ||
-      error.code ===
-        "LOCATION_NOT_FOUND" ||
-      error.code ===
-        "ROUTE_NOT_FOUND"
-    ) {
+  } catch (error) {
+    if (["ROUTE_NOT_FOUND", "ROUTE_SERVICE_ERROR"].includes(error.code)) {
       throw error;
     }
-
-
-    const wrappedError =
-      new Error(
-        "Failed to fetch route details."
-      );
-
-    wrappedError.code =
-      "ROUTE_SERVICE_ERROR";
-
+    const wrappedError = new Error("Failed to fetch route details.");
+    wrappedError.code = "ROUTE_SERVICE_ERROR";
     throw wrappedError;
   }
 };
 
+const getRouteAlternatives = async (startLocation, endLocation) => {
+  try {
+    const start = await geocodeLocation(startLocation);
+    const end = await geocodeLocation(endLocation);
+    return await requestRouteAlternatives(
+      { ...start, correctedName: start.correctedName || startLocation },
+      { ...end, correctedName: end.correctedName || endLocation }
+    );
+  } catch (error) {
+    if ([
+      "LOCATION_REQUIRED",
+      "LOCATION_NOT_FOUND",
+      "ROUTE_NOT_FOUND",
+      "ROUTE_SERVICE_ERROR",
+    ].includes(error.code)) {
+      throw error;
+    }
+    const wrappedError = new Error("Failed to fetch route details.");
+    wrappedError.code = "ROUTE_SERVICE_ERROR";
+    throw wrappedError;
+  }
+};
+
+const getRouteDetails = async (startLocation, endLocation) =>
+  (await getRouteAlternatives(startLocation, endLocation))[0];
 
 export {
-  getRouteDetails
+  getRouteDetails,
+  getRouteAlternatives,
+  getRouteAlternativesByCoordinates,
+  ROUTING_REQUEST_TIMEOUT_MS,
 };

@@ -15,10 +15,12 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
+import { fileURLToPath } from "url";
 
 
 import hotelDataRoutes from "./routes/hotelData.routes.js";
 import safetyRoutes from "./routes/safetyRoutes.js";
+import itinerarySafetyRoutes from "./routes/itinerarySafety.routes.js";
 import itineraryRoutes from "./routes/itinerary.routes.js";
 
 
@@ -86,6 +88,11 @@ app.use(
 app.use(
   "/api/safety",
   safetyRoutes
+);
+
+app.use(
+  "/api/safety",
+  itinerarySafetyRoutes
 );
 
 
@@ -294,7 +301,9 @@ http://localhost:${PORT}/api`
 
 
 
-startServer();
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  startServer();
+}
 
 
 

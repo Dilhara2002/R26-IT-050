@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import readline from "readline";
 import { spawn } from "child_process";
+import { fileURLToPath } from "url";
 
 import {
   getRouteDetails
@@ -15,6 +16,8 @@ import {
 
 
 import graphManager from "../ai-engine/knowledge-graph/graphManager.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 
 const router = express.Router();
@@ -1178,6 +1181,25 @@ const buildMLInput = (
   };
 };
 
+const defaultSafetyDependencies = {
+  getRouteDetails,
+  getWeatherByCoordinates,
+  getRoadData,
+  graphManager,
+  runRiskPrediction,
+  loadCsvData,
+};
+
+let safetyDependencies = { ...defaultSafetyDependencies };
+
+const setSafetyRouteDependenciesForTesting = (overrides = {}) => {
+  safetyDependencies = { ...safetyDependencies, ...overrides };
+};
+
+const resetSafetyRouteDependenciesForTesting = () => {
+  safetyDependencies = { ...defaultSafetyDependencies };
+};
+
 
 // ==================================================
 // Main API
@@ -1289,7 +1311,7 @@ router.post(
       // ------------------------------------------------
 
       const routeDetails =
-        await getRouteDetails(
+        await safetyDependencies.getRouteDetails(
           startLocation,
           endLocation
         );
@@ -1329,7 +1351,7 @@ router.post(
       // ------------------------------------------------
 
       const weatherInfo =
-        await getWeatherByCoordinates(
+        await safetyDependencies.getWeatherByCoordinates(
           routeDetails
             .startCoordinates
             .latitude,
@@ -1352,7 +1374,7 @@ router.post(
       // ------------------------------------------------
 
       const roadInfo =
-        await getRoadData(
+        await safetyDependencies.getRoadData(
           startLocation,
           endLocation
         );
@@ -1413,10 +1435,10 @@ router.post(
           fetchedGraphContext,
           fetchedGraphReasoning,
         ] = await Promise.all([
-          graphManager.getMLRiskContext(
+          safetyDependencies.graphManager.getMLRiskContext(
             matchedRoadName
           ),
-          graphManager.getSafetyReasoning(
+          safetyDependencies.graphManager.getSafetyReasoning(
             matchedRoadName
           ),
         ]);
@@ -1458,7 +1480,7 @@ router.post(
       try {
 
         riskPrediction =
-          await runRiskPrediction(
+          await safetyDependencies.runRiskPrediction(
             mlInput
           );
 
@@ -1501,7 +1523,7 @@ router.post(
 
 
       const vehicles =
-        await loadCsvData(
+        await safetyDependencies.loadCsvData(
           vehiclePath
         );
 
@@ -1995,5 +2017,10 @@ router.post(
   }
 );
 
+
+export {
+  setSafetyRouteDependenciesForTesting,
+  resetSafetyRouteDependenciesForTesting,
+};
 
 export default router;

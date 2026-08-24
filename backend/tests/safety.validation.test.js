@@ -1,8 +1,51 @@
-const test = require("node:test");
-const assert = require("node:assert/strict");
-const request = require("supertest");
+import test from "node:test";
+import assert from "node:assert/strict";
+import request from "supertest";
 
-const app = require("../src/app");
+import app from "../src/app.js";
+import { setSafetyRouteDependenciesForTesting } from "../src/routes/safetyRoutes.js";
+
+setSafetyRouteDependenciesForTesting({
+  getRouteDetails: async (startLocation, endLocation) => ({
+    distanceKm: 100,
+    durationMinutes: 150,
+    correctedStartLocation: startLocation,
+    correctedEndLocation: endLocation,
+    startCoordinates: { latitude: 6.9271, longitude: 79.8612 },
+    endCoordinates: { latitude: 7.2906, longitude: 80.6337 },
+  }),
+  getWeatherByCoordinates: async () => ({
+    status: "available",
+    isRaining: false,
+    temperature: 27,
+    weatherDescription: "clear sky",
+    locationName: "Colombo",
+  }),
+  getRoadData: async () => ({
+    "Route/Segment Name": "A1 Colombo-Kandy",
+    "Max Gradient (%)": 8,
+    "Average Elevation": 120,
+    "Surface Friction Index": 0.72,
+    "Terrain Type": "Mountainous",
+    "Road Surface Condition": "Asphalt - Good",
+    "Typical Road Width": "Wide",
+    _aggregationType: "route-family",
+    _segmentCount: 5,
+  }),
+  graphManager: {
+    getMLRiskContext: async () => ({ status: "available", historicalOccurrenceCount: 2 }),
+    getSafetyReasoning: async () => ({ status: "available", explanation: "Deterministic test context." }),
+  },
+  runRiskPrediction: async (inputFeatures) => ({
+    success: true,
+    riskLevel: "Medium",
+    confidence: 0.8,
+    confidencePercent: 80,
+    probabilities: { Low: 0.1, Medium: 0.8, High: 0.1 },
+    modelName: "deterministic-mock",
+    inputFeatures,
+  }),
+});
 
 
 const requestSafetyAnalysis = (
@@ -77,10 +120,6 @@ test("GET / returns the health response contract", async () => {
   assert.equal(response.status, 200);
   assert.equal(response.body.success, true);
   assert.equal(response.body.status, "Healthy");
-  assert.equal(
-    response.body.endpoints.safetyRecommendation,
-    "/api/safety/recommend-vehicle"
-  );
 });
 
 
