@@ -9,9 +9,54 @@ The Safety Analyzer supports a Sri Lankan tourism vehicle-recommendation workflo
 - vehicle suitability and recommendation; and
 - route and current-weather context.
 
+### Alternative-route comparison
+
+OSRM alternative retrieval uses the existing bounded routing request with
+`alternatives=true`, step labels, and full GeoJSON geometry. Responses are
+normalized to route ID, distance, duration, geometry, fastest-route status,
+and an internal road-label list; raw provider payloads are not returned.
+
+Road evidence is matched conservatively from OSRM step labels by an explicit
+A/B road code or at least two meaningful family-name tokens. The established
+route-family aggregation remains maximum known gradient, averages for numeric
+elevation/friction, and deterministic modes for categorical characteristics.
+Coverage describes provider-label matching, not GPS-level segment coverage.
+Partial matching is exposed. Unmatched candidates and candidates sharing the
+same evidence family are not ranked as if they had distinct evidence.
+
+The deployed model and feature schema are unchanged. Route ranking compares
+risk class, High probability, Medium probability, duration, distance, and
+route ID. Confidence remains predicted-class probability, not accident
+probability. Neo4j may populate classifier inputs but is not an independent
+ranking tie-breaker. The frontend opens an external directions map using
+waypoints sampled from the returned OSRM geometry; the external provider may
+recalculate travel between those points.
+
+When valid budget/passenger inputs are present, the selected candidate's
+in-memory `roadInfo` and prediction objects are passed directly to the shared
+vehicle recommendation helper. No route safety values are accepted back from
+the client. Known gradient therefore affects suitability exactly as in the
+legacy endpoint; unknown gradient remains null, does not reject vehicles, and
+suppresses the higher-capability upsell.
+
+The frontend submits its five normal form values once. The combined response
+always identifies the selected state structurally. Two or more distinct
+evaluable candidates produce `lower-risk-recommended`; otherwise the default
+OSRM candidate is retained as `default-analyzed-route` and is evaluated with
+the established start/destination route-family fallback when provider step
+labels are insufficient. Geometry availability is independent of comparison
+availability, so the default route remains map-capable whenever OSRM supplied
+its GeoJSON line.
+
+Limitations include OSRM returning a single candidate, missing provider road
+labels, limited documented CSV route-family coverage, partial matching, and
+the absence of comprehensive live traffic/incident evidence. Therefore this
+is a lower-risk recommendation among evaluated alternatives, never a claim of
+the safest or guaranteed-safe route.
+
 ## 2. ML Approach
 
-The deployed artifact is a **Random Forest** classifier. Its target classes are **Low**, **Medium**, and **High**. It classifies historical route hazard/risk severity; it does **not** estimate accident probability.
+The deployed artifact is a **Gradient Boosting** classifier selected by the reproducible v2 workflow. Its target classes are **Low**, **Medium**, and **High**. It classifies historical route hazard/risk severity; it does **not** estimate accident probability.
 
 ### Dataset Features
 
@@ -24,18 +69,18 @@ The deployed artifact is a **Random Forest** classifier. Its target classes are 
 
 ## 3. Model Selection and Recorded Evidence
 
-Training uses an unseen-route holdout (`GroupShuffleSplit`) and 5-fold `GroupKFold`, grouping records by `route_code` so a route is not shared across evaluation groups. A separate repeated unseen-route stability comparison evaluates Random Forest and Gradient Boosting over 10 grouped splits.
+Training first creates one final unseen-route holdout with `GroupShuffleSplit`, grouping records by `route_code`. That holdout is excluded from all candidate comparison and selection. The development routes are used for 5-fold `GroupKFold` comparison of all candidates; the top two by CV Macro F1 are then evaluated with repeated unseen-route `GroupShuffleSplit` stability analysis over 10 development-only splits. The final holdout is evaluated once only after the deployment architecture is selected, then that architecture is refit on all 598 rows.
 
 The active model artifact records **598 training rows** and **22 route groups**.
 
 Recorded repeated-stability results (`model_stability_summary.csv`):
 
-| Model | Mean test Macro F1 | Test Macro F1 SD | Mean train-test gap | Selected |
+| Model | Mean development validation Macro F1 | Validation Macro F1 SD | Mean train-validation gap | Selected |
 | --- | ---: | ---: | ---: | --- |
-| Random Forest | 0.8406 | 0.0524 | 0.0602 | Yes |
-| Gradient Boosting | 0.8341 | 0.0568 | 0.1121 | No |
+| Gradient Boosting | 0.8408 | 0.0332 | 0.1111 | Yes |
+| Random Forest | 0.8218 | 0.0357 | 0.0822 | No |
 
-Random Forest was selected because the recorded repeated unseen-route comparison gave it the higher mean test Macro F1 and lower generalization gap. The single recorded GroupKFold comparison also contains these Random Forest values: CV Macro F1 `0.7723 ± 0.0649`, untouched-test Macro F1 `0.8614`, and untouched-test accuracy `0.8758`. These values are evaluation evidence for this dataset, not an accident-probability claim.
+Gradient Boosting was selected because it had the highest repeated development validation Macro F1. Its shortlisted CV Macro F1 was `0.7742 ± 0.0682`; its final untouched-holdout Macro F1 was `0.8780` and accuracy was `0.8820`. These values are evaluation evidence for this dataset, not an accident-probability claim.
 
 ## 4. Active Model Artifact Path
 
@@ -46,7 +91,28 @@ src/ai-engine/scripts/train_models_v2.py
   -> src/routes/safetyRoutes.js
 ```
 
-`predict_safety.py` loads the v2 artifact and returns the predicted class, class probabilities, and model metadata to the route endpoint.
+`predict_safety.py` loads the v2 artifact and returns the predicted class, class probabilities, model metadata, and exact input feature values to the route endpoint.
+
+### Confidence Interpretation
+
+When the selected classifier supports `predict_proba()`, `confidence` is the probability assigned by that classifier to its predicted class. It is exposed as `confidenceType: "predicted_class_probability"`. It is not calibrated real-world accident/disaster probability, certainty, or model accuracy. The current workflow does not perform probability calibration.
+
+## 4.1 Explainability Trace
+
+The successful API response includes a compact `explanation` object. It separates:
+
+- `risk.modelInputs`: the values supplied to the deployed classifier;
+- `contextualEvidence.weather`: current enrichment context, explicitly marked as not used as an ML input;
+- `contextualEvidence.neo4j`: retrieval status and the graph-derived fields that can populate named ML inputs (`historical_occurrence_count`, `hazard_type`, and `season`); and
+- `vehicleRecommendation` and `safetyUpsell`: deterministic budget, passenger, category, gradient, and ranking-rule evidence.
+
+The trace documents evidence and rules available for a request. It is not a causal explanation or proof of a safety outcome.
+
+## 4.2 Runtime Data Access
+
+The backend lazily caches successful parses of `processed_roads.csv` and `processed_vehicles.csv` for the lifetime of one backend process. This removes repeated CSV file I/O and parsing without changing road matching, pricing, filtering, or ranking semantics. Failed reads are not cached, and a backend restart intentionally refreshes static data.
+
+The Node endpoint continues to launch one bounded Python subprocess per prediction request. `predict_safety.py` loads the artifact once within that process, but subprocess startup and model loading still occur for each request. A persistent inference service would be a separate architectural decision and is intentionally not introduced for this local research prototype. Live weather, route, geocoding, and Neo4j requests are not cached by this task.
 
 ## 5. Knowledge Graph Evidence
 
@@ -97,7 +163,7 @@ This does not establish empirically proven crash safety. The dataset does not pr
 
 ## 9. Weather
 
-Weather is returned as current trip context. It is not currently applied as an arbitrary manual multiplier to the ML risk score.
+Weather is returned as current trip context. It is not a deployed ML input and is not applied as an arbitrary manual multiplier to the ML risk score. Unavailable weather remains null/unavailable rather than being represented as no rain.
 
 ## 10. Failure Handling
 
@@ -107,16 +173,16 @@ Weather is returned as current trip context. It is not currently applied as an a
 
 ## 11. Automated Validation
 
-The current backend regression suite has eight tests protecting:
+The current backend regression suite has 17 deterministic tests protecting:
 
 1. health endpoint response;
 2. required-field validation;
 3. invalid budget validation;
 4. invalid passenger-count validation;
-5. success response or controlled ML-outage contract;
-6. vehicle-category filtering;
-7. route-family aggregation; and
-8. Neo4j graceful degradation.
+5. controlled location, road-data, and ML dependency failures;
+6. Neo4j and weather graceful degradation;
+7. risk and vehicle explanation traces; and
+8. known and unavailable gradient behavior.
 
 ## 12. Reproducibility
 
@@ -125,7 +191,7 @@ The current backend regression suite has eight tests protecting:
 - The backend defaults to `backend/.venv/bin/python`.
 - `PYTHON_BIN` can explicitly override that interpreter.
 - The latest recorded `npm audit` and `npm audit --omit=dev` checkpoint reported zero known vulnerabilities.
-- The latest recorded `npm test` checkpoint passed all eight tests.
+- The latest recorded `npm test` checkpoint passed all 17 tests.
 
 ## 13. Frontend Integration Notes
 
@@ -137,11 +203,25 @@ The current backend regression suite has eight tests protecting:
 ## 14. Limitations
 
 - The model is not an accident-probability model.
+- The original source, licence, collection date, publication date, and generation methodology of the three primary input datasets are not documented in this repository.
+- Repository evidence does not establish whether the primary road, disaster, and vehicle datasets are observed real-world data, manually curated data, synthetic/generated data, simulated data, augmented data, or a mixture.
+- The ML target `risk_level` is a deterministic transformation of the source `Severity Level` field and should be treated as an internal proxy for historical hazard/risk severity.
+- The source severity labels have not been independently externally validated.
+- The current training dataset contains 598 records.
+- Only 135 of 598 records (22.6%) have matching road-profile data.
+- 463 of 598 records (77.4%) have no matching numeric road-profile data.
+- The disaster dataset contains 22 route families, but only A1, A2, A4, A5, and A16 overlap with the current road dataset.
+- Verified matching produced 113 exact matches, 22 route-level matches, and 463 no-road-data records.
+- Missing road-profile measurements are not fabricated. Numeric road values remain missing and unavailable categorical fields are represented as `Unknown`.
 - The current road dataset has no geometry.
-- Route-family aggregation is an approximation.
+- Route-family aggregation is an approximation and is not equivalent to exact traversed-segment analysis.
+- The current datasets do not support a claim of complete nationwide Sri Lankan road coverage.
+- Model performance metrics describe performance on the current research dataset and must not be interpreted as independently validated nationwide road-safety accuracy.
 - Vehicle ranking is a heuristic based on available dataset attributes.
 - Location typo handling cannot guarantee every ambiguous input.
 - Graph reasoning is not full LLM GraphRAG.
+- Classifier confidence is not calibrated real-world accident/disaster probability or model accuracy.
+- Explainability traces describe available model inputs and deterministic rules; they do not prove causal safety relationships.
 
 ## What this component can claim
 

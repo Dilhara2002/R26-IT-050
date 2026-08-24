@@ -4,6 +4,8 @@ const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_BASE_URL ||
   "http://localhost:5001/api";
 
+const COMBINED_ANALYSIS_TIMEOUT_MS = 70000;
+
 export const getVehicleRecommendation = async (payload) => {
   try {
     const response = await axios.post(
@@ -43,6 +45,43 @@ export const getVehicleRecommendation = async (payload) => {
         ? "Cannot connect to backend server. Check the API URL and ensure the backend is running."
         : null) ||
       "Failed to generate vehicle recommendation.";
+
+    return {
+      success: false,
+      error: true,
+      message,
+    };
+  }
+};
+
+export const getLowerRiskRoute = async (payload) => {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/safety/recommend-route`,
+      {
+        ...payload,
+        startingLocation: payload.startLocation,
+        destination: payload.endLocation,
+      },
+      { timeout: COMBINED_ANALYSIS_TIMEOUT_MS }
+    );
+
+    if (!response.data) {
+      throw new Error("No data received from server.");
+    }
+
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      (error.code === "ECONNABORTED"
+        ? "Combined route and vehicle analysis timed out. Please try again."
+        : null) ||
+      (!error.response
+        ? "Cannot connect to backend server. Check the API URL and ensure the backend is running."
+        : null) ||
+      "Failed to analyze this route and recommend a vehicle.";
 
     return {
       success: false,
