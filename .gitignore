@@ -3,3 +3,5 @@ frontend/.expo/
 frontend/expo-env.d.ts
 backend/.venv/
 .DS_Store
+config.bat
+node_modules
