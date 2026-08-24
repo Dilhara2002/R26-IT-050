@@ -1,10 +1,11 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { colors } from "../styles/colors";
 
 export default function VehicleCard({
   vehicle,
   title = "Vehicle",
+  onSelect,
 }) {
   if (!vehicle) return null;
 
@@ -107,6 +108,12 @@ export default function VehicleCard({
           ? `LKR ${Number(estimatedCost).toLocaleString()}`
           : "Unavailable"}
       </Text>
+
+      {onSelect && (
+        <TouchableOpacity style={styles.selectButton} onPress={() => onSelect(vehicle)}>
+          <Text style={styles.selectButtonText}>Choose This Vehicle</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -114,23 +121,28 @@ export default function VehicleCard({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.card,
-    padding: 18,
-    borderRadius: 16,
+    padding: 20,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: colors.border,
     marginTop: 16,
+    shadowColor: "#241F18",
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
   },
 
   title: {
     fontSize: 14,
-    color: colors.primary,
+    color: colors.cinnamon,
     fontWeight: "700",
     marginBottom: 8,
   },
 
   vehicleName: {
     fontSize: 19,
-    fontWeight: "bold",
+    fontWeight: "600",
+    fontFamily: "serif",
     color: colors.text,
     marginBottom: 10,
   },
@@ -156,5 +168,17 @@ const styles = StyleSheet.create({
   unsuitable: {
     color: "#B91C1C",
     fontWeight: "700",
+  },
+  selectButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 13,
+    paddingVertical: 13,
+    alignItems: "center",
+    marginTop: 15,
+  },
+  selectButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "800",
   },
 });

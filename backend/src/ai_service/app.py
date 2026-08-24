@@ -11,9 +11,11 @@ from model import (
     run_genetic_algorithm_details,
     generate_itinerary_summary,
 )
+from landmark_routes import landmark_bp
 
 app = Flask(__name__)
 CORS(app) # Enables CORS for all routes so Web Browsers can connect
+app.register_blueprint(landmark_bp)
 
 # Retrieve Gemini API Key
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -96,4 +98,8 @@ def optimize_itinerary():
 
 if __name__ == '__main__':
     print("[SYSTEM] Starting Context-Aware AI Routing Server...")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(
+        debug=True,
+        host='0.0.0.0',
+        port=int(os.getenv("AI_SERVICE_PORT", "5002")),
+    )

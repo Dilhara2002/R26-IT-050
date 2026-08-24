@@ -24,7 +24,7 @@ function FitMapBounds({ points }) {
 
 const startIcon = L.divIcon({
   className: '',
-  html: '<div style="background:#1D4ED8;color:white;border:3px solid white;border-radius:50%;width:24px;height:24px;box-shadow:0 2px 6px #555"></div>',
+  html: '<div style="background:#1C2A44;color:white;border:3px solid white;border-radius:50%;width:24px;height:24px;box-shadow:0 2px 6px #555"></div>',
   iconSize: [30, 30],
   iconAnchor: [15, 15],
 });

@@ -249,7 +249,7 @@ const startServer = async () => {
 
 
   const PORT =
-    process.env.PORT || 5000;
+    process.env.PORT || 5001;
 
 
 

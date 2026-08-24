@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   View,
-  Linking,
 } from "react-native";
 
 import { colors } from "../styles/colors";
@@ -30,7 +29,7 @@ const getRiskStyle = (riskLevel) => {
     return {
       backgroundColor: "#FFFBEB",
       borderColor: "#FCD34D",
-      textColor: "#B45309",
+      textColor: "#A15B33",
     };
   }
 
@@ -47,6 +46,8 @@ export default function ResultScreen({
   errorMessage,
   onBack,
   onNewSearch,
+  onShowMap,
+  onReviewTrip,
 }) {
   if (!result) {
     return (
@@ -129,25 +130,6 @@ export default function ResultScreen({
   );
   const selectedRoute = routeResult;
 
-  const openSelectedRoute = async () => {
-    const coordinates = selectedRoute?.geometry?.coordinates;
-    if (!Array.isArray(coordinates) || coordinates.length < 2) return;
-    const sampleIndexes = [
-      0,
-      Math.floor((coordinates.length - 1) / 3),
-      Math.floor(((coordinates.length - 1) * 2) / 3),
-      coordinates.length - 1,
-    ];
-    const points = sampleIndexes.map((index) => coordinates[index]);
-    const [origin, ...rest] = points;
-    const destination = rest.pop();
-    const waypoints = rest.map(([longitude, latitude]) =>
-      `${latitude},${longitude}`).join("|");
-    const url = `https://www.google.com/maps/dir/?api=1&origin=${origin[1]},${origin[0]}&destination=${destination[1]},${destination[0]}&waypoints=${encodeURIComponent(waypoints)}&travelmode=driving`;
-    await Linking.openURL(url);
-  };
-
-
   return (
     <ScrollView
       style={styles.container}
@@ -160,14 +142,13 @@ export default function ResultScreen({
       </TouchableOpacity>
 
 
-      <Text style={styles.title}>
-        Recommendation Result
-      </Text>
-
-      <Text style={styles.subtitle}>
-        Route-level ML risk classification with historical
-        Neo4j safety evidence.
-      </Text>
+      <View style={styles.hero}>
+        <Text style={styles.heroBadge}>✦ AI SAFETY ANALYSIS</Text>
+        <Text style={styles.title}>Your safer trip plan</Text>
+        <Text style={styles.subtitle}>
+          Route risk, historical safety evidence and vehicle guidance for your journey.
+        </Text>
+      </View>
 
 
       {/* -----------------------------------------
@@ -301,7 +282,7 @@ export default function ResultScreen({
               </Text>
             )}
             {selectedRoute.routeGeometryAvailable ? (
-              <TouchableOpacity style={styles.button} onPress={openSelectedRoute}>
+              <TouchableOpacity style={styles.button} onPress={() => onShowMap(selectedRoute)}>
                 <Text style={styles.buttonText}>Show Route Map</Text>
               </TouchableOpacity>
             ) : (
@@ -416,6 +397,7 @@ export default function ResultScreen({
         <VehicleCard
           title="Best Vehicle Match"
           vehicle={bestVehicle}
+          onSelect={(vehicle) => onReviewTrip(vehicle, result)}
         />
       ) : (
         <View style={styles.noticeCard}>
@@ -460,6 +442,7 @@ export default function ResultScreen({
             key={`alternative-${index}`}
             title={`Alternative Option ${index + 1}`}
             vehicle={vehicle}
+            onSelect={(selectedVehicle) => onReviewTrip(selectedVehicle, result)}
           />
         )
       )}
@@ -470,6 +453,7 @@ export default function ResultScreen({
           <VehicleCard
             title="Higher Road-Capability Option"
             vehicle={result.safetyUpsell}
+            onSelect={(vehicle) => onReviewTrip(vehicle, result)}
           />
 
           {upsellExplanation?.reason && (
@@ -565,7 +549,11 @@ const styles = StyleSheet.create({
   },
 
   contentContainer: {
+    width: "100%",
+    maxWidth: 800,
+    alignSelf: "center",
     padding: 20,
+    paddingBottom: 48,
   },
 
   backText: {
@@ -577,17 +565,36 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: colors.primaryDark,
+    fontSize: 32,
+    lineHeight: 39,
+    fontWeight: "600",
+    fontFamily: "serif",
+    color: "#FFFFFF",
+    marginTop: 13,
   },
 
   subtitle: {
     fontSize: 15,
-    color: colors.muted,
-    marginTop: 6,
-    marginBottom: 24,
+    color: "#E7DBBA",
+    marginTop: 8,
     lineHeight: 22,
+  },
+  hero: {
+    backgroundColor: colors.primaryDark,
+    borderRadius: 26,
+    padding: 25,
+    marginBottom: 16,
+  },
+  heroBadge: {
+    alignSelf: "flex-start",
+    color: "#D89A1F",
+    backgroundColor: "rgba(255,255,255,0.12)",
+    borderRadius: 20,
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+    fontSize: 10,
+    fontWeight: "900",
+    letterSpacing: 1.2,
   },
 
   riskPredictionCard: {
@@ -647,21 +654,23 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 10,
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 14,
   },
 
   cardTitle: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: "600",
+    fontFamily: "serif",
     color: colors.text,
     marginBottom: 10,
   },
 
   sectionTitle: {
     fontSize: 22,
-    fontWeight: "bold",
+    fontWeight: "600",
+    fontFamily: "serif",
     color: colors.primaryDark,
     marginTop: 20,
     marginBottom: 2,
@@ -697,11 +706,11 @@ const styles = StyleSheet.create({
   },
 
   explanationCard: {
-    backgroundColor: "#F8FAFC",
+    backgroundColor: "#F1E9D2",
     borderColor: colors.border,
     borderWidth: 1,
     padding: 16,
-    borderRadius: 16,
+    borderRadius: 20,
     marginTop: 14,
   },
 
@@ -720,9 +729,9 @@ const styles = StyleSheet.create({
   },
 
   graphCard: {
-    backgroundColor: "#F0FDFA",
+    backgroundColor: "#E7DBBA",
     borderWidth: 1,
-    borderColor: "#99F6E4",
+    borderColor: "#C9B98F",
     borderRadius: 18,
     padding: 18,
     marginTop: 22,
@@ -730,7 +739,8 @@ const styles = StyleSheet.create({
 
   graphTitle: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: "600",
+    fontFamily: "serif",
     color: colors.primaryDark,
     marginBottom: 10,
   },

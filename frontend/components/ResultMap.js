@@ -8,9 +8,12 @@ export default function ResultMap({ startingLocation, optimizedStops = [] }) {
     latitude: Number(startingLocation?.lat ?? 7.2906),
     longitude: Number(startingLocation?.lon ?? 80.6337),
   }), [startingLocation]);
-  const stopCoordinates = optimizedStops
-    .filter((stop) => Number.isFinite(stop.latitude) && Number.isFinite(stop.longitude))
-    .map((stop) => ({ latitude: stop.latitude, longitude: stop.longitude }));
+  const stopCoordinates = useMemo(
+    () => optimizedStops
+      .filter((stop) => Number.isFinite(stop.latitude) && Number.isFinite(stop.longitude))
+      .map((stop) => ({ latitude: stop.latitude, longitude: stop.longitude })),
+    [optimizedStops]
+  );
 
   useEffect(() => {
     const coordinates = [startCoordinate, ...stopCoordinates];
@@ -20,7 +23,7 @@ export default function ResultMap({ startingLocation, optimizedStops = [] }) {
         animated: true,
       });
     }
-  }, [startCoordinate, optimizedStops]);
+  }, [startCoordinate, stopCoordinates]);
 
   return (
     <MapView
@@ -33,7 +36,7 @@ export default function ResultMap({ startingLocation, optimizedStops = [] }) {
         longitudeDelta: 0.05,
       }}
     >
-      <Marker coordinate={startCoordinate} title="Starting location" pinColor="#1D4ED8" />
+      <Marker coordinate={startCoordinate} title="Starting location" pinColor="#1C2A44" />
       {optimizedStops.map((stop) => (
         <Marker
           key={stop.place_id ?? `${stop.latitude}-${stop.longitude}`}

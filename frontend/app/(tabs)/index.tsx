@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   },
 
   hero: {
-    backgroundColor: "#1D4ED8",
+    backgroundColor: "#1C2A44",
     borderRadius: 28,
     padding: 26,
     marginBottom: 18,
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   },
 
   subtitle: {
-    color: "#DBEAFE",
+    color: "#E7DBBA",
     lineHeight: 23,
     fontSize: 15,
   },
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
     borderRadius: 27,
-    backgroundColor: "#DBEAFE",
+    backgroundColor: "#E7DBBA",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -212,17 +212,17 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 20,
     fontWeight: "900",
-    color: "#0F172A",
+    color: "#241F18",
   },
 
   cardSub: {
-    color: "#64748B",
+    color: "#6F6658",
     marginTop: 3,
   },
 
   quickTitle: {
     fontWeight: "800",
-    color: "#0F172A",
+    color: "#241F18",
     marginBottom: 10,
   },
 
@@ -234,22 +234,22 @@ const styles = StyleSheet.create({
   },
 
   chip: {
-    backgroundColor: "#EFF6FF",
+    backgroundColor: "#F1E9D2",
     borderWidth: 1,
-    borderColor: "#BFDBFE",
+    borderColor: "#C9B98F",
     paddingHorizontal: 12,
     paddingVertical: 9,
     borderRadius: 18,
   },
 
   chipText: {
-    color: "#1D4ED8",
+    color: "#1C2A44",
     fontWeight: "700",
     fontSize: 12,
   },
 
   generateButton: {
-    backgroundColor: "#2563EB",
+    backgroundColor: "#3E6650",
     borderRadius: 20,
     paddingVertical: 18,
     alignItems: "center",
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
 
   loadingText: {
     marginTop: 10,
-    color: "#64748B",
+    color: "#6F6658",
     fontWeight: "600",
   },
 
@@ -303,12 +303,12 @@ const styles = StyleSheet.create({
   featureTitle: {
     fontSize: 17,
     fontWeight: "900",
-    color: "#0F172A",
+    color: "#241F18",
     marginBottom: 4,
   },
 
   featureText: {
-    color: "#64748B",
+    color: "#6F6658",
     lineHeight: 20,
   },
 });

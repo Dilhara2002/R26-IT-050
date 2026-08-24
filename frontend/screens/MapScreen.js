@@ -68,16 +68,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
   },
-  cardTitle: { fontSize: 18, fontWeight: "900", color: "#0F172A" },
-  cardSub: { color: "#64748B", fontSize: 13, marginTop: 2 },
+  cardTitle: { fontSize: 18, fontWeight: "900", color: "#241F18" },
+  cardSub: { color: "#6F6658", fontSize: 13, marginTop: 2 },
   backBtn: {
     marginTop: 15,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#E7DBBA',
     padding: 10,
     borderRadius: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#BFDBFE'
+    borderColor: '#C9B98F'
   },
-  backBtnText: { color: '#1D4ED8', fontWeight: 'bold' }
+  backBtnText: { color: '#1C2A44', fontWeight: 'bold' }
 });

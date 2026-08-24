@@ -142,7 +142,7 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.mapContainer}>
           {locationLoading ? (
             <View style={styles.loadingBox}>
-              <ActivityIndicator size="large" color="#2563EB" />
+              <ActivityIndicator size="large" color="#3E6650" />
               <Text style={styles.loadingTextSmall}>Detecting Location...</Text>
             </View>
           ) : (
@@ -205,7 +205,7 @@ export default function HomeScreen({ navigation }) {
         {/* Generate Button */}
         {loading ? (
           <View style={styles.loadingBoxMain}>
-            <ActivityIndicator size="large" color="#2563EB" />
+            <ActivityIndicator size="large" color="#3E6650" />
             <Text style={styles.loadingText}>
               Optimizing Route & Fetching Locations...
             </Text>
@@ -230,7 +230,7 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#EAF2FF",
+    backgroundColor: "#F1E9D2",
   },
   content: {
     padding: 18,
@@ -240,10 +240,12 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   hero: {
-    backgroundColor: "#1D4ED8",
+    backgroundColor: "#1C2A44",
     borderRadius: 28,
     padding: 26,
     marginBottom: 18,
+    borderWidth: 1,
+    borderColor: "rgba(216,154,31,0.42)",
   },
   aiBadge: {
     alignSelf: "flex-start",
@@ -257,20 +259,27 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: "900",
+    fontWeight: "600",
+    fontFamily: "serif",
     color: "#FFFFFF",
     marginBottom: 12,
   },
   subtitle: {
-    color: "#DBEAFE",
+    color: "#E7DBBA",
     lineHeight: 23,
     fontSize: 15,
   },
   assistantCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#FBF7EC",
     borderRadius: 28,
     padding: 20,
     elevation: 6,
+    borderWidth: 1,
+    borderColor: "#D7CAB0",
+    shadowColor: "#241F18",
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
     marginBottom: 20,
   },
   assistantHeader: {
@@ -282,7 +291,7 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
     borderRadius: 27,
-    backgroundColor: "#DBEAFE",
+    backgroundColor: "#E7DBBA",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
@@ -292,16 +301,18 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 20,
-    fontWeight: "900",
-    color: "#0F172A",
+    fontWeight: "600",
+    fontFamily: "serif",
+    color: "#241F18",
   },
   cardSub: {
-    color: "#64748B",
+    color: "#6F6658",
     marginTop: 3,
   },
   sectionTitle: {
-    fontWeight: "800",
-    color: "#0F172A",
+    fontWeight: "600",
+    fontFamily: "serif",
+    color: "#241F18",
     marginBottom: 12,
     fontSize: 15,
     marginTop: 5,
@@ -311,12 +322,12 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 18,
     overflow: "hidden",
-    borderColor: "#BFDBFE",
+    borderColor: "#C9B98F",
     borderWidth: 1,
     marginBottom: 6,
   },
   coordsText: {
-    color: "#64748B",
+    color: "#6F6658",
     fontSize: 12,
     textAlign: "right",
     marginBottom: 18,
@@ -326,11 +337,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#EFF6FF",
+    backgroundColor: "#E7DBBA",
   },
   loadingTextSmall: {
     marginTop: 8,
-    color: "#2563EB",
+    color: "#3E6650",
     fontWeight: "600",
     fontSize: 12,
   },
@@ -341,19 +352,19 @@ const styles = StyleSheet.create({
     marginBottom: 22,
   },
   chip: {
-    backgroundColor: "#EFF6FF",
+    backgroundColor: "#E7DBBA",
     borderWidth: 1,
-    borderColor: "#BFDBFE",
+    borderColor: "#C9B98F",
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 20,
   },
   chipActive: {
-    backgroundColor: "#2563EB",
-    borderColor: "#1D4ED8",
+    backgroundColor: "#3E6650",
+    borderColor: "#1C2A44",
   },
   chipText: {
-    color: "#1D4ED8",
+    color: "#1C2A44",
     fontWeight: "700",
     fontSize: 13,
   },
@@ -367,17 +378,17 @@ const styles = StyleSheet.create({
   },
   timeInput: {
     flex: 1,
-    backgroundColor: "#EFF6FF",
+    backgroundColor: "#E7DBBA",
     borderWidth: 1,
-    borderColor: "#BFDBFE",
+    borderColor: "#C9B98F",
     borderRadius: 16,
     padding: 15,
     fontSize: 16,
-    color: "#0F172A",
+    color: "#241F18",
     fontWeight: "600",
   },
   generateButton: {
-    backgroundColor: "#2563EB",
+    backgroundColor: "#3E6650",
     borderRadius: 20,
     paddingVertical: 18,
     alignItems: "center",
@@ -405,7 +416,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    color: "#64748B",
+    color: "#6F6658",
     fontWeight: "600",
   },
 });
