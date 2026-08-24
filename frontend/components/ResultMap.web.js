@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -38,24 +38,64 @@ function numberedIcon(sequence) {
   });
 }
 
-export default function ResultMap({ startingLocation, optimizedStops = [] }) {
-  const defaultLat = Number(startingLocation?.lat ?? 7.2906);
-  const defaultLon = Number(startingLocation?.lon ?? 80.6337);
+const getRiskColor = (leg) => {
+  if (!leg?.risk_evidence_available) return '#64748B';
+  if (leg?.risk_prediction?.riskLevel === 'Low') return '#16A34A';
+  if (leg?.risk_prediction?.riskLevel === 'Medium') return '#F59E0B';
+  if (leg?.risk_prediction?.riskLevel === 'High') return '#DC2626';
+  return '#64748B';
+};
+
+const getSafetyLines = (safetyLegs) =>
+  (Array.isArray(safetyLegs) ? safetyLegs : []).flatMap((leg, index) => {
+    const coordinates = leg?.route_geometry?.coordinates;
+    if (leg?.status !== 'success' || leg?.route_geometry?.type !== 'LineString' || !Array.isArray(coordinates)) {
+      return [];
+    }
+    const leafletCoordinates = coordinates
+      .filter((coordinate) =>
+        Array.isArray(coordinate) &&
+        coordinate.length >= 2 &&
+        Number.isFinite(coordinate[0]) &&
+        Number.isFinite(coordinate[1])
+      )
+      .map(([longitude, latitude]) => [latitude, longitude]);
+    return leafletCoordinates.length >= 2
+      ? [{ key: leg?.leg_sequence ?? index, coordinates: leafletCoordinates, color: getRiskColor(leg) }]
+      : [];
+  });
+
+export default function ResultMap({ startingLocation, optimizedStops = [], safetyLegs = [] }) {
+  const parsedLat = Number(startingLocation?.lat);
+  const parsedLon = Number(startingLocation?.lon);
+  const defaultLat = Number.isFinite(parsedLat) ? parsedLat : 7.2906;
+  const defaultLon = Number.isFinite(parsedLon) ? parsedLon : 80.6337;
+  const validStops = useMemo(() =>
+    (Array.isArray(optimizedStops) ? optimizedStops : [])
+      .filter((stop) => Number.isFinite(stop?.latitude) && Number.isFinite(stop?.longitude)),
+  [optimizedStops]);
+  const safetyLines = useMemo(() => getSafetyLines(safetyLegs), [safetyLegs]);
   const points = useMemo(() => [
     [defaultLat, defaultLon],
-    ...optimizedStops
-      .filter((stop) => Number.isFinite(stop.latitude) && Number.isFinite(stop.longitude))
-      .map((stop) => [stop.latitude, stop.longitude]),
-  ], [defaultLat, defaultLon, optimizedStops]);
+    ...validStops.map((stop) => [stop.latitude, stop.longitude]),
+    ...safetyLines.flatMap((line) => line.coordinates),
+  ], [defaultLat, defaultLon, validStops, safetyLines]);
 
   return (
     <MapContainer center={[defaultLat, defaultLon]} zoom={12} style={{ height: '100%', width: '100%' }}>
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       <FitMapBounds points={points} />
+      {safetyLines.map((line) => (
+        <Polyline
+          key={`safety-leg-${line.key}`}
+          positions={line.coordinates}
+          pathOptions={{ color: line.color, weight: 6, opacity: 0.9 }}
+        />
+      ))}
       <Marker position={[defaultLat, defaultLon]} icon={startIcon}>
         <Popup>Starting location</Popup>
       </Marker>
-      {optimizedStops.map((stop) => (
+      {validStops.map((stop) => (
         <Marker
           key={stop.place_id ?? `${stop.latitude}-${stop.longitude}`}
           position={[stop.latitude, stop.longitude]}

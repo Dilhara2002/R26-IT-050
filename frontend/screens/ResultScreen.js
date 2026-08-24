@@ -1,8 +1,85 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import TripSafetyAnalysis from "../components/TripSafetyAnalysis";
+import {
+  buildItinerarySafetyRequest,
+  getItinerarySafetyAvailability,
+  recommendItinerarySafety,
+} from "../services/safetyApi";
 
 export default function ResultScreen({ route, navigation }) {
-  const { data, persistence } = route.params;
+  const { data, persistence } = route.params || {};
+  const [budget, setBudget] = useState("");
+  const [passengers, setPassengers] = useState("");
+  const [preferredCategory, setPreferredCategory] = useState("");
+  const [safetyLoading, setSafetyLoading] = useState(false);
+  const [safetyResult, setSafetyResult] = useState(null);
+  const [safetyError, setSafetyError] = useState("");
+  const [validationError, setValidationError] = useState("");
+
+  const optimizedStops = Array.isArray(data?.optimized_stops) ? data.optimized_stops : [];
+  const startingLocation = data?.starting_location || null;
+  const availabilityMessage = getItinerarySafetyAvailability(startingLocation, optimizedStops);
+
+  const handleSafetyAnalysis = async () => {
+    if (safetyLoading) return;
+
+    setValidationError("");
+    setSafetyError("");
+
+    if (availabilityMessage) {
+      setValidationError(availabilityMessage);
+      return;
+    }
+
+    const normalizedBudget = Number(budget.trim());
+    const normalizedPassengers = Number(passengers.trim());
+    if (!budget.trim() || !Number.isFinite(normalizedBudget) || normalizedBudget <= 0) {
+      setValidationError("Enter a whole-trip budget greater than 0 LKR.");
+      return;
+    }
+    if (
+      !passengers.trim() ||
+      !Number.isInteger(normalizedPassengers) ||
+      normalizedPassengers <= 0
+    ) {
+      setValidationError("Enter a passenger count as a positive whole number.");
+      return;
+    }
+
+    setSafetyLoading(true);
+    setSafetyResult(null);
+    try {
+      const payload = buildItinerarySafetyRequest({
+        startingLocation,
+        optimizedStops,
+        budget: normalizedBudget,
+        passengers: normalizedPassengers,
+        preferredCategory: preferredCategory.trim(),
+      });
+      const response = await recommendItinerarySafety(payload);
+      if (!response || typeof response !== "object") {
+        setSafetyError("The safety service returned an unusable response.");
+        return;
+      }
+      setSafetyResult(response);
+    } catch (error) {
+      if (error?.safetyResponse && typeof error.safetyResponse === "object") {
+        setSafetyResult(error.safetyResponse);
+      }
+      setSafetyError(error?.message || "Trip safety analysis could not be completed.");
+    } finally {
+      setSafetyLoading(false);
+    }
+  };
+
+  if (!data) {
+    return (
+      <View style={styles.missingResult}>
+        <Text style={styles.missingResultText}>The itinerary result is unavailable.</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.page} contentContainerStyle={styles.content}>
@@ -35,8 +112,11 @@ export default function ResultScreen({ route, navigation }) {
 
         <Pressable
           onPress={() => navigation.navigate("Map", {
-            optimizedStops: data.optimized_stops,
-            startingLocation: data.starting_location,
+            optimizedStops,
+            startingLocation,
+            safetyLegs: Array.isArray(safetyResult?.per_leg_safety_results)
+              ? safetyResult.per_leg_safety_results
+              : [],
           })}
           style={({ pressed }) => [
             styles.generateButton,
@@ -50,7 +130,7 @@ export default function ResultScreen({ route, navigation }) {
 
       <Text style={styles.sectionTitle}>Step-by-Step Plan</Text>
       <View style={styles.featureGrid}>
-        {data.optimized_route.map((place, index) => (
+        {(Array.isArray(data.optimized_route) ? data.optimized_route : []).map((place, index) => (
           <View key={index} style={styles.featureCard}>
             <View style={styles.stepCircle}>
               <Text style={styles.stepNumber}>{index + 1}</Text>
@@ -67,6 +147,21 @@ export default function ResultScreen({ route, navigation }) {
         <Text style={[styles.sectionTitle, { color: '#C2410C' }]}>✦ Route Explanation</Text>
         <Text style={styles.aiSummary}>{data.ai_summary}</Text>
       </View>
+
+      <TripSafetyAnalysis
+        budget={budget}
+        passengers={passengers}
+        preferredCategory={preferredCategory}
+        onBudgetChange={setBudget}
+        onPassengersChange={setPassengers}
+        onPreferredCategoryChange={setPreferredCategory}
+        onAnalyze={handleSafetyAnalysis}
+        loading={safetyLoading}
+        availabilityMessage={availabilityMessage}
+        validationError={validationError}
+        requestError={safetyError}
+        result={safetyResult}
+      />
     </ScrollView>
   );
 }
@@ -103,4 +198,6 @@ const styles = StyleSheet.create({
   featureTitle: { fontSize: 17, fontWeight: "900", color: "#0F172A", marginBottom: 4 },
   featureText: { color: "#64748B", lineHeight: 20 },
   aiSummary: { color: "#475569", lineHeight: 22, fontSize: 15, textAlign: 'justify' },
+  missingResult: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, backgroundColor: "#EAF2FF" },
+  missingResultText: { color: "#B91C1C", fontWeight: "800", fontSize: 16, textAlign: "center" },
 });
