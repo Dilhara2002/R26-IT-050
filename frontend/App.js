@@ -16,6 +16,8 @@ import MapScreen from "./screens/MapScreen";
 import SafetyMapScreen from "./src/screens/SafetyMapScreen";
 import TripReviewScreen from "./src/screens/TripReviewScreen";
 import LandmarkExplorerScreen from "./src/screens/LandmarkExplorerScreen";
+import HotelHomeScreen from "./src/screens/HotelHomeScreen";
+import HotelResultsScreen from "./src/screens/HotelResultsScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -75,6 +77,7 @@ function MainFlow({ navigation }) {
 
   const openModule = (id) => {
     if (id === "sasanka") navigation.navigate("ItineraryHome");
+    else if (id === "dunith") navigation.navigate("HotelHome");
     else if (id === "ishan") setScreen("form");
     else if (id === "madush") navigation.navigate("LandmarkExplorer");
     else setScreen(`module:${id}`);
@@ -109,6 +112,8 @@ export default function App() {
         <Stack.Screen name="SafetyMap" component={SafetyMapScreen} options={{ title: "Safe Route Map" }} />
         <Stack.Screen name="TripReview" component={TripReviewScreen} options={{ title: "Review Trip Plan" }} />
         <Stack.Screen name="LandmarkExplorer" component={LandmarkExplorerScreen} options={{ title: "Landmark Explorer" }} />
+        <Stack.Screen name="HotelHome" component={HotelHomeScreen} options={{ title: "Hotels & Activities" }} />
+        <Stack.Screen name="HotelResults" component={HotelResultsScreen} options={{ title: "Your Hotel Matches" }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
