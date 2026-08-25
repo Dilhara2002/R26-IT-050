@@ -11,6 +11,7 @@ export default function VehicleCard({
 
   const vehicleName =
     vehicle["Vehicle Name (Make & Model)"] ||
+    vehicle.vehicleName ||
     vehicle.model ||
     "Unknown Vehicle";
 
@@ -21,6 +22,7 @@ export default function VehicleCard({
 
   const fuelType =
     vehicle["Fuel Type"] ||
+    vehicle.fuelType ||
     "Unknown";
 
   const seats =

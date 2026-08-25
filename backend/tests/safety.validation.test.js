@@ -167,6 +167,7 @@ test(
     assert.ok(recommendation.bestVehicle);
     assert.equal(recommendation.bestVehicle.pricing.currency, "LKR");
     assert.equal(recommendation.bestVehicle.pricing.status, "dataset-baseline");
+    assert.notEqual(recommendation.bestVehicle.fuelType, "Unknown");
     assert.equal(recommendation.bestVehicle.pricing.isLiveMarketRate, false);
     assert.equal(
       recommendation.bestVehicle.pricing.totalCost,

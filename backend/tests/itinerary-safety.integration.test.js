@@ -30,6 +30,7 @@ const makeBody = (names = ["A"], extra = {}) => ({
   ...extra,
 });
 const post = (body) => request(api).post("/api/safety/recommend-itinerary").send(body);
+const postRoute = (body) => request(api).post("/api/safety/recommend-route").send(body);
 
 let scenario;
 let active;
@@ -52,6 +53,21 @@ const installMocks = (overrides = {}) => {
   vehicleCalls = 0;
   vehicleContexts = [];
   setSafetyAnalysisDependenciesForTesting({
+    getRouteAlternatives: async (from, to) => [{
+      routeId: "named-route",
+      isFastestRoute: true,
+      distanceKm: 10,
+      durationMinutes: 20,
+      geometry: {
+        type: "LineString",
+        coordinates: [[startingLocation.lon, startingLocation.lat], [80.64, 7.3]],
+      },
+      roadNames: ["A"],
+      correctedStartLocation: from,
+      correctedEndLocation: to,
+      startCoordinates: { latitude: startingLocation.lat, longitude: startingLocation.lon },
+      endCoordinates: { latitude: 7.3, longitude: 80.64 },
+    }],
     getRouteAlternativesByCoordinates: async (from, to) => {
       active += 1;
       maximumActive = Math.max(maximumActive, active);
@@ -140,6 +156,21 @@ test("itinerary safety integration", async (t) => {
     assert.equal(response.body.per_leg_safety_results.length, 1);
     assert.equal(response.body.per_leg_safety_results[0].from.name, "Start");
     assert.equal(response.body.per_leg_safety_results[0].to.name, "A");
+  });
+
+  await t.test("named route response contains render-safe weather fields", async () => {
+    installMocks();
+    const response = await postRoute({
+      startLocation: "Start",
+      endLocation: "A",
+    });
+    assert.equal(response.status, 200);
+    assert.equal(response.body.analysis.weather, "clear");
+    assert.equal(response.body.analysis.temperature, null);
+    assert.equal(response.body.analysis.rainDetected, null);
+    assert.equal(typeof response.body.analysis.weather, "string");
+    assert.equal(response.body.routeResult.confidence, 0.8);
+    assert.equal(response.body.routeResult.modelName, "mock-model");
   });
 
   await t.test("multiple stops construct ordered adjacent legs", async () => {

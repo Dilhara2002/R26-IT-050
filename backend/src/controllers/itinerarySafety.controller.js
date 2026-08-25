@@ -315,7 +315,13 @@ const recommendRouteSafety = async (req, res) => {
         durationMinutes: result.duration_minutes,
         geometry: result.route_geometry,
         predictedRiskLevel: result.risk_prediction?.riskLevel || null,
+        confidence: result.risk_prediction?.confidence ?? null,
+        confidencePercent: result.risk_prediction?.confidencePercent ?? null,
+        classProbabilities: result.risk_prediction?.probabilities || null,
+        modelName: result.risk_prediction?.modelName || null,
         evidenceAvailable: result.risk_evidence_available,
+        comparisonAvailable: result.selected_route_mode === "lower-risk-recommended",
+        vehicleUsesSelectedRoute: Boolean(vehicle?.bestVehicle),
       },
       riskPrediction: result.risk_prediction,
       trip: {
@@ -326,11 +332,19 @@ const recommendRouteSafety = async (req, res) => {
       },
       analysis: {
         gradient: result.max_gradient,
-        weather: result.weather,
+        terrain: result.terrain,
+        roadSurface: result.road_surface,
+        weather: result.weather?.weatherDescription || null,
+        temperature: result.weather?.temperature ?? null,
+        rainDetected: result.weather?.isRaining ?? null,
         graphContext: result.graph_context,
       },
       vehicleIntegration: vehicle,
       bestVehicle: vehicle?.bestVehicle || null,
+      alternativeOptions: vehicle?.alternativeOptions || [],
+      graphRAG: result.graph_context?.reasoning || {
+        status: result.graph_context?.status || "unavailable",
+      },
     });
   } catch (error) {
     const status = error.code === "ROUTE_NOT_FOUND" ? 422 : 503;

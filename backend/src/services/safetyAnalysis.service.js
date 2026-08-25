@@ -282,6 +282,7 @@ const recommendVehicle = async ({ distanceKm, maxGradient, riskLevel, budget, pa
     return {
       vehicleName: vehicle["Vehicle Name (Make & Model)"],
       vehicleCategory: vehicle["Vehicle Category"],
+      fuelType: vehicle["Fuel Type"] || "Unknown",
       seatingCapacity,
       estimatedHirePrice,
       calculatedCost: estimatedHirePrice,
@@ -293,6 +294,11 @@ const recommendVehicle = async ({ distanceKm, maxGradient, riskLevel, budget, pa
         gradeability,
         roadGradient: maxGradient,
         gradeabilityMargin: gradeability === null ? null : Number((gradeability - maxGradient).toFixed(2)),
+        gradientDataAvailable: true,
+        suitableForGradient: gradeability === null ? null : gradeability >= maxGradient,
+        gradientSuitability: gradeability === null
+          ? "unknown"
+          : gradeability >= maxGradient ? "suitable" : "unsuitable",
       },
     };
   }).filter((vehicle) =>
@@ -446,6 +452,8 @@ const analyzeSafetyLeg = async ({ legSequence, from, to, routeAlternatives = nul
     graph_context: graphContext,
     risk_evidence_available: Boolean(selected?.riskPrediction),
     max_gradient: toNullableNumber(selected?.roadInfo?.["Max Gradient (%)"]),
+    terrain: selected?.roadInfo?.["Terrain Type"] || "Unknown",
+    road_surface: selected?.roadInfo?.["Road Surface Condition"] || "Unknown",
     limitations,
     error: null,
   };
