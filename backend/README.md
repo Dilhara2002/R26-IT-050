@@ -179,6 +179,12 @@ Remaining candidates are ranked according to the predicted risk level. The curre
 
 This ranking is not proof that a particular vehicle is objectively safer. The dataset does not provide safety attributes such as ABS, airbags, 4WD, or traction control, so the backend does not claim to evaluate them.
 
+### Model-based Trip-cost Estimate
+
+Vehicle responses calculate one user-facing trip-cost estimate from the selected model's dataset pricing fields: `BaseHireCharge + (DistanceKM × RentalPricePerKM)`. The structured `pricing` object exposes the model rate, base charge, route distance, currency, total, formula, source status, and verification state. The frontend presents the result as `Estimated Trip Cost`; it does not present or add a separate fuel-cost estimate.
+
+The repository does not document a rental provider or verification date for these model-level rates. The API therefore reports `status: "dataset-baseline"`, `isLiveMarketRate: false`, and `requiresAdminVerification: true`. A future admin rate-management feature can replace these inputs with sourced and dated rates without changing the quote formula or frontend contract. Until then, this is a research-dataset estimate rather than an exact current Sri Lankan market fare.
+
 ### Neo4j and ML Graceful Degradation
 
 - If Neo4j is unavailable, the request continues with `graphRAG.status: "unavailable"` and the ML/vehicle result can still be returned.

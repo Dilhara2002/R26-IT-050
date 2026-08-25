@@ -124,6 +124,33 @@ test("GET / returns the health response contract", async () => {
 
 
 test(
+  "vehicle response exposes a model-based final trip-price quote",
+  async () => {
+    const response = await requestSafetyAnalysis({
+      ...standardSafetyRequest,
+      budget: 50000,
+    });
+
+    if (!assertSuccessfulResponseOrMlOutage(response)) {
+      return;
+    }
+
+    const vehicle = response.body.bestVehicle;
+    assert.ok(vehicle);
+    assert.equal(vehicle.pricing.currency, "LKR");
+    assert.equal(vehicle.pricing.status, "dataset-baseline");
+    assert.equal(vehicle.pricing.isLiveMarketRate, false);
+    assert.equal(vehicle.pricing.requiresAdminVerification, true);
+    assert.equal(vehicle.pricing.totalCost, vehicle.estimatedHirePrice);
+    assert.equal(
+      vehicle.priceFormula,
+      "BaseHireCharge + (DistanceKM × RentalPricePerKM)"
+    );
+  }
+);
+
+
+test(
   "POST /api/safety/recommend-vehicle rejects missing required fields",
   async () => {
     const response = await requestSafetyAnalysis({

@@ -749,6 +749,36 @@ const calculateHirePrice = (
 };
 
 
+const buildVehiclePriceQuote = (vehicle, distanceKm) => {
+  const baseCharge = toNumber(getField(vehicle, [
+    "BaseHireCharge",
+    "Base Hire Charge",
+    "Base_Hire_Charge",
+  ]));
+  const ratePerKm = toNumber(getField(vehicle, [
+    "RentalPricePerKM",
+    "Rental Price Per KM",
+    "Rental_Price_Per_KM",
+  ]));
+  const totalCost = calculateHirePrice(vehicle, distanceKm);
+
+  return {
+    status: totalCost === null ? "unavailable" : "dataset-baseline",
+    currency: "LKR",
+    distanceKm: Number(distanceKm.toFixed(2)),
+    baseCharge: baseCharge > 0 ? baseCharge : null,
+    ratePerKm: ratePerKm > 0 ? ratePerKm : null,
+    totalCost,
+    formula: "BaseHireCharge + (DistanceKM × RentalPricePerKM)",
+    source: "Vehicle research dataset",
+    sourceVerifiedAt: null,
+    isLiveMarketRate: false,
+    requiresAdminVerification: true,
+    limitation: "The model-level rate is an internal dataset baseline until an administrator verifies and dates it against a rental-provider source.",
+  };
+};
+
+
 const calculateVehicleSuitability = (
   vehicle,
   roadGradient
@@ -1543,11 +1573,15 @@ router.post(
         vehicles.map(
           (vehicle) => {
 
-            const estimatedHirePrice =
-              calculateHirePrice(
+            const pricing =
+              buildVehiclePriceQuote(
                 vehicle,
                 distanceKm
               );
+
+
+            const estimatedHirePrice =
+              pricing.totalCost;
 
 
             const suitability =
@@ -1591,6 +1625,8 @@ router.post(
               calculatedCost:
                 estimatedHirePrice,
 
+              pricing,
+
               seatingCapacity,
 
               vehicleCategory,
@@ -1599,7 +1635,7 @@ router.post(
                 suitability,
 
               priceFormula:
-                "BaseHireCharge + (DistanceKM × RentalPricePerKM)",
+                pricing.formula,
 
               recommendationType:
                 "Rule-based vehicle suitability + dataset pricing",

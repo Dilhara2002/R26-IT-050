@@ -161,6 +161,12 @@ The current risk-aware ranking is a transparent heuristic using available datase
 
 This does not establish empirically proven crash safety. The dataset does not provide ABS, airbags, 4WD, traction control, or equivalent safety attributes.
 
+### Model-rate and trip-cost context
+
+The final trip estimate uses the selected vehicle model's `BaseHireCharge` and `RentalPricePerKM`: `BaseHireCharge + (DistanceKM × RentalPricePerKM)`. The API exposes these inputs and the total in a structured `pricing` object, while the frontend displays only the final trip estimate rather than a separate fuel breakdown.
+
+Repository evidence does not establish a current rental provider or verification date for the rates. Accordingly, the response marks them as a dataset baseline, not a live market rate, and identifies administrator verification as the remaining pricing-data step. A later admin integration can supply sourced rates and effective dates without changing the calculation contract.
+
 ## 9. Weather
 
 Weather is returned as current trip context. It is not a deployed ML input and is not applied as an arbitrary manual multiplier to the ML risk score. Unavailable weather remains null/unavailable rather than being represented as no rain.
@@ -173,7 +179,7 @@ Weather is returned as current trip context. It is not a deployed ML input and i
 
 ## 11. Automated Validation
 
-The current backend regression suite has 17 deterministic tests protecting:
+The current backend regression suite has 39 deterministic tests protecting:
 
 1. health endpoint response;
 2. required-field validation;
@@ -183,6 +189,8 @@ The current backend regression suite has 17 deterministic tests protecting:
 6. Neo4j and weather graceful degradation;
 7. risk and vehicle explanation traces; and
 8. known and unavailable gradient behavior.
+9. multi-leg itinerary ordering, aggregation, validation, concurrency, and graceful degradation; and
+10. model-based trip-price quote metadata.
 
 ## 12. Reproducibility
 
@@ -191,7 +199,7 @@ The current backend regression suite has 17 deterministic tests protecting:
 - The backend defaults to `backend/.venv/bin/python`.
 - `PYTHON_BIN` can explicitly override that interpreter.
 - The latest recorded `npm audit` and `npm audit --omit=dev` checkpoint reported zero known vulnerabilities.
-- The latest recorded `npm test` checkpoint passed all 17 tests.
+- The latest recorded `npm test` checkpoint passed all 39 tests.
 
 ## 13. Frontend Integration Notes
 

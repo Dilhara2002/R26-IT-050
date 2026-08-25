@@ -103,7 +103,7 @@ export default function VehicleCard({
       )}
 
       <Text style={styles.price}>
-        Estimated Cost:{" "}
+        Estimated Trip Cost:{" "}
         {estimatedCost !== null
           ? `LKR ${Number(estimatedCost).toLocaleString()}`
           : "Unavailable"}
