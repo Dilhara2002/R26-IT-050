@@ -87,7 +87,7 @@ export default function ResultScreen({ route, navigation }) {
         <Text style={styles.aiBadge}>✦ Optimized Itinerary</Text>
         <Text style={styles.title}>Your Travel Plan</Text>
         <Text style={styles.subtitle}>
-          We found the most time-efficient route for your interests. Here is your personalized plan.
+          A heuristic route built from the bounded, source-traced Kandy dataset.
         </Text>
       </View>
 
@@ -97,10 +97,17 @@ export default function ResultScreen({ route, navigation }) {
             <Text style={styles.botIcon}>⏱️</Text>
           </View>
           <View>
-            <Text style={styles.cardTitle}>Total Duration</Text>
+            <Text style={styles.cardTitle}>Total Estimated Duration</Text>
             <Text style={styles.cardSub}>{data.estimated_time_required}</Text>
           </View>
         </View>
+
+        <Text style={styles.estimateText}>
+          {data.visit_time_minutes} min research-estimated visits + {data.travel_time_minutes} min estimated travel
+        </Text>
+        <Text style={styles.estimationNote}>
+          Travel uses straight-line Haversine distance, an assumed {data.travel_estimation?.assumed_average_speed_kmh || 30} km/h speed and a traffic buffer. It excludes real-road routing, live traffic, opening hours, return travel, parking and walking.
+        </Text>
 
         {persistence && (
           <Text style={styles.persistenceText}>
@@ -130,14 +137,17 @@ export default function ResultScreen({ route, navigation }) {
 
       <Text style={styles.sectionTitle}>Step-by-Step Plan</Text>
       <View style={styles.featureGrid}>
-        {(Array.isArray(data.optimized_route) ? data.optimized_route : []).map((place, index) => (
-          <View key={index} style={styles.featureCard}>
+        {optimizedStops.map((stop, index) => (
+          <View key={stop.place_id || index} style={styles.featureCard}>
             <View style={styles.stepCircle}>
               <Text style={styles.stepNumber}>{index + 1}</Text>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.featureTitle}>{place}</Text>
-              <Text style={styles.featureText}>Confirmed Destination</Text>
+              <Text style={styles.featureTitle}>{stop.name} ({stop.duration_minutes} mins)</Text>
+              <Text style={styles.featureText}>{stop.explanation}</Text>
+              <Text style={styles.sourceText}>
+                Source: {stop.source_name} · {stop.source_license}
+              </Text>
             </View>
           </View>
         ))}
@@ -145,7 +155,9 @@ export default function ResultScreen({ route, navigation }) {
 
       <View style={[styles.assistantCard, { marginTop: 20, backgroundColor: '#FFF7ED', borderColor: '#FFEDD5', borderWidth: 1 }]}>
         <Text style={[styles.sectionTitle, { color: '#C2410C' }]}>✦ Route Explanation</Text>
-        <Text style={styles.aiSummary}>{data.ai_summary}</Text>
+        <Text style={styles.aiSummary}>
+          {data.route_explanation?.summary || data.ai_summary}
+        </Text>
       </View>
 
       <TripSafetyAnalysis
@@ -185,6 +197,8 @@ const styles = StyleSheet.create({
   botIcon: { fontSize: 25 },
   cardTitle: { fontSize: 20, fontWeight: "900", color: "#0F172A" },
   cardSub: { color: "#64748B", marginTop: 3 },
+  estimateText: { color: "#334155", fontWeight: "700", marginBottom: 8 },
+  estimationNote: { color: "#64748B", lineHeight: 19, marginBottom: 16, fontSize: 13 },
   persistenceText: { color: "#64748B", marginBottom: 16 },
   sectionTitle: { fontWeight: "800", color: "#0F172A", marginBottom: 12, fontSize: 17, marginTop: 10 },
   generateButton: { backgroundColor: "#2563EB", borderRadius: 20, paddingVertical: 18, alignItems: "center", justifyContent: "center", flexDirection: "row" },
@@ -197,6 +211,7 @@ const styles = StyleSheet.create({
   stepNumber: { color: '#fff', fontWeight: 'bold' },
   featureTitle: { fontSize: 17, fontWeight: "900", color: "#0F172A", marginBottom: 4 },
   featureText: { color: "#64748B", lineHeight: 20 },
+  sourceText: { color: "#1D4ED8", fontSize: 12, fontWeight: "700", marginTop: 8 },
   aiSummary: { color: "#475569", lineHeight: 22, fontSize: 15, textAlign: 'justify' },
   missingResult: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, backgroundColor: "#EAF2FF" },
   missingResultText: { color: "#B91C1C", fontWeight: "800", fontSize: 16, textAlign: "center" },

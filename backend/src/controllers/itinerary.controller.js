@@ -137,15 +137,19 @@ export const optimizeItinerary = async (req, res) => {
   } catch(error) {
 
 
-    return res.status(500).json({
+    const statusCode = Number.isInteger(error.statusCode)
+      ? error.statusCode
+      : 500;
+    const details = error.details && typeof error.details === "object"
+      ? error.details
+      : null;
 
-      status:
-        "error",
-
-      message:
-        error.message
-
-    });
+    return res.status(statusCode).json(
+      details || {
+        status: "error",
+        message: error.message
+      }
+    );
 
 
   }

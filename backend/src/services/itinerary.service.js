@@ -29,9 +29,18 @@ export const generateItineraryFromAI = async (itineraryData) => {
     );
 
 
-    throw new Error(
-      "Failed to generate itinerary from AI Engine"
-    );
+    if (error.response?.data) {
+      const upstreamError = new Error(
+        error.response.data.error ||
+        error.response.data.message ||
+        "The itinerary engine rejected the request."
+      );
+      upstreamError.statusCode = error.response.status;
+      upstreamError.details = error.response.data;
+      throw upstreamError;
+    }
+
+    throw new Error("Failed to generate itinerary from AI Engine");
 
 
   }

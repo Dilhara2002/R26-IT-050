@@ -7,6 +7,8 @@ load_dotenv()
 
 # Import core AI logic from model.py
 from model import (
+    DATA_SCOPE,
+    VERIFIED_STATUS,
     filter_locations,
     run_genetic_algorithm_details,
     generate_itinerary_summary,
@@ -47,7 +49,16 @@ def optimize_itinerary():
         filtered_places = filter_locations(user_preferences, user_lat, user_lon, radius_km)
         
         if filtered_places is None or filtered_places.empty:
-            return jsonify({"error": f"No matching locations found within {radius_km}km radius."}), 404
+            return jsonify({
+                "status": "error",
+                "code": "insufficient_verified_evidence",
+                "error": (
+                    "No source-traced Kandy locations matched the selected "
+                    f"interests inside the active {radius_km} km radius."
+                ),
+                "data_scope": DATA_SCOPE,
+                "search_radius_km": radius_km,
+            }), 404
             
         # Step 2: Genetic Algorithm for Spatio-Temporal Routing
         optimization = run_genetic_algorithm_details(
@@ -60,11 +71,17 @@ def optimize_itinerary():
         optimal_places = optimization["optimized_route"]
         penalty_hit = optimization["time_limit_exceeded"]
 
-        # Step 3: XAI Formatting via Gemini API
-        xai_summary = ""
+        # Step 3: deterministic evidence is the core explanation. Gemini can
+        # optionally paraphrase it, but never supplies the underlying evidence.
+        core_summary = optimization["route_explanation"]["summary"]
+        optional_paraphrase = core_summary
         if optimal_places:
-            print("[INFO] Generating XAI Summary via Gemini API...")
-            xai_summary = generate_itinerary_summary(optimal_places, user_preferences, GEMINI_API_KEY)
+            optional_paraphrase = generate_itinerary_summary(
+                optimal_places,
+                user_preferences,
+                GEMINI_API_KEY,
+                core_summary=core_summary,
+            )
         
         msg = "Itinerary optimized successfully."
         if penalty_hit:
@@ -75,6 +92,9 @@ def optimize_itinerary():
             "message": msg,
             "data": {
                 "starting_location": {"lat": user_lat, "lon": user_lon},
+                "data_scope": DATA_SCOPE,
+                "verification_status": VERIFIED_STATUS,
+                "verified_candidate_count": len(filtered_places),
                 "search_radius_km": radius_km, 
                 "user_preferences": user_preferences,
                 "max_time_allocated_mins": max_time_minutes,
@@ -87,7 +107,10 @@ def optimize_itinerary():
                 "travel_time_minutes": optimization["travel_time_minutes"],
                 "remaining_time_minutes": optimization["remaining_time_minutes"],
                 "time_utilization_percent": optimization["time_utilization_percent"],
-                "ai_summary": xai_summary 
+                "travel_estimation": optimization["travel_estimation"],
+                "route_explanation": optimization["route_explanation"],
+                "ai_summary": core_summary,
+                "ai_paraphrase": optional_paraphrase,
             }
         }), 200
 

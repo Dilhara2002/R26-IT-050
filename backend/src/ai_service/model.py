@@ -15,36 +15,108 @@ QUALITY_THRESHOLD = 3.9
 MAX_ROUTE_STOPS = 8
 TRAFFIC_BUFFER = 1.25
 AVERAGE_SPEED_KM_PER_MINUTE = 0.5  # Explicit assumption: about 30 km/h.
-DATASET_PATH = Path(__file__).resolve().parent / "data" / "places.csv"
+AVERAGE_SPEED_KMH = AVERAGE_SPEED_KM_PER_MINUTE * 60
+NEAR_IDENTICAL_COORDINATE_KM = 0.05
+DATA_SCOPE = "verified_kandy_v1"
+VERIFIED_STATUS = "source_trace_verified"
+QUARANTINED_LEGACY_IDS = {"79"}
+DATASET_PATH = (
+    Path(__file__).resolve().parent
+    / "data"
+    / "verified"
+    / "kandy_runtime_verified_v1.csv"
+)
 
 PLACES_DF = None
 TAGS_ENCODED = None
 
 
 def initialize_ai_engine():
-    """Load runtime data and tag features without training a quality model."""
+    """Load the bounded source-traced Kandy overlay without training a model."""
     global PLACES_DF, TAGS_ENCODED
 
     try:
         print(f"[INFO] Loading places dataset from '{DATASET_PATH}'...")
         places = pd.read_csv(DATASET_PATH)
+        required_columns = {
+            "Place_ID",
+            "Legacy_Place_ID",
+            "Name",
+            "Latitude",
+            "Longitude",
+            "District",
+            "Tags",
+            "Duration_Minutes",
+            "Duration_Basis",
+            "Source_Name",
+            "Source_URL",
+            "Source_License",
+            "Verification_Status",
+            "Verification_Note",
+        }
+        missing_columns = required_columns.difference(places.columns)
+        if missing_columns:
+            raise ValueError(
+                f"Verified runtime dataset is missing columns: {sorted(missing_columns)}"
+            )
+
+        places["Place_ID"] = places["Place_ID"].astype(str)
+        places["Legacy_Place_ID"] = places["Legacy_Place_ID"].astype(str)
         places["Tags"] = places["Tags"].fillna("General").astype(str)
-        # Invalid or absent observations stay missing rather than being imputed.
+        places["Latitude"] = pd.to_numeric(places["Latitude"], errors="raise")
+        places["Longitude"] = pd.to_numeric(places["Longitude"], errors="raise")
+        places["Duration_Minutes"] = pd.to_numeric(
+            places["Duration_Minutes"], errors="raise"
+        )
+        # Ratings have no provenance in this overlay and remain missing.
         places["Rating"] = pd.to_numeric(places["Rating"], errors="coerce")
+
+        if not places["District"].eq("Kandy").all():
+            raise ValueError("Verified Kandy runtime data contains another district.")
+        if not places["Verification_Status"].eq(VERIFIED_STATUS).all():
+            raise ValueError("Runtime data contains a record without source verification.")
+        if places["Place_ID"].duplicated().any():
+            raise ValueError("Verified runtime data contains duplicate stable IDs.")
+        if places["Legacy_Place_ID"].isin(QUARANTINED_LEGACY_IDS).any():
+            raise ValueError("A quarantined prototype record entered verified runtime data.")
+        for column in (
+            "Name",
+            "Source_Name",
+            "Source_URL",
+            "Source_License",
+            "Verification_Note",
+            "Duration_Basis",
+        ):
+            if places[column].fillna("").astype(str).str.strip().eq("").any():
+                raise ValueError(f"Verified runtime data contains a blank {column}.")
+
+        for first_index in range(len(places)):
+            for second_index in range(first_index + 1, len(places)):
+                first = places.iloc[first_index]
+                second = places.iloc[second_index]
+                if calculate_haversine_distance(
+                    first["Latitude"],
+                    first["Longitude"],
+                    second["Latitude"],
+                    second["Longitude"],
+                ) < NEAR_IDENTICAL_COORDINATE_KM:
+                    raise ValueError(
+                        "Verified runtime data contains near-identical coordinates: "
+                        f"{first['Place_ID']} and {second['Place_ID']}."
+                    )
 
         PLACES_DF = places
         TAGS_ENCODED = places["Tags"].str.get_dummies(sep="|")
-        print("[SUCCESS] AI Engine data initialized; no model training performed.\n")
+        print(
+            f"[SUCCESS] Loaded {len(places)} source-traced Kandy POIs; "
+            "no model training performed.\n"
+        )
         return True
     except Exception as exc:
         PLACES_DF = None
         TAGS_ENCODED = None
         print(f"[ERROR] Initialization failed: {exc}")
         return False
-
-
-# Load immutable runtime inputs once at import/startup; this does not train a model.
-initialize_ai_engine()
 
 
 def calculate_haversine_distance(lat1, lon1, lat2, lon2):
@@ -63,14 +135,41 @@ def calculate_haversine_distance(lat1, lon1, lat2, lon2):
     return radius_km * c
 
 
+# Load immutable runtime inputs once at import/startup; this does not train a model.
+initialize_ai_engine()
+
+
 def format_time_display(total_minutes):
-    hours = int(total_minutes // 60)
-    mins = int(total_minutes % 60)
+    rounded_minutes = max(0, int(round(total_minutes)))
+    hours, mins = divmod(rounded_minutes, 60)
     return f"{hours}h {mins}m"
 
 
+def _drop_duplicate_places(places):
+    """Keep the first ranked record for each ID or near-identical coordinate."""
+    kept_indices = []
+    seen_ids = set()
+    kept_coordinates = []
+    for index, row in places.iterrows():
+        place_id = str(row.get("Place_ID", "")).strip()
+        latitude = float(row["Latitude"])
+        longitude = float(row["Longitude"])
+        coordinate_duplicate = any(
+            calculate_haversine_distance(latitude, longitude, kept_lat, kept_lon)
+            < NEAR_IDENTICAL_COORDINATE_KM
+            for kept_lat, kept_lon in kept_coordinates
+        )
+        if (place_id and place_id in seen_ids) or coordinate_duplicate:
+            continue
+        kept_indices.append(index)
+        if place_id:
+            seen_ids.add(place_id)
+        kept_coordinates.append((latitude, longitude))
+    return places.loc[kept_indices].copy()
+
+
 def filter_locations(user_preferences, user_lat, user_lon, radius_km=15):
-    """Screen by observed quality, then rank by proximity and tag similarity."""
+    """Rank only source-traced Kandy POIs inside the active radius."""
     if PLACES_DF is None or TAGS_ENCODED is None:
         return None
 
@@ -83,13 +182,19 @@ def filter_locations(user_preferences, user_lat, user_lon, radius_km=15):
     places_with_distance = PLACES_DF.copy()
     places_with_distance["Distance_From_Start"] = distances
 
-    # Expand once as the existing fail-safe for remote starting locations.
     df_radius = places_with_distance[
         places_with_distance["Distance_From_Start"] <= radius_km
     ].copy()
     if df_radius.empty:
-        df_radius = places_with_distance[
-            places_with_distance["Distance_From_Start"] <= radius_km * 3
+        return None
+
+    if "Verification_Status" in df_radius.columns:
+        df_radius = df_radius[
+            df_radius["Verification_Status"] == VERIFIED_STATUS
+        ].copy()
+    if "Legacy_Place_ID" in df_radius.columns:
+        df_radius = df_radius[
+            ~df_radius["Legacy_Place_ID"].astype(str).isin(QUARANTINED_LEGACY_IDS)
         ].copy()
     if df_radius.empty:
         return None
@@ -100,8 +205,8 @@ def filter_locations(user_preferences, user_lat, user_lon, radius_km=15):
         df_radius["Rating"] >= QUALITY_THRESHOLD
     )
     df_quality = df_radius[rating_is_eligible].copy()
-    if len(df_quality) < 3:
-        df_quality = df_radius.copy()
+    if df_quality.empty:
+        return None
 
     valid_indices = df_quality.index
     tags_radius = TAGS_ENCODED.loc[valid_indices].copy()
@@ -131,9 +236,9 @@ def filter_locations(user_preferences, user_lat, user_lon, radius_km=15):
         by="Composite_Score", ascending=False
     )
     if recommended.empty:
-        recommended = df_quality.sort_values(by="Distance_From_Start")
+        return None
 
-    return recommended.reset_index(drop=True).head(15)
+    return _drop_duplicate_places(recommended).reset_index(drop=True).head(15)
 
 
 def evaluate_route(route_indices, df, start_lat, start_lon):
@@ -352,7 +457,7 @@ def _optimize_route_indices(
     rng = random.Random(random_seed)
     all_indices = []
     seen_place_ids = set()
-    seen_coordinates = set()
+    seen_coordinates = []
     for index in range(len(filtered_df)):
         location = filtered_df.iloc[index]
         place_id = location.get("Place_ID")
@@ -361,15 +466,22 @@ def _optimize_route_indices(
             float(location["Latitude"]),
             float(location["Longitude"]),
         )
+        coordinate_duplicate = any(
+            calculate_haversine_distance(
+                coordinates[0], coordinates[1], kept_latitude, kept_longitude
+            )
+            < NEAR_IDENTICAL_COORDINATE_KM
+            for kept_latitude, kept_longitude in seen_coordinates
+        )
         if (
             (normalized_id is not None and normalized_id in seen_place_ids)
-            or coordinates in seen_coordinates
+            or coordinate_duplicate
         ):
             continue
         all_indices.append(index)
         if normalized_id is not None:
             seen_place_ids.add(normalized_id)
-        seen_coordinates.add(coordinates)
+        seen_coordinates.append(coordinates)
     max_stops = min(
         len(all_indices),
         calculate_route_capacity(
@@ -448,6 +560,69 @@ def _optimize_route_indices(
     return repair_route(best_route, all_indices, rng, max_stops), penalty_hit
 
 
+def _text_metadata(location, field, fallback):
+    value = location.get(field, fallback)
+    if value is None or pd.isna(value) or not str(value).strip():
+        return fallback
+    return str(value).strip()
+
+
+def build_stop_explanation(stop):
+    """Build a deterministic evidence trace without an external language model."""
+    matched = stop.get("matched_preferences") or []
+    matched_text = ", ".join(matched) if matched else "no declared preference"
+    similarity = stop.get("similarity_score")
+    proximity = stop.get("proximity_score")
+    composite = stop.get("composite_score")
+    score_text = (
+        f"similarity {similarity:.3f}, proximity {proximity:.3f}, "
+        f"composite {composite:.3f}"
+        if all(value is not None for value in (similarity, proximity, composite))
+        else "ranking scores unavailable"
+    )
+    verification = stop.get("verification_status", "verification metadata unavailable")
+    duration_basis = stop.get("duration_basis", "unspecified estimate")
+    return (
+        f"Stop {stop['sequence']} matched {matched_text}; {score_text}. "
+        f"It is {stop['distance_from_start_km']:.2f} km straight-line from the "
+        f"start. The {stop['duration_minutes']}-minute visit is labelled "
+        f"{duration_basis}; source status: {verification}."
+    )
+
+
+def build_route_explanation(
+    optimized_stops,
+    user_preferences,
+    planned_time_minutes,
+    visit_time_minutes,
+    travel_time_minutes,
+    utilization_percent,
+):
+    """Describe the bounded data scope, time evidence and heuristic selection."""
+    interests = ", ".join(user_preferences or []) or "none"
+    summary = (
+        f"A heuristic genetic algorithm selected {len(optimized_stops)} stop(s) "
+        f"for {interests} from the {DATA_SCOPE} source-traced dataset. "
+        f"The plan uses {planned_time_minutes} minutes: {visit_time_minutes} for "
+        f"research-estimated visits and {travel_time_minutes} for estimated travel "
+        f"({utilization_percent:.1f}% utilization). Travel uses straight-line "
+        f"Haversine distance, an assumed {AVERAGE_SPEED_KMH:.0f} km/h speed and a "
+        f"{TRAFFIC_BUFFER:.2f} traffic buffer; it is not real-road or live-traffic routing."
+    )
+    return {
+        "summary": summary,
+        "selection_method": "deterministic_seeded_genetic_algorithm_heuristic",
+        "is_globally_optimal": False,
+        "data_scope": DATA_SCOPE,
+        "selected_interests": list(user_preferences or []),
+        "stop_count": len(optimized_stops),
+        "planned_time_minutes": planned_time_minutes,
+        "visit_time_minutes": visit_time_minutes,
+        "estimated_travel_time_minutes": travel_time_minutes,
+        "time_utilization_percent": utilization_percent,
+    }
+
+
 def run_genetic_algorithm_details(
     filtered_df,
     max_time_minutes,
@@ -468,6 +643,16 @@ def run_genetic_algorithm_details(
             "travel_time_minutes": 0,
             "remaining_time_minutes": max(0, int(max_time_minutes)),
             "time_utilization_percent": 0.0,
+            "route_explanation": build_route_explanation(
+                [], user_preferences, 0, 0, 0, 0.0
+            ),
+            "travel_estimation": {
+                "method": "haversine_straight_line",
+                "assumed_average_speed_kmh": AVERAGE_SPEED_KMH,
+                "traffic_buffer": TRAFFIC_BUFFER,
+                "includes_return_to_start": False,
+                "includes_live_traffic": False,
+            },
         }
 
     best_route, penalty_hit = _optimize_route_indices(
@@ -512,6 +697,19 @@ def run_genetic_algorithm_details(
                 )
             ),
             "matched_preferences": matched_preferences,
+            "verification_status": _text_metadata(
+                location, "Verification_Status", "verification metadata unavailable"
+            ),
+            "source_name": _text_metadata(
+                location, "Source_Name", "source metadata unavailable"
+            ),
+            "source_url": _text_metadata(location, "Source_URL", ""),
+            "source_license": _text_metadata(
+                location, "Source_License", "license metadata unavailable"
+            ),
+            "duration_basis": _text_metadata(
+                location, "Duration_Basis", "unspecified estimate"
+            ),
         }
         optional_fields = {
             "place_id": location.get("Place_ID"),
@@ -525,6 +723,7 @@ def run_genetic_algorithm_details(
                     stop[field] = int(value) if isinstance(value, (int, float)) else str(value)
                 else:
                     stop[field] = float(value)
+        stop["explanation"] = build_stop_explanation(stop)
         optimized_stops.append(stop)
 
     optimal_places = [
@@ -535,18 +734,36 @@ def run_genetic_algorithm_details(
     rounded_planned = int(round(planned_time))
     rounded_visit = int(round(details["visit_time_minutes"]))
     rounded_travel = rounded_planned - rounded_visit
+    utilization_percent = round(
+        (rounded_planned / max(1, max_time_minutes)) * 100, 1
+    )
     return {
         "optimized_route": optimal_places,
         "optimized_stops": optimized_stops,
-        "estimated_time_required": format_time_display(planned_time),
+        "estimated_time_required": format_time_display(rounded_planned),
         "time_limit_exceeded": penalty_hit,
         "planned_time_minutes": rounded_planned,
         "visit_time_minutes": rounded_visit,
         "travel_time_minutes": rounded_travel,
         "remaining_time_minutes": max(0, int(max_time_minutes) - rounded_planned),
-        "time_utilization_percent": round(
-            (planned_time / max(1, max_time_minutes)) * 100, 1
+        "time_utilization_percent": utilization_percent,
+        "route_explanation": build_route_explanation(
+            optimized_stops,
+            user_preferences,
+            rounded_planned,
+            rounded_visit,
+            rounded_travel,
+            utilization_percent,
         ),
+        "travel_estimation": {
+            "method": "haversine_straight_line",
+            "assumed_average_speed_kmh": AVERAGE_SPEED_KMH,
+            "traffic_buffer": TRAFFIC_BUFFER,
+            "includes_return_to_start": False,
+            "includes_live_traffic": False,
+            "includes_opening_hours": False,
+            "includes_parking_or_walking": False,
+        },
     }
 
 
@@ -564,16 +781,21 @@ def run_genetic_algorithm(
     )
 
 
-def generate_itinerary_summary(places, preferences, api_key):
+def generate_itinerary_summary(places, preferences, api_key, core_summary=None):
+    """Optionally paraphrase a deterministic explanation; never replace its evidence."""
+    deterministic_summary = core_summary or (
+        f"A heuristic itinerary contains {len(places or [])} stop(s) for "
+        f"{', '.join(preferences or []) or 'the selected interests'}."
+    )
     if not places or not api_key:
-        return "Optimal itinerary generated."
+        return deterministic_summary
 
     prompt = f"""
-    Act strictly as an Explainable AI (XAI) text-formatter for a Context-Aware Spatio-Temporal travel system.
-    User Preferences: {', '.join(preferences)}.
-    Optimized Route with Allocated Times: {', '.join(places)}.
+    Paraphrase the following deterministic itinerary explanation without adding facts,
+    claims of optimality, real-road routing, live traffic, opening hours, or observed
+    duration evidence. Preserve every limitation and number.
 
-    Task: Generate a structured summary explaining that locations passed observed-rating quality screening (missing ratings remained eligible), preferences were matched using cosine similarity, and the routing sequence was optimized using a Genetic Algorithm. Keep it engaging and concise.
+    Evidence: {deterministic_summary}
     """
 
     url = (
@@ -588,6 +810,6 @@ def generate_itinerary_summary(places, preferences, api_key):
         )
         if response.status_code == 200:
             return response.json()["candidates"][0]["content"]["parts"][0]["text"]
-        return "This Context-Aware itinerary blends your selected interests while optimizing for travel time."
+        return deterministic_summary
     except requests.RequestException:
-        return "This Context-Aware itinerary blends your selected interests while optimizing for travel time."
+        return deterministic_summary

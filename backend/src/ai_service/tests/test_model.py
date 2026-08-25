@@ -23,12 +23,21 @@ def make_places(ratings=None):
     tag_cycle = ["Nature", "Nature|Culture", "Culture", "Nature", "Nature"]
     return pd.DataFrame(
         {
+            "Place_ID": [f"test-{index}" for index in range(count)],
+            "Legacy_Place_ID": [str(9000 + index) for index in range(count)],
             "Name": [f"Place {index}" for index in range(count)],
             "Latitude": [7.2906 + (index * 0.001) for index in range(count)],
             "Longitude": [80.6337 for _ in range(count)],
             "Tags": tag_cycle[:count],
             "Duration_Minutes": [30 + (index * 5) for index in range(count)],
             "Rating": ratings,
+            "District": ["Kandy" for _ in range(count)],
+            "Duration_Basis": ["research_estimate" for _ in range(count)],
+            "Source_Name": ["Test Source" for _ in range(count)],
+            "Source_URL": [f"https://example.test/{index}" for index in range(count)],
+            "Source_License": ["Test License" for _ in range(count)],
+            "Verification_Status": [model.VERIFIED_STATUS for _ in range(count)],
+            "Verification_Note": ["Test-only verified fixture" for _ in range(count)],
         }
     )
 
@@ -38,7 +47,7 @@ def make_ga_places(count=6, duration=20):
         {
             "Place_ID": [1000 + index for index in range(count)],
             "Name": [f"GA Place {index}" for index in range(count)],
-            "Latitude": [7.2906 + (index * 0.0002) for index in range(count)],
+            "Latitude": [7.2906 + (index * 0.001) for index in range(count)],
             "Longitude": [80.6337 for _ in range(count)],
             "Tags": ["Nature|Culture" for _ in range(count)],
             "Duration_Minutes": [duration for _ in range(count)],
@@ -81,7 +90,7 @@ class ModelTestCase(unittest.TestCase):
                 text=True,
             )
         result = json.loads(completed.stdout.strip().splitlines()[-1])
-        self.assertEqual(result["rows"], 1000)
+        self.assertEqual(result["rows"], 20)
 
     def test_initialization_preserves_missing_ratings(self):
         places = make_places([None, "not observed", 4.2])
@@ -117,6 +126,30 @@ class ModelTestCase(unittest.TestCase):
         pd.testing.assert_series_equal(
             result["Composite_Score"], expected, check_names=False
         )
+
+    def test_pothgulgala_legacy_id_79_is_quarantined(self):
+        result = model.filter_locations(["Nature", "Adventure"], 7.2906, 80.6337, 30)
+        self.assertIsNotNone(result)
+        self.assertNotIn("79", result["Legacy_Place_ID"].astype(str).tolist())
+        self.assertNotIn("Pothgulgala", result["Name"].tolist())
+
+    def test_runtime_results_are_verified_overlay_records_inside_radius(self):
+        radius_km = 15
+        result = model.filter_locations(["History", "Nature"], 7.2906, 80.6337, radius_km)
+        verified_ids = set(model.PLACES_DF["Place_ID"].astype(str))
+        self.assertTrue(set(result["Place_ID"].astype(str)).issubset(verified_ids))
+        self.assertTrue(result["Verification_Status"].eq(model.VERIFIED_STATUS).all())
+        self.assertTrue((result["Distance_From_Start"] <= radius_km).all())
+
+    def test_filter_rejects_duplicate_ids_and_near_identical_coordinates(self):
+        places = make_places([4.5, 4.5, 4.5, 4.5])
+        places["Tags"] = ["Nature"] * len(places)
+        places.loc[1, "Place_ID"] = places.loc[0, "Place_ID"]
+        places.loc[2, ["Latitude", "Longitude"]] = [7.29061, 80.6337]
+        self.install_places(places)
+        result = model.filter_locations(["Nature"], 7.2906, 80.6337, 10)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(len(set(result["Place_ID"])), 2)
 
     def test_crossover_produces_valid_route(self):
         child = model.crossover_routes(
@@ -181,6 +214,8 @@ class ModelTestCase(unittest.TestCase):
                 result["planned_time_minutes"] / budget * 100,
                 delta=0.6,
             )
+            hours, minutes = result["estimated_time_required"].replace("m", "").split("h ")
+            self.assertEqual(int(hours) * 60 + int(minutes), result["planned_time_minutes"])
 
         stop_counts = [len(result["optimized_route"]) for result in results]
         planned_times = [result["planned_time_minutes"] for result in results]
@@ -200,6 +235,14 @@ class ModelTestCase(unittest.TestCase):
         self.assertTrue(
             selected_names.issubset({f"GA Place {index}" for index in range(4)})
         )
+
+    def test_three_stops_are_allowed_when_they_fit_truthfully(self):
+        places = make_ga_places(count=3, duration=55)
+        result = model.run_genetic_algorithm_details(
+            places, 180, 7.2906, 80.6337, random_seed=21, user_preferences=["Nature"]
+        )
+        self.assertEqual(len(result["optimized_stops"]), 3)
+        self.assertLessEqual(result["planned_time_minutes"], 180)
 
     def test_optimized_stops_match_route_and_have_truthful_numeric_locations(self):
         places = make_ga_places(count=7, duration=35)
@@ -237,6 +280,8 @@ class ModelTestCase(unittest.TestCase):
             len(stops),
         )
         self.assertTrue(all(stop["matched_preferences"] == ["Nature"] for stop in stops))
+        self.assertTrue(all(stop["explanation"].strip() for stop in stops))
+        self.assertTrue(all("similarity" in stop["explanation"] for stop in stops))
 
     def test_ga_is_deterministic_for_fixed_seed(self):
         places = make_ga_places()
@@ -271,9 +316,7 @@ class ModelTestCase(unittest.TestCase):
     def test_flask_endpoint_preserves_response_contract_without_gemini(self):
         import app as flask_app
 
-        with mock.patch.object(
-            flask_app, "generate_itinerary_summary", return_value="Local summary"
-        ):
+        with mock.patch.object(flask_app, "GEMINI_API_KEY", None):
             response = flask_app.app.test_client().post(
                 "/api/optimize-itinerary",
                 json={
@@ -296,6 +339,10 @@ class ModelTestCase(unittest.TestCase):
                 "time_limit_exceeded",
                 "optimized_route",
                 "ai_summary",
+                "data_scope",
+                "verification_status",
+                "route_explanation",
+                "travel_estimation",
             }.issubset(payload["data"])
         )
         self.assertTrue(
@@ -308,6 +355,40 @@ class ModelTestCase(unittest.TestCase):
                 "time_utilization_percent",
             }.issubset(payload["data"])
         )
+        self.assertIn("heuristic genetic algorithm", payload["data"]["ai_summary"])
+        self.assertEqual(
+            payload["data"]["ai_summary"],
+            payload["data"]["route_explanation"]["summary"],
+        )
+        self.assertTrue(
+            all(stop["explanation"] for stop in payload["data"]["optimized_stops"])
+        )
+
+    def test_insufficient_verified_candidates_returns_controlled_response(self):
+        import app as flask_app
+
+        response = flask_app.app.test_client().post(
+            "/api/optimize-itinerary",
+            json={
+                "preferences": ["Beach"],
+                "max_time_minutes": 120,
+                "current_lat": 7.2906,
+                "current_lon": 80.6337,
+            },
+        )
+        payload = response.get_json()
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(payload["code"], "insufficient_verified_evidence")
+        self.assertEqual(payload["data_scope"], model.DATA_SCOPE)
+
+    def test_core_xai_does_not_require_gemini(self):
+        summary = model.generate_itinerary_summary(
+            ["Kandy Lake (60 mins)"],
+            ["Nature"],
+            "",
+            core_summary="Deterministic evidence summary.",
+        )
+        self.assertEqual(summary, "Deterministic evidence summary.")
 
 
 if __name__ == "__main__":
