@@ -9,30 +9,64 @@ export const findMatchingPackages = async (preferences) => {
       MATCH (h:Hotel)-[:LOCATED_IN]->(d:District)
       MATCH (h)-[:NEAR_ACTIVITY]->(a:Activity)
 
-      WHERE ($district IS NULL OR toLower(d.name) = toLower($district))
-
-      AND ($hotelCategory IS NULL OR toLower(h.category) = toLower($hotelCategory))
-
-      AND ($grade IS NULL OR toLower(h.final_grade) = toLower($grade))
+      WHERE (
+        $district IS NULL
+        OR toLower(d.name) = toLower($district)
+      )
 
       AND (
-        $foodType IS NULL OR
-        (
+        $hotelCategory IS NULL
+        OR toLower(h.category) = toLower($hotelCategory)
+      )
+
+      AND (
+        $grade IS NULL
+        OR toLower(h.final_grade) = toLower($grade)
+      )
+
+      AND (
+        $foodType IS NULL
+        OR (
           toLower($foodType) = "non-veg"
           AND toLower(h.food_type) CONTAINS "non"
         )
-        OR
-        (
+        OR (
           toLower($foodType) = "veg"
           AND toLower(h.food_type) CONTAINS "veg"
+          AND NOT toLower(h.food_type) CONTAINS "non"
         )
       )
 
-      AND ($activityCategory IS NULL OR toLower(a.category) = toLower($activityCategory))
+      AND (
+        $activityCategory IS NULL
+        OR toLower(a.category) = toLower($activityCategory)
+      )
 
-      AND ($priceLevel IS NULL OR toLower(a.price_level) = toLower($priceLevel))
+      AND (
+        $priceLevel IS NULL
+        OR toLower(a.price_level) = toLower($priceLevel)
+      )
 
-      AND ($suitableFor IS NULL OR toLower(a.suitable_for) = toLower($suitableFor))
+      AND (
+        $suitableFor IS NULL
+        OR toLower(a.suitable_for) = toLower($suitableFor)
+      )
+
+      WITH
+        h,
+        d,
+        count(DISTINCT a) AS activityMatchCount,
+        collect(DISTINCT {
+          activityId: a.activity_id,
+          name: a.name,
+          category: a.category,
+          description: a.description,
+          durationHours: a.duration_hours,
+          priceLevel: a.price_level,
+          suitableFor: a.suitable_for,
+          latitude: a.latitude,
+          longitude: a.longitude
+        })[0..7] AS activities
 
       RETURN
         h.hotel_id AS hotelId,
@@ -44,29 +78,24 @@ export const findMatchingPackages = async (preferences) => {
         h.latitude AS hotelLatitude,
         h.longitude AS hotelLongitude,
         d.name AS district,
+        activityMatchCount,
+        activities
 
-        collect(DISTINCT {
-          activityId: a.activity_id,
-          name: a.name,
-          category: a.category,
-          description: a.description,
-          durationHours: a.duration_hours,
-          priceLevel: a.price_level,
-          suitableFor: a.suitable_for,
-          latitude: a.latitude,
-          longitude: a.longitude
-        })[0..5] AS activities
+      ORDER BY
+        activityMatchCount DESC,
+        h.rooms DESC,
+        h.name ASC
 
-      LIMIT 10
+      LIMIT 3
       `,
       {
-        district: preferences.district,
-        hotelCategory: preferences.hotelCategory,
-        grade: preferences.grade,
-        foodType: preferences.foodType,
-        activityCategory: preferences.activityCategory,
-        priceLevel: preferences.priceLevel,
-        suitableFor: preferences.suitableFor,
+        district: preferences.district ?? null,
+        hotelCategory: preferences.hotelCategory ?? null,
+        grade: preferences.grade ?? null,
+        foodType: preferences.foodType ?? null,
+        activityCategory: preferences.activityCategory ?? null,
+        priceLevel: preferences.priceLevel ?? null,
+        suitableFor: preferences.suitableFor ?? null,
       }
     );
 

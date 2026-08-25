@@ -90,9 +90,8 @@ export const validatePreferences = (preferences, schema, userPrompt = "") => {
   } else {
     if (
       lowerPrompt.includes("non veg") ||
-      lowerPrompt.includes("non-veg") ||
-      lowerPrompt.includes("meat")
-    ) {
+      lowerPrompt.includes("non-veg") 
+        ) {
       clean.foodType = "Non-Veg";
     } else if (
       lowerPrompt.includes("veg") ||
