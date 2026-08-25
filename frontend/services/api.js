@@ -1,8 +1,13 @@
 import axios from "axios";
 
+const SHARED_API_BASE_URL = (
+  process.env.EXPO_PUBLIC_API_BASE_URL ||
+  "http://localhost:5001/api"
+).replace(/\/$/, "");
+
 const API_BASE_URL =
   process.env.EXPO_PUBLIC_ITINERARY_API_BASE_URL ||
-  "http://127.0.0.1:8080/api/itinerary";
+  `${SHARED_API_BASE_URL}/itinerary`;
 
 const API = axios.create({
   baseURL: API_BASE_URL

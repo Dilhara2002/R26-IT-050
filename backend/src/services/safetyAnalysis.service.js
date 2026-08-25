@@ -186,7 +186,8 @@ const buildMlInput = (roadInfo, graphContext) => ({
 });
 
 const runRiskPrediction = (input) => new Promise((resolve, reject) => {
-  const pythonBinary = process.env.PYTHON_BIN || "python";
+  const pythonBinary = process.env.PYTHON_BIN ||
+    path.join(__dirname, "../../.venv/bin/python");
   const script = path.join(__dirname, "../ai-engine/scripts/predict_safety.py");
   const child = spawn(pythonBinary, [script, JSON.stringify(input)]);
   let output = "";
@@ -264,11 +265,28 @@ const recommendVehicle = async ({ distanceKm, maxGradient, riskLevel, budget, pa
     const estimatedHirePrice = base !== null && perKm !== null
       ? Math.round(base + distanceKm * perKm)
       : null;
+    const pricing = {
+      status: estimatedHirePrice === null ? "unavailable" : "dataset-baseline",
+      currency: "LKR",
+      distanceKm: Number(distanceKm.toFixed(2)),
+      baseCharge: base,
+      ratePerKm: perKm,
+      totalCost: estimatedHirePrice,
+      formula: "BaseHireCharge + (DistanceKM × RentalPricePerKM)",
+      source: "Vehicle research dataset",
+      sourceVerifiedAt: null,
+      isLiveMarketRate: false,
+      requiresAdminVerification: true,
+      limitation: "The model-level rate is an internal dataset baseline until an administrator verifies and dates it against a rental-provider source.",
+    };
     return {
       vehicleName: vehicle["Vehicle Name (Make & Model)"],
       vehicleCategory: vehicle["Vehicle Category"],
       seatingCapacity,
       estimatedHirePrice,
+      calculatedCost: estimatedHirePrice,
+      pricing,
+      priceFormula: pricing.formula,
       maxTorqueNm: toNullableNumber(vehicle["Max Torque (Nm)"]),
       engineCapacityCc: toNullableNumber(vehicle["Engine Capacity (CC)"]),
       vehicleSuitability: {

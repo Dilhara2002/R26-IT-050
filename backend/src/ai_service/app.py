@@ -11,11 +11,19 @@ from model import (
     run_genetic_algorithm_details,
     generate_itinerary_summary,
 )
-from landmark_routes import landmark_bp
+try:
+    from landmark_routes import landmark_bp
+except ModuleNotFoundError as error:
+    landmark_bp = None
+    print(
+        "[WARNING] Landmark recognition is unavailable because an optional "
+        f"dependency could not be loaded: {error.name}"
+    )
 
 app = Flask(__name__)
 CORS(app) # Enables CORS for all routes so Web Browsers can connect
-app.register_blueprint(landmark_bp)
+if landmark_bp is not None:
+    app.register_blueprint(landmark_bp)
 
 # Retrieve Gemini API Key
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")

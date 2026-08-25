@@ -100,6 +100,14 @@ Python dependencies are pinned in `requirements.txt`. In particular, `scikit-lea
 npm start
 ```
 
+The Smart Itinerary module also requires the local Python AI service in a second terminal:
+
+```bash
+npm run ai-service
+```
+
+The integrated defaults are Node API `http://localhost:5001/api`, itinerary API `http://localhost:5001/api/itinerary`, and Python AI service `http://127.0.0.1:5002`.
+
 The default server URL is `http://localhost:5001`.
 
 - Health endpoint: `GET /`

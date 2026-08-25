@@ -4,6 +4,7 @@ import request from "supertest";
 
 import app from "../src/app.js";
 import { setSafetyRouteDependenciesForTesting } from "../src/routes/safetyRoutes.js";
+import { getWholeTripVehicleRecommendation } from "../src/services/safetyAnalysis.service.js";
 
 setSafetyRouteDependenciesForTesting({
   getRouteDetails: async (startLocation, endLocation) => ({
@@ -145,6 +146,31 @@ test(
     assert.equal(
       vehicle.priceFormula,
       "BaseHireCharge + (DistanceKM × RentalPricePerKM)"
+    );
+  }
+);
+
+
+test(
+  "integrated route service exposes the same model-based pricing contract",
+  async () => {
+    const recommendation = await getWholeTripVehicleRecommendation({
+      distanceKm: 100,
+      maxGradient: 8,
+      riskLevel: "Medium",
+      budget: 50000,
+      passengers: 4,
+      preferredCategory: "Economy",
+    });
+
+    assert.equal(recommendation.status, "available");
+    assert.ok(recommendation.bestVehicle);
+    assert.equal(recommendation.bestVehicle.pricing.currency, "LKR");
+    assert.equal(recommendation.bestVehicle.pricing.status, "dataset-baseline");
+    assert.equal(recommendation.bestVehicle.pricing.isLiveMarketRate, false);
+    assert.equal(
+      recommendation.bestVehicle.pricing.totalCost,
+      recommendation.bestVehicle.estimatedHirePrice
     );
   }
 );

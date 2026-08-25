@@ -179,7 +179,7 @@ Weather is returned as current trip context. It is not a deployed ML input and i
 
 ## 11. Automated Validation
 
-The current backend regression suite has 39 deterministic tests protecting:
+The current backend regression suite has 40 deterministic tests protecting:
 
 1. health endpoint response;
 2. required-field validation;
@@ -199,7 +199,7 @@ The current backend regression suite has 39 deterministic tests protecting:
 - The backend defaults to `backend/.venv/bin/python`.
 - `PYTHON_BIN` can explicitly override that interpreter.
 - The latest recorded `npm audit` and `npm audit --omit=dev` checkpoint reported zero known vulnerabilities.
-- The latest recorded `npm test` checkpoint passed all 39 tests.
+- The latest recorded `npm test` checkpoint passed all 40 tests.
 
 ## 13. Frontend Integration Notes
 
