@@ -305,12 +305,12 @@ class ModelTestCase(unittest.TestCase):
         self.assertFalse(penalty)
         self.assertLessEqual(route_time, 65)
 
-    def test_very_short_time_uses_graceful_penalty_fallback(self):
+    def test_very_short_time_does_not_return_an_over_budget_fallback(self):
         route, estimated_time, penalty = model.run_genetic_algorithm(
             make_ga_places(duration=30), 1, 7.2906, 80.6337, random_seed=1
         )
-        self.assertEqual(len(route), 1)
-        self.assertNotEqual(estimated_time, "0h 0m")
+        self.assertEqual(route, [])
+        self.assertEqual(estimated_time, "0h 0m")
         self.assertTrue(penalty)
 
     def test_flask_endpoint_preserves_response_contract_without_gemini(self):

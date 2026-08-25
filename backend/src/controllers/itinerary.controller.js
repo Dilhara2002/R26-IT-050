@@ -4,16 +4,48 @@ import {
 import Itinerary from "../models/Itinerary.js";
 
 
+export const buildItineraryPayload = (body) => {
+  const {
+    preferences,
+    max_time_minutes,
+    current_lat,
+    current_lon,
+    radius_km,
+    excluded_place_ids,
+    locked_place_ids,
+    generation_mode,
+    replaced_place_id,
+    target_stop_count
+  } = body;
+
+  const payload = {
+    preferences,
+    max_time_minutes: max_time_minutes || 480,
+    current_lat: current_lat || 7.2906,
+    current_lon: current_lon || 80.6337
+  };
+  const additiveFields = {
+    radius_km,
+    excluded_place_ids,
+    locked_place_ids,
+    generation_mode,
+    replaced_place_id,
+    target_stop_count
+  };
+  Object.entries(additiveFields).forEach(([field, value]) => {
+    if (value !== undefined) {
+      payload[field] = value;
+    }
+  });
+  return payload;
+};
+
+
 export const optimizeItinerary = async (req, res) => {
 
   try {
 
-    const {
-      preferences,
-      max_time_minutes,
-      current_lat,
-      current_lon
-    } = req.body;
+    const { preferences } = req.body;
 
 
 
@@ -32,20 +64,7 @@ export const optimizeItinerary = async (req, res) => {
 
 
 
-    const aiPayload = {
-
-      preferences,
-
-      max_time_minutes:
-        max_time_minutes || 480,
-
-      current_lat:
-        current_lat || 7.2906,
-
-      current_lon:
-        current_lon || 80.6337
-
-    };
+    const aiPayload = buildItineraryPayload(req.body);
 
 
 

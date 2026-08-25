@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import axios from "axios";
 
 import { generateItineraryFromAI } from "../src/services/itinerary.service.js";
+import { buildItineraryPayload } from "../src/controllers/itinerary.controller.js";
 
 
 test("itinerary service preserves controlled verified-evidence errors", async () => {
@@ -28,6 +29,91 @@ test("itinerary service preserves controlled verified-evidence errors", async ()
         assert.equal(error.statusCode, 404);
         assert.equal(error.details.code, "insufficient_verified_evidence");
         assert.equal(error.details.data_scope, "verified_kandy_v1");
+        return true;
+      }
+    );
+  } finally {
+    axios.post = originalPost;
+  }
+});
+
+test("legacy controller payload remains limited to the original four fields", () => {
+  const payload = buildItineraryPayload({
+    preferences: ["Nature"],
+    max_time_minutes: 360,
+    current_lat: 7.2906,
+    current_lon: 80.6337
+  });
+  assert.deepEqual(payload, {
+    preferences: ["Nature"],
+    max_time_minutes: 360,
+    current_lat: 7.2906,
+    current_lon: 80.6337
+  });
+});
+
+test("controller forwards stable-ID regeneration constraints additively", () => {
+  const payload = buildItineraryPayload({
+    preferences: ["Nature"],
+    max_time_minutes: 360,
+    current_lat: 7.2906,
+    current_lon: 80.6337,
+    radius_km: 15,
+    generation_mode: "replace_stop",
+    excluded_place_ids: ["rejected-id"],
+    locked_place_ids: ["accepted-a", "accepted-b"],
+    replaced_place_id: "rejected-id",
+    target_stop_count: 3
+  });
+  assert.deepEqual(payload.excluded_place_ids, ["rejected-id"]);
+  assert.deepEqual(payload.locked_place_ids, ["accepted-a", "accepted-b"]);
+  assert.equal(payload.generation_mode, "replace_stop");
+  assert.equal(payload.replaced_place_id, "rejected-id");
+  assert.equal(payload.target_stop_count, 3);
+  assert.equal(payload.radius_km, 15);
+});
+
+test("itinerary service sends regeneration fields unchanged to Flask", async () => {
+  const originalPost = axios.post;
+  let receivedPayload;
+  axios.post = async (_url, payload) => {
+    receivedPayload = payload;
+    return { data: { status: "success", data: { route_changed: true } } };
+  };
+  const requestPayload = {
+    preferences: ["Nature"],
+    generation_mode: "full_regeneration",
+    excluded_place_ids: ["old-a", "old-b"],
+    locked_place_ids: []
+  };
+  try {
+    await generateItineraryFromAI(requestPayload);
+    assert.deepEqual(receivedPayload, requestPayload);
+  } finally {
+    axios.post = originalPost;
+  }
+});
+
+test("itinerary service preserves insufficient-alternative errors", async () => {
+  const originalPost = axios.post;
+  axios.post = async () => {
+    const error = new Error("Request failed with status code 409");
+    error.response = {
+      status: 409,
+      data: {
+        status: "error",
+        code: "insufficient_verified_alternatives",
+        error: "No different verified route can satisfy the constraints."
+      }
+    };
+    throw error;
+  };
+  try {
+    await assert.rejects(
+      generateItineraryFromAI({ generation_mode: "full_regeneration" }),
+      (error) => {
+        assert.equal(error.statusCode, 409);
+        assert.equal(error.details.code, "insufficient_verified_alternatives");
         return true;
       }
     );

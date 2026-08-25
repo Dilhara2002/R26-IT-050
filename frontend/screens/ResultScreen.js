@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import TripSafetyAnalysis from "../components/TripSafetyAnalysis";
+import API from "../services/api";
+import {
+  applyFailedRegeneration,
+  applySuccessfulRegeneration,
+  buildFullRegenerationRequest,
+  buildReplacementRequest,
+} from "../services/itineraryRegeneration";
 import {
   buildItinerarySafetyRequest,
   getItinerarySafetyAvailability,
@@ -8,7 +15,10 @@ import {
 } from "../services/safetyApi";
 
 export default function ResultScreen({ route, navigation }) {
-  const { data, persistence } = route.params || {};
+  const initialData = route.params?.data || null;
+  const initialPersistence = route.params?.persistence || null;
+  const [data, setData] = useState(initialData);
+  const [persistence, setPersistence] = useState(initialPersistence);
   const [budget, setBudget] = useState("");
   const [passengers, setPassengers] = useState("");
   const [preferredCategory, setPreferredCategory] = useState("");
@@ -16,13 +26,16 @@ export default function ResultScreen({ route, navigation }) {
   const [safetyResult, setSafetyResult] = useState(null);
   const [safetyError, setSafetyError] = useState("");
   const [validationError, setValidationError] = useState("");
+  const [regenerationLoading, setRegenerationLoading] = useState(null);
+  const [regenerationError, setRegenerationError] = useState("");
+  const [regenerationMessage, setRegenerationMessage] = useState("");
 
   const optimizedStops = Array.isArray(data?.optimized_stops) ? data.optimized_stops : [];
   const startingLocation = data?.starting_location || null;
   const availabilityMessage = getItinerarySafetyAvailability(startingLocation, optimizedStops);
 
   const handleSafetyAnalysis = async () => {
-    if (safetyLoading) return;
+    if (safetyLoading || regenerationLoading) return;
 
     setValidationError("");
     setSafetyError("");
@@ -73,6 +86,49 @@ export default function ResultScreen({ route, navigation }) {
     }
   };
 
+  const handleRegeneration = async (mode, stop = null) => {
+    if (regenerationLoading || safetyLoading) return;
+
+    const action = mode === "replace_stop"
+      ? { mode, placeId: String(stop?.place_id || ""), name: stop?.name || "selected stop" }
+      : { mode, placeId: null, name: null };
+    const previousState = {
+      data,
+      persistence,
+      safetyResult,
+      safetyError,
+      validationError,
+      regenerationError: "",
+      regenerationLoading: action,
+    };
+
+    setRegenerationLoading(action);
+    setRegenerationError("");
+    setRegenerationMessage("");
+    try {
+      const requestPayload = mode === "replace_stop"
+        ? buildReplacementRequest(data, action.placeId)
+        : buildFullRegenerationRequest(data);
+      const response = await API.post("/optimize", requestPayload);
+      const nextState = applySuccessfulRegeneration(previousState, response.data);
+      setData(nextState.data);
+      setPersistence(nextState.persistence);
+      setSafetyResult(null);
+      setSafetyError("");
+      setValidationError("");
+      setRegenerationMessage(
+        mode === "replace_stop"
+          ? `${action.name} was replaced while the other accepted stops were preserved.`
+          : "A different complete itinerary was generated."
+      );
+    } catch (error) {
+      const nextState = applyFailedRegeneration(previousState, error);
+      setRegenerationError(nextState.regenerationError);
+    } finally {
+      setRegenerationLoading(null);
+    }
+  };
+
   if (!data) {
     return (
       <View style={styles.missingResult}>
@@ -117,6 +173,45 @@ export default function ResultScreen({ route, navigation }) {
           </Text>
         )}
 
+        {regenerationMessage ? (
+          <Text accessibilityLiveRegion="polite" style={styles.successText}>
+            {regenerationMessage}
+          </Text>
+        ) : null}
+        {regenerationError ? (
+          <Text accessibilityLiveRegion="assertive" style={styles.errorText}>
+            {regenerationError} The current itinerary has been kept.
+          </Text>
+        ) : null}
+        {regenerationLoading?.mode === "replace_stop" ? (
+          <Text accessibilityLiveRegion="polite" style={styles.loadingText}>
+            Replacing {regenerationLoading.name} while preserving accepted stops…
+          </Text>
+        ) : null}
+        {regenerationLoading?.mode === "full_regeneration" ? (
+          <Text accessibilityLiveRegion="polite" style={styles.loadingText}>
+            Generating a different full itinerary…
+          </Text>
+        ) : null}
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Generate a different full plan"
+          disabled={Boolean(regenerationLoading) || safetyLoading}
+          onPress={() => handleRegeneration("full_regeneration")}
+          style={({ pressed }) => [
+            styles.regenerateButton,
+            (regenerationLoading || safetyLoading) && styles.disabledButton,
+            pressed && styles.pressed,
+          ]}
+        >
+          <Text style={styles.regenerateText}>
+            {regenerationLoading?.mode === "full_regeneration"
+              ? "Generating a different plan…"
+              : "Generate a different full plan"}
+          </Text>
+        </Pressable>
+
         <Pressable
           onPress={() => navigation.navigate("Map", {
             optimizedStops,
@@ -148,6 +243,24 @@ export default function ResultScreen({ route, navigation }) {
               <Text style={styles.sourceText}>
                 Source: {stop.source_name} · {stop.source_license}
               </Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Replace ${stop.name}`}
+                disabled={Boolean(regenerationLoading) || safetyLoading}
+                onPress={() => handleRegeneration("replace_stop", stop)}
+                style={({ pressed }) => [
+                  styles.replaceButton,
+                  (regenerationLoading || safetyLoading) && styles.disabledButton,
+                  pressed && styles.pressed,
+                ]}
+              >
+                <Text style={styles.replaceText}>
+                  {regenerationLoading?.mode === "replace_stop" &&
+                  regenerationLoading.placeId === String(stop.place_id)
+                    ? `Replacing ${stop.name}…`
+                    : "Replace this place"}
+                </Text>
+              </Pressable>
             </View>
           </View>
         ))}
@@ -200,10 +313,18 @@ const styles = StyleSheet.create({
   estimateText: { color: "#334155", fontWeight: "700", marginBottom: 8 },
   estimationNote: { color: "#64748B", lineHeight: 19, marginBottom: 16, fontSize: 13 },
   persistenceText: { color: "#64748B", marginBottom: 16 },
+  successText: { color: "#166534", fontWeight: "700", marginBottom: 12 },
+  errorText: { color: "#B91C1C", fontWeight: "700", marginBottom: 12 },
+  loadingText: { color: "#1D4ED8", fontWeight: "700", marginBottom: 12 },
   sectionTitle: { fontWeight: "800", color: "#0F172A", marginBottom: 12, fontSize: 17, marginTop: 10 },
   generateButton: { backgroundColor: "#2563EB", borderRadius: 20, paddingVertical: 18, alignItems: "center", justifyContent: "center", flexDirection: "row" },
   generateText: { color: "#FFFFFF", fontSize: 16, fontWeight: "900" },
   generateIcon: { color: "#FFFFFF", fontSize: 18, marginLeft: 8 },
+  regenerateButton: { backgroundColor: "#0F766E", borderRadius: 18, paddingVertical: 14, alignItems: "center", marginBottom: 12 },
+  regenerateText: { color: "#FFFFFF", fontSize: 15, fontWeight: "900" },
+  replaceButton: { alignSelf: "flex-start", borderColor: "#2563EB", borderWidth: 1, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 9, marginTop: 12 },
+  replaceText: { color: "#1D4ED8", fontWeight: "800" },
+  disabledButton: { opacity: 0.5 },
   pressed: { opacity: 0.75 },
   featureGrid: { gap: 12 },
   featureCard: { backgroundColor: "#FFFFFF", borderRadius: 22, padding: 18, elevation: 3, flexDirection: 'row', alignItems: 'center' },

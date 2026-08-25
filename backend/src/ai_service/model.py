@@ -168,7 +168,14 @@ def _drop_duplicate_places(places):
     return places.loc[kept_indices].copy()
 
 
-def filter_locations(user_preferences, user_lat, user_lon, radius_km=15):
+def filter_locations(
+    user_preferences,
+    user_lat,
+    user_lon,
+    radius_km=15,
+    excluded_place_ids=None,
+    locked_place_ids=None,
+):
     """Rank only source-traced Kandy POIs inside the active radius."""
     if PLACES_DF is None or TAGS_ENCODED is None:
         return None
@@ -185,6 +192,15 @@ def filter_locations(user_preferences, user_lat, user_lon, radius_km=15):
     df_radius = places_with_distance[
         places_with_distance["Distance_From_Start"] <= radius_km
     ].copy()
+    if df_radius.empty:
+        return None
+
+    excluded_ids = {str(value).strip() for value in (excluded_place_ids or [])}
+    locked_ids = [str(value).strip() for value in (locked_place_ids or [])]
+    if excluded_ids:
+        df_radius = df_radius[
+            ~df_radius["Place_ID"].astype(str).isin(excluded_ids)
+        ].copy()
     if df_radius.empty:
         return None
 
@@ -235,10 +251,18 @@ def filter_locations(user_preferences, user_lat, user_lon, radius_km=15):
     recommended = df_quality[df_quality["Similarity_Score"] > 0].sort_values(
         by="Composite_Score", ascending=False
     )
-    if recommended.empty:
+    locked_rows = df_quality[
+        df_quality["Place_ID"].astype(str).isin(locked_ids)
+    ].copy()
+    if recommended.empty and locked_rows.empty:
         return None
-
-    return _drop_duplicate_places(recommended).reset_index(drop=True).head(15)
+    # Locked rows lead the bounded frame so they cannot be truncated by the
+    # candidate cap. The GA may still reorder them while preserving their set.
+    combined = pd.concat(
+        [locked_rows, recommended[~recommended.index.isin(locked_rows.index)]],
+        axis=0,
+    )
+    return _drop_duplicate_places(combined).reset_index(drop=True).head(15)
 
 
 def evaluate_route(route_indices, df, start_lat, start_lon):
@@ -338,19 +362,48 @@ def calculate_route_capacity(df, max_time_minutes, start_lat, start_lon):
     return min(MAX_ROUTE_STOPS, len(df), max(1, capacity))
 
 
-def repair_route(route, valid_indices, rng=None, max_stops=MAX_ROUTE_STOPS):
-    """Remove invalid/duplicate genes and guarantee a valid non-empty route."""
+def repair_route(
+    route,
+    valid_indices,
+    rng=None,
+    max_stops=MAX_ROUTE_STOPS,
+    locked_indices=None,
+):
+    """Repair membership while retaining every locked index and unique stop."""
     valid_indices = list(dict.fromkeys(valid_indices))
     if not valid_indices:
         return []
 
     valid_set = set(valid_indices)
+    locked = [
+        index
+        for index in dict.fromkeys(locked_indices or [])
+        if index in valid_set
+    ]
+    if len(locked) > max_stops:
+        return []
     repaired = []
     for index in route:
         if index in valid_set and index not in repaired:
             repaired.append(index)
-        if len(repaired) == min(max_stops, len(valid_indices)):
-            break
+
+    for index in locked:
+        if index not in repaired:
+            repaired.append(index)
+
+    # Preserve the accepted stops' relative order from the request while still
+    # allowing unlocked alternatives to move around them during optimization.
+    locked_positions = [
+        position for position, index in enumerate(repaired) if index in set(locked)
+    ]
+    for position, locked_index in zip(locked_positions, locked):
+        repaired[position] = locked_index
+
+    if len(repaired) > max_stops:
+        removable = [index for index in repaired if index not in set(locked)]
+        while len(repaired) > max_stops and removable:
+            removed = removable.pop()
+            repaired.remove(removed)
 
     if not repaired:
         chooser = rng if rng is not None else random
@@ -359,12 +412,21 @@ def repair_route(route, valid_indices, rng=None, max_stops=MAX_ROUTE_STOPS):
 
 
 def crossover_routes(
-    parent_a, parent_b, valid_indices, rng=None, max_stops=MAX_ROUTE_STOPS
+    parent_a,
+    parent_b,
+    valid_indices,
+    rng=None,
+    max_stops=MAX_ROUTE_STOPS,
+    locked_indices=None,
 ):
     """Ordered crossover combining a prefix from one parent with the other."""
     chooser = rng if rng is not None else random
-    parent_a = repair_route(parent_a, valid_indices, chooser, max_stops)
-    parent_b = repair_route(parent_b, valid_indices, chooser, max_stops)
+    parent_a = repair_route(
+        parent_a, valid_indices, chooser, max_stops, locked_indices
+    )
+    parent_b = repair_route(
+        parent_b, valid_indices, chooser, max_stops, locked_indices
+    )
     target_length = min(
         max_stops,
         len(set(parent_a + parent_b)),
@@ -386,22 +448,39 @@ def crossover_routes(
         unused = [index for index in valid_indices if index not in child]
         chooser.shuffle(unused)
         child.extend(unused[: target_length - len(child)])
-    return repair_route(child[:target_length], valid_indices, chooser, max_stops)
+    return repair_route(
+        child[:target_length], valid_indices, chooser, max_stops, locked_indices
+    )
 
 
-def mutate_route(route, valid_indices, rng=None, max_stops=MAX_ROUTE_STOPS):
+def mutate_route(
+    route,
+    valid_indices,
+    rng=None,
+    max_stops=MAX_ROUTE_STOPS,
+    locked_indices=None,
+):
     """Explore route membership and ordering while preserving all constraints."""
     chooser = rng if rng is not None else random
-    route = repair_route(route, valid_indices, chooser, max_stops)
+    route = repair_route(
+        route, valid_indices, chooser, max_stops, locked_indices
+    )
     if not route:
         return []
 
     unused = [index for index in valid_indices if index not in route]
     operations = []
+    locked_set = set(locked_indices or [])
+    mutable_positions = [
+        position for position, index in enumerate(route) if index not in locked_set
+    ]
     if len(route) > 1:
-        operations.extend(["swap", "remove"])
+        operations.append("swap")
+    if mutable_positions:
+        operations.append("remove")
     if unused:
-        operations.append("replace")
+        if mutable_positions:
+            operations.append("replace")
         if len(route) < min(max_stops, len(valid_indices)):
             operations.append("add")
     if not operations:
@@ -412,13 +491,15 @@ def mutate_route(route, valid_indices, rng=None, max_stops=MAX_ROUTE_STOPS):
         first, second = chooser.sample(range(len(route)), 2)
         route[first], route[second] = route[second], route[first]
     elif operation == "replace":
-        route[chooser.randrange(len(route))] = chooser.choice(unused)
+        route[chooser.choice(mutable_positions)] = chooser.choice(unused)
     elif operation == "add":
         route.insert(chooser.randrange(len(route) + 1), chooser.choice(unused))
     elif operation == "remove":
-        route.pop(chooser.randrange(len(route)))
+        route.pop(chooser.choice(mutable_positions))
 
-    return repair_route(route, valid_indices, chooser, max_stops)
+    return repair_route(
+        route, valid_indices, chooser, max_stops, locked_indices
+    )
 
 
 def _route_fitness(
@@ -448,14 +529,25 @@ def _tournament_select(population, fitnesses, rng, tournament_size=3):
 
 
 def _optimize_route_indices(
-    filtered_df, max_time_minutes, start_lat, start_lon, random_seed=42
+    filtered_df,
+    max_time_minutes,
+    start_lat,
+    start_lon,
+    random_seed=42,
+    locked_place_ids=None,
+    excluded_place_ids=None,
+    minimum_route_stops=1,
+    maximum_route_stops=MAX_ROUTE_STOPS,
 ):
     """Optimize unique route indices using a deterministic, constrained GA."""
     if filtered_df is None or filtered_df.empty:
         return [], False
 
     rng = random.Random(random_seed)
+    locked_ids = [str(value).strip() for value in (locked_place_ids or [])]
+    excluded_ids = {str(value).strip() for value in (excluded_place_ids or [])}
     all_indices = []
+    index_by_place_id = {}
     seen_place_ids = set()
     seen_coordinates = []
     for index in range(len(filtered_df)):
@@ -475,28 +567,75 @@ def _optimize_route_indices(
         )
         if (
             (normalized_id is not None and normalized_id in seen_place_ids)
+            or (normalized_id is not None and normalized_id in excluded_ids)
             or coordinate_duplicate
         ):
             continue
         all_indices.append(index)
         if normalized_id is not None:
             seen_place_ids.add(normalized_id)
+            index_by_place_id[normalized_id] = index
         seen_coordinates.append(coordinates)
+    if not all_indices:
+        return [], True
+
+    if any(place_id not in index_by_place_id for place_id in locked_ids):
+        return [], True
+    locked_indices = [index_by_place_id[place_id] for place_id in locked_ids]
     max_stops = min(
         len(all_indices),
-        calculate_route_capacity(
-            filtered_df, max_time_minutes, start_lat, start_lon
+        max(1, int(maximum_route_stops)),
+        MAX_ROUTE_STOPS,
+        max(
+            len(locked_indices),
+            calculate_route_capacity(
+                filtered_df, max_time_minutes, start_lat, start_lon
+            ),
         ),
     )
+    required_stops = max(len(locked_indices), int(minimum_route_stops))
+    if required_stops > len(all_indices) or len(locked_indices) > max_stops:
+        return [], True
     population_size = 80
     generations = 60
     elite_count = 5
 
-    # Seed every singleton so a feasible place cannot be missed by initialization.
-    population = [[index] for index in all_indices]
+    # Seed locked-plus-candidate routes so any feasible replacement cannot be
+    # missed by randomized initialization.
+    population = []
+    for index in all_indices:
+        seed_route = list(locked_indices)
+        if index not in seed_route:
+            seed_route.append(index)
+        remaining = [
+            candidate
+            for candidate in all_indices
+            if candidate not in seed_route
+        ]
+        seed_route.extend(remaining[: max(0, required_stops - len(seed_route))])
+        population.append(
+            repair_route(
+                seed_route,
+                all_indices,
+                rng,
+                max_stops,
+                locked_indices,
+            )
+        )
     while len(population) < population_size:
-        route_length = rng.randint(1, max_stops)
-        population.append(rng.sample(all_indices, route_length))
+        route_length = rng.randint(required_stops, max_stops)
+        unlocked_indices = [
+            index for index in all_indices if index not in set(locked_indices)
+        ]
+        chosen_unlocked = rng.sample(
+            unlocked_indices,
+            min(route_length - len(locked_indices), len(unlocked_indices)),
+        )
+        route = list(locked_indices) + chosen_unlocked
+        rng.shuffle(route)
+        population.append(
+            repair_route(route, all_indices, rng, max_stops, locked_indices)
+        )
     population = population[:population_size]
 
     best_route = []
@@ -518,7 +657,12 @@ def _optimize_route_indices(
         fitnesses = [item[0] for item in evaluated]
 
         for route, (fitness, route_time) in zip(population, evaluated):
-            if route_time <= max_time_minutes and fitness > best_fitness:
+            if (
+                len(route) >= required_stops
+                and set(locked_indices).issubset(route)
+                and route_time <= max_time_minutes
+                and fitness > best_fitness
+            ):
                 best_route = route.copy()
                 best_fitness = fitness
                 best_time = route_time
@@ -532,32 +676,35 @@ def _optimize_route_indices(
             parent_a = _tournament_select(population, fitnesses, rng)
             parent_b = _tournament_select(population, fitnesses, rng)
             child = crossover_routes(
-                parent_a, parent_b, all_indices, rng, max_stops
+                parent_a,
+                parent_b,
+                all_indices,
+                rng,
+                max_stops,
+                locked_indices,
             )
             if rng.random() < 0.35:
-                child = mutate_route(child, all_indices, rng, max_stops)
+                child = mutate_route(
+                    child, all_indices, rng, max_stops, locked_indices
+                )
             new_population.append(
-                repair_route(child, all_indices, rng, max_stops)
+                repair_route(
+                    child, all_indices, rng, max_stops, locked_indices
+                )
             )
         population = new_population
 
     penalty_hit = False
-    # Existing graceful fallback: closest/quickest singleton when none is feasible.
+    # Fail closed instead of returning an over-budget or constraint-breaking route.
     if not best_route:
-        best_route = [
-            min(
-                all_indices,
-                key=lambda index: evaluate_route(
-                    [index], filtered_df, start_lat, start_lon
-                )[0],
-            )
-        ]
-        best_time, _ = evaluate_route(
-            best_route, filtered_df, start_lat, start_lon
-        )
-        penalty_hit = True
+        return [], True
 
-    return repair_route(best_route, all_indices, rng, max_stops), penalty_hit
+    return (
+        repair_route(
+            best_route, all_indices, rng, max_stops, locked_indices
+        ),
+        penalty_hit,
+    )
 
 
 def _text_metadata(location, field, fallback):
@@ -630,6 +777,10 @@ def run_genetic_algorithm_details(
     start_lon,
     random_seed=42,
     user_preferences=None,
+    locked_place_ids=None,
+    excluded_place_ids=None,
+    minimum_route_stops=1,
+    maximum_route_stops=MAX_ROUTE_STOPS,
 ):
     """Return the optimized route plus additive structured/time metadata."""
     if filtered_df is None or filtered_df.empty:
@@ -656,7 +807,15 @@ def run_genetic_algorithm_details(
         }
 
     best_route, penalty_hit = _optimize_route_indices(
-        filtered_df, max_time_minutes, start_lat, start_lon, random_seed
+        filtered_df,
+        max_time_minutes,
+        start_lat,
+        start_lon,
+        random_seed,
+        locked_place_ids=locked_place_ids,
+        excluded_place_ids=excluded_place_ids,
+        minimum_route_stops=minimum_route_stops,
+        maximum_route_stops=maximum_route_stops,
     )
     details = evaluate_route_details(
         best_route, filtered_df, start_lat, start_lon
