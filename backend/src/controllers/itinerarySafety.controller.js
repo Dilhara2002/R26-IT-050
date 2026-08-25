@@ -329,6 +329,10 @@ const recommendRouteSafety = async (req, res) => {
         to: result.to.name,
         distanceKm: result.distance_km,
         durationMinutes: result.duration_minutes,
+        passengers: passengersProvided ? passengers : null,
+        preferredCategory: typeof req.body?.preferredCategory === "string"
+          ? req.body.preferredCategory.trim()
+          : "",
       },
       analysis: {
         gradient: result.max_gradient,

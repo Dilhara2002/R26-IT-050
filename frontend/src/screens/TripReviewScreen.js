@@ -15,10 +15,10 @@ export default function TripReviewScreen({ route, navigation }) {
   const [confirmed, setConfirmed] = useState(false);
   const selectedRoute = tripResult?.routeResult || null;
   const risk = tripResult?.riskPrediction || {};
-  const vehicleName = getVehicleValue(selectedVehicle, ["Vehicle Name (Make & Model)", "model"], "Selected Vehicle");
+  const vehicleName = getVehicleValue(selectedVehicle, ["Vehicle Name (Make & Model)", "vehicleName", "model"], "Selected Vehicle");
   const category = getVehicleValue(selectedVehicle, ["Vehicle Category", "vehicleCategory"]);
   const seats = getVehicleValue(selectedVehicle, ["Seating Capacity", "seatingCapacity"]);
-  const fuel = getVehicleValue(selectedVehicle, ["Fuel Type"]);
+  const fuel = getVehicleValue(selectedVehicle, ["Fuel Type", "fuelType"]);
   const cost = getVehicleValue(selectedVehicle, ["estimatedHirePrice", "calculatedCost"], null);
   const explanation = tripResult?.explanation?.vehicleRecommendation?.reason || "Selected using your budget, passengers and route conditions.";
 
@@ -37,7 +37,7 @@ export default function TripReviewScreen({ route, navigation }) {
           <Info label="Category" value={category} />
           <Info label="Seats" value={seats} />
           <Info label="Fuel" value={fuel} />
-          <Info label="Estimated Cost" value={cost === null ? "Unavailable" : `LKR ${Number(cost).toLocaleString()}`} />
+          <Info label="Estimated Trip Cost" value={cost === null ? "Unavailable" : `LKR ${Number(cost).toLocaleString()}`} />
         </View>
         <Text style={styles.reason}>{explanation}</Text>
       </Section>

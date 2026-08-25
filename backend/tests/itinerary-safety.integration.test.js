@@ -163,6 +163,8 @@ test("itinerary safety integration", async (t) => {
     const response = await postRoute({
       startLocation: "Start",
       endLocation: "A",
+      budget: 50000,
+      passengers: 4,
     });
     assert.equal(response.status, 200);
     assert.equal(response.body.analysis.weather, "clear");
@@ -171,6 +173,7 @@ test("itinerary safety integration", async (t) => {
     assert.equal(typeof response.body.analysis.weather, "string");
     assert.equal(response.body.routeResult.confidence, 0.8);
     assert.equal(response.body.routeResult.modelName, "mock-model");
+    assert.equal(response.body.trip.passengers, 4);
   });
 
   await t.test("multiple stops construct ordered adjacent legs", async () => {
