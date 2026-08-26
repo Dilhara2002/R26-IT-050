@@ -1,11 +1,3 @@
-"""
-landmark_routes.py — Upgraded Landmark Recognition Service
-Supports:
-  - Dual inference: SVM mode (92.56% accuracy) and TFLite mode (fast fallback)
-  - All 17 Sri Lankan landmark classes
-  - Full metadata from Sri_Lankan_Landmark.csv
-"""
-
 import os
 import io
 import json
@@ -18,9 +10,7 @@ from flask import Blueprint, request, jsonify
 
 landmark_bp = Blueprint('landmark_bp', __name__)
 
-# ─────────────────────────────────────────────
 #  Paths
-# ─────────────────────────────────────────────
 BASE_DIR = os.path.dirname(__file__)
 MODELS_DIR = os.path.join(BASE_DIR, 'models')
 DATA_DIR   = os.path.join(BASE_DIR, 'data')
@@ -31,18 +21,14 @@ SCALER_PATH  = os.path.join(MODELS_DIR, 'svm_scaler.joblib')
 LABELS_PATH  = os.path.join(MODELS_DIR, 'labels.txt')
 CSV_PATH     = os.path.join(DATA_DIR,   'Sri_Lankan_Landmark.csv')
 
-# ─────────────────────────────────────────────
 #  Load class names from labels.txt
-# ─────────────────────────────────────────────
 with open(LABELS_PATH, 'r', encoding='utf-8') as f:
     CLASS_NAMES = [line.strip() for line in f if line.strip()]
 
 NUM_CLASSES = len(CLASS_NAMES)
 print(f"[Landmark] Loaded {NUM_CLASSES} classes: {CLASS_NAMES}")
 
-# ─────────────────────────────────────────────
 #  CSV to model class name mapping
-# ─────────────────────────────────────────────
 CLASS_TO_CSV_SEARCH = {
     'Ambuluwawa':                   'Ambuluwawa',
     'Commonwealth_war_cemetery':    'Commonwealth War Cemetery',
@@ -63,13 +49,10 @@ CLASS_TO_CSV_SEARCH = {
     'Yapahuwa_Rock_Fortress':       'Yapahuwa Rock Fortress',
 }
 
-# ─────────────────────────────────────────────
 #  Load CSV (rich landmark metadata)
-# ─────────────────────────────────────────────
 df_landmarks = pd.read_csv(CSV_PATH, encoding='utf-8').fillna("")
 
 def lookup_metadata(class_name: str) -> dict:
-    """Look up landmark info from CSV by class name."""
     search_term = CLASS_TO_CSV_SEARCH.get(class_name, class_name.replace('_', ' '))
     rows = df_landmarks[df_landmarks['Landmark Name'].str.contains(search_term, case=False, na=False)]
     if rows.empty:
@@ -95,18 +78,14 @@ def lookup_metadata(class_name: str) -> dict:
         "nearby_restaurants":str(row.get('Nearby Restaurants', '')),
     }
 
-# ─────────────────────────────────────────────
 #  Load TFLite Interpreter
-# ─────────────────────────────────────────────
 tflite_interpreter = tf.lite.Interpreter(model_path=TFLITE_PATH)
 tflite_interpreter.allocate_tensors()
 input_details  = tflite_interpreter.get_input_details()
 output_details = tflite_interpreter.get_output_details()
 print(f"[Landmark] TFLite model loaded from {TFLITE_PATH}")
 
-# ─────────────────────────────────────────────
 #  Load MobileNetV2 Feature Extractor + SVM
-# ─────────────────────────────────────────────
 svm_available = False
 try:
     from tensorflow.keras.applications import MobileNetV2
@@ -128,43 +107,31 @@ try:
 except Exception as e:
     print(f"[Landmark] SVM mode unavailable, falling back to TFLite: {e}")
 
-# ─────────────────────────────────────────────
 #  Image helpers
-# ─────────────────────────────────────────────
 IMG_SIZE = (224, 224)
 
 def preprocess_image_np(image_bytes: bytes) -> np.ndarray:
-    """Load image bytes, resize, and return (1,224,224,3) float32 array in [0,255]."""
+    # Load image bytes, resize, and return (1,224,224,3) float32 array in [0,255]
     img = Image.open(io.BytesIO(image_bytes)).convert('RGB').resize(IMG_SIZE)
     arr = np.array(img, dtype=np.float32)                     # (224,224,3)
     return np.expand_dims(arr, axis=0)                        # (1,224,224,3)
 
 def predict_tflite(img_batch: np.ndarray) -> np.ndarray:
-    """Run TFLite inference. img_batch values should be in [0,255]."""
     normalized = img_batch / 255.0                            # TFLite model expects [0,1]
     tflite_interpreter.set_tensor(input_details[0]['index'], normalized.astype(np.float32))
     tflite_interpreter.invoke()
     return tflite_interpreter.get_tensor(output_details[0]['index'])[0]  # (num_classes,)
 
 def predict_svm(img_batch: np.ndarray) -> np.ndarray:
-    """Run MobileNetV2 feature extraction then SVM inference."""
+    # Run MobileNetV2 feature extraction then SVM inference
     features = _feature_model.predict(img_batch, verbose=0)   # (1, 1280)
     scaled   = svm_scaler.transform(features)                  # (1, 1280)
     proba    = svm_model.predict_proba(scaled)[0]              # (num_classes,)
     return proba
 
-# ─────────────────────────────────────────────
 #  Routes
-# ─────────────────────────────────────────────
-
 @landmark_bp.route('/api/landmark/predict', methods=['POST'])
 def predict():
-    """
-    POST /api/landmark/predict
-    Form-data: image file
-    Query param: mode=svm|tflite  (default: svm when available)
-    Returns: top-1 landmark with full metadata.
-    """
     if 'image' not in request.files:
         return jsonify({"error": "No image file provided. Send as multipart form-data with key 'image'."}), 400
 
@@ -210,10 +177,6 @@ def predict():
 
 @landmark_bp.route('/api/landmark/list', methods=['GET'])
 def list_landmarks():
-    """
-    GET /api/landmark/list
-    Returns all 17 supported landmark classes with display names.
-    """
     landmarks = []
     for cls in CLASS_NAMES:
         meta = lookup_metadata(cls)
