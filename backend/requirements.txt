@@ -1,11 +1,14 @@
-numpy==2.5.2
-pandas==3.0.2
-scipy==1.18.0
-scikit-learn==1.7.2
-joblib==1.5.3
-Flask
-tensorflow
-Pillow
-flask-cors
-werkzeug
+numpy>=1.24
+pandas>=2.0
+scipy>=1.10
+scikit-learn>=1.3
+joblib>=1.3
 
+Flask>=3.0
+flask-cors>=4.0
+Werkzeug>=3.0
+
+tensorflow>=2.15
+Pillow>=10.0
+
+python-dotenv>=1.0
