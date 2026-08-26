@@ -28,6 +28,7 @@ export default function TripInputScreen({
   loading,
   onSubmit,
   onBack,
+  hotelContext,
 }) {
   const [startSuggestions, setStartSuggestions] = useState([]);
   const [endSuggestions, setEndSuggestions] = useState([]);
@@ -98,15 +99,28 @@ export default function TripInputScreen({
         </Text>
       </View>
 
-      <Text style={styles.label}>Budget</Text>
-      <TextInput
-        style={styles.input}
-        value={form.budget}
-        onChangeText={(value) => updateField("budget", value)}
-        keyboardType="numeric"
-        placeholder="Enter your budget"
-        placeholderTextColor={colors.muted}
-      />
+      {hotelContext && (
+        <View style={styles.hotelBridge}>
+          <View style={styles.hotelBridgeIcon}><Text style={styles.hotelBridgeEmoji}>🏨</Text></View>
+          <View style={styles.hotelBridgeCopy}>
+            <Text style={styles.hotelBridgeLabel}>ISHAN SAFE JOURNEY ANALYSIS</Text>
+            <Text style={styles.hotelBridgeTitle}>{hotelContext.selectedHotel?.hotel?.name || "Selected hotel"}</Text>
+            <Text style={styles.hotelBridgeText}>Route details were received from your hotel plan. Total trip budget: LKR {Number(hotelContext.vehicleRequest?.totalBudget || 0).toLocaleString()}.</Text>
+          </View>
+        </View>
+      )}
+
+      {!hotelContext && <>
+        <Text style={styles.label}>Budget</Text>
+        <TextInput
+          style={styles.input}
+          value={form.budget}
+          onChangeText={(value) => updateField("budget", value)}
+          keyboardType="numeric"
+          placeholder="Enter your budget"
+          placeholderTextColor={colors.muted}
+        />
+      </>}
 
       <Text style={styles.label}>Passengers</Text>
       <TextInput
@@ -251,6 +265,13 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     letterSpacing: 1.2,
   },
+  hotelBridge:{flexDirection:"row",gap:12,backgroundColor:colors.card,borderWidth:1,borderColor:colors.primary,borderRadius:18,padding:15,marginBottom:8},
+  hotelBridgeIcon:{width:44,height:44,borderRadius:14,backgroundColor:colors.backgroundDeep,alignItems:"center",justifyContent:"center"},
+  hotelBridgeEmoji:{fontSize:21},
+  hotelBridgeCopy:{flex:1},
+  hotelBridgeLabel:{color:colors.cinnamon,fontSize:9,fontWeight:"900",letterSpacing:1},
+  hotelBridgeTitle:{color:colors.text,fontSize:16,fontFamily:"serif",fontWeight:"600",marginTop:3},
+  hotelBridgeText:{color:colors.muted,fontSize:11,lineHeight:17,marginTop:4},
   label: {
     fontSize: 15,
     fontWeight: "700",

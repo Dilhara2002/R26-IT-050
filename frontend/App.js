@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView, ActivityIndicator, StyleSheet, Alert } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -21,13 +21,32 @@ import HotelResultsScreen from "./src/screens/HotelResultsScreen";
 
 const Stack = createNativeStackNavigator();
 
-function MainFlow({ navigation }) {
+function MainFlow({ navigation, route }) {
   const [screen, setScreen] = useState("welcome");
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [hotelContext, setHotelContext] = useState(null);
+  const consumedHotelRequest = useRef(null);
   const [form, setForm] = useState({ budget: "", passengers: "", startLocation: "", endLocation: "", preferredCategory: "" });
+
+  useEffect(() => {
+    const request = route.params?.hotelSafetyRequest;
+    if (!request || consumedHotelRequest.current === request.id) return;
+    consumedHotelRequest.current = request.id;
+    setHotelContext(request);
+    setResult(null);
+    setErrorMessage("");
+    setForm({
+      budget: String(request.vehicleRequest?.totalBudget || ""),
+      passengers: String(request.vehicleRequest?.passengers || ""),
+      startLocation: request.vehicleRequest?.startLocation || "",
+      endLocation: request.selectedHotel?.hotel?.district || request.selectedHotel?.hotel?.name || "",
+      preferredCategory: request.vehicleRequest?.preferredCategory || "",
+    });
+    setScreen("form");
+  }, [route.params?.hotelSafetyRequest]);
 
   const handleAuth = ({ name, email }) => {
     setUser({ name: name?.trim() || email.split("@")[0], email });
@@ -78,7 +97,7 @@ function MainFlow({ navigation }) {
   const openModule = (id) => {
     if (id === "sasanka") navigation.navigate("ItineraryHome");
     else if (id === "dunith") navigation.navigate("HotelHome");
-    else if (id === "ishan") setScreen("form");
+    else if (id === "ishan") { setHotelContext(null); setScreen("form"); }
     else if (id === "madush") navigation.navigate("LandmarkExplorer");
     else setScreen(`module:${id}`);
   };
@@ -88,14 +107,28 @@ function MainFlow({ navigation }) {
     setScreen("welcome");
   };
 
+  const leaveSafetyForm = () => {
+    if (hotelContext) {
+      navigation.navigate("HotelResults", {
+        packageData: hotelContext.packageData,
+        restoredSelection: hotelContext.selectedHotel,
+        vehicleRequest: hotelContext.vehicleRequest,
+      });
+      setHotelContext(null);
+      setScreen("dashboard");
+      return;
+    }
+    setScreen("dashboard");
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {screen === "welcome" && <WelcomeScreen onLogin={() => setScreen("login")} onRegister={() => setScreen("register")} />}
       {(screen === "login" || screen === "register") && <AuthScreen mode={screen} onSubmit={handleAuth} onBack={() => setScreen("welcome")} onSwitch={() => setScreen(screen === "login" ? "register" : "login")} />}
       {screen === "dashboard" && <DashboardScreen user={user} onOpenModule={openModule} onLogout={logout} />}
       {screen.startsWith("module:") && <ModuleScreen moduleId={screen.split(":")[1]} onBack={() => setScreen("dashboard")} />}
-      {screen === "form" && <TripInputScreen form={form} setForm={setForm} loading={loading} onSubmit={handleSubmit} onBack={() => setScreen("dashboard")} />}
-      {screen === "result" && <SafetyResultScreen result={result} errorMessage={errorMessage} onBack={() => setScreen("form")} onNewSearch={handleNewSearch} onShowMap={(selectedRoute) => navigation.navigate("SafetyMap", { selectedRoute })} onReviewTrip={(selectedVehicle, tripResult) => navigation.navigate("TripReview", { selectedVehicle, tripResult })} />}
+      {screen === "form" && <TripInputScreen form={form} setForm={setForm} loading={loading} onSubmit={handleSubmit} onBack={leaveSafetyForm} hotelContext={hotelContext} />}
+      {screen === "result" && <SafetyResultScreen result={result} errorMessage={errorMessage} onBack={() => setScreen("form")} onNewSearch={handleNewSearch} onShowMap={(selectedRoute) => navigation.navigate("SafetyMap", { selectedRoute })} onReviewTrip={(selectedVehicle, tripResult) => navigation.navigate("TripReview", { selectedVehicle, tripResult, hotelContext })} />}
       {loading && <ActivityIndicator style={styles.loader} color={colors.primary} size="large" />}
     </SafeAreaView>
   );
