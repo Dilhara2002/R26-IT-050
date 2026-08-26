@@ -1,6 +1,7 @@
 from pathlib import Path
 import math
 import random
+import re
 import warnings
 
 import pandas as pd
@@ -20,6 +21,25 @@ NEAR_IDENTICAL_COORDINATE_KM = 0.05
 DATA_SCOPE = "verified_kandy_v1"
 VERIFIED_STATUS = "source_trace_verified"
 QUARANTINED_LEGACY_IDS = {"79"}
+GEMINI_REQUEST_TIMEOUT = (2, 5)
+GEMINI_PLACEHOLDER_KEYS = {
+    "APIKEY",
+    "CHANGEME",
+    "ENTERAPIKEY",
+    "ENTERGEMINIAPIKEY",
+    "GEMINIAPIKEY",
+    "INSERTAPIKEY",
+    "PASTEAPIKEY",
+    "PASTEGEMINIAPIKEY",
+    "PLACEHOLDER",
+    "REPLACEWITHYOURAPIKEY",
+    "TODO",
+    "YOURAPIKEY",
+    "YOURAPIKEYHERE",
+    "YOURGEMINIAPIKEY",
+    "YOURGEMINIAPIKEYHERE",
+    "YOURKEYHERE",
+}
 DATASET_PATH = (
     Path(__file__).resolve().parent
     / "data"
@@ -940,13 +960,20 @@ def run_genetic_algorithm(
     )
 
 
+def _is_usable_gemini_key(api_key):
+    if not isinstance(api_key, str) or not api_key.strip():
+        return False
+    normalized = re.sub(r"[^A-Z0-9]", "", api_key.upper())
+    return normalized not in GEMINI_PLACEHOLDER_KEYS
+
+
 def generate_itinerary_summary(places, preferences, api_key, core_summary=None):
     """Optionally paraphrase a deterministic explanation; never replace its evidence."""
     deterministic_summary = core_summary or (
         f"A heuristic itinerary contains {len(places or [])} stop(s) for "
         f"{', '.join(preferences or []) or 'the selected interests'}."
     )
-    if not places or not api_key:
+    if not places or not _is_usable_gemini_key(api_key):
         return deterministic_summary
 
     prompt = f"""
@@ -966,9 +993,12 @@ def generate_itinerary_summary(places, preferences, api_key, core_summary=None):
             url,
             headers={"Content-Type": "application/json"},
             json={"contents": [{"parts": [{"text": prompt}]}]},
+            timeout=GEMINI_REQUEST_TIMEOUT,
         )
-        if response.status_code == 200:
-            return response.json()["candidates"][0]["content"]["parts"][0]["text"]
-        return deterministic_summary
-    except requests.RequestException:
+        response.raise_for_status()
+        paraphrase = response.json()["candidates"][0]["content"]["parts"][0]["text"]
+        if not isinstance(paraphrase, str) or not paraphrase.strip():
+            return deterministic_summary
+        return paraphrase.strip()
+    except (requests.RequestException, ValueError, TypeError, KeyError, IndexError):
         return deterministic_summary

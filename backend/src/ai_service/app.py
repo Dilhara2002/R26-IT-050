@@ -5,6 +5,8 @@ from flask import Flask, jsonify, request
 from dotenv import load_dotenv
 from flask_cors import CORS
 
+# Capture the process-level opt-in before dotenv can supply a fallback key.
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 load_dotenv()
 
 from model import (
@@ -23,7 +25,6 @@ from model import (
 app = Flask(__name__)
 CORS(app)
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 ALLOWED_GENERATION_MODES = {"initial", "replace_stop", "full_regeneration"}
 
 

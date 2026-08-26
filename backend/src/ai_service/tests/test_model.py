@@ -8,6 +8,7 @@ import unittest
 from unittest import mock
 
 import pandas as pd
+import requests
 
 
 AI_SERVICE_DIR = Path(__file__).resolve().parents[1]
@@ -389,6 +390,112 @@ class ModelTestCase(unittest.TestCase):
             core_summary="Deterministic evidence summary.",
         )
         self.assertEqual(summary, "Deterministic evidence summary.")
+
+    def test_unusable_gemini_keys_make_no_external_request(self):
+        unusable_keys = [
+            None,
+            "",
+            "   \t",
+            "YOUR_API_KEY",
+            "YOUR_GEMINI_API_KEY",
+            "CHANGE_ME",
+            "replace-with-your-api-key",
+            "your Gemini API key here",
+            "PASTE_API_KEY",
+            "<placeholder>",
+        ]
+        with mock.patch.object(model.requests, "post") as post:
+            for api_key in unusable_keys:
+                with self.subTest(api_key=api_key):
+                    summary = model.generate_itinerary_summary(
+                        ["Kandy Lake (60 mins)"],
+                        ["Nature"],
+                        api_key,
+                        core_summary="Deterministic evidence summary.",
+                    )
+                    self.assertEqual(summary, "Deterministic evidence summary.")
+            post.assert_not_called()
+
+    def test_gemini_network_failures_return_deterministic_xai(self):
+        failures = [
+            requests.ConnectTimeout("connect timed out"),
+            requests.ReadTimeout("read timed out"),
+            requests.ConnectionError("connection failed"),
+        ]
+        for failure in failures:
+            with self.subTest(failure=type(failure).__name__), mock.patch.object(
+                model.requests, "post", side_effect=failure
+            ) as post:
+                summary = model.generate_itinerary_summary(
+                    ["Kandy Lake (60 mins)"],
+                    ["Nature"],
+                    "AIza-valid-looking-test-key",
+                    core_summary="Deterministic evidence summary.",
+                )
+                self.assertEqual(summary, "Deterministic evidence summary.")
+                self.assertEqual(post.call_args.kwargs["timeout"], (2, 5))
+
+    def test_gemini_non_success_response_returns_deterministic_xai(self):
+        response = mock.Mock()
+        response.raise_for_status.side_effect = requests.HTTPError("503")
+        with mock.patch.object(model.requests, "post", return_value=response):
+            summary = model.generate_itinerary_summary(
+                ["Kandy Lake (60 mins)"],
+                ["Nature"],
+                "AIza-valid-looking-test-key",
+                core_summary="Deterministic evidence summary.",
+            )
+        self.assertEqual(summary, "Deterministic evidence summary.")
+
+    def test_malformed_gemini_responses_return_deterministic_xai(self):
+        malformed_responses = [
+            ValueError("invalid JSON"),
+            {},
+            {"candidates": []},
+            {"candidates": [{"content": {"parts": [{}]}}]},
+            {"candidates": [{"content": {"parts": [{"text": "   "}]}}]},
+        ]
+        for malformed in malformed_responses:
+            response = mock.Mock()
+            response.raise_for_status.return_value = None
+            if isinstance(malformed, Exception):
+                response.json.side_effect = malformed
+            else:
+                response.json.return_value = malformed
+            with self.subTest(malformed=malformed), mock.patch.object(
+                model.requests, "post", return_value=response
+            ):
+                summary = model.generate_itinerary_summary(
+                    ["Kandy Lake (60 mins)"],
+                    ["Nature"],
+                    "AIza-valid-looking-test-key",
+                    core_summary="Deterministic evidence summary.",
+                )
+                self.assertEqual(summary, "Deterministic evidence summary.")
+
+    def test_endpoint_blank_key_uses_non_empty_truthful_fallback_without_http(self):
+        import app as flask_app
+
+        with mock.patch.object(flask_app, "GEMINI_API_KEY", "   "), mock.patch.object(
+            model.requests, "post"
+        ) as post:
+            response = flask_app.app.test_client().post(
+                "/api/optimize-itinerary",
+                json={
+                    "preferences": ["Nature", "Adventure"],
+                    "max_time_minutes": 360,
+                    "current_lat": 7.2906,
+                    "current_lon": 80.6337,
+                },
+            )
+        payload = response.get_json()
+        self.assertEqual(response.status_code, 200, payload)
+        post.assert_not_called()
+        self.assertTrue(payload["data"]["ai_paraphrase"].strip())
+        self.assertEqual(
+            payload["data"]["ai_paraphrase"],
+            payload["data"]["route_explanation"]["summary"],
+        )
 
 
 if __name__ == "__main__":
