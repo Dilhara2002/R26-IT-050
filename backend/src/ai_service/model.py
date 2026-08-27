@@ -1,12 +1,18 @@
 from pathlib import Path
+import hashlib
+import json
 import math
+import os
 import random
 import re
 import warnings
 
+import joblib
 import pandas as pd
 import requests
 from sklearn.metrics.pairwise import cosine_similarity
+
+from relevance_features import make_pair_frame
 
 
 warnings.filterwarnings("ignore")
@@ -46,13 +52,87 @@ DATASET_PATH = (
     / "verified"
     / "kandy_runtime_verified_v1.csv"
 )
+DEFAULT_RELEVANCE_MODEL_PATH = (
+    Path(__file__).resolve().parent / "models" / "user_poi_relevance_v1.joblib"
+)
+RELEVANCE_MODEL_PATH = Path(
+    os.environ.get("ITINERARY_RELEVANCE_MODEL_PATH", DEFAULT_RELEVANCE_MODEL_PATH)
+)
 
 PLACES_DF = None
 TAGS_ENCODED = None
+RELEVANCE_PIPELINE = None
+RELEVANCE_METADATA = None
+PROFILING_MODE = "content_based_fallback"
+RELEVANCE_FALLBACK_REASON = "relevance artifact has not been loaded"
+
+
+def _sha256(path):
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as source:
+        for block in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def load_relevance_artifact(path=None):
+    """Load and verify the frozen inference artifact; never fit at runtime."""
+    global RELEVANCE_PIPELINE, RELEVANCE_METADATA, PROFILING_MODE
+    global RELEVANCE_FALLBACK_REASON
+
+    artifact_path = Path(path or RELEVANCE_MODEL_PATH)
+    metadata_path = artifact_path.with_suffix(".metadata.json")
+    try:
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        if _sha256(artifact_path) != metadata["artifact_sha256"]:
+            raise ValueError("artifact SHA-256 does not match metadata")
+        pipeline = joblib.load(artifact_path)
+        if list(map(int, pipeline.classes_)) != [0, 1, 2]:
+            raise ValueError("artifact classes are not exactly [0, 1, 2]")
+        RELEVANCE_PIPELINE = pipeline
+        RELEVANCE_METADATA = metadata
+        PROFILING_MODE = "trained_relevance_model"
+        RELEVANCE_FALLBACK_REASON = None
+        print(
+            f"[SUCCESS] Loaded {metadata['model_name']} {metadata['model_version']} "
+            f"({metadata['classifier']}); runtime training was not performed."
+        )
+        return True
+    except Exception as exc:
+        RELEVANCE_PIPELINE = None
+        RELEVANCE_METADATA = None
+        PROFILING_MODE = "content_based_fallback"
+        RELEVANCE_FALLBACK_REASON = str(exc)
+        print(f"[WARNING] Relevance model unavailable; using explicit fallback: {exc}")
+        return False
+
+
+def get_relevance_engine_metadata():
+    """Return truthful additive runtime provenance for API and diagnostics."""
+    result = {
+        "profiling_mode": PROFILING_MODE,
+        "runtime_training_performed": False,
+        "runtime_role": "candidate relevance gate before 70/30 ranking and GA",
+    }
+    if RELEVANCE_METADATA:
+        result.update(
+            {
+                "model_name": RELEVANCE_METADATA.get("model_name"),
+                "model_version": RELEVANCE_METADATA.get("model_version"),
+                "classifier": RELEVANCE_METADATA.get("classifier"),
+                "artifact_sha256": RELEVANCE_METADATA.get("artifact_sha256"),
+                "score_semantics": (
+                    "predicted-class confidence; not calibrated user-satisfaction probability"
+                ),
+            }
+        )
+    else:
+        result["fallback_reason"] = RELEVANCE_FALLBACK_REASON
+    return result
 
 
 def initialize_ai_engine():
-    """Load the bounded source-traced Kandy overlay without training a model."""
+    """Load immutable POIs and the frozen artifact without runtime training."""
     global PLACES_DF, TAGS_ENCODED
 
     try:
@@ -131,6 +211,7 @@ def initialize_ai_engine():
             f"[SUCCESS] Loaded {len(places)} source-traced Kandy POIs; "
             "no model training performed.\n"
         )
+        load_relevance_artifact()
         return True
     except Exception as exc:
         PLACES_DF = None
@@ -257,6 +338,33 @@ def filter_locations(
     df_quality["Similarity_Score"] = cosine_similarity(
         user_vector, tags_radius
     )[0]
+
+    if RELEVANCE_PIPELINE is not None:
+        pairs = make_pair_frame(user_preferences, df_quality["Tags"].tolist())
+        predictions = RELEVANCE_PIPELINE.predict(pairs).astype(int)
+        probabilities = RELEVANCE_PIPELINE.predict_proba(pairs)
+        class_positions = {
+            int(label): position
+            for position, label in enumerate(RELEVANCE_PIPELINE.classes_)
+        }
+        df_quality["Predicted_Relevance_Class"] = predictions
+        df_quality["Relevance_Classification_Score"] = [
+            float(probabilities[row, class_positions[int(label)]])
+            for row, label in enumerate(predictions)
+        ]
+        df_quality = df_quality[df_quality["Predicted_Relevance_Class"] > 0].copy()
+        if df_quality.empty:
+            return None
+        valid_indices = df_quality.index
+        tags_radius = TAGS_ENCODED.loc[valid_indices].copy()
+        user_vector = user_vector.reindex(columns=tags_radius.columns, fill_value=0)
+        df_quality["Similarity_Score"] = cosine_similarity(
+            user_vector, tags_radius
+        )[0]
+    else:
+        # The fallback deliberately retains the pre-model eligibility behaviour.
+        df_quality["Predicted_Relevance_Class"] = pd.NA
+        df_quality["Relevance_Classification_Score"] = pd.NA
 
     safe_radius = max(df_quality["Distance_From_Start"].max(), 0.1)
     df_quality["Proximity_Score"] = 1 - (
@@ -749,8 +857,18 @@ def build_stop_explanation(stop):
     )
     verification = stop.get("verification_status", "verification metadata unavailable")
     duration_basis = stop.get("duration_basis", "unspecified estimate")
+    relevance_class = stop.get("predicted_relevance_class")
+    relevance_score = stop.get("relevance_classification_score")
+    if relevance_class is None:
+        relevance_text = "content-based fallback eligibility was used"
+    else:
+        relevance_text = (
+            f"trained relevance class {relevance_class} with classification "
+            f"score {relevance_score:.3f} (not a user-satisfaction probability)"
+        )
     return (
-        f"Stop {stop['sequence']} matched {matched_text}; {score_text}. "
+        f"Stop {stop['sequence']} passed {relevance_text}, matched {matched_text}; "
+        f"{score_text}. "
         f"It is {stop['distance_from_start_km']:.2f} km straight-line from the "
         f"start. The {stop['duration_minutes']}-minute visit is labelled "
         f"{duration_basis}; source status: {verification}."
@@ -768,8 +886,9 @@ def build_route_explanation(
     """Describe the bounded data scope, time evidence and heuristic selection."""
     interests = ", ".join(user_preferences or []) or "none"
     summary = (
-        f"A heuristic genetic algorithm selected {len(optimized_stops)} stop(s) "
-        f"for {interests} from the {DATA_SCOPE} source-traced dataset. "
+        f"The {PROFILING_MODE} relevance stage gated candidates, then a heuristic "
+        f"genetic algorithm selected {len(optimized_stops)} stop(s) for {interests} "
+        f"from the {DATA_SCOPE} source-traced dataset. "
         f"The plan uses {planned_time_minutes} minutes: {visit_time_minutes} for "
         f"research-estimated visits and {travel_time_minutes} for estimated travel "
         f"({utilization_percent:.1f}% utilization). Travel uses straight-line "
@@ -779,6 +898,11 @@ def build_route_explanation(
     return {
         "summary": summary,
         "selection_method": "deterministic_seeded_genetic_algorithm_heuristic",
+        "selection_stages": [
+            "trained_relevance_gate_or_explicit_content_fallback",
+            "fixed_70_percent_proximity_30_percent_cosine_ranking",
+            "deterministic_seeded_genetic_algorithm",
+        ],
         "is_globally_optimal": False,
         "data_scope": DATA_SCOPE,
         "selected_interests": list(user_preferences or []),
@@ -895,11 +1019,17 @@ def run_genetic_algorithm_details(
             "similarity_score": location.get("Similarity_Score"),
             "proximity_score": location.get("Proximity_Score"),
             "composite_score": location.get("Composite_Score"),
+            "predicted_relevance_class": location.get("Predicted_Relevance_Class"),
+            "relevance_classification_score": location.get(
+                "Relevance_Classification_Score"
+            ),
         }
         for field, value in optional_fields.items():
             if value is not None and not pd.isna(value):
                 if field == "place_id":
                     stop[field] = int(value) if isinstance(value, (int, float)) else str(value)
+                elif field == "predicted_relevance_class":
+                    stop[field] = int(value)
                 else:
                     stop[field] = float(value)
         stop["explanation"] = build_stop_explanation(stop)

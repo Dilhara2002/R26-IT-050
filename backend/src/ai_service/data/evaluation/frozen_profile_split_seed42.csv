@@ -1,0 +1,16 @@
+profile_id,user_interests,interest_count,split,seed
+P01,Nature,1,training,42
+P02,History,1,training,42
+P03,Culture,1,training,42
+P04,Religion,1,training,42
+P05,Wildlife,1,training,42
+P06,Adventure,1,heldout,42
+P07,City,1,training,42
+P08,Nature|Wildlife,2,heldout,42
+P09,History|Culture,2,training,42
+P10,Culture|Religion,2,training,42
+P11,Nature|Adventure,2,training,42
+P12,History|City,2,training,42
+P13,Nature|Wildlife|Adventure,3,heldout,42
+P14,History|Culture|Religion,3,training,42
+P15,Nature|Culture|City,3,training,42

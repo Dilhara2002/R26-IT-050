@@ -3,3 +3,6 @@ frontend/.expo/
 frontend/expo-env.d.ts
 backend/.venv/
 .DS_Store
+**/__pycache__/
+*.py[cod]
+*.inspect.ndjson

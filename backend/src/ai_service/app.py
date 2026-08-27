@@ -18,6 +18,7 @@ from model import (
     evaluate_route,
     filter_locations,
     generate_itinerary_summary,
+    get_relevance_engine_metadata,
     run_genetic_algorithm_details,
 )
 
@@ -313,6 +314,8 @@ def optimize_itinerary():
                     "starting_location": {"lat": user_lat, "lon": user_lon},
                     "data_scope": DATA_SCOPE,
                     "verification_status": VERIFIED_STATUS,
+                    "profiling_mode": get_relevance_engine_metadata()["profiling_mode"],
+                    "relevance_engine": get_relevance_engine_metadata(),
                     "verified_candidate_count": len(filtered_places),
                     "verified_alternative_count": alternative_count,
                     "search_radius_km": radius_km,
