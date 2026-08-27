@@ -95,12 +95,34 @@ export const optimizeItinerary = async (req, res) => {
 
 
 
-      await newTrip.save();
-
-
-      console.log(
-        "New itinerary saved to database successfully!"
-      );
+      if (Itinerary.db.readyState === 1) {
+        try {
+          await newTrip.save();
+          aiResponse.persistence = {
+            status: "saved",
+            saved: true
+          };
+          console.log(
+            "New itinerary saved to database successfully!"
+          );
+        } catch {
+          aiResponse.persistence = {
+            status: "failed",
+            saved: false
+          };
+          console.warn(
+            "Itinerary persistence failed; returning the optimized itinerary without saving."
+          );
+        }
+      } else {
+        aiResponse.persistence = {
+          status: "skipped",
+          saved: false
+        };
+        console.warn(
+          "Itinerary persistence skipped because MongoDB is not connected."
+        );
+      }
 
     }
 

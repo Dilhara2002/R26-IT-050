@@ -1,11 +1,11 @@
 const tourismColors = {
-  primary: "#2563EB",
-  primaryLight: "#DBEAFE",
-  background: "#EEF4FF",
-  white: "#FFFFFF",
-  textDark: "#0F172A",
-  textLight: "#64748B",
-  border: "#CBD5E1",
+  primary: "#3E6650",
+  primaryLight: "#E7DBBA",
+  background: "#F1E9D2",
+  white: "#FBF7EC",
+  textDark: "#241F18",
+  textLight: "#6F6658",
+  border: "#D7CAB0",
 };
 
 export default tourismColors;

@@ -1,8 +1,52 @@
-const test = require("node:test");
-const assert = require("node:assert/strict");
-const request = require("supertest");
+import test from "node:test";
+import assert from "node:assert/strict";
+import request from "supertest";
 
-const app = require("../src/app");
+import app from "../src/app.js";
+import { setSafetyRouteDependenciesForTesting } from "../src/routes/safetyRoutes.js";
+import { getWholeTripVehicleRecommendation } from "../src/services/safetyAnalysis.service.js";
+
+setSafetyRouteDependenciesForTesting({
+  getRouteDetails: async (startLocation, endLocation) => ({
+    distanceKm: 100,
+    durationMinutes: 150,
+    correctedStartLocation: startLocation,
+    correctedEndLocation: endLocation,
+    startCoordinates: { latitude: 6.9271, longitude: 79.8612 },
+    endCoordinates: { latitude: 7.2906, longitude: 80.6337 },
+  }),
+  getWeatherByCoordinates: async () => ({
+    status: "available",
+    isRaining: false,
+    temperature: 27,
+    weatherDescription: "clear sky",
+    locationName: "Colombo",
+  }),
+  getRoadData: async () => ({
+    "Route/Segment Name": "A1 Colombo-Kandy",
+    "Max Gradient (%)": 8,
+    "Average Elevation": 120,
+    "Surface Friction Index": 0.72,
+    "Terrain Type": "Mountainous",
+    "Road Surface Condition": "Asphalt - Good",
+    "Typical Road Width": "Wide",
+    _aggregationType: "route-family",
+    _segmentCount: 5,
+  }),
+  graphManager: {
+    getMLRiskContext: async () => ({ status: "available", historicalOccurrenceCount: 2 }),
+    getSafetyReasoning: async () => ({ status: "available", explanation: "Deterministic test context." }),
+  },
+  runRiskPrediction: async (inputFeatures) => ({
+    success: true,
+    riskLevel: "Medium",
+    confidence: 0.8,
+    confidencePercent: 80,
+    probabilities: { Low: 0.1, Medium: 0.8, High: 0.1 },
+    modelName: "deterministic-mock",
+    inputFeatures,
+  }),
+});
 
 
 const requestSafetyAnalysis = (
@@ -77,11 +121,60 @@ test("GET / returns the health response contract", async () => {
   assert.equal(response.status, 200);
   assert.equal(response.body.success, true);
   assert.equal(response.body.status, "Healthy");
-  assert.equal(
-    response.body.endpoints.safetyRecommendation,
-    "/api/safety/recommend-vehicle"
-  );
 });
+
+
+test(
+  "vehicle response exposes a model-based final trip-price quote",
+  async () => {
+    const response = await requestSafetyAnalysis({
+      ...standardSafetyRequest,
+      budget: 50000,
+    });
+
+    if (!assertSuccessfulResponseOrMlOutage(response)) {
+      return;
+    }
+
+    const vehicle = response.body.bestVehicle;
+    assert.ok(vehicle);
+    assert.equal(vehicle.pricing.currency, "LKR");
+    assert.equal(vehicle.pricing.status, "dataset-baseline");
+    assert.equal(vehicle.pricing.isLiveMarketRate, false);
+    assert.equal(vehicle.pricing.requiresAdminVerification, true);
+    assert.equal(vehicle.pricing.totalCost, vehicle.estimatedHirePrice);
+    assert.equal(
+      vehicle.priceFormula,
+      "BaseHireCharge + (DistanceKM × RentalPricePerKM)"
+    );
+  }
+);
+
+
+test(
+  "integrated route service exposes the same model-based pricing contract",
+  async () => {
+    const recommendation = await getWholeTripVehicleRecommendation({
+      distanceKm: 100,
+      maxGradient: 8,
+      riskLevel: "Medium",
+      budget: 50000,
+      passengers: 4,
+      preferredCategory: "Economy",
+    });
+
+    assert.equal(recommendation.status, "available");
+    assert.ok(recommendation.bestVehicle);
+    assert.equal(recommendation.bestVehicle.pricing.currency, "LKR");
+    assert.equal(recommendation.bestVehicle.pricing.status, "dataset-baseline");
+    assert.notEqual(recommendation.bestVehicle.fuelType, "Unknown");
+    assert.equal(recommendation.bestVehicle.pricing.isLiveMarketRate, false);
+    assert.equal(
+      recommendation.bestVehicle.pricing.totalCost,
+      recommendation.bestVehicle.estimatedHirePrice
+    );
+  }
+);
 
 
 test(

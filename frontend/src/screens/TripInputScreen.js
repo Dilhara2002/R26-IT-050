@@ -28,6 +28,7 @@ export default function TripInputScreen({
   loading,
   onSubmit,
   onBack,
+  hotelContext,
 }) {
   const [startSuggestions, setStartSuggestions] = useState([]);
   const [endSuggestions, setEndSuggestions] = useState([]);
@@ -81,25 +82,45 @@ export default function TripInputScreen({
   );
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={false}
+    >
       <TouchableOpacity onPress={onBack}>
         <Text style={styles.backText}>← Back</Text>
       </TouchableOpacity>
 
-      <Text style={styles.title}>Trip Details</Text>
-      <Text style={styles.subtitle}>
-        Enter your route and travel requirements.
-      </Text>
+      <View style={styles.hero}>
+        <Text style={styles.heroBadge}>✦ AI SAFE JOURNEY PLANNER</Text>
+        <Text style={styles.title}>Plan a safer journey</Text>
+        <Text style={styles.subtitle}>
+          Add your route and travel needs to receive a safer vehicle recommendation.
+        </Text>
+      </View>
 
-      <Text style={styles.label}>Budget</Text>
-      <TextInput
-        style={styles.input}
-        value={form.budget}
-        onChangeText={(value) => updateField("budget", value)}
-        keyboardType="numeric"
-        placeholder="Enter your budget"
-        placeholderTextColor={colors.muted}
-      />
+      {hotelContext && (
+        <View style={styles.hotelBridge}>
+          <View style={styles.hotelBridgeIcon}><Text style={styles.hotelBridgeEmoji}>🏨</Text></View>
+          <View style={styles.hotelBridgeCopy}>
+            <Text style={styles.hotelBridgeLabel}>ISHAN SAFE JOURNEY ANALYSIS</Text>
+            <Text style={styles.hotelBridgeTitle}>{hotelContext.selectedHotel?.hotel?.name || "Selected hotel"}</Text>
+            <Text style={styles.hotelBridgeText}>Route details were received from your hotel plan. Total trip budget: LKR {Number(hotelContext.vehicleRequest?.totalBudget || 0).toLocaleString()}.</Text>
+          </View>
+        </View>
+      )}
+
+      {!hotelContext && <>
+        <Text style={styles.label}>Budget</Text>
+        <TextInput
+          style={styles.input}
+          value={form.budget}
+          onChangeText={(value) => updateField("budget", value)}
+          keyboardType="numeric"
+          placeholder="Enter your budget"
+          placeholderTextColor={colors.muted}
+        />
+      </>}
 
       <Text style={styles.label}>Passengers</Text>
       <TextInput
@@ -195,8 +216,14 @@ export default function TripInputScreen({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.background,
-    padding: 20,
     flex: 1,
+  },
+  contentContainer: {
+    width: "100%",
+    maxWidth: 800,
+    alignSelf: "center",
+    padding: 20,
+    paddingBottom: 48,
   },
   backText: {
     color: colors.primary,
@@ -206,20 +233,51 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: colors.primaryDark,
+    fontSize: 32,
+    lineHeight: 39,
+    fontWeight: "600",
+    fontFamily: "serif",
+    color: "#FFFFFF",
+    marginTop: 13,
   },
   subtitle: {
     fontSize: 15,
-    color: colors.muted,
-    marginTop: 6,
-    marginBottom: 24,
+    color: "#E7DBBA",
+    marginTop: 8,
+    lineHeight: 22,
   },
+  hero: {
+    backgroundColor: colors.primaryDark,
+    borderRadius: 26,
+    padding: 25,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "rgba(216,154,31,0.42)",
+  },
+  heroBadge: {
+    alignSelf: "flex-start",
+    color: "#D89A1F",
+    backgroundColor: "rgba(255,255,255,0.12)",
+    borderRadius: 20,
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+    fontSize: 10,
+    fontWeight: "900",
+    letterSpacing: 1.2,
+  },
+  hotelBridge:{flexDirection:"row",gap:12,backgroundColor:colors.card,borderWidth:1,borderColor:colors.primary,borderRadius:18,padding:15,marginBottom:8},
+  hotelBridgeIcon:{width:44,height:44,borderRadius:14,backgroundColor:colors.backgroundDeep,alignItems:"center",justifyContent:"center"},
+  hotelBridgeEmoji:{fontSize:21},
+  hotelBridgeCopy:{flex:1},
+  hotelBridgeLabel:{color:colors.cinnamon,fontSize:9,fontWeight:"900",letterSpacing:1},
+  hotelBridgeTitle:{color:colors.text,fontSize:16,fontFamily:"serif",fontWeight:"600",marginTop:3},
+  hotelBridgeText:{color:colors.muted,fontSize:11,lineHeight:17,marginTop:4},
   label: {
     fontSize: 15,
     fontWeight: "700",
-    color: colors.text,
+    color: colors.cinnamon,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
     marginBottom: 8,
     marginTop: 14,
   },
@@ -227,10 +285,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 14,
-    padding: 14,
+    borderRadius: 16,
+    padding: 15,
     fontSize: 16,
     color: colors.text,
+    shadowColor: "#241F18",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
   },
   suggestionBox: {
     backgroundColor: colors.card,
@@ -279,10 +340,10 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: colors.primary,
     padding: 18,
-    borderRadius: 16,
+    borderRadius: 18,
     alignItems: "center",
     marginTop: 28,
-    marginBottom: 40,
+    marginBottom: 0,
   },
   buttonDisabled: {
     opacity: 0.7,

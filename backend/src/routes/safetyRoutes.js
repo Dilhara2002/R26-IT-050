@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import readline from "readline";
 import { spawn } from "child_process";
+import { fileURLToPath } from "url";
 
 import {
   getRouteDetails
@@ -15,6 +16,8 @@ import {
 
 
 import graphManager from "../ai-engine/knowledge-graph/graphManager.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 
 const router = express.Router();
@@ -746,6 +749,36 @@ const calculateHirePrice = (
 };
 
 
+const buildVehiclePriceQuote = (vehicle, distanceKm) => {
+  const baseCharge = toNumber(getField(vehicle, [
+    "BaseHireCharge",
+    "Base Hire Charge",
+    "Base_Hire_Charge",
+  ]));
+  const ratePerKm = toNumber(getField(vehicle, [
+    "RentalPricePerKM",
+    "Rental Price Per KM",
+    "Rental_Price_Per_KM",
+  ]));
+  const totalCost = calculateHirePrice(vehicle, distanceKm);
+
+  return {
+    status: totalCost === null ? "unavailable" : "dataset-baseline",
+    currency: "LKR",
+    distanceKm: Number(distanceKm.toFixed(2)),
+    baseCharge: baseCharge > 0 ? baseCharge : null,
+    ratePerKm: ratePerKm > 0 ? ratePerKm : null,
+    totalCost,
+    formula: "BaseHireCharge + (DistanceKM × RentalPricePerKM)",
+    source: "Vehicle research dataset",
+    sourceVerifiedAt: null,
+    isLiveMarketRate: false,
+    requiresAdminVerification: true,
+    limitation: "The model-level rate is an internal dataset baseline until an administrator verifies and dates it against a rental-provider source.",
+  };
+};
+
+
 const calculateVehicleSuitability = (
   vehicle,
   roadGradient
@@ -1178,6 +1211,25 @@ const buildMLInput = (
   };
 };
 
+const defaultSafetyDependencies = {
+  getRouteDetails,
+  getWeatherByCoordinates,
+  getRoadData,
+  graphManager,
+  runRiskPrediction,
+  loadCsvData,
+};
+
+let safetyDependencies = { ...defaultSafetyDependencies };
+
+const setSafetyRouteDependenciesForTesting = (overrides = {}) => {
+  safetyDependencies = { ...safetyDependencies, ...overrides };
+};
+
+const resetSafetyRouteDependenciesForTesting = () => {
+  safetyDependencies = { ...defaultSafetyDependencies };
+};
+
 
 // ==================================================
 // Main API
@@ -1289,7 +1341,7 @@ router.post(
       // ------------------------------------------------
 
       const routeDetails =
-        await getRouteDetails(
+        await safetyDependencies.getRouteDetails(
           startLocation,
           endLocation
         );
@@ -1329,7 +1381,7 @@ router.post(
       // ------------------------------------------------
 
       const weatherInfo =
-        await getWeatherByCoordinates(
+        await safetyDependencies.getWeatherByCoordinates(
           routeDetails
             .startCoordinates
             .latitude,
@@ -1352,7 +1404,7 @@ router.post(
       // ------------------------------------------------
 
       const roadInfo =
-        await getRoadData(
+        await safetyDependencies.getRoadData(
           startLocation,
           endLocation
         );
@@ -1413,10 +1465,10 @@ router.post(
           fetchedGraphContext,
           fetchedGraphReasoning,
         ] = await Promise.all([
-          graphManager.getMLRiskContext(
+          safetyDependencies.graphManager.getMLRiskContext(
             matchedRoadName
           ),
-          graphManager.getSafetyReasoning(
+          safetyDependencies.graphManager.getSafetyReasoning(
             matchedRoadName
           ),
         ]);
@@ -1458,7 +1510,7 @@ router.post(
       try {
 
         riskPrediction =
-          await runRiskPrediction(
+          await safetyDependencies.runRiskPrediction(
             mlInput
           );
 
@@ -1501,7 +1553,7 @@ router.post(
 
 
       const vehicles =
-        await loadCsvData(
+        await safetyDependencies.loadCsvData(
           vehiclePath
         );
 
@@ -1521,11 +1573,15 @@ router.post(
         vehicles.map(
           (vehicle) => {
 
-            const estimatedHirePrice =
-              calculateHirePrice(
+            const pricing =
+              buildVehiclePriceQuote(
                 vehicle,
                 distanceKm
               );
+
+
+            const estimatedHirePrice =
+              pricing.totalCost;
 
 
             const suitability =
@@ -1569,6 +1625,8 @@ router.post(
               calculatedCost:
                 estimatedHirePrice,
 
+              pricing,
+
               seatingCapacity,
 
               vehicleCategory,
@@ -1577,7 +1635,7 @@ router.post(
                 suitability,
 
               priceFormula:
-                "BaseHireCharge + (DistanceKM × RentalPricePerKM)",
+                pricing.formula,
 
               recommendationType:
                 "Rule-based vehicle suitability + dataset pricing",
@@ -1995,5 +2053,10 @@ router.post(
   }
 );
 
+
+export {
+  setSafetyRouteDependenciesForTesting,
+  resetSafetyRouteDependenciesForTesting,
+};
 
 export default router;

@@ -29,7 +29,7 @@ const getRiskStyle = (riskLevel) => {
     return {
       backgroundColor: "#FFFBEB",
       borderColor: "#FCD34D",
-      textColor: "#B45309",
+      textColor: "#A15B33",
     };
   }
 
@@ -46,6 +46,8 @@ export default function ResultScreen({
   errorMessage,
   onBack,
   onNewSearch,
+  onShowMap,
+  onReviewTrip,
 }) {
   if (!result) {
     return (
@@ -99,11 +101,34 @@ export default function ResultScreen({
   const probabilities =
     riskPrediction?.probabilities || {};
 
+  const explanation =
+    result?.explanation || {};
+
+  const riskExplanation =
+    explanation?.risk || {};
+
+  const vehicleExplanation =
+    explanation?.vehicleRecommendation ||
+    null;
+
+  const upsellExplanation =
+    explanation?.safetyUpsell ||
+    null;
+
   const bestVehicle =
     result?.bestVehicle ||
     result?.bestSafetyMatch ||
     null;
 
+  const routeResult = result?.routeResult || null;
+  const isRecommendedRoute =
+    routeResult?.selectedRouteMode === "lower-risk-recommended";
+  const isAnalyzedRoute =
+    routeResult?.selectedRouteMode === "default-analyzed-route";
+  const comparisonAvailable = Boolean(
+    routeResult?.comparisonAvailable && isRecommendedRoute
+  );
+  const selectedRoute = routeResult;
 
   return (
     <ScrollView
@@ -117,14 +142,13 @@ export default function ResultScreen({
       </TouchableOpacity>
 
 
-      <Text style={styles.title}>
-        Recommendation Result
-      </Text>
-
-      <Text style={styles.subtitle}>
-        Route-level ML risk classification with historical
-        Neo4j safety evidence.
-      </Text>
+      <View style={styles.hero}>
+        <Text style={styles.heroBadge}>✦ AI SAFETY ANALYSIS</Text>
+        <Text style={styles.title}>Your safer trip plan</Text>
+        <Text style={styles.subtitle}>
+          Route risk, historical safety evidence and vehicle guidance for your journey.
+        </Text>
+      </View>
 
 
       {/* -----------------------------------------
@@ -166,6 +190,12 @@ export default function ResultScreen({
               {confidence}%
             </Text>
           )}
+
+        <Text style={styles.modelText}>
+          {riskExplanation?.confidenceInterpretation ||
+            riskPrediction?.confidenceInterpretation ||
+            "Model confidence is the classifier's predicted-class probability, not a real-world accident probability."}
+        </Text>
 
         <Text style={styles.modelText}>
           Model:{" "}
@@ -219,6 +249,53 @@ export default function ResultScreen({
         )}
       </View>
 
+      <View style={styles.summaryCard}>
+        <Text style={styles.cardTitle}>
+          {isRecommendedRoute
+            ? "Recommended Lower-Risk Route"
+            : "Analyzed Route"}
+        </Text>
+
+        {selectedRoute ? (
+          <>
+            <Text style={styles.text}>From: {selectedRoute.startLocation}</Text>
+            <Text style={styles.text}>To: {selectedRoute.endLocation}</Text>
+            <Text style={styles.text}>Risk: {selectedRoute.predictedRiskLevel}</Text>
+            <Text style={styles.text}>Model Confidence: {selectedRoute.confidencePercent ?? "Unavailable"}%</Text>
+            <Text style={styles.text}>Distance: {selectedRoute.distanceKm} km</Text>
+            <Text style={styles.text}>Duration: {selectedRoute.durationMinutes} mins</Text>
+            <Text style={styles.text}>Evidence Status: {selectedRoute.evidenceStatus}</Text>
+            {comparisonAvailable && (
+              <Text style={styles.text}>
+                Compared with fastest route: {result?.comparison?.extraMinutesVsFastest ?? 0} mins, {result?.comparison?.extraDistanceKmVsFastest ?? 0} km
+              </Text>
+            )}
+            {isAnalyzedRoute && (
+              <Text style={styles.noticeText}>
+                Alternative lower-risk comparison unavailable.
+              </Text>
+            )}
+            <Text style={styles.contextNote}>{selectedRoute.explanation}</Text>
+            {!selectedRoute.vehicleUsesSelectedRoute && (
+              <Text style={styles.contextNote}>
+                Route-specific vehicle evidence is unavailable.
+              </Text>
+            )}
+            {selectedRoute.routeGeometryAvailable ? (
+              <TouchableOpacity style={styles.button} onPress={() => onShowMap(selectedRoute)}>
+                <Text style={styles.buttonText}>Show Route Map</Text>
+              </TouchableOpacity>
+            ) : (
+              <Text style={styles.contextNote}>Route geometry is unavailable.</Text>
+            )}
+          </>
+        ) : (
+          <Text style={styles.noticeText}>
+            Route analysis is unavailable.
+          </Text>
+        )}
+      </View>
+
 
       {/* -----------------------------------------
           TRIP SUMMARY
@@ -254,7 +331,11 @@ export default function ResultScreen({
 
         <Text style={styles.text}>
           Gradient:{" "}
-          {result?.analysis?.gradient}%
+          {result?.analysis?.gradient ?? "Unavailable"}
+          {result?.analysis?.gradient !== null &&
+            result?.analysis?.gradient !== undefined
+            ? "%"
+            : ""}
         </Text>
 
         <Text style={styles.text}>
@@ -269,7 +350,8 @@ export default function ResultScreen({
 
         <Text style={styles.text}>
           Weather:{" "}
-          {result?.analysis?.weather}
+          {result?.analysis?.weather ||
+            "Unavailable"}
         </Text>
 
         <Text style={styles.text}>
@@ -279,9 +361,16 @@ export default function ResultScreen({
 
         <Text style={styles.text}>
           Rain Detected:{" "}
-          {result?.analysis?.rainDetected
-            ? "Yes"
-            : "No"}
+          {result?.analysis?.rainDetected === null
+            ? "Unavailable"
+            : result?.analysis?.rainDetected
+              ? "Yes"
+              : "No"}
+        </Text>
+
+        <Text style={styles.contextNote}>
+          Weather is current trip context and is not an input
+          to the risk classifier.
         </Text>
       </View>
 
@@ -291,7 +380,16 @@ export default function ResultScreen({
       ----------------------------------------- */}
 
       <Text style={styles.sectionTitle}>
-        Vehicle Recommendation
+        Vehicle Recommendation for {comparisonAvailable
+          ? "Recommended Route"
+          : "Analyzed Route"}
+      </Text>
+
+      <Text style={styles.contextNote}>
+        {routeResult?.vehicleUsesSelectedRoute
+          ? `Vehicle recommendation is based on the road context of the ${comparisonAvailable ? "recommended evaluated" : "analyzed"} route.`
+          : result?.vehicleIntegration?.limitation ||
+            "Route-specific vehicle evidence is unavailable."}
       </Text>
 
 
@@ -299,6 +397,7 @@ export default function ResultScreen({
         <VehicleCard
           title="Best Vehicle Match"
           vehicle={bestVehicle}
+          onSelect={(vehicle) => onReviewTrip(vehicle, result)}
         />
       ) : (
         <View style={styles.noticeCard}>
@@ -314,6 +413,28 @@ export default function ResultScreen({
         </View>
       )}
 
+      {vehicleExplanation && (
+        <View style={styles.explanationCard}>
+          <Text style={styles.explanationTitle}>
+            Why This Vehicle
+          </Text>
+
+          <Text style={styles.text}>
+            {vehicleExplanation.reason}
+          </Text>
+
+          {vehicleExplanation?.ranking?.criteria && (
+            <Text style={styles.contextNote}>
+              Ranking for {vehicleExplanation.ranking.riskLevel} risk:
+              {" "}
+              {vehicleExplanation.ranking.criteria.join(
+                ", then "
+              )}.
+            </Text>
+          )}
+        </View>
+      )}
+
 
       {result?.alternativeOptions?.map(
         (vehicle, index) => (
@@ -321,17 +442,40 @@ export default function ResultScreen({
             key={`alternative-${index}`}
             title={`Alternative Option ${index + 1}`}
             vehicle={vehicle}
+            onSelect={(selectedVehicle) => onReviewTrip(selectedVehicle, result)}
           />
         )
       )}
 
 
       {result?.safetyUpsell && (
-        <VehicleCard
-          title="Safer / Higher Capability Option"
-          vehicle={result.safetyUpsell}
-        />
+        <>
+          <VehicleCard
+            title="Higher Road-Capability Option"
+            vehicle={result.safetyUpsell}
+            onSelect={(vehicle) => onReviewTrip(vehicle, result)}
+          />
+
+          {upsellExplanation?.reason && (
+            <View style={styles.explanationCard}>
+              <Text style={styles.explanationTitle}>
+                Why This Option Is Shown
+              </Text>
+
+              <Text style={styles.text}>
+                {upsellExplanation.reason}
+              </Text>
+            </View>
+          )}
+        </>
       )}
+
+      {!result?.safetyUpsell &&
+        upsellExplanation?.reason && (
+          <Text style={styles.contextNote}>
+            {upsellExplanation.reason}
+          </Text>
+        )}
 
 
       {/* -----------------------------------------
@@ -357,6 +501,12 @@ export default function ResultScreen({
           Graph Match Type:{" "}
           {result?.graphRAG?.matchType ||
             "Unknown"}
+        </Text>
+
+        <Text style={styles.graphMeta}>
+          Historical graph context supports retrieval and may
+          populate named model inputs when available; it does not
+          independently override the classifier result.
         </Text>
       </View>
 
@@ -399,7 +549,11 @@ const styles = StyleSheet.create({
   },
 
   contentContainer: {
+    width: "100%",
+    maxWidth: 800,
+    alignSelf: "center",
     padding: 20,
+    paddingBottom: 48,
   },
 
   backText: {
@@ -411,17 +565,36 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: colors.primaryDark,
+    fontSize: 32,
+    lineHeight: 39,
+    fontWeight: "600",
+    fontFamily: "serif",
+    color: "#FFFFFF",
+    marginTop: 13,
   },
 
   subtitle: {
     fontSize: 15,
-    color: colors.muted,
-    marginTop: 6,
-    marginBottom: 24,
+    color: "#E7DBBA",
+    marginTop: 8,
     lineHeight: 22,
+  },
+  hero: {
+    backgroundColor: colors.primaryDark,
+    borderRadius: 26,
+    padding: 25,
+    marginBottom: 16,
+  },
+  heroBadge: {
+    alignSelf: "flex-start",
+    color: "#D89A1F",
+    backgroundColor: "rgba(255,255,255,0.12)",
+    borderRadius: 20,
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+    fontSize: 10,
+    fontWeight: "900",
+    letterSpacing: 1.2,
   },
 
   riskPredictionCard: {
@@ -481,21 +654,23 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 10,
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 14,
   },
 
   cardTitle: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: "600",
+    fontFamily: "serif",
     color: colors.text,
     marginBottom: 10,
   },
 
   sectionTitle: {
     fontSize: 22,
-    fontWeight: "bold",
+    fontWeight: "600",
+    fontFamily: "serif",
     color: colors.primaryDark,
     marginTop: 20,
     marginBottom: 2,
@@ -530,10 +705,33 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
 
-  graphCard: {
-    backgroundColor: "#F0FDFA",
+  explanationCard: {
+    backgroundColor: "#F1E9D2",
+    borderColor: colors.border,
     borderWidth: 1,
-    borderColor: "#99F6E4",
+    padding: 16,
+    borderRadius: 20,
+    marginTop: 14,
+  },
+
+  explanationTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: colors.primaryDark,
+    marginBottom: 7,
+  },
+
+  contextNote: {
+    fontSize: 13,
+    color: colors.muted,
+    lineHeight: 19,
+    marginTop: 6,
+  },
+
+  graphCard: {
+    backgroundColor: "#E7DBBA",
+    borderWidth: 1,
+    borderColor: "#C9B98F",
     borderRadius: 18,
     padding: 18,
     marginTop: 22,
@@ -541,7 +739,8 @@ const styles = StyleSheet.create({
 
   graphTitle: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: "600",
+    fontFamily: "serif",
     color: colors.primaryDark,
     marginBottom: 10,
   },

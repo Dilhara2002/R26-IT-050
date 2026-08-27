@@ -1,5 +1,9 @@
 node_modules/
 venv/
+.venv/
+.venv311/
+.venv312/
+__pycache__/
 .env
 dist/
 build/
