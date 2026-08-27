@@ -1,5 +1,54 @@
+# Frontend
 frontend/node_modules/
 frontend/.expo/
 frontend/expo-env.d.ts
+
+# Backend
 backend/.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+
+# Build / distribution
+build/
+dist/
+downloads/
+lib/
+lib64/
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+myvenv/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# Testing / coverage
+.cache/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# IDE / editor
+.vscode/
+.idea/
+
+# OS files
 .DS_Store
+Thumbs.db

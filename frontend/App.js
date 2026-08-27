@@ -29,7 +29,7 @@ import HomeScreen from "./src/screens/HomeScreen";
 import TripInputScreen from "./src/screens/TripInputScreen";
 import ResultScreen from "./src/screens/ResultScreen";
 import MapScreen from "./screens/MapScreen";
-
+import LandmarkScannerScreen from "./screens/LandmarkScannerScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -179,16 +179,17 @@ function SafetyFlow() {
 
 
       {screen === "home" && (
-
         <HomeScreen
-          onStart={() =>
-            setScreen("form")
-          }
+          onStart={() => setScreen("form")}
+          onOpenLandmark={() => setScreen("landmark")}
         />
-
       )}
 
-
+      {screen === "landmark" && (
+        <LandmarkScannerScreen
+          onBack={() => setScreen("home")}
+        />
+      )}
 
       {screen === "form" && (
 
@@ -284,11 +285,18 @@ export default function App() {
 
 
         <Stack.Screen
-
           name="Map"
-
           component={MapScreen}
+        />
 
+        <Stack.Screen
+          name="LandmarkScanner"
+          component={LandmarkScannerScreen}
+          options={{
+            title: "Landmark Scanner",
+            headerStyle: { backgroundColor: "#1D4ED8" },
+            headerTintColor: "#FFFFFF",
+          }}
         />
 
 
