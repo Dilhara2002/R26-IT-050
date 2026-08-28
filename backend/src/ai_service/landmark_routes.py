@@ -1,6 +1,7 @@
 import os
 import io
 import json
+import requests
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -20,6 +21,8 @@ SVM_PATH     = os.path.join(MODELS_DIR, 'svm_landmark_classifier.joblib')
 SCALER_PATH  = os.path.join(MODELS_DIR, 'svm_scaler.joblib')
 LABELS_PATH  = os.path.join(MODELS_DIR, 'labels.txt')
 CSV_PATH     = os.path.join(DATA_DIR,   'Sri_Lankan_Landmark.csv')
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 #  Load class names from labels.txt
 with open(LABELS_PATH, 'r', encoding='utf-8') as f:
@@ -53,8 +56,13 @@ CLASS_TO_CSV_SEARCH = {
 df_landmarks = pd.read_csv(CSV_PATH, encoding='utf-8').fillna("")
 
 def lookup_metadata(class_name: str) -> dict:
+    if not class_name:
+        return {}
     search_term = CLASS_TO_CSV_SEARCH.get(class_name, class_name.replace('_', ' '))
     rows = df_landmarks[df_landmarks['Landmark Name'].str.contains(search_term, case=False, na=False)]
+    if rows.empty:
+        # Fallback: general query match across description or name
+        rows = df_landmarks[df_landmarks['Landmark Name'].str.contains(class_name, case=False, na=False)]
     if rows.empty:
         return {}
     row = rows.iloc[0]
@@ -91,7 +99,6 @@ try:
     from tensorflow.keras.applications import MobileNetV2
     from tensorflow.keras import layers, models as keras_models
 
-    # Build feature extractor identical to training
     _input = layers.Input(shape=(224, 224, 3))
     _x = tf.keras.applications.mobilenet_v2.preprocess_input(_input)
     _base = MobileNetV2(input_shape=(224, 224, 3), include_top=False, weights='imagenet')
@@ -111,23 +118,127 @@ except Exception as e:
 IMG_SIZE = (224, 224)
 
 def preprocess_image_np(image_bytes: bytes) -> np.ndarray:
-    # Load image bytes, resize, and return (1,224,224,3) float32 array in [0,255]
     img = Image.open(io.BytesIO(image_bytes)).convert('RGB').resize(IMG_SIZE)
-    arr = np.array(img, dtype=np.float32)                     # (224,224,3)
-    return np.expand_dims(arr, axis=0)                        # (1,224,224,3)
+    arr = np.array(img, dtype=np.float32)
+    return np.expand_dims(arr, axis=0)
 
 def predict_tflite(img_batch: np.ndarray) -> np.ndarray:
-    normalized = img_batch / 255.0                            # TFLite model expects [0,1]
+    normalized = img_batch / 255.0
     tflite_interpreter.set_tensor(input_details[0]['index'], normalized.astype(np.float32))
     tflite_interpreter.invoke()
-    return tflite_interpreter.get_tensor(output_details[0]['index'])[0]  # (num_classes,)
+    return tflite_interpreter.get_tensor(output_details[0]['index'])[0]
 
 def predict_svm(img_batch: np.ndarray) -> np.ndarray:
-    # Run MobileNetV2 feature extraction then SVM inference
-    features = _feature_model.predict(img_batch, verbose=0)   # (1, 1280)
-    scaled   = svm_scaler.transform(features)                  # (1, 1280)
-    proba    = svm_model.predict_proba(scaled)[0]              # (num_classes,)
+    features = _feature_model.predict(img_batch, verbose=0)
+    scaled   = svm_scaler.transform(features)
+    proba    = svm_model.predict_proba(scaled)[0]
     return proba
+
+#  RAG & Gemini Tour Guide Chatbot Logic
+def generate_local_rule_response(query: str, meta: dict) -> str:
+    """Intelligent rule-based fallback when Gemini API is offline."""
+    q = query.lower()
+    name = meta.get("landmark_name", "this landmark")
+    
+    if any(w in q for w in ["ticket", "price", "fee", "cost", "how much"]):
+        price = meta.get("ticket_price", "Standard entry rates apply.")
+        hours = meta.get("opening_hours", "Check locally for opening hours.")
+        return f"🎟️ **Ticket Information for {name}**:\n- **Foreign Ticket Price:** {price}\n- **Opening Hours:** {hours}"
+    
+    if any(w in q for w in ["time", "hour", "open", "close", "duration", "how long", "when"]):
+        hours = meta.get("opening_hours", "N/A")
+        dur = meta.get("visit_duration", "1-2 hours")
+        best = meta.get("best_time_to_visit", "Morning or late afternoon")
+        return f"⏰ **Visiting Hours & Timing for {name}**:\n- **Opening Hours:** {hours}\n- **Average Visit Duration:** {dur}\n- **Best Time to Visit:** {best}"
+    
+    if any(w in q for w in ["hotel", "restaurant", "food", "eat", "stay", "nearby"]):
+        hotels = meta.get("nearby_hotels", "Various local guesthouses available.")
+        rests = meta.get("nearby_restaurants", "Local cafes and eateries nearby.")
+        attract = meta.get("nearby_attractions", "N/A")
+        return f"🏨 **Nearby Places around {name}**:\n- **Hotels:** {hotels}\n- **Restaurants:** {rests}\n- **Nearby Attractions:** {attract}"
+    
+    if any(w in q for w in ["history", "built", "who built", "founder", "king", "period", "old", "age"]):
+        hist = meta.get("history", meta.get("description", ""))
+        builder = meta.get("built_by", "Ancient rulers")
+        period = meta.get("year_built", "Historical period")
+        signif = meta.get("significance", "")
+        return f"🏛️ **History of {name}**:\n{hist}\n\n- **Built By:** {builder}\n- **Historical Period:** {period}\n- **Significance:** {signif}"
+    
+    if any(w in q for w in ["dress", "wear", "cloth", "rule", "shoes", "temple"]):
+        cat = meta.get("category", "").lower()
+        if "temple" in cat or "religious" in cat or "buddhist" in cat or "hindu" in cat:
+            return f"👗 **Dress Code & Etiquette for {name}**:\n- Please wear white or modest clothing that covers your shoulders and knees.\n- Remove hats, caps, and footwear before entering the sacred premises.\n- Avoid posing with your back directly turned to Buddha statues for photographs."
+        return f"🎒 **Tips for visiting {name}**:\n- Wear comfortable footwear and lightweight breathable clothing.\n- Carry sunscreen, a hat, and plenty of drinking water."
+
+    desc = meta.get("description", "A renowned Sri Lankan landmark.")
+    loc = meta.get("province_district", "Sri Lanka")
+    return f"🌟 **About {name}** ({loc}):\n{desc}\n\nAsk me about opening hours, ticket prices, history, dress code, or nearby hotels and restaurants!"
+
+
+def call_gemini_tour_guide(query: str, meta: dict, history: list) -> str:
+    api_key = os.getenv("GEMINI_API_KEY") or GEMINI_API_KEY
+    if not api_key:
+        return generate_local_rule_response(query, meta)
+
+    # Context formatting
+    context_str = "\n".join([f"{k.replace('_', ' ').title()}: {v}" for k, v in meta.items() if v])
+    
+    system_instruction = f"""
+You are "Ayubowan AI", a warm, polite, and knowledgeable Sri Lankan Tour Guide chatbot.
+You assist travelers and tourists visiting Sri Lankan landmarks.
+
+VERIFIED LANDMARK KNOWLEDGE BASE:
+{context_str if context_str else "General Sri Lankan Tourism"}
+
+GUIDELINES:
+1. Answer the user's question clearly, warmly, and concisely based on the verified knowledge base above whenever relevant.
+2. If the user asks about tickets, hours, dress codes, or history, provide exact facts from the database.
+3. For religious/sacred places (Temples, Kovils, Stupas), always remind visitors about respectful dress codes (cover shoulders/knees, remove shoes).
+4. Use polite bullet points and formatting where appropriate.
+5. Keep responses engaging, accurate, and easy to read on a mobile screen.
+"""
+
+    prompt = f"User Question: {query}\n\nPlease give a helpful, concise tourist response."
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    
+    # Build contents with optional chat history
+    contents = []
+    
+    # Add system context in the first user turn if history exists
+    if history and isinstance(history, list):
+        for item in history[-6:]: # Keep last 3 turns
+            role = item.get("role", "user")
+            gemini_role = "user" if role == "user" else "model"
+            text = item.get("text", "")
+            if text:
+                contents.append({"role": gemini_role, "parts": [{"text": text}]})
+    
+    # Append current message with system instructions
+    combined_message = f"[SYSTEM CONTEXT]\n{system_instruction}\n\n[USER QUERY]\n{query}"
+    contents.append({"role": "user", "parts": [{"text": combined_message}]})
+
+    try:
+        response = requests.post(
+            url,
+            headers={'Content-Type': 'application/json'},
+            json={"contents": contents},
+            timeout=8
+        )
+        if response.status_code == 200:
+            res_json = response.json()
+            return res_json['candidates'][0]['content']['parts'][0]['text']
+        else:
+            # Fallback to flash-latest or local rules
+            fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={api_key}"
+            res2 = requests.post(fallback_url, headers={'Content-Type': 'application/json'}, json={"contents": contents}, timeout=8)
+            if res2.status_code == 200:
+                return res2.json()['candidates'][0]['content']['parts'][0]['text']
+            return generate_local_rule_response(query, meta)
+    except Exception as e:
+        print(f"[Landmark Chat] Gemini API error: {e}")
+        return generate_local_rule_response(query, meta)
+
 
 #  Routes
 @landmark_bp.route('/api/landmark/predict', methods=['POST'])
@@ -141,7 +252,7 @@ def predict():
 
     try:
         image_bytes = file.read()
-        img_batch   = preprocess_image_np(image_bytes)         # (1,224,224,3)
+        img_batch   = preprocess_image_np(image_bytes)
 
         # Select inference mode
         mode = request.args.get('mode', 'svm').lower()
@@ -165,11 +276,48 @@ def predict():
             "status":        "success",
             "engine":        engine_used,
             "class_id":      predicted_class,
-            "confidence":    round(confidence * 100, 2),      # percentage
+            "confidence":    round(confidence * 100, 2),
             "metadata":      metadata
         }
 
         return jsonify(response), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@landmark_bp.route('/api/landmark/chat', methods=['POST'])
+def chat():
+    try:
+        data = request.get_json() or {}
+        user_message = data.get("message", "").strip()
+        landmark_name = data.get("landmark_name", "").strip()
+        history = data.get("history", [])
+
+        if not user_message:
+            return jsonify({"error": "Message is required."}), 400
+
+        # Retrieve metadata for the landmark
+        meta = lookup_metadata(landmark_name) if landmark_name else {}
+        
+        # If no specific landmark is provided, try extracting landmark from message
+        if not meta:
+            for cls in CLASS_NAMES:
+                search_term = CLASS_TO_CSV_SEARCH.get(cls, cls.replace('_', ' ')).lower()
+                if search_term in user_message.lower():
+                    meta = lookup_metadata(cls)
+                    landmark_name = meta.get("landmark_name", cls)
+                    break
+
+        # Generate response via Gemini or rule-based fallback
+        bot_reply = call_gemini_tour_guide(user_message, meta, history)
+
+        return jsonify({
+            "status": "success",
+            "reply": bot_reply,
+            "landmark_name": meta.get("landmark_name", landmark_name),
+            "category": meta.get("category", "")
+        }), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
