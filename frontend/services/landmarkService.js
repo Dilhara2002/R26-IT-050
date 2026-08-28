@@ -53,3 +53,36 @@ export async function fetchSupportedLandmarks() {
   if (!response.ok) throw new Error("Could not fetch landmark list.");
   return data;
 }
+
+/**
+ * Send a chat message to the AI Tour Guide Bot.
+ *
+ * @param {string} message - User query
+ * @param {string} landmarkName - Landmark name or class_id for context
+ * @param {Array} history - Array of { role: 'user'|'assistant', text: string }
+ * @returns {Promise<object>} API response JSON
+ */
+export async function sendLandmarkChatMessage(message, landmarkName = "", history = []) {
+  const url = `${AI_SERVICE_BASE_URL}/api/landmark/chat`;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      message,
+      landmark_name: landmarkName,
+      history,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || data.error) {
+    throw new Error(data.error || "Tour guide bot is currently unavailable.");
+  }
+
+  return data;
+}

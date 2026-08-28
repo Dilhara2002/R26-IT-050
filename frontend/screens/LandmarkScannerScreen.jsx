@@ -50,7 +50,7 @@ function SectionCard({ icon, title, children }) {
 }
 
 //  Main Screen
-export default function LandmarkScannerScreen({ onBack, navigation }) {
+export default function LandmarkScannerScreen({ onBack, onOpenChat, navigation }) {
   const [imageUri, setImageUri]   = useState(null);
   const [imageAsset, setImageAsset] = useState(null);
   const [loading, setLoading]     = useState(false);
@@ -61,6 +61,15 @@ export default function LandmarkScannerScreen({ onBack, navigation }) {
       onBack();
     } else if (navigation && navigation.goBack) {
       navigation.goBack();
+    }
+  };
+
+  const handleOpenChat = (customContext = null) => {
+    const context = customContext || result?.metadata || (result?.class_id ? { landmark_name: result.class_id.replace(/_/g, " ") } : {});
+    if (onOpenChat) {
+      onOpenChat(context);
+    } else if (navigation && navigation.navigate) {
+      navigation.navigate("LandmarkChat", { landmarkContext: context });
     }
   };
 
@@ -149,7 +158,15 @@ export default function LandmarkScannerScreen({ onBack, navigation }) {
               <Text style={styles.backBtnText}>← Back</Text>
             </Pressable>
           )}
-          <Text style={styles.aiBadge}>✦ AI Vision</Text>
+          <View style={styles.heroRightActions}>
+            <Pressable
+              style={({ pressed }) => [styles.chatGuideBtn, pressed && styles.pressed]}
+              onPress={() => handleOpenChat()}
+            >
+              <Text style={styles.chatGuideBtnText}>💬 AI Tour Guide</Text>
+            </Pressable>
+            <Text style={styles.aiBadge}>✦ AI Vision</Text>
+          </View>
         </View>
         <Text style={styles.heroTitle}>Landmark Scanner</Text>
         <Text style={styles.heroSubtitle}>
@@ -230,16 +247,23 @@ export default function LandmarkScannerScreen({ onBack, navigation }) {
             </View>
           </View>
 
-          {/* Google Maps button */}
-          {meta.gps_coordinates !== "" && (
+          {/* Action Buttons Row */}
+          <View style={styles.actionButtonsRow}>
+            {meta.gps_coordinates !== "" && (
+              <Pressable
+                style={({ pressed }) => [styles.actionBtn, styles.mapsBtn, pressed && styles.pressed]}
+                onPress={() => openGoogleMaps(meta.gps_coordinates)}
+              >
+                <Text style={styles.actionBtnText}>🗺️ Maps</Text>
+              </Pressable>
+            )}
             <Pressable
-              style={({ pressed }) => [styles.mapsBtn, pressed && styles.pressed]}
-              onPress={() => openGoogleMaps(meta.gps_coordinates)}
+              style={({ pressed }) => [styles.actionBtn, styles.chatActionBtn, pressed && styles.pressed]}
+              onPress={() => handleOpenChat()}
             >
-              <Text style={styles.mapsBtnText}>View on Google Maps</Text>
-              <Text style={styles.mapsBtnIcon}>🗺️</Text>
+              <Text style={styles.actionBtnText}>💬 Chat Guide</Text>
             </Pressable>
-          )}
+          </View>
 
           {/* About */}
           {meta.description !== "" && (
@@ -306,6 +330,22 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
+  },
+  heroRightActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  chatGuideBtn: {
+    backgroundColor: "rgba(255,255,255,0.22)",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
+  },
+  chatGuideBtnText: {
+    color: "#FFFFFF",
+    fontWeight: "800",
+    fontSize: 12,
   },
   backBtn: {
     backgroundColor: "rgba(255,255,255,0.22)",
@@ -384,14 +424,32 @@ const styles = StyleSheet.create({
   resultCategory:  { color: "#BFDBFE", fontWeight: "700", fontSize: 12, marginBottom: 2 },
   resultLocation:  { color: "#DBEAFE", fontSize: 13, fontWeight: "600" },
 
-  // Maps button
-  mapsBtn: {
-    backgroundColor: "#0EA5E9", borderRadius: 18,
-    paddingVertical: 14, marginBottom: 14,
-    flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 8,
+  // Action Buttons Row (Maps & Chat)
+  actionButtonsRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 14,
   },
-  mapsBtnText: { color: "#FFFFFF", fontWeight: "900", fontSize: 15 },
-  mapsBtnIcon: { fontSize: 18 },
+  actionBtn: {
+    flex: 1,
+    borderRadius: 18,
+    paddingVertical: 14,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+  },
+  actionBtnText: {
+    color: "#FFFFFF",
+    fontWeight: "900",
+    fontSize: 14,
+  },
+  mapsBtn: {
+    backgroundColor: "#0EA5E9",
+  },
+  chatActionBtn: {
+    backgroundColor: "#7C3AED",
+  },
 
   // Section cards
   sectionCard: {
