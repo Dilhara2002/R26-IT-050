@@ -1,4 +1,4 @@
-const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:5001/api";
+const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
 
 export async function generateTourismPackage(prompt) {
   if (!prompt || !prompt.trim()) {
