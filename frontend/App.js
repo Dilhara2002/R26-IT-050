@@ -30,154 +30,72 @@ import TripInputScreen from "./src/screens/TripInputScreen";
 import ResultScreen from "./src/screens/ResultScreen";
 import MapScreen from "./screens/MapScreen";
 import LandmarkScannerScreen from "./screens/LandmarkScannerScreen";
+import LandmarkChatScreen from "./screens/LandmarkChatScreen";
 
 const Stack = createNativeStackNavigator();
 
 
 
 function SafetyFlow() {
-
-
   const [screen, setScreen] = useState("home");
-
+  const [chatContext, setChatContext] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const [result, setResult] = useState(null);
-
   const [errorMessage, setErrorMessage] = useState("");
 
-
   const [form, setForm] = useState({
-
     budget: "",
     passengers: "",
-
     startLocation: "",
     endLocation: "",
-
     preferredCategory: "",
-
   });
 
-
-
   const handleSubmit = async () => {
-
-
     try {
-
       setLoading(true);
-
       setResult(null);
-
       setErrorMessage("");
 
-
-
-      const response =
-        await getVehicleRecommendation({
-
-          budget: Number(form.budget),
-
-          passengers: Number(form.passengers),
-
-          startLocation:
-            form.startLocation.trim(),
-
-          endLocation:
-            form.endLocation.trim(),
-
-          preferredCategory:
-            form.preferredCategory.trim(),
-
-        });
-
-
+      const response = await getVehicleRecommendation({
+        budget: Number(form.budget),
+        passengers: Number(form.passengers),
+        startLocation: form.startLocation.trim(),
+        endLocation: form.endLocation.trim(),
+        preferredCategory: form.preferredCategory.trim(),
+      });
 
       if (!response) {
-
-        setErrorMessage(
-          "No response received from backend."
-        );
-
+        setErrorMessage("No response received from backend.");
         setScreen("result");
-
         return;
-
       }
 
-
-
-      if (
-        response.success === false ||
-        response.error === true
-      ) {
-
-        setErrorMessage(
-          response.message ||
-          "Recommendation failed."
-        );
-
+      if (response.success === false || response.error === true) {
+        setErrorMessage(response.message || "Recommendation failed.");
         setScreen("result");
-
         return;
-
       }
-
-
 
       if (!response.riskPrediction) {
-
-        setErrorMessage(
-          "Invalid backend response."
-        );
-
+        setErrorMessage("Invalid backend response.");
         setScreen("result");
-
         return;
-
       }
 
-
-
       setResult(response);
-
       setScreen("result");
-
-
-
     } catch(error) {
-
-
-      const message =
-        error?.message ||
-        "Something went wrong";
-
-
+      const message = error?.message || "Something went wrong";
       setErrorMessage(message);
-
-
-      Alert.alert(
-        "Recommendation Error",
-        message
-      );
-
-
+      Alert.alert("Recommendation Error", message);
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
-
-
   return (
-
     <SafeAreaView style={styles.container}>
-
-
       {screen === "home" && (
         <HomeScreen
           onStart={() => setScreen("form")}
@@ -188,101 +106,61 @@ function SafetyFlow() {
       {screen === "landmark" && (
         <LandmarkScannerScreen
           onBack={() => setScreen("home")}
+          onOpenChat={(context) => {
+            setChatContext(context);
+            setScreen("chat");
+          }}
+        />
+      )}
+
+      {screen === "chat" && (
+        <LandmarkChatScreen
+          landmarkContext={chatContext}
+          onBack={() => setScreen("landmark")}
         />
       )}
 
       {screen === "form" && (
-
         <TripInputScreen
-
           form={form}
-
           setForm={setForm}
-
           loading={loading}
-
           onSubmit={handleSubmit}
-
-          onBack={() =>
-            setScreen("home")
-          }
-
+          onBack={() => setScreen("home")}
         />
-
       )}
-
-
 
       {screen === "result" && (
-
         <ResultScreen
-
           result={result}
-
           errorMessage={errorMessage}
-
-          onBack={() =>
-            setScreen("form")
-          }
-
-          onNewSearch={() =>
-            setScreen("home")
-          }
-
+          onBack={() => setScreen("form")}
+          onNewSearch={() => setScreen("home")}
         />
-
       )}
-
-
 
       {loading && (
-
         <ActivityIndicator
-
           style={styles.loader}
-
           color={colors.primary}
-
           size="large"
-
         />
-
       )}
-
-
-
     </SafeAreaView>
-
   );
-
 }
 
-
-
-
 export default function App() {
-
-
   return (
-
     <NavigationContainer>
-
-
       <Stack.Navigator>
-
-
         <Stack.Screen
-
           name="Safety"
-
           component={SafetyFlow}
-
           options={{
-            headerShown:false
+            headerShown: false,
           }}
-
         />
-
 
         <Stack.Screen
           name="Map"
@@ -299,14 +177,18 @@ export default function App() {
           }}
         />
 
-
+        <Stack.Screen
+          name="LandmarkChat"
+          component={LandmarkChatScreen}
+          options={{
+            title: "AI Tour Guide",
+            headerStyle: { backgroundColor: "#1D4ED8" },
+            headerTintColor: "#FFFFFF",
+          }}
+        />
       </Stack.Navigator>
-
-
     </NavigationContainer>
-
   );
-
 }
 
 
