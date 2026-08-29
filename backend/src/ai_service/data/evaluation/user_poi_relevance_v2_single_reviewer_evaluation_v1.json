@@ -1,0 +1,187 @@
+{
+  "activation_gate": {
+    "conditions": {
+      "accuracy_at_least_0_80": {
+        "passed": false,
+        "threshold": 0.8,
+        "value": 0.6
+      },
+      "balanced_accuracy_at_least_0_70": {
+        "passed": false,
+        "threshold": 0.7,
+        "value": 0.6491228070175439
+      },
+      "macro_f1_at_least_0_65": {
+        "passed": false,
+        "threshold": 0.65,
+        "value": 0.5774891774891775
+      },
+      "recall_at_least_0_50_every_represented_class": {
+        "passed": false,
+        "threshold": 0.5,
+        "values": {
+          "0": 1.0,
+          "1": 0.5,
+          "2": 0.4473684210526316
+        }
+      }
+    },
+    "passed": false
+  },
+  "bootstrap": {
+    "method": "fixed-seed stratified nonparametric bootstrap",
+    "samples": 5000,
+    "seed": 42
+  },
+  "bootstrap_95_percent": {
+    "accuracy": {
+      "lower_95": 0.5,
+      "upper_95": 0.7
+    },
+    "balanced_accuracy": {
+      "lower_95": 0.5116959064327485,
+      "upper_95": 0.7865497076023392
+    },
+    "macro_f1": {
+      "lower_95": 0.48676236044657095,
+      "upper_95": 0.6717582770813243
+    }
+  },
+  "candidate": {
+    "artifact_sha256": "f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913",
+    "classifier": "Linear SVM",
+    "metadata_sha256": "69c99cf606a21f79538650a76f751cf32c7ce878c0d094c14d961d01421a5586",
+    "model_version": "v2_candidate",
+    "path": "C:\\projects\\Research\\R26-IT-050\\backend\\src\\ai_service\\models\\user_poi_relevance_v2_candidate.joblib",
+    "refit_or_retuning_performed": false,
+    "training_rows": 680,
+    "training_supervision": "rule_derived_weak_supervision_not_human"
+  },
+  "evaluation_id": "central_province_v2_single_reviewer_extension_v1",
+  "evaluation_status": "completed_once_frozen",
+  "metrics": {
+    "accuracy": 0.6,
+    "actual_distribution": {
+      "0": 16,
+      "1": 6,
+      "2": 38
+    },
+    "balanced_accuracy": 0.6491228070175439,
+    "confusion_matrix": [
+      [
+        16,
+        0,
+        0
+      ],
+      [
+        3,
+        3,
+        0
+      ],
+      [
+        0,
+        21,
+        17
+      ]
+    ],
+    "correct": 36,
+    "macro_f1": 0.5774891774891775,
+    "per_class": {
+      "0": {
+        "f1": 0.9142857142857143,
+        "precision": 0.8421052631578947,
+        "recall": 1.0,
+        "support": 16
+      },
+      "1": {
+        "f1": 0.2,
+        "precision": 0.125,
+        "recall": 0.5,
+        "support": 6
+      },
+      "2": {
+        "f1": 0.6181818181818182,
+        "precision": 1.0,
+        "recall": 0.4473684210526316,
+        "support": 38
+      }
+    },
+    "predicted_distribution": {
+      "0": 19,
+      "1": 24,
+      "2": 17
+    },
+    "total": 60,
+    "weighted_f1": 0.6553246753246753
+  },
+  "misclassified_judgement_ids": [
+    "P08::wikidata-Q37700",
+    "P13::wikidata-Q97262496",
+    "P13::wikidata-Q65949703",
+    "P13::wikidata-Q5640438",
+    "P08::wikidata-Q23585049",
+    "P13::wikidata-Q37551",
+    "P08::wikidata-Q18915186",
+    "P13::wikidata-Q38350",
+    "P08::wikidata-Q37551",
+    "P13::wikidata-Q25104534",
+    "P06::osm-node-2714398529",
+    "P13::wikidata-Q23585049",
+    "P06::wikidata-Q37551",
+    "P08::wikidata-Q97262496",
+    "P13::wikidata-Q37700",
+    "P08::wikidata-Q5640438",
+    "P08::wikidata-Q19710937",
+    "P08::wikidata-Q1146327",
+    "P13::wikidata-Q18915186",
+    "P13::wikidata-Q1146327",
+    "P06::wikidata-Q38350",
+    "P13::wikidata-Q19710937",
+    "P08::wikidata-Q38350",
+    "P08::wikidata-Q25104534"
+  ],
+  "scope": {
+    "districts": [
+      "Matale",
+      "Nuwara Eliya"
+    ],
+    "heldout_profiles": [
+      "P06",
+      "P08",
+      "P13"
+    ],
+    "not_combined_with_kandy_reference": true,
+    "reviewer_status": "single_human_reviewer",
+    "rows": 60,
+    "verified_pois": 20
+  },
+  "workbook": {
+    "path": "C:\\Users\\user\\Downloads\\reviewer_a_central_extension_60_completed.xlsx",
+    "sha256": "2bc4408f840087a152fecefb2a933ab1746177b72b599dc8f8c90a8668379a4a",
+    "validation": {
+      "duplicate_profile_poi_pairs": 0,
+      "human_label_distribution": {
+        "0": 16,
+        "1": 6,
+        "2": 38
+      },
+      "judgements_by_district": {
+        "Matale": 30,
+        "Nuwara Eliya": 30
+      },
+      "profiles": [
+        "P06",
+        "P08",
+        "P13"
+      ],
+      "rows": 60,
+      "training_profile_leakage": [],
+      "unique_judgement_ids": 60,
+      "unique_pois": 20,
+      "unique_pois_by_district": {
+        "Matale": 10,
+        "Nuwara Eliya": 10
+      }
+    }
+  }
+}

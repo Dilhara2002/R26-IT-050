@@ -1,0 +1,229 @@
+{
+  "artifact_sha256": "5a2d19d94b4867b17d037a58b941aafd779f68b2cd175d34d76a457c404a6910",
+  "classes": [
+    0,
+    1,
+    2
+  ],
+  "classifier": "Linear SVM",
+  "created_at_utc": "2026-08-27T22:09:34.314207+00:00",
+  "cv_method": "4-fold StratifiedGroupKFold by profile_id",
+  "dataset_hashes": {
+    "frozen_split_csv": "462a9154442e45d7d2ab1b5485aec50f8cf40de6ca70769ca6e6b840839da182",
+    "human_heldout_csv": "8ab1c0b0c9a598e54f60bb17470db1f5069f158d5f662d8ab7b5afc066bcf676",
+    "weak_training_csv": "d4d687689e4c4898ddadb46fa1e924634470d51b045824a4613c670993fada66"
+  },
+  "excluded_leakage_fields": [
+    "adjudication_note",
+    "decision_type",
+    "final_adjudicated_label",
+    "final_relevance_label",
+    "interest_coverage",
+    "judgement_id",
+    "overlap_set",
+    "place_id",
+    "profile_id",
+    "reviewer_a_label",
+    "reviewer_b_label",
+    "row_order",
+    "weak_label"
+  ],
+  "heldout_metrics": {
+    "accuracy": 0.6833333333333333,
+    "actual_distribution": {
+      "0": 34,
+      "1": 10,
+      "2": 16
+    },
+    "balanced_accuracy": 0.5651960784313725,
+    "confusion_matrix": [
+      [
+        33,
+        1,
+        0
+      ],
+      [
+        3,
+        6,
+        1
+      ],
+      [
+        6,
+        8,
+        2
+      ]
+    ],
+    "macro_f1": 0.5196491228070176,
+    "per_class": {
+      "0": {
+        "f1": 0.868421052631579,
+        "precision": 0.7857142857142857,
+        "recall": 0.9705882352941176,
+        "support": 34
+      },
+      "1": {
+        "f1": 0.48,
+        "precision": 0.4,
+        "recall": 0.6,
+        "support": 10
+      },
+      "2": {
+        "f1": 0.21052631578947367,
+        "precision": 0.6666666666666666,
+        "recall": 0.125,
+        "support": 16
+      }
+    },
+    "predicted_distribution": {
+      "0": 42,
+      "1": 15,
+      "2": 3
+    },
+    "weighted_f1": 0.6282456140350876
+  },
+  "heldout_profile_ids": [
+    "P06",
+    "P08",
+    "P13"
+  ],
+  "limitations": [
+    "Training supervision is deterministic and weak, not human ground truth.",
+    "Held-out evidence contains 60 rows from only three profiles.",
+    "The catalogue is limited to 20 verified Kandy POIs.",
+    "Classification probabilities are not calibrated user-satisfaction probabilities.",
+    "The model gates relevance only; it does not rank proximity or optimize routes."
+  ],
+  "model_name": "user_poi_relevance_classifier",
+  "model_version": "v1",
+  "python_version": "3.14.2 (tags/v3.14.2:df79316, Dec  5 2025, 17:18:21) [MSC v.1944 64 bit (AMD64)]",
+  "raw_feature_schema": [
+    "user_interests",
+    "verified_poi_tags"
+  ],
+  "runtime_role": "user_profile_poi_relevance_gate_before_deterministic_ranking_and_ga",
+  "schema_version": "1.0",
+  "selected_parameters": {
+    "classifier__C": 1.0,
+    "classifier__class_weight": null
+  },
+  "selection_rule": "Among Random Forest and Linear SVM, maximize grouped-CV Macro-F1; within 0.005 use balanced accuracy, then lower Macro-F1 SD, then model name.",
+  "sklearn_version": "1.7.2",
+  "training_cv_metrics": {
+    "accuracy": {
+      "fold_training_scores": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "fold_validation_scores": [
+        0.6666666666666666,
+        0.6833333333333333,
+        0.7833333333333333,
+        0.8166666666666667
+      ],
+      "gap": 0.26249999999999996,
+      "training_mean": 1.0,
+      "training_std": 0.0,
+      "validation_mean": 0.7375,
+      "validation_std": 0.06387379048648288
+    },
+    "balanced_accuracy": {
+      "fold_training_scores": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "fold_validation_scores": [
+        0.6666666666666666,
+        0.6666666666666666,
+        0.5,
+        0.7708333333333334
+      ],
+      "gap": 0.34895833333333337,
+      "training_mean": 1.0,
+      "training_std": 0.0,
+      "validation_mean": 0.6510416666666666,
+      "validation_std": 0.0970205000531102
+    },
+    "macro_f1": {
+      "fold_training_scores": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "fold_validation_scores": [
+        0.5925925925925926,
+        0.5374149659863946,
+        0.29283489096573206,
+        0.7473826409996622
+      ],
+      "gap": 0.4574437273639047,
+      "training_mean": 1.0,
+      "training_std": 0.0,
+      "validation_mean": 0.5425562726360953,
+      "validation_std": 0.16343551938701856
+    },
+    "weighted_f1": {
+      "fold_training_scores": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "fold_validation_scores": [
+        0.537037037037037,
+        0.5863945578231292,
+        0.6881619937694704,
+        0.7901046943600136
+      ],
+      "gap": 0.34957542925258744,
+      "training_mean": 1.0,
+      "training_std": 0.0,
+      "validation_mean": 0.6504245707474126,
+      "validation_std": 0.0973283429746735
+    }
+  },
+  "training_profile_ids": [
+    "P01",
+    "P02",
+    "P03",
+    "P04",
+    "P05",
+    "P07",
+    "P09",
+    "P10",
+    "P11",
+    "P12",
+    "P14",
+    "P15"
+  ],
+  "transformed_feature_names": [
+    "user_has_adventure",
+    "user_has_city",
+    "user_has_culture",
+    "user_has_history",
+    "user_has_nature",
+    "user_has_religion",
+    "user_has_wildlife",
+    "poi_has_adventure",
+    "poi_has_city",
+    "poi_has_culture",
+    "poi_has_history",
+    "poi_has_nature",
+    "poi_has_religion",
+    "poi_has_wildlife",
+    "pair_matches_adventure",
+    "pair_matches_city",
+    "pair_matches_culture",
+    "pair_matches_history",
+    "pair_matches_nature",
+    "pair_matches_religion",
+    "pair_matches_wildlife",
+    "user_interest_count",
+    "poi_tag_count"
+  ],
+  "weak_label_rule": "verified_tag_interest_coverage_v1"
+}

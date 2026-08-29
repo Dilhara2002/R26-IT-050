@@ -1,0 +1,61 @@
+judgement_id,profile_id,place_id,poi_name,district,human_relevance_label,predicted_relevance_label,correct,label_provenance,candidate_artifact_sha256
+P08::wikidata-Q45690,P08,wikidata-Q45690,Dambulla Cave Temple,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q37700,P08,wikidata-Q37700,Elgin Falls,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q97262496,P13,wikidata-Q97262496,Kurundu Oya Waterfall,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q3335386,P06,wikidata-Q3335386,Nalanda Gedige,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q65949703,P13,wikidata-Q65949703,Pidurangala Rock,Matale,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q5640438,P13,wikidata-Q5640438,Hakgala,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q23585049,P08,wikidata-Q23585049,One Tree Hill,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::osm-way-191390663,P08,osm-way-191390663,Sigiriya Museum,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q45690,P13,wikidata-Q45690,Dambulla Cave Temple,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q7796948,P06,wikidata-Q7796948,Totapolakanda,Nuwara Eliya,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q272153,P13,wikidata-Q272153,Sigiriya,Matale,1,1,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q37700,P06,wikidata-Q37700,Elgin Falls,Nuwara Eliya,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q37551,P13,wikidata-Q37551,Devon Falls,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q23585049,P06,wikidata-Q23585049,One Tree Hill,Nuwara Eliya,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q18915186,P08,wikidata-Q18915186,Sembuwatta Lake,Matale,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q38350,P13,wikidata-Q38350,St. Clair's Falls,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q37551,P08,wikidata-Q37551,Devon Falls,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q375975,P08,wikidata-Q375975,Kirigalpoththa,Nuwara Eliya,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q19710937,P06,wikidata-Q19710937,Dunsinane Falls,Nuwara Eliya,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q25104534,P13,wikidata-Q25104534,Sera Ella Falls,Matale,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::osm-node-2714398529,P06,osm-node-2714398529,NIFS Sam Popham's Arboretum,Matale,1,0,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q7796948,P13,wikidata-Q7796948,Totapolakanda,Nuwara Eliya,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q23585049,P13,wikidata-Q23585049,One Tree Hill,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q5640438,P06,wikidata-Q5640438,Hakgala,Nuwara Eliya,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q25104534,P06,wikidata-Q25104534,Sera Ella Falls,Matale,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q37551,P06,wikidata-Q37551,Devon Falls,Nuwara Eliya,1,0,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q65949703,P08,wikidata-Q65949703,Pidurangala Rock,Matale,1,1,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q97262496,P08,wikidata-Q97262496,Kurundu Oya Waterfall,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q65949703,P06,wikidata-Q65949703,Pidurangala Rock,Matale,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q272153,P06,wikidata-Q272153,Sigiriya,Matale,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q16308678,P13,wikidata-Q16308678,Matale Muthumariyamman Temple,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q37700,P13,wikidata-Q37700,Elgin Falls,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q3335386,P08,wikidata-Q3335386,Nalanda Gedige,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::osm-way-191390663,P13,osm-way-191390663,Sigiriya Museum,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q19700397,P13,wikidata-Q19700397,Aluvihare Rock Temple,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q1146327,P06,wikidata-Q1146327,Pidurutalagala,Nuwara Eliya,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q45690,P06,wikidata-Q45690,Dambulla Cave Temple,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q16308678,P06,wikidata-Q16308678,Matale Muthumariyamman Temple,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q97262496,P06,wikidata-Q97262496,Kurundu Oya Waterfall,Nuwara Eliya,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q5640438,P08,wikidata-Q5640438,Hakgala,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::osm-way-191390663,P06,osm-way-191390663,Sigiriya Museum,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q375975,P06,wikidata-Q375975,Kirigalpoththa,Nuwara Eliya,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q19700397,P08,wikidata-Q19700397,Aluvihare Rock Temple,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q19710937,P08,wikidata-Q19710937,Dunsinane Falls,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q375975,P13,wikidata-Q375975,Kirigalpoththa,Nuwara Eliya,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::osm-node-2714398529,P08,osm-node-2714398529,NIFS Sam Popham's Arboretum,Matale,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q272153,P08,wikidata-Q272153,Sigiriya,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q19700397,P06,wikidata-Q19700397,Aluvihare Rock Temple,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q1146327,P08,wikidata-Q1146327,Pidurutalagala,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q7796948,P08,wikidata-Q7796948,Totapolakanda,Nuwara Eliya,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::osm-node-2714398529,P13,osm-node-2714398529,NIFS Sam Popham's Arboretum,Matale,1,1,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q18915186,P13,wikidata-Q18915186,Sembuwatta Lake,Matale,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q1146327,P13,wikidata-Q1146327,Pidurutalagala,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q38350,P06,wikidata-Q38350,St. Clair's Falls,Nuwara Eliya,1,0,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q19710937,P13,wikidata-Q19710937,Dunsinane Falls,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q38350,P08,wikidata-Q38350,St. Clair's Falls,Nuwara Eliya,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q25104534,P08,wikidata-Q25104534,Sera Ella Falls,Matale,2,1,False,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P08::wikidata-Q16308678,P08,wikidata-Q16308678,Matale Muthumariyamman Temple,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P13::wikidata-Q3335386,P13,wikidata-Q3335386,Nalanda Gedige,Matale,0,0,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913
+P06::wikidata-Q18915186,P06,wikidata-Q18915186,Sembuwatta Lake,Matale,2,2,True,single_human_reviewer,f1d6ce2c018658d3305c4772a40f959bcff4b9041e3eacff8726bdb82bf82913

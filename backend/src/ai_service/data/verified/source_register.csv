@@ -1,0 +1,3 @@
+source_id,source_name,base_url,source_type,publisher,license,redistribution_allowed,access_method,accessed_at,fields_collected,notes
+osm_overpass,OpenStreetMap,https://www.openstreetmap.org/,open_geospatial_database,OpenStreetMap contributors,ODbL 1.0,yes_with_attribution_and_ODbL_terms,Overpass API,2026-08-19,"name; coordinates; POI classification tags; original object type and ID",Candidate collection only; preserve OpenStreetMap attribution and object URLs
+wikidata_sparql,Wikidata,https://www.wikidata.org/,structured_knowledge_base,Wikimedia Foundation,CC0 1.0,yes,Wikidata Query Service,2026-08-19,"English label; coordinates; instance-of IDs and labels; entity ID; administrative containment",Candidate collection only; structured data queried under CC0
