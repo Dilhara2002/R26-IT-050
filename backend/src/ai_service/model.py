@@ -2,10 +2,12 @@ from pathlib import Path
 import hashlib
 import itertools
 import json
+import logging
 import math
 import os
 import random
 import re
+import time
 import warnings
 
 import joblib
@@ -17,6 +19,7 @@ from relevance_features import SUPPORTED_INTERESTS, make_pair_frame
 
 
 warnings.filterwarnings("ignore")
+LOGGER = logging.getLogger(__name__)
 
 QUALITY_THRESHOLD = 3.9
 # Defensive guard against excessive GA search and impractically dense itineraries.
@@ -32,11 +35,11 @@ EXPECTED_DISTRICT_COUNTS = {"Kandy": 20, "Matale": 10, "Nuwara Eliya": 10}
 CATALOGUE_POI_COUNT = sum(EXPECTED_DISTRICT_COUNTS.values())
 VERIFIED_STATUS = "source_trace_verified"
 QUARANTINED_LEGACY_IDS = {"79"}
-GEMINI_REQUEST_TIMEOUT = (2, 5)
+GEMINI_REQUEST_TIMEOUT = (2, 10)
 GEMINI_INTERACTIONS_URL = (
     "https://generativelanguage.googleapis.com/v1beta/interactions"
 )
-DEFAULT_GEMINI_MODEL = "gemini-3.7-flash"
+DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite"
 MAX_GEMINI_GUIDE_CHARS = 8000
 GEMINI_PLACEHOLDER_KEYS = {
     "APIKEY",
@@ -1448,13 +1451,57 @@ def _final_gemini_model_output(payload):
     return final_text
 
 
+def _safe_gemini_model_for_log(model_name):
+    model_text = str(model_name)
+    if model_text.startswith("AIza"):
+        return "[redacted]"
+    return re.sub(r"[^A-Za-z0-9._:/-]", "?", model_text)[:128]
+
+
+def _log_gemini_failure(category, model_name, started_at, http_status=None):
+    elapsed_ms = max(0, round((time.perf_counter() - started_at) * 1000))
+    safe_model = _safe_gemini_model_for_log(model_name)
+    if isinstance(http_status, int):
+        LOGGER.warning(
+            "Gemini guide request failure category=%s model=%s elapsed_ms=%d http_status=%d",
+            category,
+            safe_model,
+            elapsed_ms,
+            http_status,
+        )
+    else:
+        LOGGER.warning(
+            "Gemini guide request failure category=%s model=%s elapsed_ms=%d",
+            category,
+            safe_model,
+            elapsed_ms,
+        )
+
+
+def _log_gemini_success(model_name, started_at, output_chars):
+    elapsed_ms = max(0, round((time.perf_counter() - started_at) * 1000))
+    LOGGER.info(
+        "Gemini guide request success model=%s elapsed_ms=%d output_chars=%d",
+        _safe_gemini_model_for_log(model_name),
+        elapsed_ms,
+        output_chars,
+    )
+
+
 def generate_itinerary_summary(places, preferences, api_key, core_summary=None):
     """Optionally paraphrase a deterministic explanation; never replace its evidence."""
+    started_at = time.perf_counter()
+    configured_model = os.environ.get("GEMINI_MODEL", "").strip()
+    gemini_model = configured_model or DEFAULT_GEMINI_MODEL
     deterministic_summary = core_summary or (
         f"A heuristic itinerary contains {len(places or [])} stop(s) for "
         f"{', '.join(preferences or []) or 'the selected interests'}."
     )
-    if not places or not _is_usable_gemini_key(api_key):
+    if not _is_usable_gemini_key(api_key):
+        _log_gemini_failure("missing_key", gemini_model, started_at)
+        return None
+    if not places:
+        _log_gemini_failure("malformed_output", gemini_model, started_at)
         return None
 
     prompt = f"""
@@ -1465,8 +1512,7 @@ def generate_itinerary_summary(places, preferences, api_key, core_summary=None):
     Evidence: {deterministic_summary}
     """
 
-    configured_model = os.environ.get("GEMINI_MODEL", "").strip()
-    gemini_model = configured_model or DEFAULT_GEMINI_MODEL
+    response = None
     try:
         response = requests.post(
             GEMINI_INTERACTIONS_URL,
@@ -1478,6 +1524,23 @@ def generate_itinerary_summary(places, preferences, api_key, core_summary=None):
             timeout=GEMINI_REQUEST_TIMEOUT,
         )
         response.raise_for_status()
-        return _final_gemini_model_output(response.json())
-    except (requests.RequestException, ValueError, TypeError):
+        paraphrase = _final_gemini_model_output(response.json())
+        if paraphrase is None:
+            _log_gemini_failure("malformed_output", gemini_model, started_at)
+            return None
+        _log_gemini_success(gemini_model, started_at, len(paraphrase))
+        return paraphrase
+    except requests.Timeout:
+        _log_gemini_failure("timeout", gemini_model, started_at)
+        return None
+    except requests.HTTPError as error:
+        error_response = getattr(error, "response", None) or response
+        status_code = getattr(error_response, "status_code", None)
+        _log_gemini_failure("http_status", gemini_model, started_at, status_code)
+        return None
+    except requests.RequestException:
+        _log_gemini_failure("request_exception", gemini_model, started_at)
+        return None
+    except (ValueError, TypeError, KeyError, IndexError):
+        _log_gemini_failure("malformed_output", gemini_model, started_at)
         return None

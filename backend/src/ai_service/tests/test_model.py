@@ -452,7 +452,9 @@ class ModelTestCase(unittest.TestCase):
             "PASTE_API_KEY",
             "<placeholder>",
         ]
-        with mock.patch.object(model.requests, "post") as post:
+        with mock.patch.object(model.requests, "post") as post, self.assertLogs(
+            model.LOGGER, level="WARNING"
+        ) as captured:
             for api_key in unusable_keys:
                 with self.subTest(api_key=api_key):
                     summary = model.generate_itinerary_summary(
@@ -463,6 +465,7 @@ class ModelTestCase(unittest.TestCase):
                     )
                     self.assertIsNone(summary)
             post.assert_not_called()
+        self.assertTrue(all("category=missing_key" in line for line in captured.output))
 
     def test_gemini_network_failures_return_deterministic_xai(self):
         failures = [
@@ -481,11 +484,11 @@ class ModelTestCase(unittest.TestCase):
                     core_summary="Deterministic evidence summary.",
                 )
                 self.assertIsNone(summary)
-                self.assertEqual(post.call_args.kwargs["timeout"], (2, 5))
+                self.assertEqual(post.call_args.kwargs["timeout"], (2, 10))
 
     def test_gemini_http_fallback_statuses_return_no_guide(self):
         for status in [401, 403, 404, 429, 500, 503]:
-            response = mock.Mock()
+            response = mock.Mock(status_code=status)
             response.raise_for_status.side_effect = requests.HTTPError(str(status))
             with self.subTest(status=status), mock.patch.object(
                 model.requests, "post", return_value=response
@@ -511,7 +514,9 @@ class ModelTestCase(unittest.TestCase):
         }
         with mock.patch.dict(os.environ, {"GEMINI_MODEL": "gemini-test-model"}), mock.patch.object(
             model.requests, "post", return_value=response
-        ) as post:
+        ) as post, mock.patch.object(
+            model.time, "perf_counter", side_effect=[10.0, 10.123]
+        ), self.assertLogs(model.LOGGER, level="INFO") as captured:
             summary = model.generate_itinerary_summary(
                 ["Kandy Lake (60 mins)"],
                 ["Nature"],
@@ -533,6 +538,14 @@ class ModelTestCase(unittest.TestCase):
         self.assertFalse(request_body["store"])
         self.assertIn("Paraphrase", request_body["input"])
         self.assertIn("Deterministic evidence summary.", request_body["input"])
+        success_log = "\n".join(captured.output)
+        self.assertIn("request success", success_log)
+        self.assertIn("model=gemini-test-model", success_log)
+        self.assertIn("elapsed_ms=123", success_log)
+        self.assertIn("output_chars=20", success_log)
+        self.assertNotIn("AIza-valid-looking-test-key", success_log)
+        self.assertNotIn("Deterministic evidence summary.", success_log)
+        self.assertNotIn("Friendly guide text.", success_log)
 
     def test_gemini_defaults_model_and_selects_final_valid_model_output(self):
         response = mock.Mock()
@@ -563,9 +576,50 @@ class ModelTestCase(unittest.TestCase):
                 core_summary="Deterministic evidence summary.",
             )
         self.assertEqual(summary, "Final model\ntext.")
+        self.assertEqual(model.DEFAULT_GEMINI_MODEL, "gemini-3.5-flash-lite")
         self.assertEqual(
             post.call_args.kwargs["json"]["model"], model.DEFAULT_GEMINI_MODEL
         )
+
+    def test_gemini_timeout_and_http_diagnostics_are_sanitized(self):
+        secret = "unit-test-secret-value"
+        prompt_marker = "PRIVATE DETERMINISTIC EVIDENCE"
+        with mock.patch.object(
+            model.requests, "post", side_effect=requests.ReadTimeout("private timeout detail")
+        ), mock.patch.object(
+            model.time, "perf_counter", side_effect=[20.0, 20.5]
+        ), self.assertLogs(model.LOGGER, level="WARNING") as timeout_logs:
+            summary = model.generate_itinerary_summary(
+                ["Private place"], ["Nature"], secret, core_summary=prompt_marker
+            )
+        self.assertIsNone(summary)
+        timeout_log = "\n".join(timeout_logs.output)
+        self.assertIn("category=timeout", timeout_log)
+        self.assertIn("model=gemini-3.5-flash-lite", timeout_log)
+        self.assertIn("elapsed_ms=500", timeout_log)
+        self.assertNotIn(secret, timeout_log)
+        self.assertNotIn(prompt_marker, timeout_log)
+        self.assertNotIn("private timeout detail", timeout_log)
+
+        response = mock.Mock(status_code=429)
+        response.raise_for_status.side_effect = requests.HTTPError("private response detail")
+        with mock.patch.object(
+            model.requests, "post", return_value=response
+        ), mock.patch.object(
+            model.time, "perf_counter", side_effect=[30.0, 30.25]
+        ), self.assertLogs(model.LOGGER, level="WARNING") as http_logs:
+            summary = model.generate_itinerary_summary(
+                ["Private place"], ["Nature"], secret, core_summary=prompt_marker
+            )
+        self.assertIsNone(summary)
+        http_log = "\n".join(http_logs.output)
+        self.assertIn("category=http_status", http_log)
+        self.assertIn("model=gemini-3.5-flash-lite", http_log)
+        self.assertIn("elapsed_ms=250", http_log)
+        self.assertIn("http_status=429", http_log)
+        self.assertNotIn(secret, http_log)
+        self.assertNotIn(prompt_marker, http_log)
+        self.assertNotIn("private response detail", http_log)
 
     def test_malformed_gemini_responses_return_deterministic_xai(self):
         malformed_responses = [
@@ -631,7 +685,7 @@ class ModelTestCase(unittest.TestCase):
         }
         with mock.patch.object(flask_app, "GEMINI_API_KEY", secret), mock.patch.object(
             model.requests, "post", return_value=response
-        ), mock.patch("builtins.print") as printed:
+        ), self.assertLogs(model.LOGGER, level="INFO") as captured:
             endpoint_response = flask_app.app.test_client().post(
                 "/api/optimize-itinerary",
                 json={
@@ -644,8 +698,66 @@ class ModelTestCase(unittest.TestCase):
         payload = endpoint_response.get_json()
         self.assertEqual(endpoint_response.status_code, 200, payload)
         self.assertEqual(payload["data"]["guide_explanation"], "Safe guide text.")
-        printed.assert_not_called()
         self.assertNotIn(secret, json.dumps(payload))
+        diagnostic = "\n".join(captured.output)
+        self.assertNotIn(secret, diagnostic)
+        self.assertNotIn("Safe guide text.", diagnostic)
+        self.assertNotIn(payload["data"]["deterministic_explanation"]["summary"], diagnostic)
+
+    def test_endpoint_retains_deterministic_xai_for_all_gemini_fallbacks(self):
+        import app as flask_app
+
+        http_response = mock.Mock(status_code=503)
+        http_response.raise_for_status.side_effect = requests.HTTPError("private body")
+        malformed_json = mock.Mock()
+        malformed_json.raise_for_status.return_value = None
+        malformed_json.json.side_effect = ValueError("private JSON detail")
+        empty_output = mock.Mock()
+        empty_output.raise_for_status.return_value = None
+        empty_output.json.return_value = {
+            "outputs": [
+                {"type": "model_output", "content": [{"type": "text", "text": "  "}]}
+            ]
+        }
+        non_text_output = mock.Mock()
+        non_text_output.raise_for_status.return_value = None
+        non_text_output.json.return_value = {
+            "outputs": [
+                {"type": "model_output", "content": [{"type": "image", "data": "ignored"}]}
+            ]
+        }
+        failures = [
+            requests.ReadTimeout("private timeout detail"),
+            http_response,
+            malformed_json,
+            empty_output,
+            non_text_output,
+        ]
+        for failure in failures:
+            if isinstance(failure, Exception):
+                post_patch = mock.patch.object(model.requests, "post", side_effect=failure)
+            else:
+                post_patch = mock.patch.object(model.requests, "post", return_value=failure)
+            with self.subTest(failure=type(failure).__name__), mock.patch.object(
+                flask_app, "GEMINI_API_KEY", "unit-test-valid-key"
+            ), post_patch, self.assertLogs(model.LOGGER, level="WARNING"):
+                response = flask_app.app.test_client().post(
+                    "/api/optimize-itinerary",
+                    json={
+                        "preferences": ["Nature"],
+                        "max_time_minutes": 120,
+                        "current_lat": 7.2906,
+                        "current_lon": 80.6337,
+                    },
+                )
+            payload = response.get_json()
+            self.assertEqual(response.status_code, 200, payload)
+            self.assertIsNone(payload["data"]["guide_explanation"])
+            self.assertIsNone(payload["data"]["ai_paraphrase"])
+            self.assertEqual(
+                payload["data"]["deterministic_explanation"],
+                payload["data"]["route_explanation"],
+            )
 
     def test_endpoint_blank_key_uses_non_empty_truthful_fallback_without_http(self):
         import app as flask_app
