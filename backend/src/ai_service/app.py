@@ -20,9 +20,6 @@ except ModuleNotFoundError as error:
         f"dependency could not be loaded: {error.name}"
     )
 
-# Import the new landmark recognition blueprint
-from landmark_routes import landmark_bp
-
 app = Flask(__name__)
 CORS(app) # Enables CORS for all routes so Web Browsers can connect
 if landmark_bp is not None:
@@ -30,9 +27,6 @@ if landmark_bp is not None:
 
 # Retrieve Gemini API Key
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
-# Register Blueprints
-app.register_blueprint(landmark_bp)
 
 @app.route('/api/optimize-itinerary', methods=['POST'])
 def optimize_itinerary():

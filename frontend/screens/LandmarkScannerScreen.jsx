@@ -50,7 +50,7 @@ function SectionCard({ icon, title, children }) {
 }
 
 //  Main Screen
-export default function LandmarkScannerScreen({ onBack, navigation }) {
+export default function LandmarkScannerScreen({ onBack, onOpenChat, navigation }) {
   const [imageUri, setImageUri]   = useState(null);
   const [imageAsset, setImageAsset] = useState(null);
   const [loading, setLoading]     = useState(false);
@@ -64,6 +64,15 @@ export default function LandmarkScannerScreen({ onBack, navigation }) {
     }
   };
 
+  const handleOpenChat = (customContext = null) => {
+    const context = customContext || result?.metadata || (result?.class_id ? { landmark_name: result.class_id.replace(/_/g, " ") } : {});
+    if (onOpenChat) {
+      onOpenChat(context);
+    } else if (navigation && navigation.navigate) {
+      navigation.navigate("LandmarkChat", { landmarkContext: context });
+    }
+  };
+
   // Pick image from camera
   const handleCamera = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -72,7 +81,7 @@ export default function LandmarkScannerScreen({ onBack, navigation }) {
       return;
     }
     const picked = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: 'images',
       quality: 0.85,
       allowsEditing: true,
       aspect: [4, 3],
@@ -93,7 +102,7 @@ export default function LandmarkScannerScreen({ onBack, navigation }) {
       return;
     }
     const picked = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: 'images',
       quality: 0.85,
       allowsEditing: true,
       aspect: [4, 3],
@@ -149,7 +158,15 @@ export default function LandmarkScannerScreen({ onBack, navigation }) {
               <Text style={styles.backBtnText}>← Back</Text>
             </Pressable>
           )}
-          <Text style={styles.aiBadge}>✦ AI Vision</Text>
+          <View style={styles.heroRightActions}>
+            <Pressable
+              style={({ pressed }) => [styles.chatGuideBtn, pressed && styles.pressed]}
+              onPress={() => handleOpenChat()}
+            >
+              <Text style={styles.chatGuideBtnText}>💬 AI Tour Guide</Text>
+            </Pressable>
+            <Text style={styles.aiBadge}>✦ AI Vision</Text>
+          </View>
         </View>
         <Text style={styles.heroTitle}>Landmark Scanner</Text>
         <Text style={styles.heroSubtitle}>
@@ -207,7 +224,26 @@ export default function LandmarkScannerScreen({ onBack, navigation }) {
       </View>
 
       {/* Result */}
-      {result && (
+      {result && result.unrecognized && (
+        <View style={styles.unrecognizedCard}>
+          <Text style={styles.unrecognizedIcon}>🧐</Text>
+          <Text style={styles.unrecognizedTitle}>Not Sure What This Is</Text>
+          <Text style={styles.unrecognizedText}>
+            {result.message || "We couldn't confidently recognize a landmark in this photo."}
+          </Text>
+          <Text style={styles.unrecognizedHint}>
+            Make sure the landmark is well-lit and clearly visible in the frame, then try again.
+          </Text>
+          <Pressable
+            style={({ pressed }) => [styles.resetBtn, styles.resetBtnPrimary, pressed && styles.pressed]}
+            onPress={handleReset}
+          >
+            <Text style={[styles.resetBtnText, styles.resetBtnTextPrimary]}>Take Another Photo</Text>
+          </Pressable>
+        </View>
+      )}
+
+      {result && !result.unrecognized && (
         <>
           {/* Confidence badge */}
           <View style={styles.resultHero}>
@@ -230,16 +266,23 @@ export default function LandmarkScannerScreen({ onBack, navigation }) {
             </View>
           </View>
 
-          {/* Google Maps button */}
-          {meta.gps_coordinates !== "" && (
+          {/* Action Buttons Row */}
+          <View style={styles.actionButtonsRow}>
+            {meta.gps_coordinates !== "" && (
+              <Pressable
+                style={({ pressed }) => [styles.actionBtn, styles.mapsBtn, pressed && styles.pressed]}
+                onPress={() => openGoogleMaps(meta.gps_coordinates)}
+              >
+                <Text style={styles.actionBtnText}>🗺️ Maps</Text>
+              </Pressable>
+            )}
             <Pressable
-              style={({ pressed }) => [styles.mapsBtn, pressed && styles.pressed]}
-              onPress={() => openGoogleMaps(meta.gps_coordinates)}
+              style={({ pressed }) => [styles.actionBtn, styles.chatActionBtn, pressed && styles.pressed]}
+              onPress={() => handleOpenChat()}
             >
-              <Text style={styles.mapsBtnText}>View on Google Maps</Text>
-              <Text style={styles.mapsBtnIcon}>🗺️</Text>
+              <Text style={styles.actionBtnText}>💬 Chat Guide</Text>
             </Pressable>
-          )}
+          </View>
 
           {/* About */}
           {meta.description !== "" && (
@@ -306,6 +349,22 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
+  },
+  heroRightActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  chatGuideBtn: {
+    backgroundColor: "rgba(255,255,255,0.22)",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
+  },
+  chatGuideBtnText: {
+    color: "#FFFFFF",
+    fontWeight: "800",
+    fontSize: 12,
   },
   backBtn: {
     backgroundColor: "rgba(255,255,255,0.22)",
@@ -384,14 +443,32 @@ const styles = StyleSheet.create({
   resultCategory:  { color: "#BFDBFE", fontWeight: "700", fontSize: 12, marginBottom: 2 },
   resultLocation:  { color: "#DBEAFE", fontSize: 13, fontWeight: "600" },
 
-  // Maps button
-  mapsBtn: {
-    backgroundColor: "#0EA5E9", borderRadius: 18,
-    paddingVertical: 14, marginBottom: 14,
-    flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 8,
+  // Action Buttons Row (Maps & Chat)
+  actionButtonsRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 14,
   },
-  mapsBtnText: { color: "#FFFFFF", fontWeight: "900", fontSize: 15 },
-  mapsBtnIcon: { fontSize: 18 },
+  actionBtn: {
+    flex: 1,
+    borderRadius: 18,
+    paddingVertical: 14,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+  },
+  actionBtnText: {
+    color: "#FFFFFF",
+    fontWeight: "900",
+    fontSize: 14,
+  },
+  mapsBtn: {
+    backgroundColor: "#0EA5E9",
+  },
+  chatActionBtn: {
+    backgroundColor: "#7C3AED",
+  },
 
   // Section cards
   sectionCard: {
@@ -423,6 +500,21 @@ const styles = StyleSheet.create({
     alignItems: "center", marginTop: 4,
   },
   resetBtnText: { color: "#2563EB", fontWeight: "900", fontSize: 15 },
+  
+  // Unrecognized
+  unrecognizedCard: {
+    backgroundColor: "#FFF1F2", borderRadius: 24, padding: 24,
+    alignItems: "center", marginBottom: 16,
+    borderWidth: 2, borderColor: "#FECDD3",
+  },
+  unrecognizedIcon: { fontSize: 48, marginBottom: 12 },
+  unrecognizedTitle: { fontSize: 22, fontWeight: "900", color: "#BE123C", marginBottom: 8 },
+  unrecognizedText: { fontSize: 15, color: "#881337", textAlign: "center", marginBottom: 6 },
+  unrecognizedHint: { fontSize: 13, color: "#9F1239", textAlign: "center", marginBottom: 20 },
+  resetBtnPrimary: {
+    backgroundColor: "#E11D48", borderColor: "#E11D48", borderWidth: 0, paddingHorizontal: 24,
+  },
+  resetBtnTextPrimary: { color: "#FFFFFF" },
 
   pressed: { opacity: 0.72 },
 });

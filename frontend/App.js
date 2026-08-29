@@ -16,6 +16,8 @@ import MapScreen from "./screens/MapScreen";
 import SafetyMapScreen from "./src/screens/SafetyMapScreen";
 import TripReviewScreen from "./src/screens/TripReviewScreen";
 import LandmarkExplorerScreen from "./src/screens/LandmarkExplorerScreen";
+import LandmarkScannerScreen from "./screens/LandmarkScannerScreen";
+import LandmarkChatScreen from "./screens/LandmarkChatScreen";
 import HotelHomeScreen from "./src/screens/HotelHomeScreen";
 import HotelResultsScreen from "./src/screens/HotelResultsScreen";
 import AdminPricingScreen from "./src/screens/AdminPricingScreen";
@@ -116,7 +118,7 @@ function MainFlow({ navigation, route }) {
     if (id === "sasanka") navigation.navigate("ItineraryHome");
     else if (id === "dunith") navigation.navigate("HotelHome");
     else if (id === "ishan") { setHotelContext(null); setScreen("form"); }
-    else if (id === "madush") navigation.navigate("LandmarkExplorer");
+    else if (id === "madush") navigation.navigate("LandmarkScanner");
     else setScreen(`module:${id}`);
   };
 
@@ -165,6 +167,8 @@ export default function App() {
         <Stack.Screen name="SafetyMap" component={SafetyMapScreen} options={{ title: "Safe Route Map" }} />
         <Stack.Screen name="TripReview" component={TripReviewScreen} options={{ title: "Review Trip Plan" }} />
         <Stack.Screen name="LandmarkExplorer" component={LandmarkExplorerScreen} options={{ title: "Landmark Explorer" }} />
+        <Stack.Screen name="LandmarkScanner" component={LandmarkScannerScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="LandmarkChat" component={LandmarkChatScreen} options={{ headerShown: false }} />
         <Stack.Screen name="HotelHome" component={HotelHomeScreen} options={{ title: "Hotels & Activities" }} />
         <Stack.Screen name="HotelResults" component={HotelResultsScreen} options={{ title: "Your Hotel Matches" }} />
       </Stack.Navigator>
