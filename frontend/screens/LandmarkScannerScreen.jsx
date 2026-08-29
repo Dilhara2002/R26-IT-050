@@ -81,7 +81,7 @@ export default function LandmarkScannerScreen({ onBack, onOpenChat, navigation }
       return;
     }
     const picked = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: 'images',
       quality: 0.85,
       allowsEditing: true,
       aspect: [4, 3],
@@ -102,7 +102,7 @@ export default function LandmarkScannerScreen({ onBack, onOpenChat, navigation }
       return;
     }
     const picked = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: 'images',
       quality: 0.85,
       allowsEditing: true,
       aspect: [4, 3],
@@ -224,7 +224,26 @@ export default function LandmarkScannerScreen({ onBack, onOpenChat, navigation }
       </View>
 
       {/* Result */}
-      {result && (
+      {result && result.unrecognized && (
+        <View style={styles.unrecognizedCard}>
+          <Text style={styles.unrecognizedIcon}>🧐</Text>
+          <Text style={styles.unrecognizedTitle}>Not Sure What This Is</Text>
+          <Text style={styles.unrecognizedText}>
+            {result.message || "We couldn't confidently recognize a landmark in this photo."}
+          </Text>
+          <Text style={styles.unrecognizedHint}>
+            Make sure the landmark is well-lit and clearly visible in the frame, then try again.
+          </Text>
+          <Pressable
+            style={({ pressed }) => [styles.resetBtn, styles.resetBtnPrimary, pressed && styles.pressed]}
+            onPress={handleReset}
+          >
+            <Text style={[styles.resetBtnText, styles.resetBtnTextPrimary]}>Take Another Photo</Text>
+          </Pressable>
+        </View>
+      )}
+
+      {result && !result.unrecognized && (
         <>
           {/* Confidence badge */}
           <View style={styles.resultHero}>
@@ -481,6 +500,21 @@ const styles = StyleSheet.create({
     alignItems: "center", marginTop: 4,
   },
   resetBtnText: { color: "#2563EB", fontWeight: "900", fontSize: 15 },
+  
+  // Unrecognized
+  unrecognizedCard: {
+    backgroundColor: "#FFF1F2", borderRadius: 24, padding: 24,
+    alignItems: "center", marginBottom: 16,
+    borderWidth: 2, borderColor: "#FECDD3",
+  },
+  unrecognizedIcon: { fontSize: 48, marginBottom: 12 },
+  unrecognizedTitle: { fontSize: 22, fontWeight: "900", color: "#BE123C", marginBottom: 8 },
+  unrecognizedText: { fontSize: 15, color: "#881337", textAlign: "center", marginBottom: 6 },
+  unrecognizedHint: { fontSize: 13, color: "#9F1239", textAlign: "center", marginBottom: 20 },
+  resetBtnPrimary: {
+    backgroundColor: "#E11D48", borderColor: "#E11D48", borderWidth: 0, paddingHorizontal: 24,
+  },
+  resetBtnTextPrimary: { color: "#FFFFFF" },
 
   pressed: { opacity: 0.72 },
 });
