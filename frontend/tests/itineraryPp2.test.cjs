@@ -71,7 +71,7 @@ test("route-param bridge, repeat-click guard, and truthful labels remain wired",
   assert.match(appSource, /route\.params\?\.itinerarySafetyRequest/);
   assert.match(appSource, /recommendItinerarySafety\(itineraryRequest\)/);
   assert.match(resultSource, /Why this route was selected/);
-  assert.match(resultSource, /Optional travel-guide explanation/);
+  assert.match(resultSource, /Optional AI Guide Explanation/);
   assert.match(resultSource, /Open POI source/);
   assert.match(mapSource, /Estimated Itinerary Map/);
   assert.doesNotMatch(mapSource, /Live Route View/);

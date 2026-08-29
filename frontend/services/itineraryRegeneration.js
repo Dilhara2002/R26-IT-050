@@ -1,5 +1,22 @@
 const MAX_RECENT_PLAN_SIGNATURES = 6;
 const MAX_ROUTE_STOPS = 8;
+const MAX_GUIDE_EXPLANATION_CHARS = 8000;
+
+export function validGuideExplanation(data, deterministicExplanation = null) {
+  const candidates = [data?.guide_explanation, data?.ai_paraphrase];
+  for (const candidate of candidates) {
+    if (typeof candidate !== "string") continue;
+    const normalized = candidate.trim();
+    if (
+      normalized &&
+      normalized.length <= MAX_GUIDE_EXPLANATION_CHARS &&
+      normalized !== deterministicExplanation
+    ) {
+      return normalized;
+    }
+  }
+  return null;
+}
 
 function stablePlaceIds(data) {
   const stops = Array.isArray(data?.optimized_stops) ? data.optimized_stops : [];

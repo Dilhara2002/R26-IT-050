@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import random
 import subprocess
@@ -482,25 +483,35 @@ class ModelTestCase(unittest.TestCase):
                 self.assertIsNone(summary)
                 self.assertEqual(post.call_args.kwargs["timeout"], (2, 5))
 
-    def test_gemini_non_success_response_returns_deterministic_xai(self):
-        response = mock.Mock()
-        response.raise_for_status.side_effect = requests.HTTPError("503")
-        with mock.patch.object(model.requests, "post", return_value=response):
-            summary = model.generate_itinerary_summary(
-                ["Kandy Lake (60 mins)"],
-                ["Nature"],
-                "AIza-valid-looking-test-key",
-                core_summary="Deterministic evidence summary.",
-            )
-        self.assertIsNone(summary)
+    def test_gemini_http_fallback_statuses_return_no_guide(self):
+        for status in [401, 403, 404, 429, 500, 503]:
+            response = mock.Mock()
+            response.raise_for_status.side_effect = requests.HTTPError(str(status))
+            with self.subTest(status=status), mock.patch.object(
+                model.requests, "post", return_value=response
+            ):
+                summary = model.generate_itinerary_summary(
+                    ["Kandy Lake (60 mins)"],
+                    ["Nature"],
+                    "AIza-valid-looking-test-key",
+                    core_summary="Deterministic evidence summary.",
+                )
+                self.assertIsNone(summary)
 
-    def test_gemini_success_is_optional_guide_text_only(self):
+    def test_gemini_interactions_request_and_successful_final_model_output(self):
         response = mock.Mock()
         response.raise_for_status.return_value = None
         response.json.return_value = {
-            "candidates": [{"content": {"parts": [{"text": "Friendly guide text."}]}}]
+            "outputs": [
+                {
+                    "type": "model_output",
+                    "content": [{"type": "text", "text": "Friendly guide text."}],
+                }
+            ]
         }
-        with mock.patch.object(model.requests, "post", return_value=response) as post:
+        with mock.patch.dict(os.environ, {"GEMINI_MODEL": "gemini-test-model"}), mock.patch.object(
+            model.requests, "post", return_value=response
+        ) as post:
             summary = model.generate_itinerary_summary(
                 ["Kandy Lake (60 mins)"],
                 ["Nature"],
@@ -508,15 +519,83 @@ class ModelTestCase(unittest.TestCase):
                 core_summary="Deterministic evidence summary.",
             )
         self.assertEqual(summary, "Friendly guide text.")
-        self.assertIn("Paraphrase", post.call_args.kwargs["json"]["contents"][0]["parts"][0]["text"])
+        self.assertEqual(post.call_args.args, (model.GEMINI_INTERACTIONS_URL,))
+        self.assertEqual(
+            post.call_args.kwargs["headers"],
+            {
+                "x-goog-api-key": "AIza-valid-looking-test-key",
+                "Content-Type": "application/json",
+            },
+        )
+        request_body = post.call_args.kwargs["json"]
+        self.assertEqual(set(request_body), {"model", "input", "store"})
+        self.assertEqual(request_body["model"], "gemini-test-model")
+        self.assertFalse(request_body["store"])
+        self.assertIn("Paraphrase", request_body["input"])
+        self.assertIn("Deterministic evidence summary.", request_body["input"])
+
+    def test_gemini_defaults_model_and_selects_final_valid_model_output(self):
+        response = mock.Mock()
+        response.raise_for_status.return_value = None
+        response.json.return_value = {
+            "outputs": [
+                {"type": "tool_output", "content": [{"type": "text", "text": "ignore"}]},
+                {
+                    "type": "model_output",
+                    "content": [{"type": "text", "text": "Earlier model text."}],
+                },
+                {
+                    "type": "model_output",
+                    "content": [
+                        {"type": "text", "text": "Final model"},
+                        {"type": "output_text", "text": "text."},
+                    ],
+                },
+            ]
+        }
+        with mock.patch.dict(os.environ, {}, clear=True), mock.patch.object(
+            model.requests, "post", return_value=response
+        ) as post:
+            summary = model.generate_itinerary_summary(
+                ["Kandy Lake (60 mins)"],
+                ["Nature"],
+                "AIza-valid-looking-test-key",
+                core_summary="Deterministic evidence summary.",
+            )
+        self.assertEqual(summary, "Final model\ntext.")
+        self.assertEqual(
+            post.call_args.kwargs["json"]["model"], model.DEFAULT_GEMINI_MODEL
+        )
 
     def test_malformed_gemini_responses_return_deterministic_xai(self):
         malformed_responses = [
             ValueError("invalid JSON"),
             {},
-            {"candidates": []},
-            {"candidates": [{"content": {"parts": [{}]}}]},
-            {"candidates": [{"content": {"parts": [{"text": "   "}]}}]},
+            {"outputs": []},
+            {"outputs": [{"type": "model_output", "content": [{}]}]},
+            {
+                "outputs": [
+                    {"type": "model_output", "content": [{"type": "text", "text": "   "}]}
+                ]
+            },
+            {
+                "outputs": [
+                    {
+                        "type": "model_output",
+                        "content": [{"type": "image", "text": "not text content"}],
+                    }
+                ]
+            },
+            {
+                "outputs": [
+                    {
+                        "type": "model_output",
+                        "content": [
+                            {"type": "text", "text": "x" * (model.MAX_GEMINI_GUIDE_CHARS + 1)}
+                        ],
+                    }
+                ]
+            },
         ]
         for malformed in malformed_responses:
             response = mock.Mock()
@@ -535,6 +614,38 @@ class ModelTestCase(unittest.TestCase):
                     core_summary="Deterministic evidence summary.",
                 )
                 self.assertIsNone(summary)
+
+    def test_gemini_secret_is_not_logged_or_returned(self):
+        import app as flask_app
+
+        secret = "AIza-super-secret-test-value"
+        response = mock.Mock()
+        response.raise_for_status.return_value = None
+        response.json.return_value = {
+            "outputs": [
+                {
+                    "type": "model_output",
+                    "content": [{"type": "text", "text": "Safe guide text."}],
+                }
+            ]
+        }
+        with mock.patch.object(flask_app, "GEMINI_API_KEY", secret), mock.patch.object(
+            model.requests, "post", return_value=response
+        ), mock.patch("builtins.print") as printed:
+            endpoint_response = flask_app.app.test_client().post(
+                "/api/optimize-itinerary",
+                json={
+                    "preferences": ["Nature"],
+                    "max_time_minutes": 120,
+                    "current_lat": 7.2906,
+                    "current_lon": 80.6337,
+                },
+            )
+        payload = endpoint_response.get_json()
+        self.assertEqual(endpoint_response.status_code, 200, payload)
+        self.assertEqual(payload["data"]["guide_explanation"], "Safe guide text.")
+        printed.assert_not_called()
+        self.assertNotIn(secret, json.dumps(payload))
 
     def test_endpoint_blank_key_uses_non_empty_truthful_fallback_without_http(self):
         import app as flask_app

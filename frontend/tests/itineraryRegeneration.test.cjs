@@ -22,6 +22,7 @@ const {
   buildFullRegenerationRequest,
   buildReplacementRequest,
   createRegenerationContext,
+  validGuideExplanation,
 } = helperModule.exports;
 
 
@@ -210,4 +211,44 @@ test("unchanged or unusable success payload is rejected", () => {
     }),
     /unchanged route/
   );
+});
+
+test("optional guide explanation is shown only for valid non-empty text", () => {
+  assert.equal(
+    validGuideExplanation(
+      { guide_explanation: "  Friendly evidence paraphrase.  " },
+      "Deterministic evidence."
+    ),
+    "Friendly evidence paraphrase."
+  );
+  assert.equal(validGuideExplanation({ guide_explanation: "   " }), null);
+  assert.equal(validGuideExplanation({ guide_explanation: { text: "invalid" } }), null);
+  assert.equal(
+    validGuideExplanation(
+      { guide_explanation: "Deterministic evidence." },
+      "Deterministic evidence."
+    ),
+    null
+  );
+  assert.equal(
+    validGuideExplanation({ guide_explanation: "x".repeat(8001) }),
+    null
+  );
+  assert.equal(
+    validGuideExplanation({ ai_paraphrase: "Compatibility alias text." }),
+    "Compatibility alias text."
+  );
+});
+
+test("result screen uses truthful guide and regeneration messaging", () => {
+  const resultSource = require("node:fs").readFileSync(
+    path.resolve(__dirname, "../screens/ResultScreen.js"),
+    "utf8"
+  );
+  assert.match(resultSource, /Optional AI Guide Explanation/);
+  assert.match(resultSource, /paraphrases the deterministic evidence above; it does not select the route/);
+  assert.match(resultSource, /Generate another feasible plan variation/);
+  assert.match(resultSource, /Another feasible plan variation was generated/);
+  assert.doesNotMatch(resultSource, /Generate a different full plan/);
+  assert.doesNotMatch(resultSource, /every POI changed/i);
 });

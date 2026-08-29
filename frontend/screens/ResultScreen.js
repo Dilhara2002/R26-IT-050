@@ -7,6 +7,7 @@ import {
   buildFullRegenerationRequest,
   buildReplacementRequest,
   createRegenerationContext,
+  validGuideExplanation,
 } from "../services/itineraryRegeneration";
 import {
   buildItinerarySafetyRequest,
@@ -34,10 +35,7 @@ export default function ResultScreen({ route, navigation }) {
   const availabilityMessage = getItinerarySafetyAvailability(startingLocation, optimizedStops);
   const deterministicExplanation = data?.deterministic_explanation?.summary ||
     data?.route_explanation?.summary || data?.ai_summary;
-  const guideExplanation = data?.guide_explanation ||
-    (data?.ai_paraphrase && data.ai_paraphrase !== deterministicExplanation
-      ? data.ai_paraphrase
-      : null);
+  const guideExplanation = validGuideExplanation(data, deterministicExplanation);
 
   useEffect(() => navigation.addListener("focus", () => setSafetyLoading(false)), [navigation]);
 
@@ -100,7 +98,7 @@ export default function ResultScreen({ route, navigation }) {
       setRegenerationMessage(
         mode === "replace_stop"
           ? `${action.name} was replaced while the other accepted stops were preserved.`
-          : "A different complete itinerary was generated."
+          : "Another feasible plan variation was generated."
       );
     } catch (error) {
       const nextState = applyFailedRegeneration(previousState, error);
@@ -185,7 +183,7 @@ export default function ResultScreen({ route, navigation }) {
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Generate a different full plan"
+          accessibilityLabel="Generate another feasible plan variation"
           disabled={Boolean(regenerationLoading) || safetyLoading}
           onPress={() => handleRegeneration("full_regeneration")}
           style={({ pressed }) => [
@@ -197,7 +195,7 @@ export default function ResultScreen({ route, navigation }) {
           <Text style={styles.regenerateText}>
             {regenerationLoading?.mode === "full_regeneration"
               ? "Generating a different plan…"
-              : "Generate a different full plan"}
+              : "Generate another feasible plan variation"}
           </Text>
         </Pressable>
 
@@ -269,8 +267,11 @@ export default function ResultScreen({ route, navigation }) {
 
       {guideExplanation ? (
         <View style={styles.assistantCard}>
-          <Text style={styles.sectionTitle}>Optional travel-guide explanation</Text>
+          <Text style={styles.sectionTitle}>Optional AI Guide Explanation</Text>
           <Text style={styles.aiSummary}>{guideExplanation}</Text>
+          <Text style={styles.guideNote}>
+            This paraphrases the deterministic evidence above; it does not select the route.
+          </Text>
         </View>
       ) : null}
 
@@ -341,6 +342,7 @@ const styles = StyleSheet.create({
   sourceText: { color: "#1D4ED8", fontSize: 12, fontWeight: "700", marginTop: 8 },
   sourceLink: { color: "#1D4ED8", fontSize: 12, textDecorationLine: "underline", marginTop: 5 },
   aiSummary: { color: "#475569", lineHeight: 22, fontSize: 15, textAlign: 'justify' },
+  guideNote: { color: "#64748B", fontSize: 12, lineHeight: 18, marginTop: 10 },
   safetyButton: { backgroundColor: "#7C3AED", borderRadius: 20, paddingVertical: 18, alignItems: "center", marginTop: 10 },
   missingResult: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, backgroundColor: "#EAF2FF" },
   missingResultText: { color: "#B91C1C", fontWeight: "800", fontSize: 16, textAlign: "center" },

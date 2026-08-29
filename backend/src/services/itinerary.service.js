@@ -22,14 +22,16 @@ export const generateItineraryFromAI = async (itineraryData) => {
 
   } catch (error) {
 
-
-    console.error(
-      "Error communicating with Python AI Engine:",
-      error.message
-    );
-
-
     if (error.response?.data) {
+      const controlledExhaustion =
+        error.response.status === 409 &&
+        error.response.data.code === "no_additional_feasible_alternative";
+      if (!controlledExhaustion) {
+        console.error(
+          "Error communicating with Python AI Engine:",
+          error.message
+        );
+      }
       const upstreamError = new Error(
         error.response.data.error ||
         error.response.data.message ||
@@ -40,6 +42,10 @@ export const generateItineraryFromAI = async (itineraryData) => {
       throw upstreamError;
     }
 
+    console.error(
+      "Error communicating with Python AI Engine:",
+      error.message
+    );
     throw new Error("Failed to generate itinerary from AI Engine");
 
 

@@ -149,6 +149,59 @@ test("itinerary service sends regeneration fields unchanged to Flask", async () 
   }
 });
 
+test("itinerary service forwards optional guide explanation unchanged", async () => {
+  const originalPost = axios.post;
+  const upstream = {
+    status: "success",
+    data: {
+      deterministic_explanation: { summary: "Deterministic evidence." },
+      guide_explanation: "Optional friendly paraphrase.",
+    },
+  };
+  axios.post = async () => ({ data: upstream });
+  try {
+    const result = await generateItineraryFromAI({ preferences: ["Nature"] });
+    assert.strictEqual(result, upstream);
+    assert.equal(result.data.guide_explanation, "Optional friendly paraphrase.");
+  } finally {
+    axios.post = originalPost;
+  }
+});
+
+test("itinerary service treats no-additional-alternative 409 as controlled exhaustion", async () => {
+  const originalPost = axios.post;
+  const originalError = console.error;
+  const logged = [];
+  console.error = (...args) => logged.push(args);
+  axios.post = async () => {
+    const error = new Error("Request failed with status code 409");
+    error.response = {
+      status: 409,
+      data: {
+        status: "error",
+        code: "no_additional_feasible_alternative",
+        message: "No additional feasible plan variation remains.",
+      },
+    };
+    throw error;
+  };
+  try {
+    await assert.rejects(
+      generateItineraryFromAI({ generation_mode: "full_regeneration" }),
+      (error) => {
+        assert.equal(error.statusCode, 409);
+        assert.equal(error.details.code, "no_additional_feasible_alternative");
+        assert.equal(error.details.message, "No additional feasible plan variation remains.");
+        return true;
+      }
+    );
+    assert.deepEqual(logged, []);
+  } finally {
+    axios.post = originalPost;
+    console.error = originalError;
+  }
+});
+
 test("itinerary service preserves insufficient-alternative errors", async () => {
   const originalPost = axios.post;
   axios.post = async () => {
