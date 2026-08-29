@@ -1423,29 +1423,33 @@ def _is_usable_gemini_key(api_key):
 
 def _final_gemini_model_output(payload):
     """Return bounded text from the final valid Interactions model-output step."""
-    if not isinstance(payload, dict) or not isinstance(payload.get("outputs"), list):
+    if not isinstance(payload, dict):
+        return None
+    steps = payload.get("steps")
+    if not isinstance(steps, list):
+        # Compatibility with responses used by the earlier preview transport.
+        steps = payload.get("outputs")
+    if not isinstance(steps, list):
         return None
 
     final_text = None
-    for step in payload["outputs"]:
+    for step in steps:
         if not isinstance(step, dict) or step.get("type") != "model_output":
             continue
         content = step.get("content")
         if not isinstance(content, list) or not content:
             continue
         text_parts = []
-        valid = True
         for part in content:
-            if (
-                not isinstance(part, dict)
-                or part.get("type") not in {"text", "output_text"}
-                or not isinstance(part.get("text"), str)
-                or not part["text"].strip()
-            ):
-                valid = False
-                break
-            text_parts.append(part["text"].strip())
-        candidate = "\n".join(text_parts).strip() if valid else ""
+            if not isinstance(part, dict) or part.get("type") not in {
+                "text",
+                "output_text",
+            }:
+                continue
+            text = part.get("text")
+            if isinstance(text, str) and text.strip():
+                text_parts.append(text)
+        candidate = "".join(text_parts).strip()
         if candidate and len(candidate) <= MAX_GEMINI_GUIDE_CHARS:
             final_text = candidate
     return final_text
