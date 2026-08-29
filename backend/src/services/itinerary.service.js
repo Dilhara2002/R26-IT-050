@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const PYTHON_AI_TIMEOUT_MS = 45000;
+export const PYTHON_AI_TIMEOUT_MS = 60000;
 
 
 export const generateItineraryFromAI = async (itineraryData) => {

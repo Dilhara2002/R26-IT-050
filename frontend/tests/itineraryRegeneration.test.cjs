@@ -350,6 +350,6 @@ test("result screen uses truthful guide and regeneration messaging", () => {
   assert.doesNotMatch(resultSource, /timeout of 30000ms exceeded/);
   assert.doesNotMatch(resultSource, /Generate a different full plan/);
   assert.doesNotMatch(resultSource, /every POI changed/i);
-  assert.match(apiSource, /ITINERARY_API_TIMEOUT_MS\s*=\s*55000/);
+  assert.match(apiSource, /ITINERARY_API_TIMEOUT_MS\s*=\s*70000/);
   assert.doesNotMatch(apiSource, /timeout:\s*30000/);
 });
