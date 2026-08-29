@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { predictLandmark } from "../services/landmarkService";
+import { colors } from "../src/styles/colors";
 
 //  Helpers
 function openGoogleMaps(gpsCoordinates) {
@@ -217,7 +218,7 @@ export default function LandmarkScannerScreen({ onBack, onOpenChat, navigation }
 
         {loading && (
           <View style={styles.loadingBox}>
-            <ActivityIndicator size="large" color="#2563EB" />
+            <ActivityIndicator size="large" color={colors.primary} />
             <Text style={styles.loadingText}>Analyzing image with AI...</Text>
           </View>
         )}
@@ -339,11 +340,11 @@ export default function LandmarkScannerScreen({ onBack, onOpenChat, navigation }
 
 //  Styles
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: "#EAF2FF" },
+  page: { flex: 1, backgroundColor: colors.background },
   content: { padding: 18, paddingBottom: 48, maxWidth: 800, alignSelf: "center", width: "100%" },
 
   // Header
-  hero: { backgroundColor: "#1D4ED8", borderRadius: 28, padding: 26, marginBottom: 18 },
+  hero: { backgroundColor: colors.primaryDark, borderRadius: 28, padding: 26, marginBottom: 18, borderWidth: 1, borderColor: "rgba(216,154,31,0.42)" },
   heroTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -385,38 +386,38 @@ const styles = StyleSheet.create({
     borderRadius: 20, fontWeight: "800",
   },
   heroTitle:    { fontSize: 32, fontWeight: "900", color: "#FFFFFF", marginBottom: 8 },
-  heroSubtitle: { color: "#DBEAFE", lineHeight: 22, fontSize: 14 },
+  heroSubtitle: { color: "#E7DBBA", lineHeight: 22, fontSize: 14 },
 
   // Image card
   card: {
-    backgroundColor: "#FFFFFF", borderRadius: 24,
-    padding: 18, marginBottom: 16, elevation: 4,
+    backgroundColor: colors.card, borderRadius: 24,
+    padding: 18, marginBottom: 16, borderWidth: 1, borderColor: colors.border,
   },
   previewImage: {
     width: "100%", height: 240, borderRadius: 16, marginBottom: 14,
   },
   placeholderBox: {
-    height: 200, borderRadius: 16, backgroundColor: "#EFF6FF",
+    height: 200, borderRadius: 16, backgroundColor: colors.backgroundDeep,
     justifyContent: "center", alignItems: "center",
-    borderWidth: 1.5, borderColor: "#BFDBFE",
+    borderWidth: 1.5, borderColor: "#C9B98F",
     borderStyle: "dashed", marginBottom: 14,
   },
   placeholderIcon: { fontSize: 48, marginBottom: 10 },
-  placeholderText: { fontSize: 16, fontWeight: "800", color: "#1D4ED8" },
-  placeholderSub:  { color: "#64748B", fontSize: 12, marginTop: 4 },
+  placeholderText: { fontSize: 16, fontWeight: "800", color: colors.text },
+  placeholderSub:  { color: colors.muted, fontSize: 12, marginTop: 4 },
 
   buttonRow: { flexDirection: "row", gap: 12, marginBottom: 14 },
   pickBtn: {
-    flex: 1, backgroundColor: "#2563EB",
+    flex: 1, backgroundColor: colors.primary,
     borderRadius: 16, paddingVertical: 14,
     alignItems: "center",
   },
-  pickBtnSecondary: { backgroundColor: "#EFF6FF", borderWidth: 1.5, borderColor: "#BFDBFE" },
+  pickBtnSecondary: { backgroundColor: colors.card, borderWidth: 1.5, borderColor: colors.primary },
   pickBtnText: { color: "#FFFFFF", fontWeight: "800", fontSize: 14 },
-  pickBtnTextSecondary: { color: "#1D4ED8" },
+  pickBtnTextSecondary: { color: colors.primary },
 
   analyzeBtn: {
-    backgroundColor: "#059669", borderRadius: 18,
+    backgroundColor: colors.cinnamon, borderRadius: 18,
     paddingVertical: 18, flexDirection: "row",
     justifyContent: "center", alignItems: "center", gap: 8,
   },
@@ -424,11 +425,11 @@ const styles = StyleSheet.create({
   analyzeBtnIcon: { fontSize: 18 },
 
   loadingBox: { alignItems: "center", paddingVertical: 20 },
-  loadingText: { marginTop: 10, color: "#64748B", fontWeight: "600", fontSize: 13 },
+  loadingText: { marginTop: 10, color: colors.muted, fontWeight: "600", fontSize: 13 },
 
   // Result hero
   resultHero: {
-    backgroundColor: "#1D4ED8", borderRadius: 24,
+    backgroundColor: colors.primaryDark, borderRadius: 24,
     padding: 20, marginBottom: 12,
     flexDirection: "row", alignItems: "flex-start", gap: 16,
   },
@@ -436,12 +437,12 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.18)",
     borderRadius: 16, padding: 12, alignItems: "center", minWidth: 72,
   },
-  confidenceLabel: { color: "#DBEAFE", fontSize: 10, fontWeight: "700" },
+  confidenceLabel: { color: colors.backgroundDeep, fontSize: 10, fontWeight: "700" },
   confidenceValue: { color: "#FFFFFF", fontSize: 26, fontWeight: "900" },
   resultTitleArea: { flex: 1 },
   resultTitle:     { fontSize: 20, fontWeight: "900", color: "#FFFFFF", marginBottom: 4 },
-  resultCategory:  { color: "#BFDBFE", fontWeight: "700", fontSize: 12, marginBottom: 2 },
-  resultLocation:  { color: "#DBEAFE", fontSize: 13, fontWeight: "600" },
+  resultCategory:  { color: "#F5D98F", fontWeight: "700", fontSize: 12, marginBottom: 2 },
+  resultLocation:  { color: colors.backgroundDeep, fontSize: 13, fontWeight: "600" },
 
   // Action Buttons Row (Maps & Chat)
   actionButtonsRow: {
@@ -464,42 +465,42 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   mapsBtn: {
-    backgroundColor: "#0EA5E9",
+    backgroundColor: colors.primary,
   },
   chatActionBtn: {
-    backgroundColor: "#7C3AED",
+    backgroundColor: colors.cinnamon,
   },
 
   // Section cards
   sectionCard: {
-    backgroundColor: "#FFFFFF", borderRadius: 22,
-    padding: 18, marginBottom: 12, elevation: 3,
+    backgroundColor: colors.card, borderRadius: 22,
+    padding: 18, marginBottom: 12, borderWidth: 1, borderColor: colors.border,
   },
   sectionHeader: {
     flexDirection: "row", alignItems: "center",
     marginBottom: 12, gap: 8,
   },
   sectionIcon:  { fontSize: 22 },
-  sectionTitle: { fontSize: 17, fontWeight: "900", color: "#0F172A" },
-  bodyText:     { color: "#475569", lineHeight: 22, fontSize: 14, marginBottom: 10 },
+  sectionTitle: { fontSize: 17, fontWeight: "900", color: colors.text },
+  bodyText:     { color: colors.muted, lineHeight: 22, fontSize: 14, marginBottom: 10 },
 
   infoRow:      { flexDirection: "row", gap: 8, marginBottom: 8 },
-  infoLabel:    { fontWeight: "800", color: "#1D4ED8", fontSize: 12, minWidth: 110 },
-  infoValue:    { flex: 1, color: "#334155", fontSize: 12, lineHeight: 18 },
+  infoLabel:    { fontWeight: "800", color: colors.cinnamon, fontSize: 12, minWidth: 110 },
+  infoValue:    { flex: 1, color: colors.muted, fontSize: 12, lineHeight: 18 },
 
   // Engine badge
   engineBadge: {
-    textAlign: "center", color: "#94A3B8",
+    textAlign: "center", color: colors.muted,
     fontSize: 11, marginBottom: 14, fontStyle: "italic",
   },
 
   // Reset button
   resetBtn: {
-    borderWidth: 2, borderColor: "#2563EB",
+    borderWidth: 2, borderColor: colors.primary,
     borderRadius: 18, paddingVertical: 16,
     alignItems: "center", marginTop: 4,
   },
-  resetBtnText: { color: "#2563EB", fontWeight: "900", fontSize: 15 },
+  resetBtnText: { color: colors.primary, fontWeight: "900", fontSize: 15 },
   
   // Unrecognized
   unrecognizedCard: {

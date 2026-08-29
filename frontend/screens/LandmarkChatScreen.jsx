@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { sendLandmarkChatMessage } from "../services/landmarkService";
+import { colors } from "../src/styles/colors";
 
 const QUICK_PROMPTS = [
   "👗 Dress code & rules",
@@ -194,7 +195,7 @@ export default function LandmarkChatScreen({ landmarkContext, onBack, navigation
                 <Text style={styles.botAvatarText}>🤖</Text>
               </View>
               <View style={[styles.bubble, styles.botBubble, styles.loadingBubble]}>
-                <ActivityIndicator size="small" color="#1D4ED8" />
+                <ActivityIndicator size="small" color={colors.primary} />
                 <Text style={styles.loadingText}>Tour guide is typing...</Text>
               </View>
             </View>
@@ -210,7 +211,7 @@ export default function LandmarkChatScreen({ landmarkContext, onBack, navigation
                 ? `Ask about ${activeLandmark}...`
                 : "Ask about any landmark..."
             }
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={colors.muted}
             value={inputText}
             onChangeText={setInputText}
             onSubmitEditing={() => handleSend()}
@@ -237,16 +238,16 @@ export default function LandmarkChatScreen({ landmarkContext, onBack, navigation
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
   },
   container: {
     flex: 1,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
   },
 
   // Header
   header: {
-    backgroundColor: "#1D4ED8",
+    backgroundColor: colors.primaryDark,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -274,7 +275,7 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   headerSub: {
-    color: "#DBEAFE",
+    color: colors.backgroundDeep,
     fontSize: 11,
     fontWeight: "600",
     marginTop: 2,
@@ -294,9 +295,9 @@ const styles = StyleSheet.create({
 
   // Quick Chips
   chipsContainer: {
-    backgroundColor: "#EFF6FF",
+    backgroundColor: colors.backgroundDeep,
     borderBottomWidth: 1,
-    borderBottomColor: "#DBEAFE",
+    borderBottomColor: colors.border,
     paddingVertical: 8,
   },
   chipsScroll: {
@@ -304,15 +305,15 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: "#BFDBFE",
+    borderColor: colors.border,
     borderRadius: 18,
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
   chipText: {
-    color: "#1D4ED8",
+    color: colors.cinnamon,
     fontWeight: "700",
     fontSize: 12,
   },
@@ -341,11 +342,11 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: "#DBEAFE",
+    backgroundColor: colors.backgroundDeep,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#BFDBFE",
+    borderColor: colors.border,
   },
   botAvatarText: {
     fontSize: 18,
@@ -360,14 +361,14 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   userBubble: {
-    backgroundColor: "#1D4ED8",
+    backgroundColor: colors.primary,
     borderBottomRightRadius: 4,
   },
   botBubble: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.card,
     borderBottomLeftRadius: 4,
     borderWidth: 1,
-    borderColor: "#E2E8F0",
+    borderColor: colors.border,
   },
   loadingBubble: {
     flexDirection: "row",
@@ -376,7 +377,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   loadingText: {
-    color: "#64748B",
+    color: colors.muted,
     fontSize: 13,
     fontWeight: "600",
   },
@@ -390,7 +391,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   botText: {
-    color: "#0F172A",
+    color: colors.text,
   },
   timeText: {
     fontSize: 10,
@@ -398,42 +399,42 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
   },
   userTime: {
-    color: "#93C5FD",
+    color: colors.backgroundDeep,
   },
   botTime: {
-    color: "#94A3B8",
+    color: colors.muted,
   },
 
   // Input Bar
   inputBar: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.card,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderTopWidth: 1,
-    borderTopColor: "#E2E8F0",
+    borderTopColor: colors.border,
     gap: 10,
   },
   input: {
     flex: 1,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: colors.background,
     borderRadius: 24,
     paddingHorizontal: 18,
     paddingVertical: 10,
     fontSize: 14,
-    color: "#0F172A",
+    color: colors.text,
   },
   sendBtn: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "#1D4ED8",
+    backgroundColor: colors.cinnamon,
     justifyContent: "center",
     alignItems: "center",
   },
   sendBtnDisabled: {
-    backgroundColor: "#94A3B8",
+    backgroundColor: colors.border,
   },
   sendBtnIcon: {
     color: "#FFFFFF",
