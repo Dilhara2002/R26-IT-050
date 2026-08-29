@@ -505,10 +505,12 @@ class ModelTestCase(unittest.TestCase):
         response = mock.Mock()
         response.raise_for_status.return_value = None
         response.json.return_value = {
-            "outputs": [
+            "steps": [
                 {
                     "type": "model_output",
-                    "content": [{"type": "text", "text": "Friendly guide text."}],
+                    "content": [
+                        {"type": "text", "text": "Friendly guide explanation"}
+                    ],
                 }
             ]
         }
@@ -523,7 +525,7 @@ class ModelTestCase(unittest.TestCase):
                 "AIza-valid-looking-test-key",
                 core_summary="Deterministic evidence summary.",
             )
-        self.assertEqual(summary, "Friendly guide text.")
+        self.assertEqual(summary, "Friendly guide explanation")
         self.assertEqual(post.call_args.args, (model.GEMINI_INTERACTIONS_URL,))
         self.assertEqual(
             post.call_args.kwargs["headers"],
@@ -542,10 +544,10 @@ class ModelTestCase(unittest.TestCase):
         self.assertIn("request success", success_log)
         self.assertIn("model=gemini-test-model", success_log)
         self.assertIn("elapsed_ms=123", success_log)
-        self.assertIn("output_chars=20", success_log)
+        self.assertIn("output_chars=26", success_log)
         self.assertNotIn("AIza-valid-looking-test-key", success_log)
         self.assertNotIn("Deterministic evidence summary.", success_log)
-        self.assertNotIn("Friendly guide text.", success_log)
+        self.assertNotIn("Friendly guide explanation", success_log)
 
     def test_gemini_defaults_model_and_selects_final_valid_model_output(self):
         response = mock.Mock()
@@ -560,9 +562,14 @@ class ModelTestCase(unittest.TestCase):
                 {
                     "type": "model_output",
                     "content": [
-                        {"type": "text", "text": "Final model"},
+                        {"type": "text", "text": "Final model "},
+                        {"type": "image", "data": "ignored"},
                         {"type": "output_text", "text": "text."},
                     ],
+                },
+                {
+                    "type": "model_output",
+                    "content": [{"type": "image", "data": "no valid text"}],
                 },
             ]
         }
@@ -575,10 +582,32 @@ class ModelTestCase(unittest.TestCase):
                 "AIza-valid-looking-test-key",
                 core_summary="Deterministic evidence summary.",
             )
-        self.assertEqual(summary, "Final model\ntext.")
+        self.assertEqual(summary, "Final model text.")
         self.assertEqual(model.DEFAULT_GEMINI_MODEL, "gemini-3.5-flash-lite")
         self.assertEqual(
             post.call_args.kwargs["json"]["model"], model.DEFAULT_GEMINI_MODEL
+        )
+
+    def test_official_steps_join_text_in_order_and_ignore_unsupported_content(self):
+        payload = {
+            "steps": [
+                {
+                    "type": "model_output",
+                    "content": [{"type": "text", "text": "Earlier guide"}],
+                },
+                {
+                    "type": "model_output",
+                    "content": [
+                        {"type": "text", "text": "  Final "},
+                        {"type": "image", "data": "ignored"},
+                        {"type": "text", "text": "guide explanation  "},
+                    ],
+                },
+            ]
+        }
+        self.assertEqual(
+            model._final_gemini_model_output(payload),
+            "Final guide explanation",
         )
 
     def test_gemini_timeout_and_http_diagnostics_are_sanitized(self):
@@ -625,15 +654,15 @@ class ModelTestCase(unittest.TestCase):
         malformed_responses = [
             ValueError("invalid JSON"),
             {},
-            {"outputs": []},
-            {"outputs": [{"type": "model_output", "content": [{}]}]},
+            {"steps": []},
+            {"steps": [{"type": "model_output", "content": [{}]}]},
             {
-                "outputs": [
+                "steps": [
                     {"type": "model_output", "content": [{"type": "text", "text": "   "}]}
                 ]
             },
             {
-                "outputs": [
+                "steps": [
                     {
                         "type": "model_output",
                         "content": [{"type": "image", "text": "not text content"}],
@@ -641,7 +670,7 @@ class ModelTestCase(unittest.TestCase):
                 ]
             },
             {
-                "outputs": [
+                "steps": [
                     {
                         "type": "model_output",
                         "content": [
@@ -676,10 +705,12 @@ class ModelTestCase(unittest.TestCase):
         response = mock.Mock()
         response.raise_for_status.return_value = None
         response.json.return_value = {
-            "outputs": [
+            "steps": [
                 {
                     "type": "model_output",
-                    "content": [{"type": "text", "text": "Safe guide text."}],
+                    "content": [
+                        {"type": "text", "text": "Friendly guide explanation"}
+                    ],
                 }
             ]
         }
@@ -697,11 +728,14 @@ class ModelTestCase(unittest.TestCase):
             )
         payload = endpoint_response.get_json()
         self.assertEqual(endpoint_response.status_code, 200, payload)
-        self.assertEqual(payload["data"]["guide_explanation"], "Safe guide text.")
+        self.assertEqual(
+            payload["data"]["guide_explanation"],
+            "Friendly guide explanation",
+        )
         self.assertNotIn(secret, json.dumps(payload))
         diagnostic = "\n".join(captured.output)
         self.assertNotIn(secret, diagnostic)
-        self.assertNotIn("Safe guide text.", diagnostic)
+        self.assertNotIn("Friendly guide explanation", diagnostic)
         self.assertNotIn(payload["data"]["deterministic_explanation"]["summary"], diagnostic)
 
     def test_endpoint_retains_deterministic_xai_for_all_gemini_fallbacks(self):
@@ -715,14 +749,14 @@ class ModelTestCase(unittest.TestCase):
         empty_output = mock.Mock()
         empty_output.raise_for_status.return_value = None
         empty_output.json.return_value = {
-            "outputs": [
+            "steps": [
                 {"type": "model_output", "content": [{"type": "text", "text": "  "}]}
             ]
         }
         non_text_output = mock.Mock()
         non_text_output.raise_for_status.return_value = None
         non_text_output.json.return_value = {
-            "outputs": [
+            "steps": [
                 {"type": "model_output", "content": [{"type": "image", "data": "ignored"}]}
             ]
         }
