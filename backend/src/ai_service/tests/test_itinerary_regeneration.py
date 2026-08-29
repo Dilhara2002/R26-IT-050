@@ -215,8 +215,55 @@ class RegenerationApiTests(unittest.TestCase):
         }
         self.assertTrue(returned_ids)
         self.assertNotEqual(returned_ids, original_ids)
-        self.assertTrue(returned_ids.isdisjoint(original_ids))
+        self.assertEqual(len(returned_ids), len(original_ids))
+        self.assertTrue(returned_ids & original_ids)
         self.assertTrue(data["route_changed"])
+
+    def test_three_sequential_full_regenerations_do_not_cycle_recent_signatures(self):
+        target = 3
+        current = ["verified-0", "verified-1", "verified-2"]
+        recent = [sorted(current)]
+        successful = []
+        for _ in range(3):
+            response = self.post(
+                {
+                    "generation_mode": "full_regeneration",
+                    "excluded_place_ids": current,
+                    "locked_place_ids": [],
+                    "target_stop_count": target,
+                    "current_plan_signature": current,
+                    "recent_plan_signatures": recent,
+                }
+            )
+            self.assertEqual(response.status_code, 200, response.get_json())
+            data = response.get_json()["data"]
+            signature = sorted(str(stop["place_id"]) for stop in data["optimized_stops"])
+            self.assertEqual(len(signature), target)
+            self.assertNotIn(signature, recent)
+            self.assertLessEqual(data["planned_time_minutes"], 100)
+            successful.append(signature)
+            recent.append(signature)
+            current = signature
+        self.assertEqual(len({tuple(value) for value in successful}), 3)
+
+    def test_full_regeneration_exhaustion_is_controlled(self):
+        # The API intentionally bounds history at eight, so use a target equal
+        # to the complete candidate set to produce one exhausted signature.
+        all_ids = [f"verified-{index}" for index in range(6)]
+        response = self.post(
+            {
+                "generation_mode": "full_regeneration",
+                "excluded_place_ids": all_ids,
+                "locked_place_ids": [],
+                "target_stop_count": 6,
+                "current_plan_signature": all_ids,
+                "recent_plan_signatures": [all_ids],
+            }
+        )
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(
+            response.get_json()["code"], "no_additional_feasible_alternative"
+        )
 
     def test_insufficient_full_regeneration_alternatives_is_truthful(self):
         response = self.post(
@@ -228,7 +275,7 @@ class RegenerationApiTests(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 409)
         payload = response.get_json()
-        self.assertEqual(payload["code"], "insufficient_verified_alternatives")
+        self.assertEqual(payload["code"], "no_additional_feasible_alternative")
         self.assertEqual(payload["generation_mode"], "full_regeneration")
 
     def test_success_updates_structured_map_xai_and_time_contracts(self):
@@ -290,6 +337,60 @@ class RegenerationApiTests(unittest.TestCase):
         returned = {str(stop["place_id"]) for stop in first["optimized_stops"]}
         self.assertIn("verified-1", returned)
         self.assertNotIn("verified-0", returned)
+
+
+class RealCatalogueRegenerationTests(unittest.TestCase):
+    def test_kandy_plan_a_regenerates_to_three_useful_stops(self):
+        original_key = flask_app.GEMINI_API_KEY
+        flask_app.GEMINI_API_KEY = None
+        try:
+            plan_a = [
+                "wikidata-Q5966035",
+                "wikidata-Q7876953",
+                "wikidata-Q3119056",
+            ]
+            response = flask_app.app.test_client().post(
+                "/api/optimize-itinerary",
+                json={
+                    "preferences": ["Nature", "Adventure"],
+                    "max_time_minutes": 360,
+                    "current_lat": 7.2906,
+                    "current_lon": 80.6337,
+                    "radius_km": 15,
+                    "generation_mode": "full_regeneration",
+                    "excluded_place_ids": plan_a,
+                    "locked_place_ids": [],
+                    "target_stop_count": 3,
+                    "current_plan_signature": plan_a,
+                    "recent_plan_signatures": [plan_a],
+                },
+            )
+        finally:
+            flask_app.GEMINI_API_KEY = original_key
+        self.assertEqual(response.status_code, 200, response.get_json())
+        data = response.get_json()["data"]
+        returned = [str(stop["place_id"]) for stop in data["optimized_stops"]]
+        self.assertEqual(len(returned), 3)
+        self.assertEqual(len(set(returned)), 3)
+        self.assertNotEqual(set(returned), set(plan_a))
+        self.assertTrue(set(returned) & set(plan_a))
+        self.assertLessEqual(data["planned_time_minutes"], 360)
+        self.assertEqual(
+            data["planned_time_minutes"],
+            data["visit_time_minutes"] + data["travel_time_minutes"],
+        )
+        self.assertEqual(
+            [stop["sequence"] for stop in data["optimized_stops"]], [1, 2, 3]
+        )
+        self.assertEqual(
+            data["optimized_route"],
+            [
+                f"{stop['name']} ({stop['duration_minutes']} mins)"
+                for stop in data["optimized_stops"]
+            ],
+        )
+        self.assertTrue(all(stop["explanation"] for stop in data["optimized_stops"]))
+        self.assertTrue(data["route_explanation"]["summary"])
 
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@ import {
   applySuccessfulRegeneration,
   buildFullRegenerationRequest,
   buildReplacementRequest,
+  createRegenerationContext,
 } from "../services/itineraryRegeneration";
 import {
   buildItinerarySafetyRequest,
@@ -24,6 +25,9 @@ export default function ResultScreen({ route, navigation }) {
   const [regenerationLoading, setRegenerationLoading] = useState(null);
   const [regenerationError, setRegenerationError] = useState("");
   const [regenerationMessage, setRegenerationMessage] = useState("");
+  const [regenerationContext, setRegenerationContext] = useState(() =>
+    initialData ? createRegenerationContext(initialData) : null
+  );
 
   const optimizedStops = Array.isArray(data?.optimized_stops) ? data.optimized_stops : [];
   const startingLocation = data?.starting_location || null;
@@ -75,6 +79,7 @@ export default function ResultScreen({ route, navigation }) {
       validationError,
       regenerationError: "",
       regenerationLoading: action,
+      regenerationContext,
     };
 
     setRegenerationLoading(action);
@@ -83,7 +88,7 @@ export default function ResultScreen({ route, navigation }) {
     try {
       const requestPayload = mode === "replace_stop"
         ? buildReplacementRequest(data, action.placeId)
-        : buildFullRegenerationRequest(data);
+        : buildFullRegenerationRequest(data, regenerationContext);
       const response = await API.post("/optimize", requestPayload);
       const nextState = applySuccessfulRegeneration(previousState, response.data);
       setData(nextState.data);
@@ -91,6 +96,7 @@ export default function ResultScreen({ route, navigation }) {
       setSafetyResult(null);
       setSafetyError("");
       setValidationError("");
+      setRegenerationContext(nextState.regenerationContext);
       setRegenerationMessage(
         mode === "replace_stop"
           ? `${action.name} was replaced while the other accepted stops were preserved.`

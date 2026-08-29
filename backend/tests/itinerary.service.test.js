@@ -73,6 +73,43 @@ test("controller forwards stable-ID regeneration constraints additively", () => 
   assert.equal(payload.radius_km, 15);
 });
 
+test("controller validates and canonicalizes bounded full-regeneration context", () => {
+  const payload = buildItineraryPayload({
+    preferences: ["Nature", "Adventure"],
+    max_time_minutes: 360,
+    generation_mode: "full_regeneration",
+    excluded_place_ids: ["place-c", "place-a", "place-b"],
+    locked_place_ids: [],
+    target_stop_count: 3,
+    current_plan_signature: ["place-c", "place-a", "place-b"],
+    recent_plan_signatures: [
+      ["place-c", "place-a", "place-b"],
+      ["place-a", "place-d", "place-e"],
+    ],
+  });
+  assert.equal(payload.target_stop_count, 3);
+  assert.deepEqual(payload.current_plan_signature, ["place-a", "place-b", "place-c"]);
+  assert.deepEqual(payload.recent_plan_signatures, [
+    ["place-a", "place-b", "place-c"],
+    ["place-a", "place-d", "place-e"],
+  ]);
+});
+
+test("controller rejects unbounded or malformed regeneration context", () => {
+  const invalidCases = [
+    { target_stop_count: 0 },
+    { target_stop_count: 9 },
+    { target_stop_count: 3.5 },
+    { current_plan_signature: [] },
+    { current_plan_signature: ["same", "same"] },
+    { recent_plan_signatures: Array.from({ length: 9 }, (_, index) => [`p-${index}`]) },
+    { recent_plan_signatures: [["same"], ["same"]] },
+  ];
+  for (const additions of invalidCases) {
+    assert.throws(() => buildItineraryPayload({ preferences: ["Nature"], ...additions }));
+  }
+});
+
 test("controller rejects invalid time, coordinates, and radius instead of defaulting", () => {
   const cases = [
     { max_time_minutes: 0 },

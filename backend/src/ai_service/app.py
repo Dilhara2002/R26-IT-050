@@ -20,6 +20,7 @@ from model import (
     calculate_haversine_distance,
     evaluate_route,
     filter_locations,
+    find_best_full_regeneration_route,
     generate_itinerary_summary,
     get_relevance_engine_metadata,
     run_genetic_algorithm_details,
@@ -31,6 +32,7 @@ CORS(app)
 
 ALLOWED_GENERATION_MODES = {"initial", "replace_stop", "full_regeneration"}
 MAX_TIME_MINUTES = 1440
+MAX_RECENT_PLAN_SIGNATURES = 8
 
 
 class RequestValidationError(ValueError):
@@ -90,6 +92,34 @@ def _normalize_id_array(data, field_name):
     return normalized
 
 
+def _normalize_plan_signature(raw_value, field_name):
+    if not isinstance(raw_value, list) or not 1 <= len(raw_value) <= MAX_ROUTE_STOPS:
+        raise RequestValidationError(
+            f"{field_name} must contain between 1 and {MAX_ROUTE_STOPS} place IDs."
+        )
+    normalized = [_normalize_id(value, field_name) for value in raw_value]
+    if len(normalized) != len(set(normalized)):
+        raise RequestValidationError(f"{field_name} cannot contain duplicate IDs.")
+    return tuple(sorted(normalized))
+
+
+def _normalize_recent_plan_signatures(data):
+    raw_signatures = data.get("recent_plan_signatures", [])
+    if not isinstance(raw_signatures, list) or len(raw_signatures) > MAX_RECENT_PLAN_SIGNATURES:
+        raise RequestValidationError(
+            f"recent_plan_signatures must contain at most {MAX_RECENT_PLAN_SIGNATURES} signatures."
+        )
+    signatures = [
+        _normalize_plan_signature(value, f"recent_plan_signatures[{index}]")
+        for index, value in enumerate(raw_signatures)
+    ]
+    if len(signatures) != len(set(signatures)):
+        raise RequestValidationError(
+            "recent_plan_signatures cannot contain duplicate signatures."
+        )
+    return signatures
+
+
 def _verified_places_by_id():
     return {
         str(row["Place_ID"]): row
@@ -113,8 +143,22 @@ def _validate_constraints(data, user_lat, user_lon, radius_km, max_time_minutes)
             f"generation_mode must be one of {sorted(ALLOWED_GENERATION_MODES)}."
         )
 
+    current_signature = (
+        _normalize_plan_signature(
+            data["current_plan_signature"], "current_plan_signature"
+        )
+        if "current_plan_signature" in data
+        else None
+    )
+    recent_signatures = _normalize_recent_plan_signatures(data)
+
     verified_by_id = _verified_places_by_id()
-    unknown_ids = sorted((set(locked_ids) | set(excluded_ids)) - set(verified_by_id))
+    contextual_ids = set(current_signature or ())
+    for signature in recent_signatures:
+        contextual_ids.update(signature)
+    unknown_ids = sorted(
+        (set(locked_ids) | set(excluded_ids) | contextual_ids) - set(verified_by_id)
+    )
     if unknown_ids:
         raise RequestValidationError(
             f"Unknown, stale, or unverified place IDs: {unknown_ids}."
@@ -158,6 +202,15 @@ def _validate_constraints(data, user_lat, user_lon, radius_km, max_time_minutes)
 
     replaced_place_id = data.get("replaced_place_id")
     target_stop_count = data.get("target_stop_count")
+    if target_stop_count is not None and (
+        isinstance(target_stop_count, bool)
+        or not isinstance(target_stop_count, int)
+        or target_stop_count < 1
+        or target_stop_count > MAX_ROUTE_STOPS
+    ):
+        raise RequestValidationError(
+            f"target_stop_count must be an integer from 1 to {MAX_ROUTE_STOPS}."
+        )
     if generation_mode == "replace_stop":
         if replaced_place_id is None:
             raise RequestValidationError("replaced_place_id is required for replace_stop mode.")
@@ -168,18 +221,24 @@ def _validate_constraints(data, user_lat, user_lon, radius_km, max_time_minutes)
             )
         if target_stop_count is None:
             target_stop_count = len(locked_ids) + 1
-        if (
-            isinstance(target_stop_count, bool)
-            or not isinstance(target_stop_count, int)
-            or target_stop_count < 1
-            or target_stop_count > MAX_ROUTE_STOPS
-        ):
-            raise RequestValidationError(
-                f"target_stop_count must be an integer from 1 to {MAX_ROUTE_STOPS}."
-            )
         if target_stop_count != len(locked_ids) + 1:
             raise RequestValidationError(
                 "replace_stop mode must lock every accepted stop and request exactly one replacement."
+            )
+        if current_signature is not None or recent_signatures:
+            raise RequestValidationError(
+                "Plan history fields are only valid in full_regeneration mode."
+            )
+    elif generation_mode == "initial":
+        if replaced_place_id is not None:
+            raise RequestValidationError(
+                "replaced_place_id is only valid in replace_stop mode."
+            )
+        replaced_place_id = None
+        target_stop_count = None
+        if current_signature is not None or recent_signatures:
+            raise RequestValidationError(
+                "Plan history fields are only valid in full_regeneration mode."
             )
     else:
         if replaced_place_id is not None:
@@ -187,17 +246,24 @@ def _validate_constraints(data, user_lat, user_lon, radius_km, max_time_minutes)
                 "replaced_place_id is only valid in replace_stop mode."
             )
         replaced_place_id = None
-        target_stop_count = None
 
     if generation_mode == "full_regeneration":
         if locked_ids:
             raise RequestValidationError(
                 "full_regeneration cannot lock stops from the previous plan."
             )
-        if not excluded_ids:
+        if current_signature is None:
+            current_signature = tuple(sorted(excluded_ids)) if excluded_ids else None
+        if current_signature is None:
             raise RequestValidationError(
-                "full_regeneration requires the current place IDs in excluded_place_ids."
+                "full_regeneration requires a current plan signature."
             )
+        if target_stop_count is None:
+            target_stop_count = len(current_signature)
+        if current_signature not in recent_signatures:
+            if len(recent_signatures) >= MAX_RECENT_PLAN_SIGNATURES:
+                recent_signatures = recent_signatures[1:]
+            recent_signatures.append(current_signature)
 
     return {
         "generation_mode": generation_mode,
@@ -205,6 +271,8 @@ def _validate_constraints(data, user_lat, user_lon, radius_km, max_time_minutes)
         "excluded_place_ids": excluded_ids,
         "replaced_place_id": replaced_place_id,
         "target_stop_count": target_stop_count,
+        "current_plan_signature": current_signature,
+        "recent_plan_signatures": recent_signatures,
     }
 
 
@@ -245,12 +313,13 @@ def optimize_itinerary():
         locked_ids = constraints["locked_place_ids"]
         excluded_ids = constraints["excluded_place_ids"]
 
+        candidate_excluded_ids = [] if generation_mode == "full_regeneration" else excluded_ids
         filtered_places = filter_locations(
             user_preferences,
             user_lat,
             user_lon,
             radius_km,
-            excluded_place_ids=excluded_ids,
+            excluded_place_ids=candidate_excluded_ids,
             locked_place_ids=locked_ids,
         )
         if filtered_places is None or filtered_places.empty:
@@ -273,6 +342,29 @@ def optimize_itinerary():
             )
 
         target_stop_count = constraints["target_stop_count"]
+        selected_route_indices = None
+        if generation_mode == "full_regeneration":
+            selected_route_indices = find_best_full_regeneration_route(
+                filtered_places,
+                max_time_minutes,
+                user_lat,
+                user_lon,
+                target_stop_count,
+                constraints["recent_plan_signatures"],
+            )
+            if not selected_route_indices:
+                return _controlled_error(
+                    "No additional feasible useful itinerary remains in the bounded verified candidate set.",
+                    "no_additional_feasible_alternative",
+                    409,
+                    generation_mode=generation_mode,
+                    target_stop_count=target_stop_count,
+                    current_plan_signature=list(constraints["current_plan_signature"]),
+                    recent_plan_signatures=[
+                        list(signature) for signature in constraints["recent_plan_signatures"]
+                    ],
+                    search_radius_km=radius_km,
+                )
         optimization = run_genetic_algorithm_details(
             filtered_places,
             max_time_minutes,
@@ -283,6 +375,7 @@ def optimize_itinerary():
             excluded_place_ids=excluded_ids,
             minimum_route_stops=target_stop_count or 1,
             maximum_route_stops=target_stop_count or MAX_ROUTE_STOPS,
+            route_indices_override=selected_route_indices,
         )
         optimal_places = optimization["optimized_route"]
         optimized_stops = optimization["optimized_stops"]
@@ -290,13 +383,23 @@ def optimize_itinerary():
 
         constraints_satisfied = (
             set(locked_ids).issubset(returned_ids)
-            and not (set(excluded_ids) & set(returned_ids))
+            and (
+                generation_mode == "full_regeneration"
+                or not (set(excluded_ids) & set(returned_ids))
+            )
             and len(returned_ids) == len(set(returned_ids))
             and optimization["planned_time_minutes"] <= max_time_minutes
             and len(returned_ids) <= MAX_ROUTE_STOPS
         )
-        if generation_mode == "replace_stop":
+        if generation_mode in {"replace_stop", "full_regeneration"}:
             constraints_satisfied = constraints_satisfied and len(returned_ids) == target_stop_count
+        if generation_mode == "full_regeneration":
+            returned_signature = tuple(sorted(returned_ids))
+            constraints_satisfied = (
+                constraints_satisfied
+                and returned_signature != constraints["current_plan_signature"]
+                and returned_signature not in set(constraints["recent_plan_signatures"])
+            )
         if not optimal_places or not constraints_satisfied:
             code = (
                 "insufficient_verified_alternatives"
@@ -368,6 +471,14 @@ def optimize_itinerary():
                     "locked_place_ids": locked_ids,
                     "excluded_place_ids": excluded_ids,
                     "replaced_place_id": constraints["replaced_place_id"],
+                    "regeneration_target_stop_count": (
+                        target_stop_count if generation_mode != "initial" else len(returned_ids)
+                    ),
+                    "current_plan_signature": (
+                        list(constraints["current_plan_signature"])
+                        if constraints["current_plan_signature"] is not None
+                        else None
+                    ),
                     "route_changed": generation_mode != "initial",
                 },
             }

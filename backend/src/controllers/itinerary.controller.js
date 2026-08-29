@@ -14,6 +14,45 @@ const requireFiniteNumber = (value, field, minimum, maximum, fallback) => {
   return candidate;
 };
 
+const normalizePlanSignature = (value, field) => {
+  if (!Array.isArray(value) || value.length < 1 || value.length > 8) {
+    const error = new Error(`${field} must contain between 1 and 8 place IDs.`);
+    error.statusCode = 400;
+    throw error;
+  }
+  const normalized = value.map((placeId) => {
+    if (typeof placeId !== "string" && typeof placeId !== "number") {
+      const error = new Error(`${field} must contain stable string or number IDs.`);
+      error.statusCode = 400;
+      throw error;
+    }
+    return String(placeId).trim();
+  });
+  if (normalized.some((placeId) => !placeId) || new Set(normalized).size !== normalized.length) {
+    const error = new Error(`${field} must contain unique, non-empty place IDs.`);
+    error.statusCode = 400;
+    throw error;
+  }
+  return normalized.sort();
+};
+
+const normalizeRecentPlanSignatures = (value) => {
+  if (!Array.isArray(value) || value.length > 8) {
+    const error = new Error("recent_plan_signatures must contain at most 8 signatures.");
+    error.statusCode = 400;
+    throw error;
+  }
+  const normalized = value.map((signature, index) =>
+    normalizePlanSignature(signature, `recent_plan_signatures[${index}]`)
+  );
+  if (new Set(normalized.map((signature) => JSON.stringify(signature))).size !== normalized.length) {
+    const error = new Error("recent_plan_signatures cannot contain duplicate signatures.");
+    error.statusCode = 400;
+    throw error;
+  }
+  return normalized;
+};
+
 export const buildItineraryPayload = (body) => {
   const {
     preferences,
@@ -25,7 +64,9 @@ export const buildItineraryPayload = (body) => {
     locked_place_ids,
     generation_mode,
     replaced_place_id,
-    target_stop_count
+    target_stop_count,
+    current_plan_signature,
+    recent_plan_signatures
   } = body;
 
   const payload = {
@@ -40,13 +81,28 @@ export const buildItineraryPayload = (body) => {
     locked_place_ids,
     generation_mode,
     replaced_place_id,
-    target_stop_count
+    target_stop_count,
+    current_plan_signature,
+    recent_plan_signatures
   };
   Object.entries(additiveFields).forEach(([field, value]) => {
     if (value !== undefined) {
-      payload[field] = field === "radius_km"
-        ? requireFiniteNumber(value, "radius_km", 0.1, 100)
-        : value;
+      if (field === "radius_km") {
+        payload[field] = requireFiniteNumber(value, "radius_km", 0.1, 100);
+      } else if (field === "target_stop_count") {
+        if (!Number.isInteger(value) || value < 1 || value > 8) {
+          const error = new Error("target_stop_count must be an integer from 1 to 8.");
+          error.statusCode = 400;
+          throw error;
+        }
+        payload[field] = value;
+      } else if (field === "current_plan_signature") {
+        payload[field] = normalizePlanSignature(value, field);
+      } else if (field === "recent_plan_signatures") {
+        payload[field] = normalizeRecentPlanSignatures(value);
+      } else {
+        payload[field] = value;
+      }
     }
   });
   return payload;

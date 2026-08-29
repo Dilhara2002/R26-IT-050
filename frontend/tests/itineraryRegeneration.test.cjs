@@ -21,6 +21,7 @@ const {
   applySuccessfulRegeneration,
   buildFullRegenerationRequest,
   buildReplacementRequest,
+  createRegenerationContext,
 } = helperModule.exports;
 
 
@@ -49,11 +50,32 @@ test("replacement request excludes one stop and locks every accepted stop", () =
 });
 
 test("full regeneration excludes the complete current place set", () => {
-  const request = buildFullRegenerationRequest(itinerary);
+  const request = buildFullRegenerationRequest(
+    itinerary,
+    createRegenerationContext(itinerary)
+  );
   assert.equal(request.generation_mode, "full_regeneration");
   assert.deepEqual(request.excluded_place_ids, ["place-a", "place-b", "place-c"]);
   assert.deepEqual(request.locked_place_ids, []);
   assert.deepEqual(request.preferences, itinerary.user_preferences);
+  assert.equal(request.target_stop_count, 3);
+  assert.deepEqual(request.current_plan_signature, ["place-a", "place-b", "place-c"]);
+  assert.deepEqual(request.recent_plan_signatures, [["place-a", "place-b", "place-c"]]);
+});
+
+test("stable full-regeneration target remains three after a degraded displayed response", () => {
+  const context = createRegenerationContext(itinerary);
+  const degraded = {
+    ...itinerary,
+    optimized_stops: [{ place_id: "arthurs-seat", name: "Arthur's Seat" }],
+  };
+  const request = buildFullRegenerationRequest(degraded, context);
+  assert.equal(request.target_stop_count, 3);
+  assert.deepEqual(request.current_plan_signature, ["arthurs-seat"]);
+  assert.deepEqual(request.recent_plan_signatures, [
+    ["place-a", "place-b", "place-c"],
+    ["arthurs-seat"],
+  ]);
 });
 
 test("failed regeneration preserves itinerary and existing safety evidence", () => {
@@ -98,6 +120,86 @@ test("successful regeneration updates route metadata and clears stale safety", (
   assert.equal(next.safetyError, "");
   assert.deepEqual(next.persistence, { saved: false, status: "failed" });
   assert.equal(next.data.route_explanation.summary, "Updated deterministic explanation.");
+});
+
+test("successful full regeneration preserves target, records history, and clears Safety", () => {
+  const context = createRegenerationContext(itinerary);
+  const nextData = {
+    ...itinerary,
+    generation_mode: "full_regeneration",
+    route_changed: true,
+    optimized_stops: [
+      { place_id: "place-a", name: "Place A" },
+      { place_id: "place-d", name: "Place D" },
+      { place_id: "place-e", name: "Place E" },
+    ],
+  };
+  const next = applySuccessfulRegeneration(
+    {
+      data: itinerary,
+      safetyResult: { status: "old" },
+      safetyError: "old",
+      regenerationLoading: { mode: "full_regeneration" },
+      regenerationContext: context,
+    },
+    { status: "success", data: nextData }
+  );
+  assert.equal(next.regenerationContext.targetStopCount, 3);
+  assert.deepEqual(next.regenerationContext.recentPlanSignatures, [
+    ["place-a", "place-b", "place-c"],
+    ["place-a", "place-d", "place-e"],
+  ]);
+  assert.equal(next.safetyResult, null);
+  assert.equal(next.safetyError, "");
+});
+
+test("degraded or recent full-regeneration success is rejected before replacing state", () => {
+  const context = createRegenerationContext(itinerary);
+  const baseState = {
+    data: itinerary,
+    safetyResult: { status: "kept" },
+    regenerationLoading: { mode: "full_regeneration" },
+    regenerationContext: context,
+  };
+  assert.throws(
+    () => applySuccessfulRegeneration(baseState, {
+      status: "success",
+      data: {
+        ...itinerary,
+        generation_mode: "full_regeneration",
+        route_changed: true,
+        optimized_stops: [{ place_id: "only-one" }],
+      },
+    }),
+    /stable 3-stop target/
+  );
+  assert.throws(
+    () => applySuccessfulRegeneration(baseState, {
+      status: "success",
+      data: { ...itinerary, generation_mode: "full_regeneration", route_changed: true },
+    }),
+    /current plan again|recent plan again/
+  );
+});
+
+test("controlled exhaustion preserves current plan and Safety state", () => {
+  const safetyResult = { status: "complete", legs: 3 };
+  const currentState = {
+    data: itinerary,
+    safetyResult,
+    regenerationLoading: { mode: "full_regeneration" },
+  };
+  const next = applyFailedRegeneration(currentState, {
+    response: {
+      data: {
+        code: "no_additional_feasible_alternative",
+        error: "No additional feasible useful itinerary remains in the bounded verified candidate set.",
+      },
+    },
+  });
+  assert.strictEqual(next.data, itinerary);
+  assert.strictEqual(next.safetyResult, safetyResult);
+  assert.match(next.regenerationError, /No additional feasible useful itinerary/);
 });
 
 test("unchanged or unusable success payload is rejected", () => {

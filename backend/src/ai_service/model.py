@@ -1,5 +1,6 @@
 from pathlib import Path
 import hashlib
+import itertools
 import json
 import math
 import os
@@ -813,6 +814,124 @@ def minimum_replacement_insertion_order(
     )
 
 
+def find_best_full_regeneration_route(
+    filtered_df,
+    max_time_minutes,
+    start_lat,
+    start_lon,
+    target_stop_count,
+    recent_plan_signatures=None,
+):
+    """Return the best feasible unseen fixed-size set in exact open-path order."""
+    if (
+        filtered_df is None
+        or filtered_df.empty
+        or not isinstance(target_stop_count, int)
+        or target_stop_count < 1
+        or target_stop_count > min(MAX_ROUTE_STOPS, len(filtered_df))
+    ):
+        return []
+
+    indices = list(range(len(filtered_df)))
+    positions = list(range(len(indices)))
+    coordinates = {
+        position: (
+            float(filtered_df.iloc[index]["Latitude"]),
+            float(filtered_df.iloc[index]["Longitude"]),
+        )
+        for position, index in enumerate(indices)
+    }
+    start_distances = {
+        position: calculate_haversine_distance(
+            start_lat, start_lon, *coordinates[position]
+        )
+        for position in positions
+    }
+    leg_distances = {
+        (first, second): calculate_haversine_distance(
+            *coordinates[first], *coordinates[second]
+        )
+        for first in positions
+        for second in positions
+        if first != second
+    }
+    states = {
+        (1 << position, position): (start_distances[position], (position,))
+        for position in positions
+    }
+    for size in range(2, target_stop_count + 1):
+        for subset in itertools.combinations(positions, size):
+            mask = sum(1 << position for position in subset)
+            for last in subset:
+                previous_mask = mask ^ (1 << last)
+                candidates = []
+                for previous in subset:
+                    if previous == last:
+                        continue
+                    previous_state = states.get((previous_mask, previous))
+                    if previous_state is None:
+                        continue
+                    candidates.append(
+                        (
+                            previous_state[0] + leg_distances[(previous, last)],
+                            previous_state[1] + (last,),
+                        )
+                    )
+                states[(mask, last)] = min(
+                    candidates,
+                    key=lambda item: (
+                        round(item[0], 12),
+                        tuple(
+                            _stable_place_id_key(indices[position], filtered_df)
+                            for position in item[1]
+                        ),
+                    ),
+                )
+
+    forbidden = {
+        tuple(sorted(str(value).strip() for value in signature))
+        for signature in (recent_plan_signatures or [])
+    }
+    best = None
+    for subset in itertools.combinations(positions, target_stop_count):
+        mask = sum(1 << position for position in subset)
+        _, ordered_positions = min(
+            (states[(mask, last)] for last in subset),
+            key=lambda item: (
+                round(item[0], 12),
+                tuple(
+                    _stable_place_id_key(indices[position], filtered_df)
+                    for position in item[1]
+                ),
+            ),
+        )
+        route = [indices[position] for position in ordered_positions]
+        signature = tuple(
+            sorted(str(filtered_df.iloc[index]["Place_ID"]).strip() for index in route)
+        )
+        if signature in forbidden:
+            continue
+        fitness, route_time = _route_fitness(
+            route,
+            filtered_df,
+            max_time_minutes,
+            start_lat,
+            start_lon,
+            target_stop_count,
+        )
+        if route_time > max_time_minutes:
+            continue
+        tie_break = (
+            -round(fitness, 12),
+            round(route_time, 12),
+            signature,
+            tuple(_stable_place_id_key(index, filtered_df) for index in route),
+        )
+        if best is None or tie_break < best[0]:
+            best = (tie_break, route)
+    return [] if best is None else best[1]
+
+
 def _tournament_select(population, fitnesses, rng, tournament_size=3):
     contestants = rng.sample(
         list(zip(population, fitnesses)), min(tournament_size, len(population))
@@ -1091,6 +1210,7 @@ def run_genetic_algorithm_details(
     excluded_place_ids=None,
     minimum_route_stops=1,
     maximum_route_stops=MAX_ROUTE_STOPS,
+    route_indices_override=None,
 ):
     """Return the optimized route plus additive structured/time metadata."""
     if filtered_df is None or filtered_df.empty:
@@ -1116,17 +1236,21 @@ def run_genetic_algorithm_details(
             },
         }
 
-    best_route, penalty_hit = _optimize_route_indices(
-        filtered_df,
-        max_time_minutes,
-        start_lat,
-        start_lon,
-        random_seed,
-        locked_place_ids=locked_place_ids,
-        excluded_place_ids=excluded_place_ids,
-        minimum_route_stops=minimum_route_stops,
-        maximum_route_stops=maximum_route_stops,
-    )
+    if route_indices_override is None:
+        best_route, penalty_hit = _optimize_route_indices(
+            filtered_df,
+            max_time_minutes,
+            start_lat,
+            start_lon,
+            random_seed,
+            locked_place_ids=locked_place_ids,
+            excluded_place_ids=excluded_place_ids,
+            minimum_route_stops=minimum_route_stops,
+            maximum_route_stops=maximum_route_stops,
+        )
+    else:
+        best_route = list(route_indices_override)
+        penalty_hit = False
     if locked_place_ids:
         best_route = minimum_replacement_insertion_order(
             best_route,
