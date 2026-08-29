@@ -5,6 +5,9 @@ import {
   ActivityIndicator,
   StyleSheet,
   Alert,
+  View,
+  Text,
+  Pressable,
 } from "react-native";
 
 import {
@@ -28,10 +31,39 @@ import {
 import HomeScreen from "./src/screens/HomeScreen";
 import TripInputScreen from "./src/screens/TripInputScreen";
 import ResultScreen from "./src/screens/ResultScreen";
+import ItineraryHomeScreen from "./screens/HomeScreen";
+import ItineraryResultScreen from "./screens/ResultScreen";
 import MapScreen from "./screens/MapScreen";
 import LandmarkScannerScreen from "./screens/LandmarkScannerScreen";
 
 const Stack = createNativeStackNavigator();
+
+
+function ComponentLauncher({ navigation }) {
+  return (
+    <SafeAreaView style={styles.launcherContainer}>
+      <View style={styles.launcherCard}>
+        <Text style={styles.launcherTitle}>Tourism Research Platform</Text>
+        <Text style={styles.launcherSubtitle}>Choose a component to test.</Text>
+
+        <Pressable
+          onPress={() => navigation.navigate("Safety")}
+          style={({ pressed }) => [styles.launcherButton, pressed && styles.launcherButtonPressed]}
+        >
+          <Text style={styles.launcherButtonTitle}>Safety Analyzer</Text>
+        </Pressable>
+
+        <Pressable
+          onPress={() => navigation.navigate("ItineraryHome")}
+          style={({ pressed }) => [styles.launcherButton, pressed && styles.launcherButtonPressed]}
+        >
+          <Text style={styles.launcherButtonTitle}>Itinerary Optimizer</Text>
+          <Text style={styles.launcherButtonText}>Context-aware, time-constrained route planning</Text>
+        </Pressable>
+      </View>
+    </SafeAreaView>
+  );
+}
 
 
 
@@ -268,7 +300,14 @@ export default function App() {
     <NavigationContainer>
 
 
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="ComponentLauncher">
+
+
+        <Stack.Screen
+          name="ComponentLauncher"
+          component={ComponentLauncher}
+          options={{ headerShown: false }}
+        />
 
 
         <Stack.Screen
@@ -281,6 +320,19 @@ export default function App() {
             headerShown:false
           }}
 
+        />
+
+
+        <Stack.Screen
+          name="ItineraryHome"
+          component={ItineraryHomeScreen}
+          options={{ title: "Itinerary Optimizer" }}
+        />
+
+        <Stack.Screen
+          name="ItineraryResult"
+          component={ItineraryResultScreen}
+          options={{ title: "Optimized Itinerary" }}
         />
 
 
@@ -312,6 +364,58 @@ export default function App() {
 
 
 const styles = StyleSheet.create({
+
+  launcherContainer: {
+    flex: 1,
+    backgroundColor: "#EAF2FF",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+
+  launcherCard: {
+    width: "100%",
+    maxWidth: 620,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    padding: 24,
+    elevation: 6,
+  },
+
+  launcherTitle: {
+    color: "#0F172A",
+    fontSize: 28,
+    fontWeight: "900",
+  },
+
+  launcherSubtitle: {
+    color: "#64748B",
+    fontSize: 16,
+    marginTop: 6,
+    marginBottom: 18,
+  },
+
+  launcherButton: {
+    backgroundColor: "#2563EB",
+    borderRadius: 16,
+    padding: 18,
+    marginTop: 12,
+  },
+
+  launcherButtonPressed: {
+    opacity: 0.75,
+  },
+
+  launcherButtonTitle: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "900",
+  },
+
+  launcherButtonText: {
+    color: "#DBEAFE",
+    marginTop: 4,
+  },
 
   container: {
 

@@ -150,7 +150,7 @@ test("itinerary service sends regeneration fields unchanged to Flask", async () 
     await generateItineraryFromAI(requestPayload);
     assert.deepEqual(receivedPayload, requestPayload);
     assert.deepEqual(receivedOptions, { timeout: PYTHON_AI_TIMEOUT_MS });
-    assert.equal(PYTHON_AI_TIMEOUT_MS, 45000);
+    assert.equal(PYTHON_AI_TIMEOUT_MS, 60000);
   } finally {
     axios.post = originalPost;
   }
@@ -165,7 +165,7 @@ test("itinerary service maps Python timeout to a controlled safe 504", async () 
   console.warn = (...args) => warnings.push(args.join(" "));
   console.error = (...args) => errors.push(args.join(" "));
   axios.post = async () => {
-    const error = new Error("timeout of 45000ms exceeded private-url");
+    const error = new Error("timeout of 60000ms exceeded private-url");
     error.code = "ECONNABORTED";
     throw error;
   };
@@ -180,12 +180,12 @@ test("itinerary service maps Python timeout to a controlled safe 504", async () 
           error.details.error,
           "This plan variation took longer than expected."
         );
-        assert.doesNotMatch(error.details.error, /45000|private-url|Axios/i);
+        assert.doesNotMatch(error.details.error, /60000|private-url|Axios/i);
         return true;
       }
     );
     assert.equal(warnings.length, 1);
-    assert.match(warnings[0], /45000ms/);
+    assert.match(warnings[0], /60000ms/);
     assert.doesNotMatch(warnings[0], /private-url/);
     assert.deepEqual(errors, []);
   } finally {
