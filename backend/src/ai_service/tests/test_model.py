@@ -91,10 +91,14 @@ class ModelTestCase(unittest.TestCase):
                 text=True,
             )
         result = json.loads(completed.stdout.strip().splitlines()[-1])
-        self.assertEqual(result["rows"], 20)
+        self.assertEqual(result["rows"], 40)
 
     def test_initialization_preserves_missing_ratings(self):
-        places = make_places([None, "not observed", 4.2])
+        places = self.original_places.copy()
+        places["Rating"] = places["Rating"].astype(object)
+        places.loc[0, "Rating"] = None
+        places.loc[1, "Rating"] = "not observed"
+        places.loc[2, "Rating"] = 4.2
         with mock.patch.object(model.pd, "read_csv", return_value=places):
             self.assertTrue(model.initialize_ai_engine())
         self.assertTrue(model.PLACES_DF.loc[0, "Rating"] != model.PLACES_DF.loc[0, "Rating"])

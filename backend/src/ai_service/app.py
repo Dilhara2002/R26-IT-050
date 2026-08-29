@@ -10,9 +10,12 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 load_dotenv()
 
 from model import (
+    CATALOGUE_POI_COUNT,
     DATA_SCOPE,
+    DATASET_VERSION,
     MAX_ROUTE_STOPS,
     PLACES_DF,
+    SUPPORTED_DISTRICTS,
     VERIFIED_STATUS,
     calculate_haversine_distance,
     evaluate_route,
@@ -43,6 +46,9 @@ def _controlled_error(error, code, status, **metadata):
             "code": code,
             "error": str(error),
             "data_scope": DATA_SCOPE,
+            "dataset_version": DATASET_VERSION,
+            "covered_districts": list(SUPPORTED_DISTRICTS),
+            "catalogue_poi_count": CATALOGUE_POI_COUNT,
             **metadata,
         }
     ), status
@@ -240,7 +246,7 @@ def optimize_itinerary():
                     search_radius_km=radius_km,
                 )
             return _controlled_error(
-                "No source-traced Kandy locations matched the selected interests "
+                "No source-traced Central Province locations matched the selected interests "
                 f"inside the active {radius_km} km radius.",
                 "insufficient_verified_evidence",
                 404,
@@ -313,6 +319,9 @@ def optimize_itinerary():
                 "data": {
                     "starting_location": {"lat": user_lat, "lon": user_lon},
                     "data_scope": DATA_SCOPE,
+                    "dataset_version": DATASET_VERSION,
+                    "covered_districts": list(SUPPORTED_DISTRICTS),
+                    "catalogue_poi_count": CATALOGUE_POI_COUNT,
                     "verification_status": VERIFIED_STATUS,
                     "profiling_mode": get_relevance_engine_metadata()["profiling_mode"],
                     "relevance_engine": get_relevance_engine_metadata(),

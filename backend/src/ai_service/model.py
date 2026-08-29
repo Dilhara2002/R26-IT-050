@@ -12,7 +12,7 @@ import pandas as pd
 import requests
 from sklearn.metrics.pairwise import cosine_similarity
 
-from relevance_features import make_pair_frame
+from relevance_features import SUPPORTED_INTERESTS, make_pair_frame
 
 
 warnings.filterwarnings("ignore")
@@ -24,7 +24,11 @@ TRAFFIC_BUFFER = 1.25
 AVERAGE_SPEED_KM_PER_MINUTE = 0.5  # Explicit assumption: about 30 km/h.
 AVERAGE_SPEED_KMH = AVERAGE_SPEED_KM_PER_MINUTE * 60
 NEAR_IDENTICAL_COORDINATE_KM = 0.05
-DATA_SCOPE = "verified_kandy_v1"
+DATA_SCOPE = "verified_central_province_v1"
+DATASET_VERSION = "central_province_runtime_verified_v1"
+SUPPORTED_DISTRICTS = ("Kandy", "Matale", "Nuwara Eliya")
+EXPECTED_DISTRICT_COUNTS = {"Kandy": 20, "Matale": 10, "Nuwara Eliya": 10}
+CATALOGUE_POI_COUNT = sum(EXPECTED_DISTRICT_COUNTS.values())
 VERIFIED_STATUS = "source_trace_verified"
 QUARANTINED_LEGACY_IDS = {"79"}
 GEMINI_REQUEST_TIMEOUT = (2, 5)
@@ -50,7 +54,7 @@ DATASET_PATH = (
     Path(__file__).resolve().parent
     / "data"
     / "verified"
-    / "kandy_runtime_verified_v1.csv"
+    / "central_province_runtime_verified_v1.csv"
 )
 DEFAULT_RELEVANCE_MODEL_PATH = (
     Path(__file__).resolve().parent / "models" / "user_poi_relevance_v1.joblib"
@@ -171,12 +175,18 @@ def initialize_ai_engine():
         # Ratings have no provenance in this overlay and remain missing.
         places["Rating"] = pd.to_numeric(places["Rating"], errors="coerce")
 
-        if not places["District"].eq("Kandy").all():
-            raise ValueError("Verified Kandy runtime data contains another district.")
+        district_counts = places["District"].value_counts().to_dict()
+        if district_counts != EXPECTED_DISTRICT_COUNTS:
+            raise ValueError(
+                "Verified Central Province runtime district counts differ from "
+                f"{EXPECTED_DISTRICT_COUNTS}: {district_counts}."
+            )
         if not places["Verification_Status"].eq(VERIFIED_STATUS).all():
             raise ValueError("Runtime data contains a record without source verification.")
         if places["Place_ID"].duplicated().any():
             raise ValueError("Verified runtime data contains duplicate stable IDs.")
+        if places["Name"].fillna("").astype(str).str.strip().str.casefold().duplicated().any():
+            raise ValueError("Verified runtime data contains duplicate canonical names.")
         if places["Legacy_Place_ID"].isin(QUARANTINED_LEGACY_IDS).any():
             raise ValueError("A quarantined prototype record entered verified runtime data.")
         for column in (
@@ -189,6 +199,30 @@ def initialize_ai_engine():
         ):
             if places[column].fillna("").astype(str).str.strip().eq("").any():
                 raise ValueError(f"Verified runtime data contains a blank {column}.")
+
+        allowed_tags = set(SUPPORTED_INTERESTS)
+        for _, place in places.iterrows():
+            tags = {
+                token.strip().lower()
+                for token in str(place["Tags"]).split("|")
+                if token.strip()
+            }
+            if not tags or not tags.issubset(allowed_tags):
+                raise ValueError(
+                    f"Verified runtime POI {place['Place_ID']} uses unsupported tags: "
+                    f"{sorted(tags - allowed_tags)}."
+                )
+            if not (
+                math.isfinite(place["Latitude"])
+                and math.isfinite(place["Longitude"])
+                and math.isfinite(place["Duration_Minutes"])
+                and -90 <= place["Latitude"] <= 90
+                and -180 <= place["Longitude"] <= 180
+                and place["Duration_Minutes"] > 0
+            ):
+                raise ValueError(
+                    f"Verified runtime POI {place['Place_ID']} has invalid coordinates or duration."
+                )
 
         for first_index in range(len(places)):
             for second_index in range(first_index + 1, len(places)):
@@ -208,7 +242,8 @@ def initialize_ai_engine():
         PLACES_DF = places
         TAGS_ENCODED = places["Tags"].str.get_dummies(sep="|")
         print(
-            f"[SUCCESS] Loaded {len(places)} source-traced Kandy POIs; "
+            f"[SUCCESS] Loaded {len(places)} source-traced Central Province POIs "
+            f"across {', '.join(SUPPORTED_DISTRICTS)}; "
             "no model training performed.\n"
         )
         load_relevance_artifact()
@@ -277,7 +312,7 @@ def filter_locations(
     excluded_place_ids=None,
     locked_place_ids=None,
 ):
-    """Rank only source-traced Kandy POIs inside the active radius."""
+    """Rank only source-traced Central Province POIs inside the active radius."""
     if PLACES_DF is None or TAGS_ENCODED is None:
         return None
 

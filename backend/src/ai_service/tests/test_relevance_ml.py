@@ -137,6 +137,9 @@ class RelevanceModelTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200, payload)
         data = payload["data"]
         self.assertEqual(data["profiling_mode"], "trained_relevance_model")
+        self.assertEqual(data["dataset_version"], "central_province_runtime_verified_v1")
+        self.assertEqual(data["covered_districts"], ["Kandy", "Matale", "Nuwara Eliya"])
+        self.assertEqual(data["catalogue_poi_count"], 40)
         self.assertFalse(data["relevance_engine"]["runtime_training_performed"])
         self.assertTrue(data["optimized_stops"])
         for stop in data["optimized_stops"]:
