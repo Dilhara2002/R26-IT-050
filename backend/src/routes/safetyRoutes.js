@@ -16,6 +16,7 @@ import {
 
 
 import graphManager from "../ai-engine/knowledge-graph/graphManager.js";
+import { applyPricingOverride, getPricingOverrides } from "../services/vehiclePricing.service.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -763,18 +764,18 @@ const buildVehiclePriceQuote = (vehicle, distanceKm) => {
   const totalCost = calculateHirePrice(vehicle, distanceKm);
 
   return {
-    status: totalCost === null ? "unavailable" : "dataset-baseline",
+    status: totalCost === null ? "unavailable" : vehicle._pricingVerified ? "admin-verified" : "dataset-baseline",
     currency: "LKR",
     distanceKm: Number(distanceKm.toFixed(2)),
     baseCharge: baseCharge > 0 ? baseCharge : null,
     ratePerKm: ratePerKm > 0 ? ratePerKm : null,
     totalCost,
     formula: "BaseHireCharge + (DistanceKM × RentalPricePerKM)",
-    source: "Vehicle research dataset",
-    sourceVerifiedAt: null,
+    source: vehicle._pricingSource || "Vehicle research dataset",
+    sourceVerifiedAt: vehicle._pricingEffectiveDate || null,
     isLiveMarketRate: false,
-    requiresAdminVerification: true,
-    limitation: "The model-level rate is an internal dataset baseline until an administrator verifies and dates it against a rental-provider source.",
+    requiresAdminVerification: !vehicle._pricingVerified,
+    limitation: vehicle._pricingVerified ? null : "The model-level rate is an internal dataset baseline until an administrator verifies and dates it against a rental-provider source.",
   };
 };
 
@@ -1557,6 +1558,8 @@ router.post(
           vehiclePath
         );
 
+      const pricingOverrides = await getPricingOverrides();
+
 
       const roadGradient =
         toNumber(
@@ -1571,7 +1574,9 @@ router.post(
 
       const analyzedVehicles =
         vehicles.map(
-          (vehicle) => {
+          (rawVehicle) => {
+
+            const vehicle = applyPricingOverride(rawVehicle, pricingOverrides);
 
             const pricing =
               buildVehiclePriceQuote(
@@ -1982,7 +1987,7 @@ router.post(
             "Displayed as current trip context; not used as an unvalidated manual ML score multiplier.",
 
           predictionSource:
-            "Python Random Forest risk classifier",
+            `Python ${riskPrediction.modelName} risk classifier`,
 
           graphContext:
             graphContext,

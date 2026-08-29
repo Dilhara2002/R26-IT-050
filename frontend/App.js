@@ -18,12 +18,15 @@ import TripReviewScreen from "./src/screens/TripReviewScreen";
 import LandmarkExplorerScreen from "./src/screens/LandmarkExplorerScreen";
 import HotelHomeScreen from "./src/screens/HotelHomeScreen";
 import HotelResultsScreen from "./src/screens/HotelResultsScreen";
+import AdminPricingScreen from "./src/screens/AdminPricingScreen";
+import { adminLogin } from "./src/api/adminApi";
 
 const Stack = createNativeStackNavigator();
 
 function MainFlow({ navigation, route }) {
   const [screen, setScreen] = useState("welcome");
   const [user, setUser] = useState(null);
+  const [adminToken, setAdminToken] = useState(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
@@ -48,7 +51,22 @@ function MainFlow({ navigation, route }) {
     setScreen("form");
   }, [route.params?.hotelSafetyRequest]);
 
-  const handleAuth = ({ name, email }) => {
+  const handleAuth = async ({ name, email, password }) => {
+    if (screen === "adminLogin" || screen === "login") {
+      try {
+        const admin = await adminLogin(email, password);
+        if (admin?.user?.role === "admin") {
+          setUser(admin.user);
+          setAdminToken(admin.token);
+          setScreen("admin");
+          return;
+        }
+      } catch (error) {
+        if (screen === "adminLogin") {
+          throw new Error(error.response?.data?.message || "Cannot connect to the administrator login service.");
+        }
+      }
+    }
     setUser({ name: name?.trim() || email.split("@")[0], email });
     setScreen("dashboard");
   };
@@ -104,6 +122,7 @@ function MainFlow({ navigation, route }) {
 
   const logout = () => {
     setUser(null);
+    setAdminToken(null);
     setScreen("welcome");
   };
 
@@ -123,9 +142,10 @@ function MainFlow({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {screen === "welcome" && <WelcomeScreen onLogin={() => setScreen("login")} onRegister={() => setScreen("register")} />}
-      {(screen === "login" || screen === "register") && <AuthScreen mode={screen} onSubmit={handleAuth} onBack={() => setScreen("welcome")} onSwitch={() => setScreen(screen === "login" ? "register" : "login")} />}
+      {screen === "welcome" && <WelcomeScreen onLogin={() => setScreen("login")} onRegister={() => setScreen("register")} onAdminLogin={() => setScreen("adminLogin")} />}
+      {(screen === "login" || screen === "register" || screen === "adminLogin") && <AuthScreen mode={screen} onSubmit={handleAuth} onBack={() => setScreen("welcome")} onSwitch={() => setScreen(screen === "login" ? "register" : "login")} />}
       {screen === "dashboard" && <DashboardScreen user={user} onOpenModule={openModule} onLogout={logout} />}
+      {screen === "admin" && <AdminPricingScreen user={user} token={adminToken} onLogout={logout} />}
       {screen.startsWith("module:") && <ModuleScreen moduleId={screen.split(":")[1]} onBack={() => setScreen("dashboard")} />}
       {screen === "form" && <TripInputScreen form={form} setForm={setForm} loading={loading} onSubmit={handleSubmit} onBack={leaveSafetyForm} hotelContext={hotelContext} />}
       {screen === "result" && <SafetyResultScreen result={result} errorMessage={errorMessage} onBack={() => setScreen("form")} onNewSearch={handleNewSearch} onShowMap={(selectedRoute) => navigation.navigate("SafetyMap", { selectedRoute })} onReviewTrip={(selectedVehicle, tripResult) => navigation.navigate("TripReview", { selectedVehicle, tripResult, hotelContext })} />}

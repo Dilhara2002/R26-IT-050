@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   ScrollView,
   Text,
@@ -41,6 +41,26 @@ const getRiskStyle = (riskLevel) => {
 };
 
 
+const formatDuration = (durationMinutes) => {
+  const totalMinutes = Number(durationMinutes);
+
+  if (!Number.isFinite(totalMinutes) || totalMinutes < 0) {
+    return "Unavailable";
+  }
+
+  const roundedMinutes = Math.round(totalMinutes);
+
+  if (roundedMinutes < 60) {
+    return `${roundedMinutes} min`;
+  }
+
+  const hours = Math.floor(roundedMinutes / 60);
+  const minutes = roundedMinutes % 60;
+
+  return `${hours} h ${minutes} min`;
+};
+
+
 export default function ResultScreen({
   result,
   errorMessage,
@@ -49,6 +69,9 @@ export default function ResultScreen({
   onShowMap,
   onReviewTrip,
 }) {
+  const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
+  const [showHistoricalRecords, setShowHistoricalRecords] = useState(false);
+
   if (!result) {
     return (
       <ScrollView
@@ -104,9 +127,6 @@ export default function ResultScreen({
   const explanation =
     result?.explanation || {};
 
-  const riskExplanation =
-    explanation?.risk || {};
-
   const vehicleExplanation =
     explanation?.vehicleRecommendation ||
     null;
@@ -129,6 +149,14 @@ export default function ResultScreen({
     routeResult?.comparisonAvailable && isRecommendedRoute
   );
   const selectedRoute = routeResult;
+  const normalizedRiskLevel = String(riskLevel).toLowerCase();
+  const riskMessage = normalizedRiskLevel === "high"
+    ? "Several historical safety concerns were identified. Extra caution is recommended."
+    : normalizedRiskLevel === "medium"
+      ? "Some safety concerns were identified. Travel with additional care."
+      : normalizedRiskLevel === "low"
+        ? "This route has a relatively low historical safety risk."
+        : "Route safety information is currently limited.";
 
   return (
     <ScrollView
@@ -143,10 +171,9 @@ export default function ResultScreen({
 
 
       <View style={styles.hero}>
-        <Text style={styles.heroBadge}>✦ AI SAFETY ANALYSIS</Text>
         <Text style={styles.title}>Your safer trip plan</Text>
         <Text style={styles.subtitle}>
-          Route risk, historical safety evidence and vehicle guidance for your journey.
+          Clear route safety guidance and a suitable vehicle recommendation for your journey.
         </Text>
       </View>
 
@@ -168,7 +195,7 @@ export default function ResultScreen({
         ]}
       >
         <Text style={styles.sectionLabel}>
-          Predicted Route Risk
+          Route Safety Level
         </Text>
 
         <Text
@@ -183,70 +210,7 @@ export default function ResultScreen({
           {riskLevel}
         </Text>
 
-        {confidence !== undefined &&
-          confidence !== null && (
-            <Text style={styles.confidence}>
-              Model Confidence:{" "}
-              {confidence}%
-            </Text>
-          )}
-
-        <Text style={styles.modelText}>
-          {riskExplanation?.confidenceInterpretation ||
-            riskPrediction?.confidenceInterpretation ||
-            "Model confidence is the classifier's predicted-class probability, not a real-world accident probability."}
-        </Text>
-
-        <Text style={styles.modelText}>
-          Model:{" "}
-          {riskPrediction?.modelName ||
-            "Unknown"}
-        </Text>
-
-        <Text style={styles.modelText}>
-          Prediction Scope:{" "}
-          {riskPrediction?.predictionScope ||
-            "Route-level risk classification"}
-        </Text>
-
-
-        {Object.keys(probabilities).length > 0 && (
-          <View style={styles.probabilityBox}>
-            <Text style={styles.probabilityTitle}>
-              Class Probabilities
-            </Text>
-
-            <Text style={styles.probabilityText}>
-              Low:{" "}
-              {(
-                Number(
-                  probabilities.Low || 0
-                ) * 100
-              ).toFixed(1)}
-              %
-            </Text>
-
-            <Text style={styles.probabilityText}>
-              Medium:{" "}
-              {(
-                Number(
-                  probabilities.Medium || 0
-                ) * 100
-              ).toFixed(1)}
-              %
-            </Text>
-
-            <Text style={styles.probabilityText}>
-              High:{" "}
-              {(
-                Number(
-                  probabilities.High || 0
-                ) * 100
-              ).toFixed(1)}
-              %
-            </Text>
-          </View>
-        )}
+        <Text style={styles.riskMessage}>{riskMessage}</Text>
       </View>
 
       <View style={styles.summaryCard}>
@@ -260,11 +224,8 @@ export default function ResultScreen({
           <>
             <Text style={styles.text}>From: {selectedRoute.startLocation}</Text>
             <Text style={styles.text}>To: {selectedRoute.endLocation}</Text>
-            <Text style={styles.text}>Risk: {selectedRoute.predictedRiskLevel}</Text>
-            <Text style={styles.text}>Model Confidence: {selectedRoute.confidencePercent ?? "Unavailable"}%</Text>
             <Text style={styles.text}>Distance: {selectedRoute.distanceKm} km</Text>
-            <Text style={styles.text}>Duration: {selectedRoute.durationMinutes} mins</Text>
-            <Text style={styles.text}>Evidence Status: {selectedRoute.evidenceStatus}</Text>
+            <Text style={styles.text}>Duration: {formatDuration(selectedRoute.durationMinutes)}</Text>
             {comparisonAvailable && (
               <Text style={styles.text}>
                 Compared with fastest route: {result?.comparison?.extraMinutesVsFastest ?? 0} mins, {result?.comparison?.extraDistanceKmVsFastest ?? 0} km
@@ -275,7 +236,6 @@ export default function ResultScreen({
                 Alternative lower-risk comparison unavailable.
               </Text>
             )}
-            <Text style={styles.contextNote}>{selectedRoute.explanation}</Text>
             {!selectedRoute.vehicleUsesSelectedRoute && (
               <Text style={styles.contextNote}>
                 Route-specific vehicle evidence is unavailable.
@@ -321,31 +281,7 @@ export default function ResultScreen({
 
         <Text style={styles.text}>
           Duration:{" "}
-          {result?.trip?.durationMinutes} mins
-        </Text>
-
-        <Text style={styles.text}>
-          Matched Road:{" "}
-          {result?.analysis?.matchedRoad}
-        </Text>
-
-        <Text style={styles.text}>
-          Gradient:{" "}
-          {result?.analysis?.gradient ?? "Unavailable"}
-          {result?.analysis?.gradient !== null &&
-            result?.analysis?.gradient !== undefined
-            ? "%"
-            : ""}
-        </Text>
-
-        <Text style={styles.text}>
-          Terrain:{" "}
-          {result?.analysis?.terrain}
-        </Text>
-
-        <Text style={styles.text}>
-          Road Surface:{" "}
-          {result?.analysis?.roadSurface}
+          {formatDuration(result?.trip?.durationMinutes)}
         </Text>
 
         <Text style={styles.text}>
@@ -368,10 +304,6 @@ export default function ResultScreen({
               : "No"}
         </Text>
 
-        <Text style={styles.contextNote}>
-          Weather is current trip context and is not an input
-          to the risk classifier.
-        </Text>
       </View>
 
 
@@ -397,6 +329,7 @@ export default function ResultScreen({
         <VehicleCard
           title="Best Vehicle Match"
           vehicle={bestVehicle}
+          showTechnicalDetails={showTechnicalDetails}
           onSelect={(vehicle) => onReviewTrip(vehicle, result)}
         />
       ) : (
@@ -413,7 +346,7 @@ export default function ResultScreen({
         </View>
       )}
 
-      {vehicleExplanation && (
+      {showTechnicalDetails && vehicleExplanation && (
         <View style={styles.explanationCard}>
           <Text style={styles.explanationTitle}>
             Why This Vehicle
@@ -442,6 +375,7 @@ export default function ResultScreen({
             key={`alternative-${index}`}
             title={`Alternative Option ${index + 1}`}
             vehicle={vehicle}
+            showTechnicalDetails={showTechnicalDetails}
             onSelect={(selectedVehicle) => onReviewTrip(selectedVehicle, result)}
           />
         )
@@ -453,6 +387,7 @@ export default function ResultScreen({
           <VehicleCard
             title="Higher Road-Capability Option"
             vehicle={result.safetyUpsell}
+            showTechnicalDetails={showTechnicalDetails}
             onSelect={(vehicle) => onReviewTrip(vehicle, result)}
           />
 
@@ -484,7 +419,7 @@ export default function ResultScreen({
 
       <View style={styles.graphCard}>
         <Text style={styles.graphTitle}>
-          Historical Safety Reasoning
+          Why is this route {String(riskLevel).toLowerCase()} risk?
         </Text>
 
         <Text style={styles.text}>
@@ -497,30 +432,63 @@ export default function ResultScreen({
           {result?.graphRAG?.riskCount || 0}
         </Text>
 
-        <Text style={styles.graphMeta}>
-          Graph Match Type:{" "}
-          {result?.graphRAG?.matchType ||
-            "Unknown"}
-        </Text>
-
-        <Text style={styles.graphMeta}>
-          Historical graph context supports retrieval and may
-          populate named model inputs when available; it does not
-          independently override the classifier result.
-        </Text>
       </View>
 
+      {(result?.graphRAG?.matchedRisks?.length || 0) > 0 && (
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={() => setShowHistoricalRecords(!showHistoricalRecords)}
+        >
+          <Text style={styles.secondaryButtonText}>
+            {showHistoricalRecords
+              ? "Hide historical records"
+              : `View all ${result.graphRAG.matchedRisks.length} historical records`}
+          </Text>
+        </TouchableOpacity>
+      )}
 
-      {result?.graphRAG?.matchedRisks?.map(
+      {showHistoricalRecords && result?.graphRAG?.matchedRisks?.map(
         (risk, index) => (
           <RiskCard
-            key={
-              risk?.riskId ||
-              `risk-${index}`
-            }
+            key={risk?.riskId || `risk-${index}`}
             risk={risk}
           />
         )
+      )}
+
+      <TouchableOpacity
+        style={styles.secondaryButton}
+        onPress={() => setShowTechnicalDetails(!showTechnicalDetails)}
+      >
+        <Text style={styles.secondaryButtonText}>
+          {showTechnicalDetails ? "Hide technical details" : "View technical details"}
+        </Text>
+      </TouchableOpacity>
+
+      {showTechnicalDetails && (
+        <View style={styles.summaryCard}>
+          <Text style={styles.cardTitle}>Technical Details</Text>
+          <Text style={styles.text}>Model: {riskPrediction?.modelName || "Unknown"}</Text>
+          <Text style={styles.text}>Prediction scope: {riskPrediction?.predictionScope || "Route-level risk classification"}</Text>
+          <Text style={styles.text}>Prediction confidence: {confidence ?? "Unavailable"}{confidence != null ? "%" : ""}</Text>
+          <Text style={styles.contextNote}>
+            This is confidence for this prediction, not the overall accuracy of the system.
+          </Text>
+          <Text style={styles.text}>Evidence status: {selectedRoute?.evidenceStatus || "Unavailable"}</Text>
+          <Text style={styles.text}>Graph match type: {result?.graphRAG?.matchType || "Unknown"}</Text>
+          <Text style={styles.text}>Matched road: {result?.analysis?.matchedRoad || "Unavailable"}</Text>
+          <Text style={styles.text}>Gradient: {result?.analysis?.gradient ?? "Unavailable"}{result?.analysis?.gradient != null ? "%" : ""}</Text>
+          <Text style={styles.text}>Terrain: {result?.analysis?.terrain || "Unknown"}</Text>
+          <Text style={styles.text}>Road surface: {result?.analysis?.roadSurface || "Unknown"}</Text>
+          {Object.keys(probabilities).length > 0 && (
+            <View style={styles.probabilityBox}>
+              <Text style={styles.probabilityTitle}>Class Probabilities</Text>
+              <Text style={styles.probabilityText}>Low: {(Number(probabilities.Low || 0) * 100).toFixed(1)}%</Text>
+              <Text style={styles.probabilityText}>Medium: {(Number(probabilities.Medium || 0) * 100).toFixed(1)}%</Text>
+              <Text style={styles.probabilityText}>High: {(Number(probabilities.High || 0) * 100).toFixed(1)}%</Text>
+            </View>
+          )}
+        </View>
       )}
 
 
@@ -615,6 +583,12 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "bold",
     marginBottom: 6,
+  },
+
+  riskMessage: {
+    color: colors.text,
+    fontSize: 15,
+    lineHeight: 22,
   },
 
   confidence: {
@@ -756,6 +730,22 @@ const styles = StyleSheet.create({
     marginTop: 6,
     color: colors.muted,
     fontSize: 13,
+  },
+
+  secondaryButton: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: 13,
+    paddingVertical: 13,
+    paddingHorizontal: 16,
+    alignItems: "center",
+    marginTop: 14,
+  },
+
+  secondaryButtonText: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: "800",
   },
 
   errorCard: {

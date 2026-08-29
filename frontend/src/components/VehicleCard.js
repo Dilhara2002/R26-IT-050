@@ -6,6 +6,7 @@ export default function VehicleCard({
   vehicle,
   title = "Vehicle",
   onSelect,
+  showTechnicalDetails = true,
 }) {
   if (!vehicle) return null;
 
@@ -62,27 +63,31 @@ export default function VehicleCard({
 
       {suitability && (
         <>
-          <Text style={styles.text}>
-            Gradeability: {suitability.gradeability}%
-          </Text>
+          {showTechnicalDetails && (
+            <>
+              <Text style={styles.text}>
+                Gradeability: {suitability.gradeability}%
+              </Text>
 
-          <Text style={styles.text}>
-            Required Road Gradient:{" "}
-            {suitability.roadGradient ?? "Unavailable"}
-            {suitability.roadGradient !== null &&
-              suitability.roadGradient !== undefined
-              ? "%"
-              : ""}
-          </Text>
+              <Text style={styles.text}>
+                Required Road Gradient:{" "}
+                {suitability.roadGradient ?? "Unavailable"}
+                {suitability.roadGradient !== null &&
+                  suitability.roadGradient !== undefined
+                  ? "%"
+                  : ""}
+              </Text>
 
-          <Text style={styles.text}>
-            Capability Margin:{" "}
-            {suitability.gradeabilityMargin ?? "Unavailable"}
-            {suitability.gradeabilityMargin !== null &&
-              suitability.gradeabilityMargin !== undefined
-              ? "%"
-              : ""}
-          </Text>
+              <Text style={styles.text}>
+                Capability Margin:{" "}
+                {suitability.gradeabilityMargin ?? "Unavailable"}
+                {suitability.gradeabilityMargin !== null &&
+                  suitability.gradeabilityMargin !== undefined
+                  ? "%"
+                  : ""}
+              </Text>
+            </>
+          )}
 
           <Text
             style={[
@@ -94,7 +99,7 @@ export default function VehicleCard({
                   : null,
             ]}
           >
-            Road Suitability:{" "}
+            Route suitability:{" "}
             {suitability.suitableForGradient === true
               ? "Suitable"
               : suitability.suitableForGradient === false

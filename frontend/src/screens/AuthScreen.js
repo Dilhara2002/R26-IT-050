@@ -5,14 +5,15 @@ import { colors } from "../styles/colors";
 
 export default function AuthScreen({ mode, onSubmit, onBack, onSwitch }) {
   const register = mode === "register";
-  const [name,setName]=useState(""), [email,setEmail]=useState(""), [password,setPassword]=useState(""), [confirm,setConfirm]=useState(""), [visible,setVisible]=useState(false), [error,setError]=useState("");
-  const submit=()=>{ if(register&&!name.trim())return setError("Please enter your full name."); if(!/^\S+@\S+\.\S+$/.test(email.trim()))return setError("Please enter a valid email address."); if(password.length<6)return setError("Password must contain at least 6 characters."); if(register&&password!==confirm)return setError("Passwords do not match."); setError("");onSubmit({name,email:email.trim()}); };
+  const admin = mode === "adminLogin";
+  const [name,setName]=useState(""), [email,setEmail]=useState(""), [password,setPassword]=useState(""), [confirm,setConfirm]=useState(""), [visible,setVisible]=useState(false), [error,setError]=useState(""), [loading,setLoading]=useState(false);
+  const submit=async()=>{ if(register&&!name.trim())return setError("Please enter your full name."); if(!/^\S+@\S+\.\S+$/.test(email.trim()))return setError("Please enter a valid email address."); if(password.length<6)return setError("Password must contain at least 6 characters."); if(register&&password!==confirm)return setError("Passwords do not match."); try{setError("");setLoading(true);await onSubmit({name,email:email.trim(),password,register});}catch(e){setError(e.message||"Sign in failed.");}finally{setLoading(false);} };
   return <ScrollView style={s.page} contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">
     <TouchableOpacity style={s.back} onPress={onBack}><Ionicons name="arrow-back" size={22} color={colors.text}/></TouchableOpacity>
     <View style={s.brand}>
       <Image source={require("../../assets/ceylongo-logo.png")} style={s.logo} resizeMode="contain" accessibilityLabel="CeylonGo logo" />
-      <Text style={s.title}>{register?"Start your journey":"Welcome back"}</Text>
-      <Text style={s.subtitle}>{register?"Create your CeylonGo account and explore smarter.":"Sign in to continue planning your Sri Lankan adventure."}</Text>
+      <Text style={s.title}>{register?"Start your journey":admin?"Administrator access":"Welcome back"}</Text>
+      <Text style={s.subtitle}>{register?"Create your CeylonGo account and explore smarter.":admin?"Sign in with the protected administrator account to manage verified vehicle rates.":"Sign in to continue planning your Sri Lankan adventure."}</Text>
     </View>
     <View style={s.form}>
       {register&&<Field label="Full name" icon="person-outline" value={name} onChangeText={setName} placeholder="Your full name"/>}
@@ -20,10 +21,10 @@ export default function AuthScreen({ mode, onSubmit, onBack, onSwitch }) {
       <View><Text style={s.label}>Password</Text><View style={s.inputWrap}><Ionicons name="lock-closed-outline" size={20} color={colors.muted}/><TextInput style={s.input} value={password} onChangeText={setPassword} placeholder="At least 6 characters" placeholderTextColor="#94A3B8" secureTextEntry={!visible}/><TouchableOpacity onPress={()=>setVisible(!visible)}><Ionicons name={visible?"eye-off-outline":"eye-outline"} size={21} color={colors.muted}/></TouchableOpacity></View></View>
       {register&&<Field label="Confirm password" icon="shield-checkmark-outline" value={confirm} onChangeText={setConfirm} placeholder="Enter password again" secureTextEntry={!visible}/>} 
       {!!error&&<View style={s.error}><Ionicons name="alert-circle" size={18} color="#B91C1C"/><Text style={s.errorText}>{error}</Text></View>}
-      {!register&&<TouchableOpacity><Text style={s.forgot}>Forgot password?</Text></TouchableOpacity>}
-      <TouchableOpacity style={s.submit} onPress={submit}><Text style={s.submitText}>{register?"Create account":"Sign in"}</Text><Ionicons name="arrow-forward" size={20} color="#fff"/></TouchableOpacity>
+      {!register&&!admin&&<TouchableOpacity><Text style={s.forgot}>Forgot password?</Text></TouchableOpacity>}
+      <TouchableOpacity style={s.submit} onPress={submit} disabled={loading}><Text style={s.submitText}>{loading?"Please wait...":register?"Create account":"Sign in"}</Text><Ionicons name="arrow-forward" size={20} color="#fff"/></TouchableOpacity>
     </View>
-    <View style={s.switchRow}><Text style={s.switchText}>{register?"Already have an account?":"New to CeylonGo?"}</Text><TouchableOpacity onPress={onSwitch}><Text style={s.switchLink}>{register?" Sign in":" Create account"}</Text></TouchableOpacity></View>
+    {!admin&&<View style={s.switchRow}><Text style={s.switchText}>{register?"Already have an account?":"New to CeylonGo?"}</Text><TouchableOpacity onPress={onSwitch}><Text style={s.switchLink}>{register?" Sign in":" Create account"}</Text></TouchableOpacity></View>}
   </ScrollView>;
 }
 function Field({label,icon,...props}){return <View><Text style={s.label}>{label}</Text><View style={s.inputWrap}><Ionicons name={icon} size={20} color={colors.muted}/><TextInput style={s.input} placeholderTextColor="#94A3B8" {...props}/></View></View>}

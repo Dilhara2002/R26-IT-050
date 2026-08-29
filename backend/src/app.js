@@ -22,6 +22,8 @@ import hotelDataRoutes from "./routes/hotelData.routes.js";
 import safetyRoutes from "./routes/safetyRoutes.js";
 import itinerarySafetyRoutes from "./routes/itinerarySafety.routes.js";
 import itineraryRoutes from "./routes/itinerary.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
+import { seedAdmin } from "./services/adminAuth.service.js";
 
 
 import { verifyNeo4jConnection } from "./config/neo4j.js";
@@ -102,6 +104,8 @@ app.use(
   itineraryRoutes
 );
 
+app.use("/api/admin", adminRoutes);
+
 
 
 
@@ -164,6 +168,8 @@ const connectInfrastructure = async () => {
       console.log(
         "✅ Connected to MongoDB Atlas"
       );
+
+      await seedAdmin();
 
 
     } catch(error) {

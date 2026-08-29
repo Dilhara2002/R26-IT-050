@@ -9,6 +9,7 @@ import {
   getRouteAlternativesByCoordinates,
 } from "./routeService.js";
 import { getWeatherByCoordinates } from "./weatherService.js";
+import { applyPricingOverride, getPricingOverrides } from "./vehiclePricing.service.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIRECTORY = path.join(__dirname, "../ai-engine/data");
@@ -257,7 +258,9 @@ const recommendVehicle = async ({ distanceKm, maxGradient, riskLevel, budget, pa
     return { status: "unavailable", reason: "Complete distance, gradient, and risk evidence is required." };
   }
   const vehicles = await loadCsv("processed_vehicles.csv");
-  const candidates = vehicles.map((vehicle) => {
+  const pricingOverrides = await getPricingOverrides();
+  const candidates = vehicles.map((rawVehicle) => {
+    const vehicle = applyPricingOverride(rawVehicle, pricingOverrides);
     const base = toNullableNumber(vehicle.BaseHireCharge);
     const perKm = toNullableNumber(vehicle.RentalPricePerKM);
     const gradeability = toNullableNumber(vehicle["Gradeability (%)"]);
@@ -266,18 +269,18 @@ const recommendVehicle = async ({ distanceKm, maxGradient, riskLevel, budget, pa
       ? Math.round(base + distanceKm * perKm)
       : null;
     const pricing = {
-      status: estimatedHirePrice === null ? "unavailable" : "dataset-baseline",
+      status: estimatedHirePrice === null ? "unavailable" : vehicle._pricingVerified ? "admin-verified" : "dataset-baseline",
       currency: "LKR",
       distanceKm: Number(distanceKm.toFixed(2)),
       baseCharge: base,
       ratePerKm: perKm,
       totalCost: estimatedHirePrice,
       formula: "BaseHireCharge + (DistanceKM × RentalPricePerKM)",
-      source: "Vehicle research dataset",
-      sourceVerifiedAt: null,
+      source: vehicle._pricingSource || "Vehicle research dataset",
+      sourceVerifiedAt: vehicle._pricingEffectiveDate || null,
       isLiveMarketRate: false,
-      requiresAdminVerification: true,
-      limitation: "The model-level rate is an internal dataset baseline until an administrator verifies and dates it against a rental-provider source.",
+      requiresAdminVerification: !vehicle._pricingVerified,
+      limitation: vehicle._pricingVerified ? null : "The model-level rate is an internal dataset baseline until an administrator verifies and dates it against a rental-provider source.",
     };
     return {
       vehicleName: vehicle["Vehicle Name (Make & Model)"],
