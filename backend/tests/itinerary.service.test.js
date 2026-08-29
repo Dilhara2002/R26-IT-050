@@ -73,6 +73,24 @@ test("controller forwards stable-ID regeneration constraints additively", () => 
   assert.equal(payload.radius_km, 15);
 });
 
+test("controller rejects invalid time, coordinates, and radius instead of defaulting", () => {
+  const cases = [
+    { max_time_minutes: 0 },
+    { max_time_minutes: -1 },
+    { max_time_minutes: 1441 },
+    { max_time_minutes: "120" },
+    { current_lat: Number.NaN },
+    { current_lon: Number.POSITIVE_INFINITY },
+    { radius_km: 0 },
+  ];
+  for (const additions of cases) {
+    assert.throws(
+      () => buildItineraryPayload({ preferences: ["Nature"], ...additions }),
+      /must be a finite number between/
+    );
+  }
+});
+
 test("itinerary service sends regeneration fields unchanged to Flask", async () => {
   const originalPost = axios.post;
   let receivedPayload;

@@ -310,6 +310,49 @@ class ModelTestCase(unittest.TestCase):
         self.assertFalse(penalty)
         self.assertLessEqual(route_time, 65)
 
+    def test_additional_travel_reduces_fitness_when_other_evidence_is_equal(self):
+        places = make_ga_places(count=2, duration=20)
+        places.loc[:, "Composite_Score"] = 0.8
+        places.loc[0, ["Latitude", "Longitude"]] = [7.2907, 80.6337]
+        places.loc[1, ["Latitude", "Longitude"]] = [7.3906, 80.6337]
+        near_fitness, _ = model._route_fitness([0], places, 180, 7.2906, 80.6337, 1)
+        far_fitness, _ = model._route_fitness([1], places, 180, 7.2906, 80.6337, 1)
+        self.assertGreater(near_fitness, far_fitness)
+
+    def test_route_distance_and_time_use_consecutive_legs(self):
+        places = make_ga_places(count=2, duration=0)
+        places.loc[0, ["Latitude", "Longitude"]] = [7.3006, 80.6337]
+        places.loc[1, ["Latitude", "Longitude"]] = [7.3106, 80.6337]
+        distance = model.route_travel_distance_km([0, 1], places, 7.2906, 80.6337)
+        expected = model.calculate_haversine_distance(7.2906, 80.6337, 7.3006, 80.6337)
+        expected += model.calculate_haversine_distance(7.3006, 80.6337, 7.3106, 80.6337)
+        repeated_start = model.calculate_haversine_distance(7.2906, 80.6337, 7.3006, 80.6337)
+        repeated_start += model.calculate_haversine_distance(7.2906, 80.6337, 7.3106, 80.6337)
+        self.assertAlmostEqual(distance, expected, places=9)
+        self.assertLess(distance, repeated_start)
+
+    def test_kandy_exact_open_path_reorders_town_peradeniya_town(self):
+        names = ["Kandy Lake", "Royal Botanic Gardens, Peradeniya", "Arthur's Seat"]
+        places = model.PLACES_DF.set_index("Name").loc[names].reset_index()
+        observed = [0, 1, 2]
+        ordered = model.minimum_open_path_order(observed, places, 7.2906, 80.6410)
+        before = model.route_travel_distance_km(observed, places, 7.2906, 80.6410)
+        after = model.route_travel_distance_km(ordered, places, 7.2906, 80.6410)
+        self.assertEqual([places.iloc[index]["Name"] for index in ordered], [
+            "Kandy Lake", "Arthur's Seat", "Royal Botanic Gardens, Peradeniya"
+        ])
+        self.assertLess(after, before)
+
+    def test_replacement_uses_minimum_insertion_and_keeps_locked_order(self):
+        places = make_ga_places(count=3, duration=10)
+        places["Place_ID"] = places["Place_ID"].astype(object)
+        places.loc[:, "Place_ID"] = ["accepted-a", "replacement", "accepted-b"]
+        places.loc[:, "Latitude"] = [7.3006, 7.3106, 7.3206]
+        order = model.minimum_replacement_insertion_order(
+            [2, 1, 0], places, 7.2906, 80.6337, ["accepted-a", "accepted-b"]
+        )
+        self.assertEqual(order, [0, 1, 2])
+
     def test_very_short_time_does_not_return_an_over_budget_fallback(self):
         route, estimated_time, penalty = model.run_genetic_algorithm(
             make_ga_places(duration=30), 1, 7.2906, 80.6337, random_seed=1
@@ -393,7 +436,7 @@ class ModelTestCase(unittest.TestCase):
             "",
             core_summary="Deterministic evidence summary.",
         )
-        self.assertEqual(summary, "Deterministic evidence summary.")
+        self.assertIsNone(summary)
 
     def test_unusable_gemini_keys_make_no_external_request(self):
         unusable_keys = [
@@ -417,7 +460,7 @@ class ModelTestCase(unittest.TestCase):
                         api_key,
                         core_summary="Deterministic evidence summary.",
                     )
-                    self.assertEqual(summary, "Deterministic evidence summary.")
+                    self.assertIsNone(summary)
             post.assert_not_called()
 
     def test_gemini_network_failures_return_deterministic_xai(self):
@@ -436,7 +479,7 @@ class ModelTestCase(unittest.TestCase):
                     "AIza-valid-looking-test-key",
                     core_summary="Deterministic evidence summary.",
                 )
-                self.assertEqual(summary, "Deterministic evidence summary.")
+                self.assertIsNone(summary)
                 self.assertEqual(post.call_args.kwargs["timeout"], (2, 5))
 
     def test_gemini_non_success_response_returns_deterministic_xai(self):
@@ -449,7 +492,23 @@ class ModelTestCase(unittest.TestCase):
                 "AIza-valid-looking-test-key",
                 core_summary="Deterministic evidence summary.",
             )
-        self.assertEqual(summary, "Deterministic evidence summary.")
+        self.assertIsNone(summary)
+
+    def test_gemini_success_is_optional_guide_text_only(self):
+        response = mock.Mock()
+        response.raise_for_status.return_value = None
+        response.json.return_value = {
+            "candidates": [{"content": {"parts": [{"text": "Friendly guide text."}]}}]
+        }
+        with mock.patch.object(model.requests, "post", return_value=response) as post:
+            summary = model.generate_itinerary_summary(
+                ["Kandy Lake (60 mins)"],
+                ["Nature"],
+                "AIza-valid-looking-test-key",
+                core_summary="Deterministic evidence summary.",
+            )
+        self.assertEqual(summary, "Friendly guide text.")
+        self.assertIn("Paraphrase", post.call_args.kwargs["json"]["contents"][0]["parts"][0]["text"])
 
     def test_malformed_gemini_responses_return_deterministic_xai(self):
         malformed_responses = [
@@ -475,7 +534,7 @@ class ModelTestCase(unittest.TestCase):
                     "AIza-valid-looking-test-key",
                     core_summary="Deterministic evidence summary.",
                 )
-                self.assertEqual(summary, "Deterministic evidence summary.")
+                self.assertIsNone(summary)
 
     def test_endpoint_blank_key_uses_non_empty_truthful_fallback_without_http(self):
         import app as flask_app
@@ -495,10 +554,11 @@ class ModelTestCase(unittest.TestCase):
         payload = response.get_json()
         self.assertEqual(response.status_code, 200, payload)
         post.assert_not_called()
-        self.assertTrue(payload["data"]["ai_paraphrase"].strip())
+        self.assertIsNone(payload["data"]["ai_paraphrase"])
+        self.assertIsNone(payload["data"]["guide_explanation"])
         self.assertEqual(
-            payload["data"]["ai_paraphrase"],
-            payload["data"]["route_explanation"]["summary"],
+            payload["data"]["deterministic_explanation"],
+            payload["data"]["route_explanation"],
         )
 
 

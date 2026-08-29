@@ -59,6 +59,11 @@ export function buildItinerarySafetyRequest({
   passengers,
   preferredCategory,
 }) {
+  const budgetProvided = budget !== undefined && budget !== null && budget !== "";
+  const passengersProvided = passengers !== undefined && passengers !== null && passengers !== "";
+  if (budgetProvided !== passengersProvided) {
+    throw new Error("Budget and passengers must be supplied together.");
+  }
   return {
     starting_location: {
       lat: startingLocation.lat,
@@ -76,8 +81,7 @@ export function buildItinerarySafetyRequest({
       longitude: stop.longitude,
       duration_minutes: stop.duration_minutes,
     })),
-    budget,
-    passengers,
+    ...(budgetProvided ? { budget, passengers } : {}),
     ...(preferredCategory ? { preferredCategory } : {}),
   };
 }

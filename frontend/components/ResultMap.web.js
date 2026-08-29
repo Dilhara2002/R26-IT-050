@@ -83,7 +83,10 @@ export default function ResultMap({ startingLocation, optimizedStops = [], safet
 
   return (
     <MapContainer center={[defaultLat, defaultLon]} zoom={12} style={{ height: '100%', width: '100%' }}>
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+      />
       <FitMapBounds points={points} />
       {safetyLines.map((line) => (
         <Polyline

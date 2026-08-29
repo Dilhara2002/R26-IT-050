@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   SafeAreaView,
@@ -8,6 +8,7 @@ import {
   View,
   Text,
   Pressable,
+  ScrollView,
 } from "react-native";
 
 import {
@@ -34,6 +35,8 @@ import ResultScreen from "./src/screens/ResultScreen";
 import ItineraryHomeScreen from "./screens/HomeScreen";
 import ItineraryResultScreen from "./screens/ResultScreen";
 import MapScreen from "./screens/MapScreen";
+import TripSafetyAnalysis from "./components/TripSafetyAnalysis";
+import { recommendItinerarySafety } from "./services/safetyApi";
 
 
 const Stack = createNativeStackNavigator();
@@ -50,7 +53,7 @@ function ComponentLauncher({ navigation }) {
         </Text>
 
         <Pressable
-          onPress={() => navigation.navigate("Safety")}
+          onPress={() => navigation.navigate("Safety", { itinerarySafetyRequest: null })}
           style={({ pressed }) => [
             styles.launcherButton,
             pressed && styles.launcherButtonPressed,
@@ -81,7 +84,7 @@ function ComponentLauncher({ navigation }) {
 
 
 
-function SafetyFlow() {
+function SafetyFlow({ route }) {
 
 
   const [screen, setScreen] = useState("home");
@@ -91,6 +94,13 @@ function SafetyFlow() {
   const [result, setResult] = useState(null);
 
   const [errorMessage, setErrorMessage] = useState("");
+  const [itineraryResult, setItineraryResult] = useState(null);
+  const [itineraryError, setItineraryError] = useState("");
+  const [itineraryValidationError, setItineraryValidationError] = useState("");
+  const [itineraryBudget, setItineraryBudget] = useState("");
+  const [itineraryPassengers, setItineraryPassengers] = useState("");
+  const [itineraryCategory, setItineraryCategory] = useState("");
+  const itineraryRequest = route.params?.itinerarySafetyRequest || null;
 
 
   const [form, setForm] = useState({
@@ -104,6 +114,83 @@ function SafetyFlow() {
     preferredCategory: "",
 
   });
+
+  useEffect(() => {
+    if (!itineraryRequest) return undefined;
+    let active = true;
+    setLoading(true);
+    setItineraryResult(null);
+    setItineraryError("");
+    recommendItinerarySafety(itineraryRequest)
+      .then((response) => {
+        if (active) setItineraryResult(response);
+      })
+      .catch((error) => {
+        if (!active) return;
+        if (error?.safetyResponse) setItineraryResult(error.safetyResponse);
+        setItineraryError(error?.message || "Trip safety analysis could not be completed.");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [itineraryRequest]);
+
+  const handleItineraryAnalyze = async () => {
+    if (loading) return;
+    const budget = Number(itineraryBudget.trim());
+    const passengers = Number(itineraryPassengers.trim());
+    if (!itineraryBudget.trim() || !Number.isFinite(budget) || budget <= 0) {
+      setItineraryValidationError("Enter a whole-trip budget greater than 0 LKR.");
+      return;
+    }
+    if (!itineraryPassengers.trim() || !Number.isInteger(passengers) || passengers <= 0) {
+      setItineraryValidationError("Enter passengers as a positive whole number.");
+      return;
+    }
+    setLoading(true);
+    setItineraryValidationError("");
+    setItineraryError("");
+    try {
+      const response = await recommendItinerarySafety({
+        ...itineraryRequest,
+        budget,
+        passengers,
+        ...(itineraryCategory.trim() ? { preferredCategory: itineraryCategory.trim() } : {}),
+      });
+      setItineraryResult(response);
+    } catch (error) {
+      if (error?.safetyResponse) setItineraryResult(error.safetyResponse);
+      setItineraryError(error?.message || "Trip safety analysis could not be completed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (itineraryRequest) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={{ padding: 18, paddingBottom: 40 }}>
+          <TripSafetyAnalysis
+            budget={itineraryBudget}
+            passengers={itineraryPassengers}
+            preferredCategory={itineraryCategory}
+            onBudgetChange={setItineraryBudget}
+            onPassengersChange={setItineraryPassengers}
+            onPreferredCategoryChange={setItineraryCategory}
+            onAnalyze={handleItineraryAnalyze}
+            loading={loading}
+            availabilityMessage=""
+            validationError={itineraryValidationError}
+            requestError={itineraryError}
+            result={itineraryResult}
+          />
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
 
 

@@ -42,8 +42,8 @@ export default function MapScreen({ route, navigation }) {
       )}
       
       <View style={styles.floatingCard}>
-        <Text style={styles.cardTitle}>Live Route View</Text>
-        <Text style={styles.cardSub}>Optimized for your current context</Text>
+        <Text style={styles.cardTitle}>Estimated Itinerary Map</Text>
+        <Text style={styles.cardSub}>Markers follow the current heuristic itinerary order</Text>
         
         <Pressable 
           onPress={() => navigation.goBack()} 

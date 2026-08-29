@@ -668,20 +668,149 @@ def mutate_route(
 def _route_fitness(
     route, df, max_time_minutes, start_lat, start_lon, route_capacity
 ):
-    route_time, relevance = evaluate_route(route, df, start_lat, start_lon)
+    details = evaluate_route_details(route, df, start_lat, start_lon)
+    route_time = details["planned_time_minutes"]
+    relevance = details["relevance"]
     if route_time > max_time_minutes:
         return 0.0001 / (route_time + 1), route_time
     average_relevance = relevance / len(route)
     useful_coverage = relevance / max(1, route_capacity)
-    utilization = min(1.0, route_time / max(1, max_time_minutes))
-    # Relevance remains dominant. Coverage and utilization reward useful use of
-    # available time, while low-score additions can reduce average relevance.
+    visit_utilization = min(
+        1.0, details["visit_time_minutes"] / max(1, max_time_minutes)
+    )
+    travel_fraction = details["travel_time_minutes"] / max(1, max_time_minutes)
+    # Relevance remains dominant. Only visit time rewards useful budget use;
+    # additional travel is always a penalty and can never improve fitness.
     fitness = (
         (average_relevance * 55)
         + (useful_coverage * 25)
-        + (utilization * average_relevance * 20)
+        + (visit_utilization * average_relevance * 20)
+        - (travel_fraction * 20)
     )
     return fitness, route_time
+
+
+def _stable_place_id_key(index, df):
+    value = str(df.iloc[index].get("Place_ID", "")).strip()
+    try:
+        return (0, int(value), value)
+    except ValueError:
+        return (1, value, value)
+
+
+def route_travel_distance_km(route_indices, df, start_lat, start_lon):
+    """Return consecutive-leg Haversine distance for an open route."""
+    total = 0.0
+    previous_latitude, previous_longitude = start_lat, start_lon
+    for index in route_indices:
+        location = df.iloc[index]
+        total += calculate_haversine_distance(
+            previous_latitude,
+            previous_longitude,
+            location["Latitude"],
+            location["Longitude"],
+        )
+        previous_latitude = location["Latitude"]
+        previous_longitude = location["Longitude"]
+    return total
+
+
+def minimum_open_path_order(route_indices, df, start_lat, start_lon):
+    """Find the exact minimum-distance open path with a stable POI-ID tie-break."""
+    unique_indices = list(dict.fromkeys(route_indices))
+    if len(unique_indices) < 2:
+        return unique_indices
+    coordinates = {
+        index: (
+            float(df.iloc[index]["Latitude"]),
+            float(df.iloc[index]["Longitude"]),
+        )
+        for index in unique_indices
+    }
+    start_distances = {
+        index: calculate_haversine_distance(
+            start_lat, start_lon, *coordinates[index]
+        )
+        for index in unique_indices
+    }
+    leg_distances = {
+        (first, second): calculate_haversine_distance(
+            *coordinates[first], *coordinates[second]
+        )
+        for first in unique_indices
+        for second in unique_indices
+        if first != second
+    }
+    position = {index: bit for bit, index in enumerate(unique_indices)}
+    states = {
+        (1 << position[index], index): (start_distances[index], (index,))
+        for index in unique_indices
+    }
+    for mask_size in range(2, len(unique_indices) + 1):
+        for mask in range(1, 1 << len(unique_indices)):
+            if mask.bit_count() != mask_size:
+                continue
+            for last in unique_indices:
+                last_bit = 1 << position[last]
+                if not mask & last_bit:
+                    continue
+                previous_mask = mask ^ last_bit
+                candidates = []
+                for previous in unique_indices:
+                    state = states.get((previous_mask, previous))
+                    if state is None:
+                        continue
+                    candidates.append(
+                        (state[0] + leg_distances[(previous, last)], state[1] + (last,))
+                    )
+                if candidates:
+                    states[(mask, last)] = min(
+                        candidates,
+                        key=lambda item: (
+                            round(item[0], 12),
+                            tuple(_stable_place_id_key(index, df) for index in item[1]),
+                        ),
+                    )
+    full_mask = (1 << len(unique_indices)) - 1
+    return list(
+        min(
+            (states[(full_mask, last)] for last in unique_indices),
+            key=lambda item: (
+                round(item[0], 12),
+                tuple(_stable_place_id_key(index, df) for index in item[1]),
+            ),
+        )[1]
+    )
+
+
+def minimum_replacement_insertion_order(
+    route_indices, df, start_lat, start_lon, locked_place_ids
+):
+    """Keep accepted-stop order and insert the replacement at minimum travel cost."""
+    locked_ids = [str(value).strip() for value in (locked_place_ids or [])]
+    index_by_id = {
+        str(df.iloc[index].get("Place_ID", "")).strip(): index
+        for index in route_indices
+    }
+    locked_indices = [index_by_id[value] for value in locked_ids if value in index_by_id]
+    locked_set = set(locked_indices)
+    replacements = [index for index in route_indices if index not in locked_set]
+    if len(replacements) != 1:
+        return minimum_open_path_order(route_indices, df, start_lat, start_lon)
+    replacement = replacements[0]
+    candidates = []
+    for position in range(len(locked_indices) + 1):
+        candidate = locked_indices.copy()
+        candidate.insert(position, replacement)
+        candidates.append(candidate)
+    return min(
+        candidates,
+        key=lambda route: (
+            round(route_travel_distance_km(route, df, start_lat, start_lon), 12),
+            route.index(replacement),
+            tuple(_stable_place_id_key(index, df) for index in route),
+        ),
+    )
 
 
 def _tournament_select(population, fitnesses, rng, tournament_size=3):
@@ -745,19 +874,20 @@ def _optimize_route_indices(
     if any(place_id not in index_by_place_id for place_id in locked_ids):
         return [], True
     locked_indices = [index_by_place_id[place_id] for place_id in locked_ids]
+    required_stops = max(len(locked_indices), int(minimum_route_stops))
     max_stops = min(
         len(all_indices),
         max(1, int(maximum_route_stops)),
         MAX_ROUTE_STOPS,
         max(
+            required_stops,
             len(locked_indices),
             calculate_route_capacity(
                 filtered_df, max_time_minutes, start_lat, start_lon
             ),
         ),
     )
-    required_stops = max(len(locked_indices), int(minimum_route_stops))
-    if required_stops > len(all_indices) or len(locked_indices) > max_stops:
+    if required_stops > len(all_indices) or required_stops > max_stops:
         return [], True
     population_size = 80
     generations = 60
@@ -904,8 +1034,8 @@ def build_stop_explanation(stop):
     return (
         f"Stop {stop['sequence']} passed {relevance_text}, matched {matched_text}; "
         f"{score_text}. "
-        f"It is {stop['distance_from_start_km']:.2f} km straight-line from the "
-        f"start. The {stop['duration_minutes']}-minute visit is labelled "
+        f"Its incoming consecutive leg is {stop['leg_distance_km']:.2f} km "
+        f"straight-line. The {stop['duration_minutes']}-minute visit is labelled "
         f"{duration_basis}; source status: {verification}."
     )
 
@@ -936,7 +1066,8 @@ def build_route_explanation(
         "selection_stages": [
             "trained_relevance_gate_or_explicit_content_fallback",
             "fixed_70_percent_proximity_30_percent_cosine_ranking",
-            "deterministic_seeded_genetic_algorithm",
+            "deterministic_seeded_genetic_algorithm_selects_stop_set",
+            "exact_minimum_haversine_open_path_orders_selected_set",
         ],
         "is_globally_optimal": False,
         "data_scope": DATA_SCOPE,
@@ -996,13 +1127,35 @@ def run_genetic_algorithm_details(
         minimum_route_stops=minimum_route_stops,
         maximum_route_stops=maximum_route_stops,
     )
+    if locked_place_ids:
+        best_route = minimum_replacement_insertion_order(
+            best_route,
+            filtered_df,
+            start_lat,
+            start_lon,
+            locked_place_ids,
+        )
+    else:
+        best_route = minimum_open_path_order(
+            best_route, filtered_df, start_lat, start_lon
+        )
     details = evaluate_route_details(
         best_route, filtered_df, start_lat, start_lon
     )
     planned_time = details["planned_time_minutes"]
     optimized_stops = []
+    previous_latitude, previous_longitude = start_lat, start_lon
     for sequence, index in enumerate(best_route, start=1):
         location = filtered_df.iloc[index]
+        leg_distance_km = calculate_haversine_distance(
+            previous_latitude,
+            previous_longitude,
+            location["Latitude"],
+            location["Longitude"],
+        )
+        leg_travel_minutes = (
+            leg_distance_km / AVERAGE_SPEED_KM_PER_MINUTE
+        ) * TRAFFIC_BUFFER
         tags = [
             tag.strip()
             for tag in str(location.get("Tags", "")).split("|")
@@ -1034,6 +1187,8 @@ def run_genetic_algorithm_details(
                     ),
                 )
             ),
+            "leg_distance_km": float(leg_distance_km),
+            "estimated_leg_travel_minutes": float(leg_travel_minutes),
             "matched_preferences": matched_preferences,
             "verification_status": _text_metadata(
                 location, "Verification_Status", "verification metadata unavailable"
@@ -1069,6 +1224,8 @@ def run_genetic_algorithm_details(
                     stop[field] = float(value)
         stop["explanation"] = build_stop_explanation(stop)
         optimized_stops.append(stop)
+        previous_latitude = location["Latitude"]
+        previous_longitude = location["Longitude"]
 
     optimal_places = [
         f"{filtered_df.iloc[index]['Name']} "
@@ -1139,7 +1296,7 @@ def generate_itinerary_summary(places, preferences, api_key, core_summary=None):
         f"{', '.join(preferences or []) or 'the selected interests'}."
     )
     if not places or not _is_usable_gemini_key(api_key):
-        return deterministic_summary
+        return None
 
     prompt = f"""
     Paraphrase the following deterministic itinerary explanation without adding facts,
@@ -1163,7 +1320,7 @@ def generate_itinerary_summary(places, preferences, api_key, core_summary=None):
         response.raise_for_status()
         paraphrase = response.json()["candidates"][0]["content"]["parts"][0]["text"]
         if not isinstance(paraphrase, str) or not paraphrase.strip():
-            return deterministic_summary
+            return None
         return paraphrase.strip()
     except (requests.RequestException, ValueError, TypeError, KeyError, IndexError):
-        return deterministic_summary
+        return None

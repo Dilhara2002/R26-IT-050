@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import API from "../services/api";
+import { parseAvailableTime } from "../services/itineraryValidation";
 
 // Auto-resolves to MapPicker.js on Mobile, and MapPicker.web.js on Web
 import MapPicker from "../components/MapPicker";
@@ -74,12 +75,13 @@ export default function HomeScreen({ navigation }) {
       Alert.alert("Error", "Please select at least one preference.");
       return;
     }
-    if (!hours && !minutes) {
-      Alert.alert("Error", "Please enter your available time.");
+    let totalMinutes;
+    try {
+      totalMinutes = parseAvailableTime(hours, minutes);
+    } catch (error) {
+      Alert.alert("Error", error.message);
       return;
     }
-
-    const totalMinutes = parseInt(hours || 0) * 60 + parseInt(minutes || 0);
     setLoading(true);
 
     try {

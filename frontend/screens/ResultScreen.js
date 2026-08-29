@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
-import TripSafetyAnalysis from "../components/TripSafetyAnalysis";
+import React, { useEffect, useState } from "react";
+import { View, Text, ScrollView, Pressable, StyleSheet, Linking } from "react-native";
 import API from "../services/api";
 import {
   applyFailedRegeneration,
@@ -11,7 +10,6 @@ import {
 import {
   buildItinerarySafetyRequest,
   getItinerarySafetyAvailability,
-  recommendItinerarySafety,
 } from "../services/safetyApi";
 
 export default function ResultScreen({ route, navigation }) {
@@ -19,9 +17,6 @@ export default function ResultScreen({ route, navigation }) {
   const initialPersistence = route.params?.persistence || null;
   const [data, setData] = useState(initialData);
   const [persistence, setPersistence] = useState(initialPersistence);
-  const [budget, setBudget] = useState("");
-  const [passengers, setPassengers] = useState("");
-  const [preferredCategory, setPreferredCategory] = useState("");
   const [safetyLoading, setSafetyLoading] = useState(false);
   const [safetyResult, setSafetyResult] = useState(null);
   const [safetyError, setSafetyError] = useState("");
@@ -33,8 +28,16 @@ export default function ResultScreen({ route, navigation }) {
   const optimizedStops = Array.isArray(data?.optimized_stops) ? data.optimized_stops : [];
   const startingLocation = data?.starting_location || null;
   const availabilityMessage = getItinerarySafetyAvailability(startingLocation, optimizedStops);
+  const deterministicExplanation = data?.deterministic_explanation?.summary ||
+    data?.route_explanation?.summary || data?.ai_summary;
+  const guideExplanation = data?.guide_explanation ||
+    (data?.ai_paraphrase && data.ai_paraphrase !== deterministicExplanation
+      ? data.ai_paraphrase
+      : null);
 
-  const handleSafetyAnalysis = async () => {
+  useEffect(() => navigation.addListener("focus", () => setSafetyLoading(false)), [navigation]);
+
+  const handleSafetyAnalysis = () => {
     if (safetyLoading || regenerationLoading) return;
 
     setValidationError("");
@@ -45,43 +48,15 @@ export default function ResultScreen({ route, navigation }) {
       return;
     }
 
-    const normalizedBudget = Number(budget.trim());
-    const normalizedPassengers = Number(passengers.trim());
-    if (!budget.trim() || !Number.isFinite(normalizedBudget) || normalizedBudget <= 0) {
-      setValidationError("Enter a whole-trip budget greater than 0 LKR.");
-      return;
-    }
-    if (
-      !passengers.trim() ||
-      !Number.isInteger(normalizedPassengers) ||
-      normalizedPassengers <= 0
-    ) {
-      setValidationError("Enter a passenger count as a positive whole number.");
-      return;
-    }
-
     setSafetyLoading(true);
-    setSafetyResult(null);
     try {
       const payload = buildItinerarySafetyRequest({
         startingLocation,
         optimizedStops,
-        budget: normalizedBudget,
-        passengers: normalizedPassengers,
-        preferredCategory: preferredCategory.trim(),
       });
-      const response = await recommendItinerarySafety(payload);
-      if (!response || typeof response !== "object") {
-        setSafetyError("The safety service returned an unusable response.");
-        return;
-      }
-      setSafetyResult(response);
+      navigation.navigate("Safety", { itinerarySafetyRequest: payload });
     } catch (error) {
-      if (error?.safetyResponse && typeof error.safetyResponse === "object") {
-        setSafetyResult(error.safetyResponse);
-      }
-      setSafetyError(error?.message || "Trip safety analysis could not be completed.");
-    } finally {
+      setValidationError(error?.message || "The Safety request could not be prepared.");
       setSafetyLoading(false);
     }
   };
@@ -143,7 +118,7 @@ export default function ResultScreen({ route, navigation }) {
         <Text style={styles.aiBadge}>✦ Optimized Itinerary</Text>
         <Text style={styles.title}>Your Travel Plan</Text>
         <Text style={styles.subtitle}>
-          A heuristic route built from the bounded, source-traced Kandy dataset.
+          A heuristic route built from the bounded, source-traced Central Province dataset.
         </Text>
       </View>
 
@@ -161,6 +136,14 @@ export default function ResultScreen({ route, navigation }) {
         <Text style={styles.estimateText}>
           {data.visit_time_minutes} min research-estimated visits + {data.travel_time_minutes} min estimated travel
         </Text>
+        <View style={styles.timeGrid}>
+          <Text style={styles.timeItem}>Time budget: {data.max_time_allocated_mins} min</Text>
+          <Text style={styles.timeItem}>Estimated visit time: {data.visit_time_minutes} min</Text>
+          <Text style={styles.timeItem}>Estimated travel time: {data.travel_time_minutes} min</Text>
+          <Text style={styles.timeItem}>Total used: {data.planned_time_minutes} min</Text>
+          <Text style={styles.timeItem}>Remaining: {data.remaining_time_minutes} min</Text>
+          <Text style={styles.timeItem}>Utilization: {data.time_utilization_percent}%</Text>
+        </View>
         <Text style={styles.estimationNote}>
           Travel uses straight-line Haversine distance, an assumed {data.travel_estimation?.assumed_average_speed_kmh || 30} km/h speed and a traffic buffer. It excludes real-road routing, live traffic, opening hours, return travel, parking and walking.
         </Text>
@@ -168,8 +151,8 @@ export default function ResultScreen({ route, navigation }) {
         {persistence && (
           <Text style={styles.persistenceText}>
             {persistence.saved
-              ? "Saved to itinerary history."
-              : "Route generated successfully; itinerary history was not saved."}
+              ? "Plan saved to prototype database."
+              : "Route generated successfully; the plan was not saved to the prototype database."}
           </Text>
         )}
 
@@ -243,6 +226,11 @@ export default function ResultScreen({ route, navigation }) {
               <Text style={styles.sourceText}>
                 Source: {stop.source_name} · {stop.source_license}
               </Text>
+              {stop.source_url ? (
+                <Pressable accessibilityRole="link" onPress={() => Linking.openURL(stop.source_url)}>
+                  <Text style={styles.sourceLink}>Open POI source</Text>
+                </Pressable>
+              ) : null}
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={`Replace ${stop.name}`}
@@ -267,26 +255,36 @@ export default function ResultScreen({ route, navigation }) {
       </View>
 
       <View style={[styles.assistantCard, { marginTop: 20, backgroundColor: '#FFF7ED', borderColor: '#FFEDD5', borderWidth: 1 }]}>
-        <Text style={[styles.sectionTitle, { color: '#C2410C' }]}>✦ Route Explanation</Text>
+        <Text style={[styles.sectionTitle, { color: '#C2410C' }]}>Why this route was selected</Text>
         <Text style={styles.aiSummary}>
-          {data.route_explanation?.summary || data.ai_summary}
+          {deterministicExplanation}
         </Text>
       </View>
 
-      <TripSafetyAnalysis
-        budget={budget}
-        passengers={passengers}
-        preferredCategory={preferredCategory}
-        onBudgetChange={setBudget}
-        onPassengersChange={setPassengers}
-        onPreferredCategoryChange={setPreferredCategory}
-        onAnalyze={handleSafetyAnalysis}
-        loading={safetyLoading}
-        availabilityMessage={availabilityMessage}
-        validationError={validationError}
-        requestError={safetyError}
-        result={safetyResult}
-      />
+      {guideExplanation ? (
+        <View style={styles.assistantCard}>
+          <Text style={styles.sectionTitle}>Optional travel-guide explanation</Text>
+          <Text style={styles.aiSummary}>{guideExplanation}</Text>
+        </View>
+      ) : null}
+
+      {availabilityMessage || validationError ? (
+        <Text style={styles.errorText}>{validationError || availabilityMessage}</Text>
+      ) : null}
+      <Pressable
+        accessibilityRole="button"
+        disabled={safetyLoading || Boolean(regenerationLoading) || Boolean(availabilityMessage)}
+        onPress={handleSafetyAnalysis}
+        style={({ pressed }) => [
+          styles.safetyButton,
+          (safetyLoading || regenerationLoading || availabilityMessage) && styles.disabledButton,
+          pressed && styles.pressed,
+        ]}
+      >
+        <Text style={styles.generateText}>
+          {safetyLoading ? "Opening Safety Analysis…" : "Continue to Safety Analysis"}
+        </Text>
+      </Pressable>
     </ScrollView>
   );
 }
@@ -312,6 +310,8 @@ const styles = StyleSheet.create({
   cardSub: { color: "#64748B", marginTop: 3 },
   estimateText: { color: "#334155", fontWeight: "700", marginBottom: 8 },
   estimationNote: { color: "#64748B", lineHeight: 19, marginBottom: 16, fontSize: 13 },
+  timeGrid: { backgroundColor: "#F8FAFC", borderRadius: 14, padding: 12, marginBottom: 12, gap: 4 },
+  timeItem: { color: "#334155", fontSize: 13, fontWeight: "700" },
   persistenceText: { color: "#64748B", marginBottom: 16 },
   successText: { color: "#166534", fontWeight: "700", marginBottom: 12 },
   errorText: { color: "#B91C1C", fontWeight: "700", marginBottom: 12 },
@@ -333,7 +333,9 @@ const styles = StyleSheet.create({
   featureTitle: { fontSize: 17, fontWeight: "900", color: "#0F172A", marginBottom: 4 },
   featureText: { color: "#64748B", lineHeight: 20 },
   sourceText: { color: "#1D4ED8", fontSize: 12, fontWeight: "700", marginTop: 8 },
+  sourceLink: { color: "#1D4ED8", fontSize: 12, textDecorationLine: "underline", marginTop: 5 },
   aiSummary: { color: "#475569", lineHeight: 22, fontSize: 15, textAlign: 'justify' },
+  safetyButton: { backgroundColor: "#7C3AED", borderRadius: 20, paddingVertical: 18, alignItems: "center", marginTop: 10 },
   missingResult: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, backgroundColor: "#EAF2FF" },
   missingResultText: { color: "#B91C1C", fontWeight: "800", fontSize: 16, textAlign: "center" },
 });

@@ -100,6 +100,22 @@ class RegenerationApiTests(unittest.TestCase):
                     response.get_json()["code"], "invalid_regeneration_constraints"
                 )
 
+    def test_invalid_time_and_non_finite_numeric_inputs_are_rejected(self):
+        cases = (
+            {"max_time_minutes": 0},
+            {"max_time_minutes": -1},
+            {"max_time_minutes": 1441},
+            {"max_time_minutes": "120"},
+            {"current_lat": "not-a-number"},
+            {"current_lon": float("inf")},
+            {"radius_km": 0},
+        )
+        for additions in cases:
+            with self.subTest(additions=additions):
+                response = self.post(additions)
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.get_json()["code"], "invalid_regeneration_constraints")
+
     def test_unknown_unverified_and_quarantined_ids_are_rejected(self):
         for place_id in ("unknown-id", "79"):
             with self.subTest(place_id=place_id):
@@ -237,6 +253,16 @@ class RegenerationApiTests(unittest.TestCase):
             data["visit_time_minutes"] + data["travel_time_minutes"],
         )
         self.assertTrue(data["route_explanation"]["summary"])
+        self.assertEqual(
+            [stop["sequence"] for stop in data["optimized_stops"]],
+            list(range(1, len(data["optimized_stops"]) + 1)),
+        )
+        self.assertTrue(all(stop["leg_distance_km"] >= 0 for stop in data["optimized_stops"]))
+        self.assertAlmostEqual(
+            sum(stop["estimated_leg_travel_minutes"] for stop in data["optimized_stops"]),
+            data["travel_time_minutes"],
+            delta=1.0,
+        )
 
     def test_fixed_seed_with_locked_and_excluded_constraints_is_deterministic(self):
         filtered = model.filter_locations(

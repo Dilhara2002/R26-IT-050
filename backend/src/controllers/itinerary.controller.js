@@ -3,6 +3,16 @@ import {
 } from "../services/itinerary.service.js";
 import Itinerary from "../models/Itinerary.js";
 
+const requireFiniteNumber = (value, field, minimum, maximum, fallback) => {
+  const candidate = value === undefined ? fallback : value;
+  if (typeof candidate !== "number" || !Number.isFinite(candidate) ||
+      candidate < minimum || candidate > maximum) {
+    const error = new Error(`${field} must be a finite number between ${minimum} and ${maximum}.`);
+    error.statusCode = 400;
+    throw error;
+  }
+  return candidate;
+};
 
 export const buildItineraryPayload = (body) => {
   const {
@@ -20,9 +30,9 @@ export const buildItineraryPayload = (body) => {
 
   const payload = {
     preferences,
-    max_time_minutes: max_time_minutes || 480,
-    current_lat: current_lat || 7.2906,
-    current_lon: current_lon || 80.6337
+    max_time_minutes: requireFiniteNumber(max_time_minutes, "max_time_minutes", 1, 1440, 480),
+    current_lat: requireFiniteNumber(current_lat, "current_lat", -90, 90, 7.2906),
+    current_lon: requireFiniteNumber(current_lon, "current_lon", -180, 180, 80.6337)
   };
   const additiveFields = {
     radius_km,
@@ -34,7 +44,9 @@ export const buildItineraryPayload = (body) => {
   };
   Object.entries(additiveFields).forEach(([field, value]) => {
     if (value !== undefined) {
-      payload[field] = value;
+      payload[field] = field === "radius_km"
+        ? requireFiniteNumber(value, "radius_km", 0.1, 100)
+        : value;
     }
   });
   return payload;

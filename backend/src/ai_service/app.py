@@ -30,6 +30,7 @@ app = Flask(__name__)
 CORS(app)
 
 ALLOWED_GENERATION_MODES = {"initial", "replace_stop", "full_regeneration"}
+MAX_TIME_MINUTES = 1440
 
 
 class RequestValidationError(ValueError):
@@ -52,6 +53,20 @@ def _controlled_error(error, code, status, **metadata):
             **metadata,
         }
     ), status
+
+
+def _finite_number(data, field_name, default, minimum, maximum):
+    value = data[field_name] if field_name in data else default
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise RequestValidationError(f"{field_name} must be a finite number.")
+    value = float(value)
+    if not math.isfinite(value):
+        raise RequestValidationError(f"{field_name} must be a finite number.")
+    if value < minimum or value > maximum:
+        raise RequestValidationError(
+            f"{field_name} must be between {minimum} and {maximum}."
+        )
+    return int(value) if value.is_integer() else value
 
 
 def _normalize_id(value, field_name):
@@ -201,9 +216,11 @@ def optimize_itinerary():
             raise RequestValidationError("The request body must be a JSON object.")
 
         user_preferences = data.get("preferences", [])
-        max_time_minutes = data.get("max_time_minutes", 480)
-        user_lat = data.get("current_lat", 7.2906)
-        user_lon = data.get("current_lon", 80.6337)
+        max_time_minutes = _finite_number(
+            data, "max_time_minutes", 480, 1, MAX_TIME_MINUTES
+        )
+        user_lat = _finite_number(data, "current_lat", 7.2906, -90, 90)
+        user_lon = _finite_number(data, "current_lon", 80.6337, -180, 180)
         radius_km = data.get("radius_km")
 
         if radius_km is None:
@@ -215,6 +232,8 @@ def optimize_itinerary():
                 radius_km = 60
             else:
                 radius_km = 100
+        else:
+            radius_km = _finite_number(data, "radius_km", None, 0.1, 100)
 
         if not user_preferences:
             return jsonify({"error": "Preferences are required."}), 400
@@ -341,6 +360,8 @@ def optimize_itinerary():
                     "time_utilization_percent": optimization["time_utilization_percent"],
                     "travel_estimation": optimization["travel_estimation"],
                     "route_explanation": optimization["route_explanation"],
+                    "deterministic_explanation": optimization["route_explanation"],
+                    "guide_explanation": optional_paraphrase,
                     "ai_summary": core_summary,
                     "ai_paraphrase": optional_paraphrase,
                     "generation_mode": generation_mode,
