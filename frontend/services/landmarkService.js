@@ -1,7 +1,10 @@
 import { Platform } from "react-native";
 
-// Change this to your machine's local IP and keep http:// and :5000
-const AI_SERVICE_BASE_URL = "http://192.168.1.85:5000";
+// Set EXPO_PUBLIC_AI_SERVICE_BASE_URL to the computer's LAN address when
+// testing on a physical phone, for example http://192.168.1.20:5002.
+const AI_SERVICE_BASE_URL = (
+  process.env.EXPO_PUBLIC_AI_SERVICE_BASE_URL || "http://localhost:5002"
+).replace(/\/$/, "");
 
 /**
  * Predict the landmark in a given image.

@@ -16,6 +16,22 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npx expo start
    ```
 
+## Landmark scanner and AI tour guide
+
+The landmark service runs from `backend/src/ai_service` on port `5002`.
+
+```bash
+cd backend
+python3.11 -m venv .venv311
+.venv311/bin/pip install -r requirements.txt
+.venv311/bin/python src/ai_service/app.py
+```
+
+Copy `frontend/.env.example` to `frontend/.env`. When using Expo Go on a
+physical phone, set `EXPO_PUBLIC_AI_SERVICE_BASE_URL` to the computer's LAN IP
+(for example, `http://192.168.1.20:5002`). The phone and computer must be on the
+same network.
+
 In the output, you'll find options to open the app in a
 
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)
