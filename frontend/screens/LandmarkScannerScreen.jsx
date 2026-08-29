@@ -125,7 +125,7 @@ export default function LandmarkScannerScreen({ onBack, onOpenChat, navigation }
     setLoading(true);
     setResult(null);
     try {
-      const data = await predictLandmark(imageAsset, "svm");
+      const data = await predictLandmark(imageAsset);
       setResult(data);
     } catch (err) {
       Alert.alert(

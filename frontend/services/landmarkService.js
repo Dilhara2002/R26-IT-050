@@ -1,9 +1,19 @@
 import { Platform } from "react-native";
+import Constants from "expo-constants";
 
-// Set EXPO_PUBLIC_AI_SERVICE_BASE_URL to the computer's LAN address when
-// testing on a physical phone, for example http://192.168.1.20:5002.
+function getDevelopmentHost() {
+  if (Platform.OS === "web" && globalThis.location?.hostname) {
+    return globalThis.location.hostname;
+  }
+
+  const expoHost =
+    Constants.expoConfig?.hostUri || Constants.expoGoConfig?.debuggerHost || "";
+  return expoHost.split(":")[0] || "localhost";
+}
+
 const AI_SERVICE_BASE_URL = (
-  process.env.EXPO_PUBLIC_AI_SERVICE_BASE_URL || "http://localhost:5002"
+  process.env.EXPO_PUBLIC_AI_SERVICE_BASE_URL ||
+  `http://${getDevelopmentHost()}:5002`
 ).replace(/\/$/, "");
 
 /**
@@ -14,7 +24,7 @@ const AI_SERVICE_BASE_URL = (
  * @param {'svm'|'tflite'} mode - 
  * @returns {Promise<object>} API response JSON
  */
-export async function predictLandmark(imageAsset, mode = "svm") {
+export async function predictLandmark(imageAsset, mode = "tflite") {
   const formData = new FormData();
   
   const photoUri =

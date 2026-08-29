@@ -93,26 +93,29 @@ input_details  = tflite_interpreter.get_input_details()
 output_details = tflite_interpreter.get_output_details()
 print(f"[Landmark] TFLite model loaded from {TFLITE_PATH}")
 
-#  Load MobileNetV2 Feature Extractor + SVM
+# Load the optional MobileNetV2 feature extractor + SVM only when explicitly
+# enabled. It needs ImageNet weights on first use; the bundled TFLite model is
+# the reliable offline default.
 svm_available = False
-try:
-    from tensorflow.keras.applications import MobileNetV2
-    from tensorflow.keras import layers, models as keras_models
+if os.getenv("LANDMARK_ENABLE_SVM", "").lower() in {"1", "true", "yes"}:
+    try:
+        from tensorflow.keras.applications import MobileNetV2
+        from tensorflow.keras import layers, models as keras_models
 
-    _input = layers.Input(shape=(224, 224, 3))
-    _x = tf.keras.applications.mobilenet_v2.preprocess_input(_input)
-    _base = MobileNetV2(input_shape=(224, 224, 3), include_top=False, weights='imagenet')
-    _base.trainable = False
-    _x = _base(_x, training=False)
-    _x = layers.GlobalAveragePooling2D(name="global_avg_pool")(_x)
-    _feature_model = keras_models.Model(inputs=_input, outputs=_x)
+        _input = layers.Input(shape=(224, 224, 3))
+        _x = tf.keras.applications.mobilenet_v2.preprocess_input(_input)
+        _base = MobileNetV2(input_shape=(224, 224, 3), include_top=False, weights='imagenet')
+        _base.trainable = False
+        _x = _base(_x, training=False)
+        _x = layers.GlobalAveragePooling2D(name="global_avg_pool")(_x)
+        _feature_model = keras_models.Model(inputs=_input, outputs=_x)
 
-    svm_model  = joblib.load(SVM_PATH)
-    svm_scaler = joblib.load(SCALER_PATH)
-    svm_available = True
-    print("[Landmark] SVM mode READY (92.56% accuracy).")
-except Exception as e:
-    print(f"[Landmark] SVM mode unavailable, falling back to TFLite: {e}")
+        svm_model = joblib.load(SVM_PATH)
+        svm_scaler = joblib.load(SCALER_PATH)
+        svm_available = True
+        print("[Landmark] SVM mode READY (92.56% accuracy).")
+    except Exception as e:
+        print(f"[Landmark] SVM mode unavailable, falling back to TFLite: {e}")
 
 #  Image helpers
 IMG_SIZE = (224, 224)
