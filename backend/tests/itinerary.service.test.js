@@ -2,7 +2,10 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import axios from "axios";
 
-import { generateItineraryFromAI } from "../src/services/itinerary.service.js";
+import {
+  generateItineraryFromAI,
+  PYTHON_AI_TIMEOUT_MS
+} from "../src/services/itinerary.service.js";
 import { buildItineraryPayload } from "../src/controllers/itinerary.controller.js";
 
 
@@ -131,8 +134,10 @@ test("controller rejects invalid time, coordinates, and radius instead of defaul
 test("itinerary service sends regeneration fields unchanged to Flask", async () => {
   const originalPost = axios.post;
   let receivedPayload;
-  axios.post = async (_url, payload) => {
+  let receivedOptions;
+  axios.post = async (_url, payload, options) => {
     receivedPayload = payload;
+    receivedOptions = options;
     return { data: { status: "success", data: { route_changed: true } } };
   };
   const requestPayload = {
@@ -144,8 +149,49 @@ test("itinerary service sends regeneration fields unchanged to Flask", async () 
   try {
     await generateItineraryFromAI(requestPayload);
     assert.deepEqual(receivedPayload, requestPayload);
+    assert.deepEqual(receivedOptions, { timeout: PYTHON_AI_TIMEOUT_MS });
+    assert.equal(PYTHON_AI_TIMEOUT_MS, 45000);
   } finally {
     axios.post = originalPost;
+  }
+});
+
+test("itinerary service maps Python timeout to a controlled safe 504", async () => {
+  const originalPost = axios.post;
+  const originalWarn = console.warn;
+  const originalError = console.error;
+  const warnings = [];
+  const errors = [];
+  console.warn = (...args) => warnings.push(args.join(" "));
+  console.error = (...args) => errors.push(args.join(" "));
+  axios.post = async () => {
+    const error = new Error("timeout of 45000ms exceeded private-url");
+    error.code = "ECONNABORTED";
+    throw error;
+  };
+  try {
+    await assert.rejects(
+      generateItineraryFromAI({ generation_mode: "full_regeneration" }),
+      (error) => {
+        assert.equal(error.statusCode, 504);
+        assert.equal(error.details.status, "error");
+        assert.equal(error.details.code, "itinerary_generation_timeout");
+        assert.equal(
+          error.details.error,
+          "This plan variation took longer than expected."
+        );
+        assert.doesNotMatch(error.details.error, /45000|private-url|Axios/i);
+        return true;
+      }
+    );
+    assert.equal(warnings.length, 1);
+    assert.match(warnings[0], /45000ms/);
+    assert.doesNotMatch(warnings[0], /private-url/);
+    assert.deepEqual(errors, []);
+  } finally {
+    axios.post = originalPost;
+    console.warn = originalWarn;
+    console.error = originalError;
   }
 });
 
