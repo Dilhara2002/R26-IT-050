@@ -5,7 +5,8 @@ const API_BASE_URL =
   "http://127.0.0.1:8080/api/itinerary";
 
 const API = axios.create({
-  baseURL: API_BASE_URL
+  baseURL: API_BASE_URL,
+  timeout: 30000,
 });
 
 export default API;

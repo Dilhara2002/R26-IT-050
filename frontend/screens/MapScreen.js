@@ -43,11 +43,14 @@ export default function MapScreen({ route, navigation }) {
       
       <View style={styles.floatingCard}>
         <Text style={styles.cardTitle}>Estimated Itinerary Map</Text>
-        <Text style={styles.cardSub}>Markers follow the current heuristic itinerary order</Text>
+        <Text style={styles.cardSub}>Numbered markers and the dashed blue line follow the current itinerary order.</Text>
+        <Text style={styles.cardNote}>The blue line is a straight-line planning estimate, not a drivable route or live traffic view.</Text>
         
         <Pressable 
           onPress={() => navigation.goBack()} 
-          style={styles.backBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Back to itinerary list"
+          style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
         >
           <Text style={styles.backBtnText}>Back to List</Text>
         </Pressable>
@@ -90,13 +93,13 @@ const styles = StyleSheet.create({
   legendWarning: { color: '#9A3412', fontSize: 11, fontWeight: '700', marginTop: 6 },
   floatingCard: {
     position: 'absolute',
-    top: 50,
+    top: 16,
     alignSelf: 'center', // <--- Centers it perfectly on web
     width: '90%',
     maxWidth: 400, // <--- Stops it from stretching across the screen
     backgroundColor: '#fff',
     borderRadius: 22,
-    padding: 20,
+    padding: 16,
     elevation: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -105,6 +108,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: { fontSize: 18, fontWeight: "900", color: "#0F172A" },
   cardSub: { color: "#64748B", fontSize: 13, marginTop: 2 },
+  cardNote: { color: "#475569", fontSize: 12, lineHeight: 17, marginTop: 7 },
   backBtn: {
     marginTop: 15,
     backgroundColor: '#EFF6FF',
@@ -114,5 +118,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#BFDBFE'
   },
-  backBtnText: { color: '#1D4ED8', fontWeight: 'bold' }
+  backBtnText: { color: '#1D4ED8', fontWeight: 'bold' },
+  backBtnPressed: { opacity: 0.72 },
 });

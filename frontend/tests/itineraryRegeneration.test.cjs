@@ -22,6 +22,8 @@ const {
   buildFullRegenerationRequest,
   buildReplacementRequest,
   createRegenerationContext,
+  parseGuideExplanation,
+  regenerationErrorKind,
   validGuideExplanation,
 } = helperModule.exports;
 
@@ -201,6 +203,13 @@ test("controlled exhaustion preserves current plan and Safety state", () => {
   assert.strictEqual(next.data, itinerary);
   assert.strictEqual(next.safetyResult, safetyResult);
   assert.match(next.regenerationError, /No additional feasible useful itinerary/);
+  assert.equal(next.regenerationErrorKind, "exhausted");
+});
+
+test("regeneration errors distinguish service and feasibility states", () => {
+  assert.equal(regenerationErrorKind({}), "service_unavailable");
+  assert.equal(regenerationErrorKind({ response: { status: 409, data: {} } }), "no_feasible_alternative");
+  assert.equal(regenerationErrorKind({ response: { status: 500, data: {} } }), "unexpected");
 });
 
 test("unchanged or unusable success payload is rejected", () => {
@@ -240,13 +249,38 @@ test("optional guide explanation is shown only for valid non-empty text", () => 
   );
 });
 
+test("four-stop guide sections preserve exact names, route order, and line breaks", () => {
+  const stops = ["Kandy Lake", "Royal Botanic Gardens", "Ceylon Tea Museum", "Udawattakele Forest Reserve"]
+    .map((name, index) => ({ sequence: index + 1, name }));
+  const guide = [
+    "Trip overview",
+    "A friendly nature and culture day.",
+    ...stops.flatMap((stop) => [
+      `Stop ${stop.sequence}: ${stop.name}`,
+      `First sentence for ${stop.name}.\nSecond sentence stays on a new line.`,
+    ]),
+    "Route-flow conclusion",
+    "Straight-line travel is estimated. Gemini did not select or optimize the route.",
+  ].join("\n\n");
+  const parsed = parseGuideExplanation(guide, stops);
+  assert.equal(parsed.structured, true);
+  assert.deepEqual(
+    parsed.sections.filter((section) => section.type === "stop").map((section) => section.name),
+    stops.map((stop) => stop.name)
+  );
+  assert.match(parsed.sections.find((section) => section.type === "stop").body, /\n/);
+  assert.equal(parseGuideExplanation(guide, [...stops].reverse()).structured, false);
+});
+
 test("result screen uses truthful guide and regeneration messaging", () => {
   const resultSource = require("node:fs").readFileSync(
     path.resolve(__dirname, "../screens/ResultScreen.js"),
     "utf8"
   );
-  assert.match(resultSource, /Optional AI Guide Explanation/);
-  assert.match(resultSource, /paraphrases the deterministic evidence above; it does not select the route/);
+  assert.match(resultSource, /Optional AI Tour Guide/);
+  assert.match(resultSource, /does not select or optimize the route/);
+  assert.match(resultSource, /guidePresentation\.sections\.map/);
+  assert.doesNotMatch(resultSource, /dangerouslySetInnerHTML/);
   assert.match(resultSource, /Generate another feasible plan variation/);
   assert.match(resultSource, /Another feasible plan variation was generated/);
   assert.doesNotMatch(resultSource, /Generate a different full plan/);

@@ -60,6 +60,93 @@ def make_ga_places(count=6, duration=20):
     )
 
 
+def make_guide_stops(count=4):
+    names = [
+        "Kandy Lake",
+        "Royal Botanic Gardens",
+        "Ceylon Tea Museum",
+        "Udawattakele Forest Reserve",
+        "Ambuluwawa Biodiversity Complex",
+        "Hanthana Mountain Range",
+        "National Museum of Kandy",
+        "Bahirawakanda Temple",
+    ]
+    return [
+        {
+            "sequence": index + 1,
+            "name": name,
+            "district": "Kandy",
+            "verified_tags": ["Nature", "Culture"],
+            "matched_preferences": ["Nature"],
+            "duration_minutes": 60 + (index * 15),
+            "verification_status": model.VERIFIED_STATUS,
+            "leg_distance_km": 1.25 + index,
+            "estimated_leg_travel_minutes": 4.0 + index,
+        }
+        for index, name in enumerate(names[:count])
+    ]
+
+
+def make_guide_context():
+    return {
+        "visit_time_minutes": 300,
+        "travel_time_minutes": 45,
+        "planned_time_minutes": 345,
+        "remaining_time_minutes": 15,
+        "time_utilization_percent": 95.8,
+        "route_limitations": "Straight-line Haversine estimate; no live traffic.",
+    }
+
+
+def make_guide_output(stops):
+    sections = [
+        "Trip overview",
+        "This nature and culture trip balances verified places with 300 minutes of visits and 45 minutes of estimated travel.",
+    ]
+    for stop in stops:
+        sections.extend(
+            [
+                f"Stop {stop['sequence']}: {stop['name']}",
+                f"This verified {stop['district']} stop supports the selected interests. Plan about {stop['duration_minutes']} minutes here before continuing in route order.",
+            ]
+        )
+    sections.extend(
+        [
+            "Route-flow conclusion",
+            "The deterministic order aims to reduce estimated straight-line travel. Travel time is estimated, and I did not select or optimize this route. Enjoy your trip!",
+        ]
+    )
+    return "\n\n".join(sections)
+
+
+def make_guide_response_from_request(*_args, **kwargs):
+    prompt = kwargs["json"]["input"]
+    names = []
+    for line in prompt.splitlines():
+        if line.startswith("Stop ") and " | exact name: " in line:
+            names.append(line.split(" | exact name: ", 1)[1].split(" | ", 1)[0])
+    stops = [
+        {
+            "sequence": index + 1,
+            "name": name,
+            "district": "Kandy",
+            "duration_minutes": 60,
+        }
+        for index, name in enumerate(names)
+    ]
+    response = mock.Mock()
+    response.raise_for_status.return_value = None
+    response.json.return_value = {
+        "steps": [
+            {
+                "type": "model_output",
+                "content": [{"type": "text", "text": make_guide_output(stops)}],
+            }
+        ]
+    }
+    return response
+
+
 class ModelTestCase(unittest.TestCase):
     def setUp(self):
         self.original_places = model.PLACES_DF
@@ -432,10 +519,11 @@ class ModelTestCase(unittest.TestCase):
 
     def test_core_xai_does_not_require_gemini(self):
         summary = model.generate_itinerary_summary(
-            ["Kandy Lake (60 mins)"],
+            make_guide_stops(1),
             ["Nature"],
             "",
             core_summary="Deterministic evidence summary.",
+            itinerary_context=make_guide_context(),
         )
         self.assertIsNone(summary)
 
@@ -458,10 +546,11 @@ class ModelTestCase(unittest.TestCase):
             for api_key in unusable_keys:
                 with self.subTest(api_key=api_key):
                     summary = model.generate_itinerary_summary(
-                        ["Kandy Lake (60 mins)"],
+                        make_guide_stops(1),
                         ["Nature"],
                         api_key,
                         core_summary="Deterministic evidence summary.",
+                        itinerary_context=make_guide_context(),
                     )
                     self.assertIsNone(summary)
             post.assert_not_called()
@@ -478,10 +567,11 @@ class ModelTestCase(unittest.TestCase):
                 model.requests, "post", side_effect=failure
             ) as post:
                 summary = model.generate_itinerary_summary(
-                    ["Kandy Lake (60 mins)"],
+                    make_guide_stops(1),
                     ["Nature"],
                     "AIza-valid-looking-test-key",
                     core_summary="Deterministic evidence summary.",
+                    itinerary_context=make_guide_context(),
                 )
                 self.assertIsNone(summary)
                 self.assertEqual(post.call_args.kwargs["timeout"], (2, 10))
@@ -494,14 +584,17 @@ class ModelTestCase(unittest.TestCase):
                 model.requests, "post", return_value=response
             ):
                 summary = model.generate_itinerary_summary(
-                    ["Kandy Lake (60 mins)"],
+                    make_guide_stops(1),
                     ["Nature"],
                     "AIza-valid-looking-test-key",
                     core_summary="Deterministic evidence summary.",
+                    itinerary_context=make_guide_context(),
                 )
                 self.assertIsNone(summary)
 
     def test_gemini_interactions_request_and_successful_final_model_output(self):
+        stops = make_guide_stops(4)
+        guide_output = make_guide_output(stops)
         response = mock.Mock()
         response.raise_for_status.return_value = None
         response.json.return_value = {
@@ -509,7 +602,7 @@ class ModelTestCase(unittest.TestCase):
                 {
                     "type": "model_output",
                     "content": [
-                        {"type": "text", "text": "Friendly guide explanation"}
+                        {"type": "text", "text": guide_output}
                     ],
                 }
             ]
@@ -520,12 +613,14 @@ class ModelTestCase(unittest.TestCase):
             model.time, "perf_counter", side_effect=[10.0, 10.123]
         ), self.assertLogs(model.LOGGER, level="INFO") as captured:
             summary = model.generate_itinerary_summary(
-                ["Kandy Lake (60 mins)"],
-                ["Nature"],
+                stops,
+                ["Nature", "Culture"],
                 "AIza-valid-looking-test-key",
                 core_summary="Deterministic evidence summary.",
+                itinerary_context=make_guide_context(),
             )
-        self.assertEqual(summary, "Friendly guide explanation")
+        self.assertEqual(summary, guide_output)
+        self.assertEqual(post.call_count, 1)
         self.assertEqual(post.call_args.args, (model.GEMINI_INTERACTIONS_URL,))
         self.assertEqual(
             post.call_args.kwargs["headers"],
@@ -538,18 +633,32 @@ class ModelTestCase(unittest.TestCase):
         self.assertEqual(set(request_body), {"model", "input", "store"})
         self.assertEqual(request_body["model"], "gemini-test-model")
         self.assertFalse(request_body["store"])
-        self.assertIn("Paraphrase", request_body["input"])
-        self.assertIn("Deterministic evidence summary.", request_body["input"])
+        prompt = request_body["input"]
+        self.assertIn("Selected interests: Nature, Culture", prompt)
+        self.assertIn("planned visit: 60 minutes", prompt)
+        self.assertIn("exactly one section for every supplied stop", prompt)
+        self.assertIn("You did not select, rank, replace, optimize", prompt)
+        self.assertIn("opening hours", prompt)
+        self.assertIn("ticket prices", prompt)
+        self.assertIn("live traffic", prompt)
+        self.assertIn("safety guarantees", prompt)
+        positions = [prompt.index(f"exact name: {stop['name']}") for stop in stops]
+        self.assertEqual(positions, sorted(positions))
+        for stop in stops:
+            self.assertEqual(prompt.count(f"exact name: {stop['name']}"), 1)
+        self.assertNotIn("Deterministic evidence summary.", prompt)
         success_log = "\n".join(captured.output)
         self.assertIn("request success", success_log)
         self.assertIn("model=gemini-test-model", success_log)
         self.assertIn("elapsed_ms=123", success_log)
-        self.assertIn("output_chars=26", success_log)
+        self.assertIn(f"output_chars={len(guide_output)}", success_log)
         self.assertNotIn("AIza-valid-looking-test-key", success_log)
         self.assertNotIn("Deterministic evidence summary.", success_log)
-        self.assertNotIn("Friendly guide explanation", success_log)
+        self.assertNotIn(guide_output, success_log)
 
     def test_gemini_defaults_model_and_selects_final_valid_model_output(self):
+        stops = make_guide_stops(1)
+        final_output = make_guide_output(stops)
         response = mock.Mock()
         response.raise_for_status.return_value = None
         response.json.return_value = {
@@ -557,14 +666,14 @@ class ModelTestCase(unittest.TestCase):
                 {"type": "tool_output", "content": [{"type": "text", "text": "ignore"}]},
                 {
                     "type": "model_output",
-                    "content": [{"type": "text", "text": "Earlier model text."}],
+                    "content": [{"type": "text", "text": "Earlier invalid model text."}],
                 },
                 {
                     "type": "model_output",
                     "content": [
-                        {"type": "text", "text": "Final model "},
+                        {"type": "text", "text": final_output[: len(final_output) // 2]},
                         {"type": "image", "data": "ignored"},
-                        {"type": "output_text", "text": "text."},
+                        {"type": "output_text", "text": final_output[len(final_output) // 2 :]},
                     ],
                 },
                 {
@@ -577,12 +686,13 @@ class ModelTestCase(unittest.TestCase):
             model.requests, "post", return_value=response
         ) as post:
             summary = model.generate_itinerary_summary(
-                ["Kandy Lake (60 mins)"],
+                stops,
                 ["Nature"],
                 "AIza-valid-looking-test-key",
                 core_summary="Deterministic evidence summary.",
+                itinerary_context=make_guide_context(),
             )
-        self.assertEqual(summary, "Final model text.")
+        self.assertEqual(summary, final_output)
         self.assertEqual(model.DEFAULT_GEMINI_MODEL, "gemini-3.5-flash-lite")
         self.assertEqual(
             post.call_args.kwargs["json"]["model"], model.DEFAULT_GEMINI_MODEL
@@ -610,6 +720,57 @@ class ModelTestCase(unittest.TestCase):
             "Final guide explanation",
         )
 
+    def test_prompt_supports_eight_ordered_stops_and_is_bounded(self):
+        stops = make_guide_stops(8)
+        prompt = model.build_itinerary_guide_prompt(
+            stops, ["Nature", "Culture"], make_guide_context()
+        )
+        self.assertIsNotNone(prompt)
+        self.assertLessEqual(len(prompt), model.MAX_GEMINI_PROMPT_CHARS)
+        positions = [prompt.index(f"exact name: {stop['name']}") for stop in stops]
+        self.assertEqual(positions, sorted(positions))
+        self.assertEqual(prompt.count(" | exact name: "), 8)
+
+    def test_structured_guide_rejects_missing_reordered_or_oversized_output(self):
+        stops = make_guide_stops(4)
+        names = [stop["name"] for stop in stops]
+        valid = make_guide_output(stops)
+        payload = {
+            "steps": [
+                {"type": "model_output", "content": [{"type": "text", "text": valid}]}
+            ]
+        }
+        self.assertEqual(
+            model._final_gemini_model_output(payload, names),
+            valid,
+        )
+        self.assertIsNone(
+            model._final_gemini_model_output(payload, list(reversed(names)))
+        )
+        missing = valid.replace(f"Stop 4: {names[3]}", "Stop 4: Missing")
+        payload["steps"][0]["content"][0]["text"] = missing
+        self.assertIsNone(model._final_gemini_model_output(payload, names))
+        payload["steps"][0]["content"][0]["text"] = (
+            valid + ("x" * model.MAX_GEMINI_GUIDE_CHARS)
+        )
+        self.assertIsNone(model._final_gemini_model_output(payload, names))
+
+    def test_invalid_finalized_context_makes_no_gemini_request(self):
+        malformed = make_guide_stops(2)
+        malformed[1]["sequence"] = 3
+        with mock.patch.object(model.requests, "post") as post, self.assertLogs(
+            model.LOGGER, level="WARNING"
+        ) as captured:
+            summary = model.generate_itinerary_summary(
+                malformed,
+                ["Nature"],
+                "unit-test-valid-key",
+                itinerary_context=make_guide_context(),
+            )
+        self.assertIsNone(summary)
+        post.assert_not_called()
+        self.assertIn("category=malformed_output", "\n".join(captured.output))
+
     def test_gemini_timeout_and_http_diagnostics_are_sanitized(self):
         secret = "unit-test-secret-value"
         prompt_marker = "PRIVATE DETERMINISTIC EVIDENCE"
@@ -619,7 +780,11 @@ class ModelTestCase(unittest.TestCase):
             model.time, "perf_counter", side_effect=[20.0, 20.5]
         ), self.assertLogs(model.LOGGER, level="WARNING") as timeout_logs:
             summary = model.generate_itinerary_summary(
-                ["Private place"], ["Nature"], secret, core_summary=prompt_marker
+                make_guide_stops(1),
+                ["Nature"],
+                secret,
+                core_summary=prompt_marker,
+                itinerary_context=make_guide_context(),
             )
         self.assertIsNone(summary)
         timeout_log = "\n".join(timeout_logs.output)
@@ -638,7 +803,11 @@ class ModelTestCase(unittest.TestCase):
             model.time, "perf_counter", side_effect=[30.0, 30.25]
         ), self.assertLogs(model.LOGGER, level="WARNING") as http_logs:
             summary = model.generate_itinerary_summary(
-                ["Private place"], ["Nature"], secret, core_summary=prompt_marker
+                make_guide_stops(1),
+                ["Nature"],
+                secret,
+                core_summary=prompt_marker,
+                itinerary_context=make_guide_context(),
             )
         self.assertIsNone(summary)
         http_log = "\n".join(http_logs.output)
@@ -691,10 +860,11 @@ class ModelTestCase(unittest.TestCase):
                 model.requests, "post", return_value=response
             ):
                 summary = model.generate_itinerary_summary(
-                    ["Kandy Lake (60 mins)"],
+                    make_guide_stops(1),
                     ["Nature"],
                     "AIza-valid-looking-test-key",
                     core_summary="Deterministic evidence summary.",
+                    itinerary_context=make_guide_context(),
                 )
                 self.assertIsNone(summary)
 
@@ -702,20 +872,8 @@ class ModelTestCase(unittest.TestCase):
         import app as flask_app
 
         secret = "AIza-super-secret-test-value"
-        response = mock.Mock()
-        response.raise_for_status.return_value = None
-        response.json.return_value = {
-            "steps": [
-                {
-                    "type": "model_output",
-                    "content": [
-                        {"type": "text", "text": "Friendly guide explanation"}
-                    ],
-                }
-            ]
-        }
         with mock.patch.object(flask_app, "GEMINI_API_KEY", secret), mock.patch.object(
-            model.requests, "post", return_value=response
+            model.requests, "post", side_effect=make_guide_response_from_request
         ), self.assertLogs(model.LOGGER, level="INFO") as captured:
             endpoint_response = flask_app.app.test_client().post(
                 "/api/optimize-itinerary",
@@ -728,14 +886,13 @@ class ModelTestCase(unittest.TestCase):
             )
         payload = endpoint_response.get_json()
         self.assertEqual(endpoint_response.status_code, 200, payload)
-        self.assertEqual(
-            payload["data"]["guide_explanation"],
-            "Friendly guide explanation",
-        )
+        self.assertIn("Trip overview", payload["data"]["guide_explanation"])
+        for stop in payload["data"]["optimized_stops"]:
+            self.assertIn(stop["name"], payload["data"]["guide_explanation"])
         self.assertNotIn(secret, json.dumps(payload))
         diagnostic = "\n".join(captured.output)
         self.assertNotIn(secret, diagnostic)
-        self.assertNotIn("Friendly guide explanation", diagnostic)
+        self.assertNotIn(payload["data"]["guide_explanation"], diagnostic)
         self.assertNotIn(payload["data"]["deterministic_explanation"]["summary"], diagnostic)
 
     def test_endpoint_retains_deterministic_xai_for_all_gemini_fallbacks(self):

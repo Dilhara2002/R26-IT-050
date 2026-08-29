@@ -18,6 +18,49 @@ export function validGuideExplanation(data, deterministicExplanation = null) {
   return null;
 }
 
+export function parseGuideExplanation(guideText, optimizedStops = []) {
+  if (typeof guideText !== "string" || !guideText.trim()) return null;
+  const normalized = guideText.trim();
+  const lines = normalized.split(/\r?\n/).map((line) => line.trim());
+  const sections = [];
+  let current = null;
+  for (const line of lines) {
+    if (!line) continue;
+    const stopMatch = line.match(/^Stop\s+(\d+)\s*:\s*(.+)$/i);
+    if (/^Trip overview:?$/i.test(line)) {
+      current = { type: "overview", title: "Trip overview", body: [] };
+      sections.push(current);
+    } else if (stopMatch) {
+      current = {
+        type: "stop",
+        sequence: Number(stopMatch[1]),
+        name: stopMatch[2].trim(),
+        title: `Stop ${stopMatch[1]}: ${stopMatch[2].trim()}`,
+        body: [],
+      };
+      sections.push(current);
+    } else if (/^Route-flow conclusion:?$/i.test(line)) {
+      current = { type: "conclusion", title: "Route-flow conclusion", body: [] };
+      sections.push(current);
+    } else if (current) {
+      current.body.push(line);
+    }
+  }
+  const stopSections = sections.filter((section) => section.type === "stop");
+  const expectedStops = Array.isArray(optimizedStops) ? optimizedStops : [];
+  const structured =
+    sections.some((section) => section.type === "overview") &&
+    sections.some((section) => section.type === "conclusion") &&
+    stopSections.length === expectedStops.length &&
+    stopSections.every(
+      (section, index) =>
+        section.sequence === index + 1 && section.name === expectedStops[index]?.name
+    );
+  return structured
+    ? { structured: true, sections: sections.map((section) => ({ ...section, body: section.body.join("\n") })), raw: normalized }
+    : { structured: false, sections: [], raw: normalized };
+}
+
 function stablePlaceIds(data) {
   const stops = Array.isArray(data?.optimized_stops) ? data.optimized_stops : [];
   const ids = stops.map((stop) => String(stop?.place_id ?? "").trim());
@@ -169,6 +212,15 @@ export function regenerationErrorMessage(error) {
   );
 }
 
+export function regenerationErrorKind(error) {
+  const status = error?.response?.status;
+  const code = error?.response?.data?.code;
+  if (code === "no_additional_feasible_alternative") return "exhausted";
+  if (status === 409) return "no_feasible_alternative";
+  if (!error?.response) return "service_unavailable";
+  return "unexpected";
+}
+
 export function applySuccessfulRegeneration(currentState, responsePayload) {
   if (
     responsePayload?.status !== "success" ||
@@ -217,5 +269,6 @@ export function applyFailedRegeneration(currentState, error) {
     ...currentState,
     regenerationLoading: null,
     regenerationError: regenerationErrorMessage(error),
+    regenerationErrorKind: regenerationErrorKind(error),
   };
 }

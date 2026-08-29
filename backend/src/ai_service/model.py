@@ -41,6 +41,7 @@ GEMINI_INTERACTIONS_URL = (
 )
 DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite"
 MAX_GEMINI_GUIDE_CHARS = 8000
+MAX_GEMINI_PROMPT_CHARS = 12000
 GEMINI_PLACEHOLDER_KEYS = {
     "APIKEY",
     "CHANGEME",
@@ -1305,6 +1306,8 @@ def run_genetic_algorithm_details(
         stop = {
             "sequence": sequence,
             "name": str(location["Name"]),
+            "district": _text_metadata(location, "District", ""),
+            "verified_tags": tags,
             "latitude": float(location["Latitude"]),
             "longitude": float(location["Longitude"]),
             "duration_minutes": int(location["Duration_Minutes"]),
@@ -1421,7 +1424,28 @@ def _is_usable_gemini_key(api_key):
     return normalized not in GEMINI_PLACEHOLDER_KEYS
 
 
-def _final_gemini_model_output(payload):
+def _guide_has_required_sections(text, expected_place_names):
+    """Validate the presentation contract without interpreting untrusted markup."""
+    if not isinstance(text, str) or not re.search(
+        r"(?im)^\s*trip overview\s*:?[ \t]*$", text
+    ):
+        return False
+    if not re.search(r"(?im)^\s*route-flow conclusion\s*:?[ \t]*$", text):
+        return False
+
+    previous_position = -1
+    for sequence, place_name in enumerate(expected_place_names, start=1):
+        heading = re.compile(
+            rf"(?im)^\s*stop\s+{sequence}\s*:\s*{re.escape(place_name)}\s*$"
+        )
+        matches = list(heading.finditer(text))
+        if len(matches) != 1 or matches[0].start() <= previous_position:
+            return False
+        previous_position = matches[0].start()
+    return True
+
+
+def _final_gemini_model_output(payload, expected_place_names=None):
     """Return bounded text from the final valid Interactions model-output step."""
     if not isinstance(payload, dict):
         return None
@@ -1450,9 +1474,128 @@ def _final_gemini_model_output(payload):
             if isinstance(text, str) and text.strip():
                 text_parts.append(text)
         candidate = "".join(text_parts).strip()
-        if candidate and len(candidate) <= MAX_GEMINI_GUIDE_CHARS:
+        if (
+            candidate
+            and len(candidate) <= MAX_GEMINI_GUIDE_CHARS
+            and (
+                not expected_place_names
+                or _guide_has_required_sections(candidate, expected_place_names)
+            )
+        ):
             final_text = candidate
     return final_text
+
+
+def _safe_guide_text(value, maximum_chars=240):
+    """Return compact plain text for the prompt; never forward control characters."""
+    normalized = re.sub(r"[\x00-\x1f\x7f]+", " ", str(value or ""))
+    normalized = re.sub(r"\s+", " ", normalized).strip()
+    return normalized[:maximum_chars]
+
+
+def build_itinerary_guide_prompt(stops, preferences, itinerary_context=None):
+    """Build one bounded prompt from an already finalized itinerary."""
+    if not isinstance(stops, list) or not 1 <= len(stops) <= MAX_ROUTE_STOPS:
+        return None
+
+    safe_stops = []
+    for expected_sequence, stop in enumerate(stops, start=1):
+        if not isinstance(stop, dict) or stop.get("sequence") != expected_sequence:
+            return None
+        name = _safe_guide_text(stop.get("name"), 160)
+        duration = stop.get("duration_minutes")
+        if not name or isinstance(duration, bool) or not isinstance(duration, (int, float)):
+            return None
+        if not math.isfinite(float(duration)) or float(duration) <= 0:
+            return None
+        tags = [
+            _safe_guide_text(tag, 40)
+            for tag in (stop.get("verified_tags") or [])
+            if _safe_guide_text(tag, 40)
+        ][:12]
+        matched = [
+            _safe_guide_text(interest, 40)
+            for interest in (stop.get("matched_preferences") or [])
+            if _safe_guide_text(interest, 40)
+        ][:12]
+        safe_stops.append(
+            {
+                "sequence": expected_sequence,
+                "name": name,
+                "district": _safe_guide_text(stop.get("district"), 80) or "not supplied",
+                "tags": ", ".join(tags) or "not supplied",
+                "matched": ", ".join(matched) or "no direct category match supplied",
+                "duration": int(round(float(duration))),
+                "source_status": _safe_guide_text(
+                    stop.get("verification_status"), 100
+                ) or "not supplied",
+                "leg_distance": (
+                    f"{float(stop['leg_distance_km']):.2f} km"
+                    if isinstance(stop.get("leg_distance_km"), (int, float))
+                    and math.isfinite(float(stop["leg_distance_km"]))
+                    else "not supplied"
+                ),
+                "leg_minutes": (
+                    f"{float(stop['estimated_leg_travel_minutes']):.1f} minutes"
+                    if isinstance(stop.get("estimated_leg_travel_minutes"), (int, float))
+                    and math.isfinite(float(stop["estimated_leg_travel_minutes"]))
+                    else "not supplied"
+                ),
+            }
+        )
+
+    context = itinerary_context if isinstance(itinerary_context, dict) else {}
+    safe_preferences = [
+        _safe_guide_text(value, 40)
+        for value in (preferences or [])
+        if _safe_guide_text(value, 40)
+    ][:12]
+    stop_facts = "\n".join(
+        (
+            f"Stop {stop['sequence']} | exact name: {stop['name']} | "
+            f"district: {stop['district']} | verified categories: {stop['tags']} | "
+            f"matched interests: {stop['matched']} | planned visit: {stop['duration']} minutes | "
+            f"incoming straight-line leg: {stop['leg_distance']} / {stop['leg_minutes']} | "
+            f"source status: {stop['source_status']}"
+        )
+        for stop in safe_stops
+    )
+    limitations = _safe_guide_text(
+        context.get(
+            "route_limitations",
+            "Straight-line Haversine travel estimate; no real-road routing, live traffic, "
+            "opening hours, return travel, parking, or walking.",
+        ),
+        600,
+    )
+    prompt = f"""You are writing an optional tourist-guide explanation for an itinerary that is already final.
+The Linear SVM performed relevance classification. A heuristic genetic algorithm selected the feasible stop set. Deterministic distance logic ordered the selected stops. You did not select, rank, replace, optimize, approve, or validate any place or route.
+
+Authoritative itinerary facts
+Selected interests: {', '.join(safe_preferences) or 'not supplied'}
+Total planned visit time: {_safe_guide_text(context.get('visit_time_minutes'), 20)} minutes
+Total estimated travel time: {_safe_guide_text(context.get('travel_time_minutes'), 20)} minutes
+Total used time: {_safe_guide_text(context.get('planned_time_minutes'), 20)} minutes
+Remaining time: {_safe_guide_text(context.get('remaining_time_minutes'), 20)} minutes
+Time utilization: {_safe_guide_text(context.get('time_utilization_percent'), 20)}%
+Route limitations: {limitations}
+
+Final route in authoritative order
+{stop_facts}
+
+Write clear, friendly, concise English suitable for a tourist and mobile reading. Use plain text with line breaks, never JSON, code, HTML, probabilities, raw field names, dataset identifiers, or internal implementation terminology.
+
+Use exactly this structure:
+Trip overview
+Write 2-4 concise sentences mentioning the selected interests, the trip character, planned visit time, and estimated travel time naturally.
+
+Then write exactly one section for every supplied stop, preserving exact names and order. Each heading must be exactly "Stop N: Exact Place Name". Give 2-4 concise sentences explaining tourist interest, the connection to selected interests, planned visit duration, and contribution to the trip. Do not omit, duplicate, reorder, rename, or introduce a place.
+
+Route-flow conclusion
+Explain that deterministic ordering is intended to reduce estimated straight-line travel among the selected stops, remind the traveller that travel time is estimated, state that you did not select or optimize the route, and end with one friendly sentence.
+
+Use only supplied facts as authoritative context. Do not invent or claim opening hours, ticket prices, phone numbers, accessibility facilities, exact historical facts not supplied, current events, live weather, live traffic, medical or legal advice, safety guarantees, or that a place is currently open. When facts are limited, use cautious category- and interest-based wording. Where appropriate, advise checking the provided source link for current visitor information."""
+    return prompt if len(prompt) <= MAX_GEMINI_PROMPT_CHARS else None
 
 
 def _safe_gemini_model_for_log(model_name):
@@ -1492,15 +1635,13 @@ def _log_gemini_success(model_name, started_at, output_chars):
     )
 
 
-def generate_itinerary_summary(places, preferences, api_key, core_summary=None):
-    """Optionally paraphrase a deterministic explanation; never replace its evidence."""
+def generate_itinerary_summary(
+    places, preferences, api_key, core_summary=None, itinerary_context=None
+):
+    """Optionally explain one finalized itinerary; never replace its evidence."""
     started_at = time.perf_counter()
     configured_model = os.environ.get("GEMINI_MODEL", "").strip()
     gemini_model = configured_model or DEFAULT_GEMINI_MODEL
-    deterministic_summary = core_summary or (
-        f"A heuristic itinerary contains {len(places or [])} stop(s) for "
-        f"{', '.join(preferences or []) or 'the selected interests'}."
-    )
     if not _is_usable_gemini_key(api_key):
         _log_gemini_failure("missing_key", gemini_model, started_at)
         return None
@@ -1508,13 +1649,10 @@ def generate_itinerary_summary(places, preferences, api_key, core_summary=None):
         _log_gemini_failure("malformed_output", gemini_model, started_at)
         return None
 
-    prompt = f"""
-    Paraphrase the following deterministic itinerary explanation without adding facts,
-    claims of optimality, real-road routing, live traffic, opening hours, or observed
-    duration evidence. Preserve every limitation and number.
-
-    Evidence: {deterministic_summary}
-    """
+    prompt = build_itinerary_guide_prompt(places, preferences, itinerary_context)
+    if prompt is None:
+        _log_gemini_failure("malformed_output", gemini_model, started_at)
+        return None
 
     response = None
     try:
@@ -1528,7 +1666,10 @@ def generate_itinerary_summary(places, preferences, api_key, core_summary=None):
             timeout=GEMINI_REQUEST_TIMEOUT,
         )
         response.raise_for_status()
-        paraphrase = _final_gemini_model_output(response.json())
+        expected_place_names = [stop["name"] for stop in places]
+        paraphrase = _final_gemini_model_output(
+            response.json(), expected_place_names=expected_place_names
+        )
         if paraphrase is None:
             _log_gemini_failure("malformed_output", gemini_model, started_at)
             return None

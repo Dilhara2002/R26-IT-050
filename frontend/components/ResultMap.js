@@ -47,6 +47,7 @@ export default function ResultMap({ startingLocation, optimizedStops = [], safet
     validStops.map((stop) => ({ latitude: stop.latitude, longitude: stop.longitude })),
   [validStops]);
   const safetyLines = useMemo(() => getSafetyLines(safetyLegs), [safetyLegs]);
+  const itineraryLine = useMemo(() => [startCoordinate, ...stopCoordinates], [startCoordinate, stopCoordinates]);
 
   useEffect(() => {
     const coordinates = [
@@ -73,6 +74,14 @@ export default function ResultMap({ startingLocation, optimizedStops = [], safet
         longitudeDelta: 0.05,
       }}
     >
+      {itineraryLine.length > 1 ? (
+        <Polyline
+          coordinates={itineraryLine}
+          strokeColor="#1D4ED8"
+          strokeWidth={4}
+          lineDashPattern={[9, 8]}
+        />
+      ) : null}
       {safetyLines.map((line) => (
         <Polyline
           key={`safety-leg-${line.key}`}

@@ -80,6 +80,10 @@ export default function ResultMap({ startingLocation, optimizedStops = [], safet
     ...validStops.map((stop) => [stop.latitude, stop.longitude]),
     ...safetyLines.flatMap((line) => line.coordinates),
   ], [defaultLat, defaultLon, validStops, safetyLines]);
+  const itineraryLine = useMemo(() => [
+    [defaultLat, defaultLon],
+    ...validStops.map((stop) => [stop.latitude, stop.longitude]),
+  ], [defaultLat, defaultLon, validStops]);
 
   return (
     <MapContainer center={[defaultLat, defaultLon]} zoom={12} style={{ height: '100%', width: '100%' }}>
@@ -88,6 +92,12 @@ export default function ResultMap({ startingLocation, optimizedStops = [], safet
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
       />
       <FitMapBounds points={points} />
+      {itineraryLine.length > 1 ? (
+        <Polyline
+          positions={itineraryLine}
+          pathOptions={{ color: '#1D4ED8', weight: 4, opacity: 0.72, dashArray: '9 8' }}
+        />
+      ) : null}
       {safetyLines.map((line) => (
         <Polyline
           key={`safety-leg-${line.key}`}

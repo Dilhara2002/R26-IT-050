@@ -419,10 +419,22 @@ def optimize_itinerary():
 
         core_summary = optimization["route_explanation"]["summary"]
         optional_paraphrase = generate_itinerary_summary(
-            optimal_places,
+            optimized_stops,
             user_preferences,
             GEMINI_API_KEY,
             core_summary=core_summary,
+            itinerary_context={
+                "visit_time_minutes": optimization["visit_time_minutes"],
+                "travel_time_minutes": optimization["travel_time_minutes"],
+                "planned_time_minutes": optimization["planned_time_minutes"],
+                "remaining_time_minutes": optimization["remaining_time_minutes"],
+                "time_utilization_percent": optimization["time_utilization_percent"],
+                "route_limitations": (
+                    "Straight-line Haversine travel estimate with an assumed average "
+                    "speed and traffic buffer; no real-road routing, live traffic, "
+                    "opening hours, return travel, parking, or walking."
+                ),
+            },
         )
         locked_set = set(locked_ids)
         alternative_count = sum(
