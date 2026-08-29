@@ -41,8 +41,6 @@ myvenv/
 htmlcov/
 
 # Environment variables
-.env
-.env.*
 !.env.example
 
 # IDE / editor
@@ -52,3 +50,5 @@ htmlcov/
 # OS files
 .DS_Store
 Thumbs.db
+config.bat
+node_modules
