@@ -24,6 +24,8 @@ const {
   createRegenerationContext,
   parseGuideExplanation,
   regenerationErrorKind,
+  regenerationErrorMessage,
+  regenerationRecoveryMessage,
   validGuideExplanation,
 } = helperModule.exports;
 
@@ -209,7 +211,64 @@ test("controlled exhaustion preserves current plan and Safety state", () => {
 test("regeneration errors distinguish service and feasibility states", () => {
   assert.equal(regenerationErrorKind({}), "service_unavailable");
   assert.equal(regenerationErrorKind({ response: { status: 409, data: {} } }), "no_feasible_alternative");
+  assert.equal(
+    regenerationErrorKind({
+      response: { status: 504, data: { code: "itinerary_generation_timeout" } },
+    }),
+    "timeout"
+  );
+  assert.equal(regenerationErrorKind({ code: "ECONNABORTED" }), "timeout");
   assert.equal(regenerationErrorKind({ response: { status: 500, data: {} } }), "unexpected");
+});
+
+test("regeneration timeouts use safe copy and never expose raw Axios text", () => {
+  const axiosTimeout = {
+    code: "ECONNABORTED",
+    message: "timeout of 30000ms exceeded",
+  };
+  const controlledTimeout = {
+    response: {
+      status: 504,
+      data: {
+        code: "itinerary_generation_timeout",
+        error: "This plan variation took longer than expected.",
+      },
+    },
+  };
+  assert.equal(
+    regenerationErrorMessage(axiosTimeout),
+    "This plan variation took longer than expected."
+  );
+  assert.doesNotMatch(regenerationErrorMessage(axiosTimeout), /30000|Axios/i);
+  assert.equal(
+    regenerationErrorMessage(controlledTimeout),
+    "This plan variation took longer than expected."
+  );
+  assert.match(regenerationRecoveryMessage("timeout"), /current itinerary has been kept/i);
+  assert.doesNotMatch(regenerationRecoveryMessage("timeout"), /verified catalogue/i);
+  assert.match(regenerationRecoveryMessage("exhausted"), /verified catalogue/i);
+});
+
+test("timeout failure preserves the current itinerary and Safety evidence", () => {
+  const safetyResult = { status: "complete", legs: 3 };
+  const currentState = {
+    data: itinerary,
+    safetyResult,
+    regenerationLoading: { mode: "full_regeneration" },
+  };
+  const next = applyFailedRegeneration(currentState, {
+    response: {
+      status: 504,
+      data: {
+        code: "itinerary_generation_timeout",
+        error: "This plan variation took longer than expected.",
+      },
+    },
+  });
+  assert.strictEqual(next.data, itinerary);
+  assert.strictEqual(next.safetyResult, safetyResult);
+  assert.equal(next.regenerationErrorKind, "timeout");
+  assert.equal(next.regenerationLoading, null);
 });
 
 test("unchanged or unusable success payload is rejected", () => {
@@ -277,12 +336,20 @@ test("result screen uses truthful guide and regeneration messaging", () => {
     path.resolve(__dirname, "../screens/ResultScreen.js"),
     "utf8"
   );
+  const apiSource = require("node:fs").readFileSync(
+    path.resolve(__dirname, "../services/api.js"),
+    "utf8"
+  );
   assert.match(resultSource, /Optional AI Tour Guide/);
   assert.match(resultSource, /does not select or optimize the route/);
   assert.match(resultSource, /guidePresentation\.sections\.map/);
   assert.doesNotMatch(resultSource, /dangerouslySetInnerHTML/);
   assert.match(resultSource, /Generate another feasible plan variation/);
   assert.match(resultSource, /Another feasible plan variation was generated/);
+  assert.match(resultSource, /regenerationRecoveryMessage/);
+  assert.doesNotMatch(resultSource, /timeout of 30000ms exceeded/);
   assert.doesNotMatch(resultSource, /Generate a different full plan/);
   assert.doesNotMatch(resultSource, /every POI changed/i);
+  assert.match(apiSource, /ITINERARY_API_TIMEOUT_MS\s*=\s*55000/);
+  assert.doesNotMatch(apiSource, /timeout:\s*30000/);
 });

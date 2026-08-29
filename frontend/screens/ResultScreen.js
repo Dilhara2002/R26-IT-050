@@ -9,6 +9,7 @@ import {
   createRegenerationContext,
   parseGuideExplanation,
   validGuideExplanation,
+  regenerationRecoveryMessage,
 } from "../services/itineraryRegeneration";
 import { buildItinerarySafetyRequest, getItinerarySafetyAvailability } from "../services/safetyApi";
 
@@ -167,7 +168,7 @@ export default function ResultScreen({ route, navigation }) {
       {regenerationError ? (
         <StatusMessage
           kind={regenerationErrorKind === "exhausted" ? "warning" : "error"}
-          text={`${regenerationError} The current itinerary has been kept. Unique alternatives are limited by the verified catalogue and your constraints.`}
+          text={`${regenerationError} ${regenerationRecoveryMessage(regenerationErrorKind)}`}
         />
       ) : null}
       {regenerationLoading ? (

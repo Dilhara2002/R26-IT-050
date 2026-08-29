@@ -204,21 +204,53 @@ export function buildFullRegenerationRequest(data, context = null) {
 }
 
 export function regenerationErrorMessage(error) {
-  return (
-    error?.response?.data?.error ||
-    error?.response?.data?.message ||
-    error?.message ||
-    "The itinerary could not be regenerated."
-  );
+  const status = error?.response?.status;
+  const code = error?.response?.data?.code;
+  if (
+    status === 504 ||
+    code === "itinerary_generation_timeout" ||
+    error?.code === "ECONNABORTED" ||
+    error?.code === "ETIMEDOUT"
+  ) {
+    return "This plan variation took longer than expected.";
+  }
+  const serverMessage =
+    error?.response?.data?.error || error?.response?.data?.message;
+  if (typeof serverMessage === "string" && serverMessage.trim()) {
+    return serverMessage.trim();
+  }
+  if (!error?.response) {
+    return "The itinerary service could not be reached.";
+  }
+  return "The itinerary could not be regenerated.";
 }
 
 export function regenerationErrorKind(error) {
   const status = error?.response?.status;
   const code = error?.response?.data?.code;
   if (code === "no_additional_feasible_alternative") return "exhausted";
+  if (
+    status === 504 ||
+    code === "itinerary_generation_timeout" ||
+    error?.code === "ECONNABORTED" ||
+    error?.code === "ETIMEDOUT"
+  ) return "timeout";
   if (status === 409) return "no_feasible_alternative";
   if (!error?.response) return "service_unavailable";
   return "unexpected";
+}
+
+export function regenerationRecoveryMessage(kind) {
+  if (kind === "timeout") {
+    return "Your current itinerary has been kept. Please try again or adjust the interests, time, or radius.";
+  }
+  if (kind === "exhausted" || kind === "no_feasible_alternative") {
+    return "The current itinerary has been kept. Unique alternatives are limited by the verified catalogue and your constraints.";
+  }
+  if (kind === "service_unavailable") {
+    return "Your current itinerary has been kept. Check the local services and try again.";
+  }
+  return "Your current itinerary has been kept. Please try again.";
 }
 
 export function applySuccessfulRegeneration(currentState, responsePayload) {
