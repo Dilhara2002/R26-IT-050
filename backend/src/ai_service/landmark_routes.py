@@ -267,6 +267,16 @@ def predict():
         top_idx        = int(np.argmax(probabilities))
         confidence     = float(probabilities[top_idx])
         predicted_class = CLASS_NAMES[top_idx]
+        
+        confidence_percent = round(confidence * 100, 2)
+        
+        if confidence_percent < 40:
+            return jsonify({
+                "status": "success",
+                "unrecognized": True,
+                "confidence": confidence_percent,
+                "message": "We couldn't confidently recognize a landmark in this photo."
+            }), 200
 
         # Metadata from CSV
         metadata = lookup_metadata(predicted_class)
@@ -276,7 +286,7 @@ def predict():
             "status":        "success",
             "engine":        engine_used,
             "class_id":      predicted_class,
-            "confidence":    round(confidence * 100, 2),
+            "confidence":    confidence_percent,
             "metadata":      metadata
         }
 
