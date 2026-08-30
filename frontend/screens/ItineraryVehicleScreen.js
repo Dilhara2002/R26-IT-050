@@ -150,7 +150,7 @@ function Metric({ label, value }) {
 
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.background },
-  content: { width: "100%", maxWidth: 780, alignSelf: "center", padding: 20, paddingBottom: 60 },
+  content: { width: "100%", maxWidth: 820, alignSelf: "center", padding: 20, paddingBottom: 60 },
   hero: { backgroundColor: colors.primaryDark, borderRadius: 24, padding: 24, marginBottom: 16 },
   eyebrow: { color: colors.turmeric, fontSize: 11, fontWeight: "900", letterSpacing: 1.3 },
   title: { color: "#FFFFFF", fontSize: 29, fontWeight: "700", fontFamily: "serif", marginTop: 7 },
