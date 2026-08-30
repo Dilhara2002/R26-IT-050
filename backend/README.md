@@ -232,6 +232,22 @@ The suite covers:
 - deterministic explanation metadata and recommendation-rule traces; and
 - known and unavailable road-gradient behavior.
 
+## Live Hotel Room Pricing
+
+Hotel package generation accepts a `stay` object with `checkInDate`,
+`checkOutDate`, `adults`, and `roomQuantity`. The backend uses the LiteAPI /
+Nuitee Connect Hotel Rates API to search around the selected hotel's graph
+coordinates, safely name-match the property, and retrieve a dated room offer.
+The returned `hotelPricing.offer.total` is the provider retail total for all
+requested room occupancies across the complete stay.
+
+Configure `LITEAPI_KEY` with a sandbox key. `LITEAPI_BASE_URL` defaults to
+`https://api.liteapi.travel/v3.0`; the response's own `sandbox` flag determines
+whether the UI labels a quote `SANDBOX` or `PRODUCTION`. Sandbox results are for
+development and are never represented as live production-market rates. If the
+hotel cannot be safely name-matched or has no offer, the backend returns pricing
+as `unavailable` and does not fabricate an estimate.
+
 ## Legacy / Research Artifacts
 
 The following files are retained for historical research reproducibility and are not part of the active recommendation request path:

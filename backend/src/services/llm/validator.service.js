@@ -1,6 +1,13 @@
 export const validatePreferences = (preferences, schema, userPrompt = "") => {
   const lowerPrompt = userPrompt.toLowerCase();
 
+  const findAllowedValueInPrompt = (allowedValues = []) =>
+    allowedValues.find((value) => {
+      if (typeof value !== "string" || !value.trim()) return false;
+      const escaped = value.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      return new RegExp(`(^|\\W)${escaped}(?=\\W|$)`, "i").test(userPrompt);
+    }) || null;
+
   const clean = {
     district: preferences.district || null,
     hotelCategory: preferences.hotelCategory || null,
@@ -11,6 +18,15 @@ export const validatePreferences = (preferences, schema, userPrompt = "") => {
     priceLevel: preferences.priceLevel || null,
     suitableFor: preferences.suitableFor || null,
   };
+
+  // Deterministic schema-aware fallback when the local LLM is slow/unavailable.
+  clean.district ||= findAllowedValueInPrompt(schema.districts);
+  clean.hotelCategory ||= findAllowedValueInPrompt(schema.hotelCategories);
+  clean.grade ||= findAllowedValueInPrompt(schema.grades);
+  clean.foodType ||= findAllowedValueInPrompt(schema.foodTypes);
+  clean.activityCategory ||= findAllowedValueInPrompt(schema.activityCategories);
+  clean.priceLevel ||= findAllowedValueInPrompt(schema.priceLevels);
+  clean.suitableFor ||= findAllowedValueInPrompt(schema.suitableFor);
 
   // duration fallback
   if (!clean.durationDays) {

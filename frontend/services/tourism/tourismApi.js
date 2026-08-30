@@ -1,6 +1,6 @@
-const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:5001/api";
+const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
 
-export async function generateTourismPackage(prompt) {
+export async function generateTourismPackage(prompt, stay) {
   if (!prompt || !prompt.trim()) {
     throw new Error("Please enter your travel preferences.");
   }
@@ -12,6 +12,7 @@ export async function generateTourismPackage(prompt) {
     },
     body: JSON.stringify({
       prompt: prompt.trim(),
+      stay,
     }),
   });
 
@@ -27,4 +28,18 @@ export async function generateTourismPackage(prompt) {
   }
 
   return data;
+}
+
+export async function getSelectedHotelPrice(hotelId, stay) {
+  const response = await fetch(`${BASE_URL}/hotel-price`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ hotelId, stay }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || data.error || "Failed to retrieve hotel price");
+  }
+  return data.hotelPricing;
 }
