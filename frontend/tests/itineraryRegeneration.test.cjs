@@ -210,6 +210,14 @@ test("controlled exhaustion preserves current plan and Safety state", () => {
 
 test("regeneration errors distinguish service and feasibility states", () => {
   assert.equal(regenerationErrorKind({}), "service_unavailable");
+  const staleServerError = new Error("The regeneration service returned an unusable or unchanged route.");
+  assert.equal(regenerationErrorKind(staleServerError), "invalid_response");
+  assert.match(regenerationErrorMessage(staleServerError), /unusable or unchanged route/);
+  assert.match(regenerationRecoveryMessage("invalid_response"), /Restart the local AI service/);
+  assert.equal(
+    regenerationErrorKind({ isAxiosError: true, message: "Network Error" }),
+    "service_unavailable"
+  );
   assert.equal(regenerationErrorKind({ response: { status: 409, data: {} } }), "no_feasible_alternative");
   assert.equal(
     regenerationErrorKind({

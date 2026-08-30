@@ -219,6 +219,9 @@ export function regenerationErrorMessage(error) {
   if (typeof serverMessage === "string" && serverMessage.trim()) {
     return serverMessage.trim();
   }
+  if (!error?.isAxiosError && error instanceof Error && error.message) {
+    return error.message;
+  }
   if (!error?.response) {
     return "The itinerary service could not be reached.";
   }
@@ -236,6 +239,7 @@ export function regenerationErrorKind(error) {
     error?.code === "ETIMEDOUT"
   ) return "timeout";
   if (status === 409) return "no_feasible_alternative";
+  if (!error?.isAxiosError && error instanceof Error && error.message) return "invalid_response";
   if (!error?.response) return "service_unavailable";
   return "unexpected";
 }
@@ -249,6 +253,9 @@ export function regenerationRecoveryMessage(kind) {
   }
   if (kind === "service_unavailable") {
     return "Your current itinerary has been kept. Check the local services and try again.";
+  }
+  if (kind === "invalid_response") {
+    return "Your current itinerary has been kept. Restart the local AI service so it uses the latest project code, then try again.";
   }
   return "Your current itinerary has been kept. Please try again.";
 }
