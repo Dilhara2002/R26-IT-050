@@ -310,7 +310,7 @@ const recommendVehicle = async ({ distanceKm, maxGradient, riskLevel, budget, pa
     vehicle.vehicleSuitability.gradeability >= maxGradient &&
     (!preferredCategory || normalize(vehicle.vehicleCategory).includes(normalize(preferredCategory)))
   ).sort((first, second) => {
-    if (riskLevel === "Low") return first.estimatedHirePrice - second.estimatedHirePrice;
+    if (riskLevel === "Low" || ignoreBudget) return first.estimatedHirePrice - second.estimatedHirePrice;
     return second.vehicleSuitability.gradeabilityMargin - first.vehicleSuitability.gradeabilityMargin ||
       second.maxTorqueNm - first.maxTorqueNm || first.estimatedHirePrice - second.estimatedHirePrice;
   });
