@@ -12,6 +12,7 @@ import TripInputScreen from "./src/screens/TripInputScreen";
 import SafetyResultScreen from "./src/screens/ResultScreen";
 import ItineraryHomeScreen from "./screens/HomeScreen";
 import ItineraryResultScreen from "./screens/ResultScreen";
+import ItineraryVehicleScreen from "./screens/ItineraryVehicleScreen";
 import MapScreen from "./screens/MapScreen";
 import SafetyMapScreen from "./src/screens/SafetyMapScreen";
 import TripReviewScreen from "./src/screens/TripReviewScreen";
@@ -163,6 +164,7 @@ export default function App() {
         <Stack.Screen name="Main" component={MainFlow} options={{ headerShown: false }} />
         <Stack.Screen name="ItineraryHome" component={ItineraryHomeScreen} options={{ title: "Smart Itinerary" }} />
         <Stack.Screen name="ItineraryResult" component={ItineraryResultScreen} options={{ title: "Optimized Itinerary" }} />
+        <Stack.Screen name="ItineraryVehicle" component={ItineraryVehicleScreen} options={{ title: "Route & Vehicle Match" }} />
         <Stack.Screen name="Map" component={MapScreen} options={{ title: "Itinerary Map" }} />
         <Stack.Screen name="SafetyMap" component={SafetyMapScreen} options={{ title: "Safe Route Map" }} />
         <Stack.Screen name="TripReview" component={TripReviewScreen} options={{ title: "Review Trip Plan" }} />

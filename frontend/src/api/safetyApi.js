@@ -90,3 +90,30 @@ export const getLowerRiskRoute = async (payload) => {
     };
   }
 };
+
+export const getItinerarySafetyRecommendation = async (payload) => {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/safety/recommend-itinerary`,
+      payload,
+      { timeout: COMBINED_ANALYSIS_TIMEOUT_MS }
+    );
+    if (!response.data) throw new Error("No data received from server.");
+    return response.data;
+  } catch (error) {
+    return {
+      success: false,
+      error: true,
+      message:
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        (error.code === "ECONNABORTED"
+          ? "Itinerary safety and vehicle analysis timed out. Please try again."
+          : null) ||
+        (!error.response
+          ? "Cannot connect to the backend. Check that the Node backend is running and try again."
+          : null) ||
+        "The itinerary could not be analyzed for a vehicle recommendation.",
+    };
+  }
+};

@@ -175,6 +175,12 @@ export default function ResultScreen({ route, navigation }) {
             disabled={busy}
             style={styles.mapButton}
           />
+          <ActionButton
+            label="Find a Vehicle for This Plan"
+            onPress={() => navigation.navigate("ItineraryVehicle", { itinerary: data })}
+            disabled={busy}
+            style={styles.vehicleButton}
+          />
         </View>
       </View>
 
@@ -357,6 +363,7 @@ const styles = StyleSheet.create({
   actionButton: { minHeight: 50, borderRadius: 13, paddingHorizontal: 15, paddingVertical: 13, margin: 5, alignItems: "center", justifyContent: "center" },
   alternativeButton: { backgroundColor: "#0F766E", flexGrow: 1, flexBasis: 240 },
   mapButton: { backgroundColor: "#1D4ED8", flexGrow: 1, flexBasis: 240 },
+  vehicleButton: { backgroundColor: "#3E6650", flexGrow: 1, flexBasis: 240 },
   actionButtonText: { color: "#FFFFFF", fontSize: 14, lineHeight: 19, fontWeight: "900", textAlign: "center" },
   sectionHeadingRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 11 },
   sectionHeadingCopy: { flexGrow: 1, flexBasis: 250, minWidth: 0 },
