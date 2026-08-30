@@ -4,8 +4,14 @@ import { loadDataset } from "../services/csv.service.js";
 import { createKnowledgeGraph } from "../services/hotelGraph.service.js";
 import { createActivityGraph } from "../services/activityGraph.service.js";
 import { extractPreferences } from "../services/llm/extractor.service.js";
-import { findMatchingPackages } from "../services/package.service.js";
-import { generateItineraryText } from "../services/llm/itineraryGenerator.service.js";
+import {
+  findHotelById,
+  findMatchingPackages,
+} from "../services/package.service.js";
+import {
+  getHotelPrice,
+  validateStayRequest,
+} from "../services/liteApiHotelPricing.service.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -66,12 +72,17 @@ export const buildActivityGraph = async (req, res) => {
 
 export const generatePackageFromPrompt = async (req, res) => {
   try {
-    const { prompt } = req.body;
+    const { prompt, stay } = req.body;
 
     if (!prompt) {
       return res.status(400).json({
         error: "Prompt is required",
       });
+    }
+
+    const stayValidation = stay === undefined ? null : validateStayRequest(stay);
+    if (stayValidation && !stayValidation.valid) {
+      return res.status(400).json({ error: stayValidation.error });
     }
 
     console.log("Extracting preferences...");
@@ -91,51 +102,61 @@ export const generatePackageFromPrompt = async (req, res) => {
       });
     }
 
-    const selectedPackage = packages[0];
-
     const totalDays = preferences.durationDays || 3;
 
-    //  only use activities according to requested day count
-    const limitedActivities = selectedPackage.activities.slice(0, totalDays);
+    const topPackages = [...packages]
+      .sort((left, right) => {
+        const activityDifference =
+          (right.activities?.length || 0) - (left.activities?.length || 0);
+        if (activityDifference) return activityDifference;
+        return Number(right.rooms || 0) - Number(left.rooms || 0);
+      })
+      .slice(0, 3);
 
-    const itinerary = {
-      title: `${totalDays}-Day ${selectedPackage.district} Tour Package`,
-      summary: `Stay at ${selectedPackage.hotelName} with ${
-        preferences.activityCategory || "selected"
-      } activities.`,
-      selectedHotel: {
-        name: selectedPackage.hotelName,
-        district: selectedPackage.district,
-        grade: selectedPackage.grade,
-        foodType: selectedPackage.foodType,
-        category: selectedPackage.hotelCategory,
-      },
-      dayWisePlan: limitedActivities.map((activity, index) => ({
-        day: index + 1,
-        activities: [activity.name],
-        notes: `${activity.category} activity. Suitable for ${activity.suitableFor}. Price level: ${activity.priceLevel}.`,
-      })),
-      whyThisPackageMatches: [
-        `Located in ${selectedPackage.district}`,
-        `Hotel grade matches ${selectedPackage.grade}`,
-        `Food preference matches ${preferences.foodType}`,
-        `Activities match ${preferences.activityCategory}`,
-      ],
-    };
+    const recommendations = topPackages.map((hotelPackage, index) => {
+      const activities = Array.isArray(hotelPackage.activities)
+        ? hotelPackage.activities
+        : [];
+      const limitedActivities = activities.slice(0, totalDays);
+      const itinerary = {
+        title: `${totalDays}-Day ${hotelPackage.district} Tour Package`,
+        summary: `Stay at ${hotelPackage.hotelName} with ${
+          preferences.activityCategory || "selected"
+        } activities.`,
+        dayWisePlan: Array.from({ length: totalDays }, (_, dayIndex) => {
+          const activity = limitedActivities[dayIndex % limitedActivities.length];
+          return {
+            day: dayIndex + 1,
+            activities: activity ? [activity.name] : [],
+            notes: activity
+              ? `${activity.category} activity. Suitable for ${activity.suitableFor}. Price level: ${activity.priceLevel}.`
+              : "Free day at the hotel.",
+          };
+        }),
+      };
 
-    const userFriendlyResponse = `
-Here is your ${totalDays}-day ${selectedPackage.district} tour package.
+      return {
+        rank: index + 1,
+        matchScore: { matchingActivityCount: activities.length },
+        hotel: {
+          id: hotelPackage.hotelId,
+          name: hotelPackage.hotelName,
+          district: hotelPackage.district,
+          grade: hotelPackage.grade,
+          foodType: hotelPackage.foodType,
+          category: hotelPackage.hotelCategory,
+          rooms: hotelPackage.rooms,
+        },
+        activities,
+        itinerary,
+      };
+    });
 
-You will stay at ${selectedPackage.hotelName}, a ${selectedPackage.grade} ${selectedPackage.hotelCategory}. This hotel supports ${selectedPackage.foodType} food options, which matches your food preference.
-
-Your trip includes ${preferences.activityCategory || "selected"} activities such as ${limitedActivities
-      .map((activity) => activity.name)
-      .join(", ")}.
-
-This package was selected because it is located in ${selectedPackage.district}, matches the ${selectedPackage.grade} hotel grade, supports your ${preferences.foodType} food preference, and includes ${
-      preferences.activityCategory || "matching"
-    } activities.
-`.trim();
+    const first = recommendations[0];
+    const userFriendlyResponse =
+      `Here are the top ${recommendations.length} hotel matches for your ` +
+      `${totalDays}-day ${preferences.district || first.hotel.district} trip. ` +
+      "Select a hotel to retrieve its room price for your complete stay.";
 
     console.log("Sending response...");
 
@@ -143,8 +164,11 @@ This package was selected because it is located in ${selectedPackage.district}, 
       userPrompt: prompt,
       extractedPreferences: preferences,
       packageCount: packages.length,
-      selectedPackage,
-      itinerary,
+      recommendationCount: recommendations.length,
+      recommendations,
+      stay: stayValidation?.value || null,
+      selectedPackage: topPackages[0],
+      itinerary: first.itinerary,
       userFriendlyResponse,
     });
   } catch (error) {
@@ -152,5 +176,30 @@ This package was selected because it is located in ${selectedPackage.district}, 
     return res.status(500).json({
       error: error.message,
     });
+  }
+};
+
+export const priceSelectedHotel = async (req, res) => {
+  try {
+    const { hotelId, stay } = req.body || {};
+    if (typeof hotelId !== "string" || !hotelId.trim()) {
+      return res.status(400).json({ error: "hotelId is required." });
+    }
+
+    const stayValidation = validateStayRequest(stay);
+    if (!stayValidation.valid) {
+      return res.status(400).json({ error: stayValidation.error });
+    }
+
+    const hotel = await findHotelById(hotelId.trim());
+    if (!hotel) {
+      return res.status(404).json({ error: "Selected hotel was not found." });
+    }
+
+    const hotelPricing = await getHotelPrice(hotel, stayValidation.value);
+    return res.json({ hotelId: hotel.hotelId, hotelPricing });
+  } catch (error) {
+    console.error("HOTEL_PRICE_ERROR:", error);
+    return res.status(500).json({ error: error.message });
   }
 };

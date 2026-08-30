@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_BASE_URL ||
-  "http://localhost:5001/api";
+  "http://localhost:5000/api";
 
 const COMBINED_ANALYSIS_TIMEOUT_MS = 70000;
 
