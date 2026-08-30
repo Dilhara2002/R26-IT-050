@@ -1,422 +1,485 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
   ActivityIndicator,
-  Alert,
   Pressable,
   ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import * as Location from "expo-location";
 import API from "../services/api";
-
-// Auto-resolves to MapPicker.js on Mobile, and MapPicker.web.js on Web
+import {
+  formatAvailableTime,
+  itineraryRequestError,
+  parseAvailableTime,
+  validateItineraryForm,
+} from "../services/itineraryValidation";
 import MapPicker from "../components/MapPicker";
+
+const MAP_PREVIEW = { latitude: 7.2906, longitude: 80.6337 };
+const CENTRAL_PROVINCE_BOUNDS = {
+  minLatitude: 6.7,
+  maxLatitude: 8.05,
+  minLongitude: 80.4,
+  maxLongitude: 81.0,
+};
+const LOCATION_TIMEOUT_MS = 8000;
+const AVAILABLE_INTERESTS = [
+  "History", "Nature", "Wildlife", "Culture", "Adventure", "City", "Beach", "Religion",
+];
+
+const isSupportedStartingPoint = (latitude, longitude) =>
+  Number.isFinite(latitude) &&
+  Number.isFinite(longitude) &&
+  latitude >= CENTRAL_PROVINCE_BOUNDS.minLatitude &&
+  latitude <= CENTRAL_PROVINCE_BOUNDS.maxLatitude &&
+  longitude >= CENTRAL_PROVINCE_BOUNDS.minLongitude &&
+  longitude <= CENTRAL_PROVINCE_BOUNDS.maxLongitude;
+
+function withTimeout(promise, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(
+      () => reject(new Error("location_timeout")),
+      timeoutMs
+    );
+    promise.then(
+      (value) => {
+        clearTimeout(timeoutId);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timeoutId);
+        reject(error);
+      }
+    );
+  });
+}
 
 export default function HomeScreen({ navigation }) {
   const [preferences, setPreferences] = useState([]);
   const [hours, setHours] = useState("");
   const [minutes, setMinutes] = useState("");
-
-  const [lat, setLat] = useState(7.2906);
-  const [lon, setLon] = useState(80.6337);
-
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [radius, setRadius] = useState("");
   const [loading, setLoading] = useState(false);
-  const [locationLoading, setLocationLoading] = useState(true);
+  const [mapLoading, setMapLoading] = useState(true);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationMessage, setLocationMessage] = useState(
+    "Demo viewport: Kandy, Central Province. This is for display only; select a point, enter coordinates, or use device location."
+  );
+  const [errors, setErrors] = useState({});
+  const [requestError, setRequestError] = useState(null);
+  const latitudeRef = useRef(null);
+  const longitudeRef = useRef(null);
+  const hoursRef = useRef(null);
+  const radiusRef = useRef(null);
 
-  const availablePreferences = [
-    "History",
-    "Nature",
-    "Wildlife",
-    "Culture",
-    "Adventure",
-    "City",
-    "Beach",
-    "Religion",
-  ];
+  const parsedLatitude = Number(String(latitude).trim());
+  const parsedLongitude = Number(String(longitude).trim());
+  const hasCoordinatePair =
+    String(latitude).trim() !== "" &&
+    String(longitude).trim() !== "" &&
+    Number.isFinite(parsedLatitude) &&
+    parsedLatitude >= -90 &&
+    parsedLatitude <= 90 &&
+    Number.isFinite(parsedLongitude) &&
+    parsedLongitude >= -180 &&
+    parsedLongitude <= 180;
+  const mapLatitude = hasCoordinatePair ? parsedLatitude : MAP_PREVIEW.latitude;
+  const mapLongitude = hasCoordinatePair ? parsedLongitude : MAP_PREVIEW.longitude;
+  const interpretedTime = useMemo(() => {
+    try { return formatAvailableTime(parseAvailableTime(hours, minutes)); }
+    catch { return ""; }
+  }, [hours, minutes]);
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+  const clearError = (field) => {
+    setErrors((current) => {
+      if (!current[field]) return current;
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+    setRequestError(null);
+  };
+
+  const selectMapLocation = (nextLatitude, nextLongitude) => {
+    if (!isSupportedStartingPoint(Number(nextLatitude), Number(nextLongitude))) {
+      setLocationMessage(
+        "That map point is outside the Central Province prototype area. Select a point within the Kandy, Matale, or Nuwara Eliya area."
+      );
+      return;
+    }
+    setLatitude(Number(nextLatitude).toFixed(6));
+    setLongitude(Number(nextLongitude).toFixed(6));
+    clearError("latitude");
+    clearError("longitude");
+    setLocationMessage("Map point selected. Decimal coordinates are shown below.");
+  };
+
+  const detectDeviceLocation = async () => {
+    if (locationLoading) return;
+    setLocationLoading(true);
+    setLocationMessage("Checking device location… You can keep using the map and coordinate fields.");
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert(
-          "Notice",
-          "Location permission denied. You can manually select your location on the map."
+        setLocationMessage(
+          "Location permission was not granted. Select a Central Province point on the map or enter coordinates manually."
         );
-        setLocationLoading(false);
         return;
       }
-
-      try {
-        let userLocation = await Location.getCurrentPositionAsync({});
-        setLat(userLocation.coords.latitude);
-        setLon(userLocation.coords.longitude);
-      } catch (error) {
-        console.log("Could not detect GPS automatically.");
-      } finally {
-        setLocationLoading(false);
+      const position = await withTimeout(
+        Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
+        LOCATION_TIMEOUT_MS
+      );
+      const detectedLatitude = Number(position?.coords?.latitude);
+      const detectedLongitude = Number(position?.coords?.longitude);
+      if (!isSupportedStartingPoint(detectedLatitude, detectedLongitude)) {
+        setLocationMessage(
+          "Device location is outside the Central Province prototype area and was not accepted. Your existing coordinates were kept; select a valid map point or enter coordinates manually."
+        );
+        return;
       }
-    })();
-  }, []);
-
-  const togglePreference = (item) => {
-    if (preferences.includes(item)) {
-      setPreferences(preferences.filter((p) => p !== item));
-    } else {
-      setPreferences([...preferences, item]);
+      setLatitude(detectedLatitude.toFixed(6));
+      setLongitude(detectedLongitude.toFixed(6));
+      clearError("latitude");
+      clearError("longitude");
+      setLocationMessage("Device location accepted within the Central Province prototype area.");
+    } catch (error) {
+      setLocationMessage(
+        error?.message === "location_timeout"
+          ? "Device location took too long and was not used. Select a point on the map or enter coordinates manually."
+          : "Device location was unavailable. Select a point on the map or enter coordinates manually."
+      );
+    } finally {
+      setLocationLoading(false);
     }
   };
 
+  const togglePreference = (item) => {
+    if (loading) return;
+    setPreferences((current) => current.includes(item)
+      ? current.filter((value) => value !== item)
+      : [...current, item]);
+    clearError("preferences");
+  };
+
+  const focusFirstInvalidField = (field) => {
+    const refs = { latitude: latitudeRef, longitude: longitudeRef, time: hoursRef, radius: radiusRef };
+    refs[field]?.current?.focus?.();
+  };
+
   const handleGenerate = async () => {
-    if (preferences.length === 0) {
-      Alert.alert("Error", "Please select at least one preference.");
-      return;
-    }
-    if (!hours && !minutes) {
-      Alert.alert("Error", "Please enter your available time.");
-      return;
-    }
-
-    const totalMinutes = parseInt(hours || 0) * 60 + parseInt(minutes || 0);
-    setLoading(true);
-
-    try {
-      const res = await API.post("/optimize", {
-        preferences: preferences,
-        max_time_minutes: totalMinutes,
-        current_lat: parseFloat(lat),
-        current_lon: parseFloat(lon),
+    if (loading) return;
+    const validation = validateItineraryForm({
+      preferences, hours, minutes, latitude, longitude, radius,
+    });
+    if (!validation.valid) {
+      setErrors(validation.errors);
+      setRequestError({
+        title: "Check your trip details",
+        message: "Correct the highlighted field and try again. Your other entries have been kept.",
       });
-
-      if (res.data.status === "success" && res.data.data) {
+      focusFirstInvalidField(validation.firstInvalidField);
+      return;
+    }
+    if (!isSupportedStartingPoint(validation.values.latitude, validation.values.longitude)) {
+      const scopeMessage =
+        "Starting coordinates must be within the Central Province prototype area covering Kandy, Matale, and Nuwara Eliya.";
+      setErrors((current) => ({
+        ...current,
+        latitude: scopeMessage,
+        longitude: scopeMessage,
+      }));
+      setRequestError({ title: "Choose a supported starting point", message: scopeMessage });
+      focusFirstInvalidField("latitude");
+      return;
+    }
+    setErrors({});
+    setRequestError(null);
+    setLoading(true);
+    try {
+      const payload = {
+        preferences: validation.values.preferences,
+        max_time_minutes: validation.values.totalMinutes,
+        current_lat: validation.values.latitude,
+        current_lon: validation.values.longitude,
+        ...(validation.values.radiusKm === null ? {} : { radius_km: validation.values.radiusKm }),
+      };
+      const response = await API.post("/optimize", payload);
+      if (response.data?.status === "success" && response.data?.data) {
         navigation.navigate("ItineraryResult", {
-          data: res.data.data,
-          persistence: res.data.persistence,
+          data: response.data.data,
+          persistence: response.data.persistence,
         });
-      } else {
-        Alert.alert("Try Again", res.data.message || "No suitable route found.");
+        return;
       }
-    } catch (err) {
-      const serverMessage =
-        err.response?.data?.message ||
-        err.response?.data?.error;
-
-      Alert.alert(
-        err.response ? "Itinerary Error" : "Connection Error",
-        serverMessage ||
-          (err.response
-            ? "The itinerary could not be generated."
-            : "Cannot connect to the Node backend at the configured API URL.")
-      );
+      setRequestError({
+        title: "No feasible itinerary found",
+        message: response.data?.message || "The bounded verified catalogue could not produce a route for these constraints.",
+      });
+    } catch (error) {
+      setRequestError(itineraryRequestError(error));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <ScrollView style={styles.page} contentContainerStyle={styles.content}>
+    <ScrollView style={styles.page} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <View style={styles.hero}>
-        <Text style={styles.aiBadge}>✦ Smart Optimization</Text>
-        <Text style={styles.title}>Dynamic Trip Planner</Text>
+        <Text style={styles.eyebrow}>SMART ITINERARY · CENTRAL PROVINCE</Text>
+        <Text style={styles.title}>Plan a realistic day around what you enjoy</Text>
         <Text style={styles.subtitle}>
-          Generate context-aware travel routes. Select your starting
-          point, interests, and time limit to optimize your journey.
+          Choose a start, interests, time budget, and optional travel radius. The planner uses a bounded catalogue of 40 source-traced places.
         </Text>
       </View>
 
-      <View style={styles.assistantCard}>
-        <View style={styles.assistantHeader}>
-          <View style={styles.botCircle}>
-            <Text style={styles.botIcon}>📍</Text>
-          </View>
-          <View>
-            <Text style={styles.cardTitle}>Dynamic Routing Engine</Text>
-            <Text style={styles.cardSub}>Smart Path Optimization</Text>
-          </View>
-        </View>
-
-        {/* Map Selection Section */}
-        <Text style={styles.sectionTitle}>1. Set Start Location</Text>
+      <View style={styles.card}>
+        <StepHeader number="1" title="Starting location">
+          Required · Tap the map or enter decimal latitude and longitude, for example 7.290600 and 80.633700.
+        </StepHeader>
         <View style={styles.mapContainer}>
-          {locationLoading ? (
-            <View style={styles.loadingBox}>
-              <ActivityIndicator size="large" color="#3E6650" />
-              <Text style={styles.loadingTextSmall}>Detecting Location...</Text>
+          <MapPicker
+            lat={mapLatitude}
+            lon={mapLongitude}
+            hasSelection={hasCoordinatePair}
+            onSelect={selectMapLocation}
+            onReady={() => setMapLoading(false)}
+          />
+          {mapLoading || locationLoading ? (
+            <View pointerEvents="none" style={styles.mapStatusOverlay}>
+              <ActivityIndicator color="#1D4ED8" />
+              <Text style={styles.mapStatusText}>
+                {mapLoading ? "Loading map…" : "Checking device location…"}
+              </Text>
             </View>
-          ) : (
-            <MapPicker
-              lat={lat}
-              lon={lon}
-              onSelect={(newLat, newLon) => {
-                setLat(newLat);
-                setLon(newLon);
-              }}
-            />
-          )}
+          ) : null}
         </View>
-        <Text style={styles.coordsText}>
-          Selected: {lat.toFixed(4)}, {lon.toFixed(4)}
-        </Text>
+        <Text style={styles.locationMessage}>{locationMessage}</Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ disabled: locationLoading }}
+          disabled={locationLoading}
+          onPress={detectDeviceLocation}
+          style={({ pressed }) => [
+            styles.locationButton,
+            locationLoading && styles.disabledButton,
+            pressed && styles.pressed,
+          ]}
+        >
+          <Text style={styles.locationButtonText}>
+            {locationLoading ? "Checking device location…" : "Use device location"}
+          </Text>
+        </Pressable>
+        <View style={styles.inputRow}>
+          <Field label="Latitude" error={errors.latitude} style={styles.inputColumn}>
+            <TextInput
+              ref={latitudeRef}
+              accessibilityLabel="Starting latitude"
+              value={latitude}
+              onChangeText={(value) => { setLatitude(value); clearError("latitude"); }}
+              placeholder="7.290600"
+              placeholderTextColor="#64748B"
+              keyboardType="numbers-and-punctuation"
+              editable={!loading}
+              style={[styles.input, errors.latitude && styles.inputError]}
+            />
+          </Field>
+          <Field label="Longitude" error={errors.longitude} style={styles.inputColumn}>
+            <TextInput
+              ref={longitudeRef}
+              accessibilityLabel="Starting longitude"
+              value={longitude}
+              onChangeText={(value) => { setLongitude(value); clearError("longitude"); }}
+              placeholder="80.633700"
+              placeholderTextColor="#64748B"
+              keyboardType="numbers-and-punctuation"
+              editable={!loading}
+              style={[styles.input, errors.longitude && styles.inputError]}
+            />
+          </Field>
+        </View>
+      </View>
 
-        {/* Preferences Section */}
-        <Text style={styles.sectionTitle}>2. Select Your Interests</Text>
-        <View style={styles.chips}>
-          {availablePreferences.map((item) => {
-            const isActive = preferences.includes(item);
+      <View style={styles.card}>
+        <StepHeader number="2" title="Interests">
+          Required · Select at least one. These categories feed the relevance classifier; they are not free-text search.
+        </StepHeader>
+        <View style={styles.chips} accessibilityRole="group" accessibilityLabel="Travel interests">
+          {AVAILABLE_INTERESTS.map((item) => {
+            const selected = preferences.includes(item);
             return (
               <Pressable
                 key={item}
-                style={[styles.chip, isActive && styles.chipActive]}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: selected, disabled: loading }}
+                disabled={loading}
                 onPress={() => togglePreference(item)}
+                style={({ pressed }) => [styles.chip, selected && styles.chipSelected, pressed && styles.pressed]}
               >
-                <Text
-                  style={[styles.chipText, isActive && styles.chipTextActive]}
-                >
-                  {item}
+                <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
+                  {selected ? "✓ " : "+ "}{item}
                 </Text>
               </Pressable>
             );
           })}
         </View>
-
-        {/* Time Constraint Section */}
-        <Text style={styles.sectionTitle}>3. Time Constraint</Text>
-        <View style={styles.timeInputRow}>
-          <TextInput
-            placeholder="Hours"
-            placeholderTextColor="#94A3B8"
-            value={hours}
-            onChangeText={setHours}
-            keyboardType="numeric"
-            style={styles.timeInput}
-          />
-          <TextInput
-            placeholder="Minutes"
-            placeholderTextColor="#94A3B8"
-            value={minutes}
-            onChangeText={setMinutes}
-            keyboardType="numeric"
-            style={styles.timeInput}
-          />
-        </View>
-
-        {/* Generate Button */}
-        {loading ? (
-          <View style={styles.loadingBoxMain}>
-            <ActivityIndicator size="large" color="#3E6650" />
-            <Text style={styles.loadingText}>
-              Optimizing Route & Fetching Locations...
-            </Text>
-          </View>
-        ) : (
-          <Pressable
-            onPress={handleGenerate}
-            style={({ pressed }) => [
-              styles.generateButton,
-              pressed && styles.pressed,
-            ]}
-          >
-            <Text style={styles.generateText}>Generate Route</Text>
-            <Text style={styles.generateIcon}>🚀</Text>
-          </Pressable>
-        )}
+        {errors.preferences ? <Text style={styles.fieldError}>{errors.preferences}</Text> : null}
       </View>
+
+      <View style={styles.card}>
+        <StepHeader number="3" title="Available time">
+          Required · Enter whole hours and minutes. Minutes must be 0–59; total time must be greater than zero and no more than 24 hours.
+        </StepHeader>
+        <View style={styles.inputRow}>
+          <Field label="Hours" style={styles.inputColumn}>
+            <TextInput
+              ref={hoursRef}
+              accessibilityLabel="Available whole hours"
+              value={hours}
+              onChangeText={(value) => { setHours(value); clearError("time"); }}
+              placeholder="4"
+              placeholderTextColor="#64748B"
+              keyboardType="number-pad"
+              maxLength={2}
+              editable={!loading}
+              style={[styles.input, errors.time && styles.inputError]}
+            />
+          </Field>
+          <Field label="Minutes" style={styles.inputColumn}>
+            <TextInput
+              accessibilityLabel="Available minutes from zero to fifty-nine"
+              value={minutes}
+              onChangeText={(value) => { setMinutes(value); clearError("time"); }}
+              placeholder="30"
+              placeholderTextColor="#64748B"
+              keyboardType="number-pad"
+              maxLength={2}
+              editable={!loading}
+              style={[styles.input, errors.time && styles.inputError]}
+            />
+          </Field>
+        </View>
+        {errors.time ? <Text style={styles.fieldError}>{errors.time}</Text> : null}
+        {interpretedTime ? (
+          <Text accessibilityLiveRegion="polite" style={styles.interpretedTime}>Planner time budget: {interpretedTime}</Text>
+        ) : null}
+      </View>
+
+      <View style={styles.card}>
+        <StepHeader number="4" title="Travel radius">
+          Optional · 0.1–100 km from your start. A smaller radius narrows candidates; leave blank for the planner’s time-based radius.
+        </StepHeader>
+        <Field label="Maximum radius (km)" error={errors.radius}>
+          <TextInput
+            ref={radiusRef}
+            accessibilityLabel="Optional maximum travel radius in kilometres"
+            value={radius}
+            onChangeText={(value) => { setRadius(value); clearError("radius"); }}
+            placeholder="For example, 15"
+            placeholderTextColor="#64748B"
+            keyboardType="decimal-pad"
+            editable={!loading}
+            style={[styles.input, errors.radius && styles.inputError]}
+          />
+        </Field>
+      </View>
+
+      {requestError ? (
+        <View accessibilityLiveRegion="assertive" style={styles.errorBanner}>
+          <Text style={styles.errorTitle}>{requestError.title}</Text>
+          <Text style={styles.errorMessage}>{requestError.message}</Text>
+        </View>
+      ) : null}
+
+      <Pressable
+        accessibilityRole="button"
+        accessibilityHint="Creates a feasible route from the verified Central Province catalogue"
+        accessibilityState={{ disabled: loading, busy: loading }}
+        disabled={loading}
+        onPress={handleGenerate}
+        style={({ pressed }) => [styles.generateButton, loading && styles.disabledButton, pressed && styles.pressed]}
+      >
+        {loading ? <ActivityIndicator color="#FFFFFF" /> : null}
+        <View style={styles.generateCopy}>
+          <Text style={styles.generateTitle}>{loading ? "Building your itinerary…" : "Generate Smart Itinerary"}</Text>
+          <Text style={styles.generateSubtext}>
+            {loading ? "Selecting a feasible stop set and ordering the route" : "Your entries stay here if a correction is needed"}
+          </Text>
+        </View>
+      </Pressable>
+      <Text style={styles.scopeNote}>
+        Planning note: travel uses estimated straight-line distance, not live traffic or real-road routing. Safety evidence is handled separately by the existing Safety Analyzer.
+      </Text>
     </ScrollView>
   );
 }
 
+function StepHeader({ number, title, children }) {
+  return (
+    <View style={styles.stepHeader}>
+      <Text style={styles.stepNumber}>{number}</Text>
+      <View style={styles.stepCopy}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <Text style={styles.helperText}>{children}</Text>
+      </View>
+    </View>
+  );
+}
+
+function Field({ label, error, children, style }) {
+  return (
+    <View style={style}>
+      <Text style={styles.inputLabel}>{label}</Text>
+      {children}
+      {error ? <Text style={styles.fieldError}>{error}</Text> : null}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  page: {
-    flex: 1,
-    backgroundColor: "#F1E9D2",
-  },
-  content: {
-    padding: 18,
-    paddingBottom: 40,
-    width: "100%",
-    maxWidth: 800,
-    alignSelf: "center",
-  },
-  hero: {
-    backgroundColor: "#1C2A44",
-    borderRadius: 28,
-    padding: 26,
-    marginBottom: 18,
-    borderWidth: 1,
-    borderColor: "rgba(216,154,31,0.42)",
-  },
-  aiBadge: {
-    alignSelf: "flex-start",
-    backgroundColor: "rgba(255,255,255,0.18)",
-    color: "#FFFFFF",
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 20,
-    fontWeight: "800",
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "600",
-    fontFamily: "serif",
-    color: "#FFFFFF",
-    marginBottom: 12,
-  },
-  subtitle: {
-    color: "#E7DBBA",
-    lineHeight: 23,
-    fontSize: 15,
-  },
-  assistantCard: {
-    backgroundColor: "#FBF7EC",
-    borderRadius: 28,
-    padding: 20,
-    elevation: 6,
-    borderWidth: 1,
-    borderColor: "#D7CAB0",
-    shadowColor: "#241F18",
-    shadowOpacity: 0.12,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
-    marginBottom: 20,
-  },
-  assistantHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 25,
-  },
-  botCircle: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-    backgroundColor: "#E7DBBA",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
-  botIcon: {
-    fontSize: 25,
-  },
-  cardTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    fontFamily: "serif",
-    color: "#241F18",
-  },
-  cardSub: {
-    color: "#6F6658",
-    marginTop: 3,
-  },
-  sectionTitle: {
-    fontWeight: "600",
-    fontFamily: "serif",
-    color: "#241F18",
-    marginBottom: 12,
-    fontSize: 15,
-    marginTop: 5,
-  },
-  mapContainer: {
-    height: 250,
-    width: "100%",
-    borderRadius: 18,
-    overflow: "hidden",
-    borderColor: "#C9B98F",
-    borderWidth: 1,
-    marginBottom: 6,
-  },
-  coordsText: {
-    color: "#6F6658",
-    fontSize: 12,
-    textAlign: "right",
-    marginBottom: 18,
-    fontWeight: "600",
-  },
-  loadingBox: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#E7DBBA",
-  },
-  loadingTextSmall: {
-    marginTop: 8,
-    color: "#3E6650",
-    fontWeight: "600",
-    fontSize: 12,
-  },
-  chips: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 22,
-  },
-  chip: {
-    backgroundColor: "#E7DBBA",
-    borderWidth: 1,
-    borderColor: "#C9B98F",
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  chipActive: {
-    backgroundColor: "#3E6650",
-    borderColor: "#1C2A44",
-  },
-  chipText: {
-    color: "#1C2A44",
-    fontWeight: "700",
-    fontSize: 13,
-  },
-  chipTextActive: {
-    color: "#FFFFFF",
-  },
-  timeInputRow: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 25,
-  },
-  timeInput: {
-    flex: 1,
-    backgroundColor: "#E7DBBA",
-    borderWidth: 1,
-    borderColor: "#C9B98F",
-    borderRadius: 16,
-    padding: 15,
-    fontSize: 16,
-    color: "#241F18",
-    fontWeight: "600",
-  },
-  generateButton: {
-    backgroundColor: "#3E6650",
-    borderRadius: 20,
-    paddingVertical: 18,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    marginTop: 10,
-  },
-  generateText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "900",
-  },
-  generateIcon: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    marginLeft: 8,
-  },
-  pressed: {
-    opacity: 0.75,
-  },
-  loadingBoxMain: {
-    alignItems: "center",
-    paddingVertical: 20,
-    marginTop: 10,
-  },
-  loadingText: {
-    marginTop: 12,
-    color: "#6F6658",
-    fontWeight: "600",
-  },
+  page: { flex: 1, backgroundColor: "#F1F5F9" },
+  content: { width: "100%", maxWidth: 960, alignSelf: "center", padding: 16, paddingBottom: 48 },
+  hero: { backgroundColor: "#123B72", borderRadius: 24, padding: 24, marginBottom: 16 },
+  eyebrow: { color: "#BFDBFE", fontSize: 12, fontWeight: "900", letterSpacing: 1.1, marginBottom: 10 },
+  title: { color: "#FFFFFF", fontSize: 30, lineHeight: 37, fontWeight: "900", maxWidth: 720 },
+  subtitle: { color: "#DBEAFE", fontSize: 16, lineHeight: 24, marginTop: 12, maxWidth: 760 },
+  card: { backgroundColor: "#FFFFFF", borderRadius: 20, padding: 18, marginBottom: 14, borderWidth: 1, borderColor: "#DCE4EE", elevation: 2 },
+  stepHeader: { flexDirection: "row", alignItems: "flex-start", marginBottom: 16 },
+  stepNumber: { width: 34, height: 34, borderRadius: 17, textAlign: "center", backgroundColor: "#DBEAFE", color: "#1D4ED8", fontWeight: "900", fontSize: 16, marginRight: 12, paddingTop: 7 },
+  stepCopy: { flex: 1, minWidth: 0 },
+  sectionTitle: { color: "#0F172A", fontSize: 19, lineHeight: 24, fontWeight: "900" },
+  helperText: { color: "#475569", fontSize: 14, lineHeight: 20, marginTop: 4 },
+  mapContainer: { height: 260, width: "100%", borderRadius: 16, overflow: "hidden", borderWidth: 1, borderColor: "#CBD5E1", backgroundColor: "#E2E8F0" },
+  mapStatusOverlay: { position: "absolute", left: 12, right: 12, bottom: 12, padding: 10, borderRadius: 12, backgroundColor: "rgba(255,255,255,0.94)", flexDirection: "row", alignItems: "center", justifyContent: "center" },
+  mapStatusText: { color: "#1E3A5F", fontWeight: "700", marginLeft: 8 },
+  locationMessage: { color: "#475569", fontSize: 13, lineHeight: 19, marginTop: 9, marginBottom: 12 },
+  locationButton: { alignSelf: "flex-start", minHeight: 44, justifyContent: "center", backgroundColor: "#EFF6FF", borderColor: "#93C5FD", borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, marginBottom: 12 },
+  locationButtonText: { color: "#1D4ED8", fontWeight: "900" },
+  inputRow: { flexDirection: "row", flexWrap: "wrap", marginHorizontal: -5 },
+  inputColumn: { flexGrow: 1, flexBasis: 220, minWidth: 0, paddingHorizontal: 5, marginBottom: 8 },
+  inputLabel: { color: "#1E293B", fontSize: 14, fontWeight: "800", marginBottom: 7 },
+  input: { width: "100%", minHeight: 50, backgroundColor: "#F8FAFC", borderWidth: 1.5, borderColor: "#CBD5E1", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, color: "#0F172A", fontSize: 16 },
+  inputError: { borderColor: "#DC2626", backgroundColor: "#FEF2F2" },
+  fieldError: { color: "#B91C1C", fontSize: 13, lineHeight: 19, fontWeight: "700", marginTop: 6 },
+  chips: { flexDirection: "row", flexWrap: "wrap", margin: -4 },
+  chip: { minHeight: 44, justifyContent: "center", backgroundColor: "#F8FAFC", borderWidth: 1.5, borderColor: "#CBD5E1", borderRadius: 22, paddingHorizontal: 15, paddingVertical: 10, margin: 4 },
+  chipSelected: { backgroundColor: "#1D4ED8", borderColor: "#1D4ED8" },
+  chipText: { color: "#334155", fontSize: 14, fontWeight: "800" },
+  chipTextSelected: { color: "#FFFFFF" },
+  interpretedTime: { color: "#166534", backgroundColor: "#F0FDF4", borderRadius: 10, padding: 10, fontWeight: "800", marginTop: 4 },
+  errorBanner: { backgroundColor: "#FEF2F2", borderColor: "#FCA5A5", borderWidth: 1, borderRadius: 16, padding: 15, marginBottom: 14 },
+  errorTitle: { color: "#991B1B", fontSize: 16, fontWeight: "900" },
+  errorMessage: { color: "#B91C1C", lineHeight: 20, marginTop: 4 },
+  generateButton: { minHeight: 68, backgroundColor: "#0F766E", borderRadius: 18, paddingHorizontal: 20, paddingVertical: 14, flexDirection: "row", alignItems: "center", justifyContent: "center" },
+  generateCopy: { marginLeft: 10, flexShrink: 1, alignItems: "center" },
+  generateTitle: { color: "#FFFFFF", fontSize: 17, lineHeight: 22, fontWeight: "900", textAlign: "center" },
+  generateSubtext: { color: "#CCFBF1", fontSize: 12, lineHeight: 17, textAlign: "center", marginTop: 2 },
+  disabledButton: { opacity: 0.58 },
+  pressed: { opacity: 0.78 },
+  scopeNote: { color: "#475569", fontSize: 13, lineHeight: 20, textAlign: "center", marginTop: 14, paddingHorizontal: 8 },
 });

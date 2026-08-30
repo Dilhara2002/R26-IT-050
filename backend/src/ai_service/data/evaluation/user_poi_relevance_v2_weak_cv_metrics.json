@@ -1,0 +1,934 @@
+{
+  "comparison": [
+    {
+      "cv_accuracy_mean": 0.5508333333333333,
+      "cv_accuracy_std": 0.1389544289806314,
+      "cv_balanced_accuracy_mean": 0.36666666666666664,
+      "cv_balanced_accuracy_std": 0.06666666666666668,
+      "cv_macro_f1_mean": 0.233560747059471,
+      "cv_macro_f1_std": 0.03617999138486974,
+      "cv_training_macro_f1_mean": 0.23329425621547992,
+      "cv_weighted_f1_mean": 0.40098442548825375,
+      "cv_weighted_f1_std": 0.17003851161694244,
+      "deployment_eligible": false,
+      "grid_size": 1,
+      "model": "Dummy",
+      "overfitting_assessment": "low observed weak-CV gap",
+      "parameters": "{}",
+      "training_accuracy": 0.538235294117647,
+      "training_macro_f1": 0.2332695984703633,
+      "training_validation_macro_f1_gap": -0.0002664908439910796
+    },
+    {
+      "cv_accuracy_mean": 1.0,
+      "cv_accuracy_std": 0.0,
+      "cv_balanced_accuracy_mean": 1.0,
+      "cv_balanced_accuracy_std": 0.0,
+      "cv_macro_f1_mean": 0.9333333333333332,
+      "cv_macro_f1_std": 0.13333333333333336,
+      "cv_training_macro_f1_mean": 1.0,
+      "cv_weighted_f1_mean": 1.0,
+      "cv_weighted_f1_std": 0.0,
+      "deployment_eligible": false,
+      "grid_size": 12,
+      "model": "Decision Tree",
+      "overfitting_assessment": "no OOF errors; apparent gap comes from a validation fold missing one declared class",
+      "parameters": "{\"classifier__class_weight\": null, \"classifier__max_depth\": 2, \"classifier__min_samples_leaf\": 5}",
+      "training_accuracy": 1.0,
+      "training_macro_f1": 1.0,
+      "training_validation_macro_f1_gap": 0.06666666666666676
+    },
+    {
+      "cv_accuracy_mean": 1.0,
+      "cv_accuracy_std": 0.0,
+      "cv_balanced_accuracy_mean": 1.0,
+      "cv_balanced_accuracy_std": 0.0,
+      "cv_macro_f1_mean": 0.9333333333333332,
+      "cv_macro_f1_std": 0.13333333333333336,
+      "cv_training_macro_f1_mean": 1.0,
+      "cv_weighted_f1_mean": 1.0,
+      "cv_weighted_f1_std": 0.0,
+      "deployment_eligible": true,
+      "grid_size": 32,
+      "model": "Random Forest",
+      "overfitting_assessment": "no OOF errors; apparent gap comes from a validation fold missing one declared class",
+      "parameters": "{\"classifier__class_weight\": null, \"classifier__max_depth\": 6, \"classifier__max_features\": 0.75, \"classifier__min_samples_leaf\": 3, \"classifier__n_estimators\": 100}",
+      "training_accuracy": 1.0,
+      "training_macro_f1": 1.0,
+      "training_validation_macro_f1_gap": 0.06666666666666676
+    },
+    {
+      "cv_accuracy_mean": 1.0,
+      "cv_accuracy_std": 0.0,
+      "cv_balanced_accuracy_mean": 1.0,
+      "cv_balanced_accuracy_std": 0.0,
+      "cv_macro_f1_mean": 0.9333333333333332,
+      "cv_macro_f1_std": 0.13333333333333336,
+      "cv_training_macro_f1_mean": 1.0,
+      "cv_weighted_f1_mean": 1.0,
+      "cv_weighted_f1_std": 0.0,
+      "deployment_eligible": true,
+      "grid_size": 6,
+      "model": "Linear SVM",
+      "overfitting_assessment": "no OOF errors; apparent gap comes from a validation fold missing one declared class",
+      "parameters": "{\"classifier__C\": 0.1, \"classifier__class_weight\": null}",
+      "training_accuracy": 1.0,
+      "training_macro_f1": 1.0,
+      "training_validation_macro_f1_gap": 0.06666666666666676
+    }
+  ],
+  "cv": {
+    "group": "profile_id",
+    "method": "StratifiedGroupKFold",
+    "splits": 5
+  },
+  "environment": {
+    "python": "3.14.2",
+    "scikit_learn": "1.7.2"
+  },
+  "evaluation_data_accessed": false,
+  "models": {
+    "Decision Tree": {
+      "cv": {
+        "accuracy": {
+          "fold_training_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fold_validation_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "gap": 0.0,
+          "training_mean": 1.0,
+          "training_std": 0.0,
+          "validation_mean": 1.0,
+          "validation_std": 0.0
+        },
+        "balanced_accuracy": {
+          "fold_training_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fold_validation_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "gap": 0.0,
+          "training_mean": 1.0,
+          "training_std": 0.0,
+          "validation_mean": 1.0,
+          "validation_std": 0.0
+        },
+        "macro_f1": {
+          "fold_training_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fold_validation_scores": [
+            1.0,
+            1.0,
+            1.0,
+            0.6666666666666666,
+            1.0
+          ],
+          "gap": 0.06666666666666676,
+          "training_mean": 1.0,
+          "training_std": 0.0,
+          "validation_mean": 0.9333333333333332,
+          "validation_std": 0.13333333333333336
+        },
+        "weighted_f1": {
+          "fold_training_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fold_validation_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "gap": 0.0,
+          "training_mean": 1.0,
+          "training_std": 0.0,
+          "validation_mean": 1.0,
+          "validation_std": 0.0
+        }
+      },
+      "deployment_eligible": false,
+      "full_training_metrics": {
+        "accuracy": 1.0,
+        "actual_distribution": {
+          "0": 366,
+          "1": 186,
+          "2": 128
+        },
+        "balanced_accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            366,
+            0,
+            0
+          ],
+          [
+            0,
+            186,
+            0
+          ],
+          [
+            0,
+            0,
+            128
+          ]
+        ],
+        "macro_f1": 1.0,
+        "per_class": {
+          "0": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 366
+          },
+          "1": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 186
+          },
+          "2": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 128
+          }
+        },
+        "predicted_distribution": {
+          "0": 366,
+          "1": 186,
+          "2": 128
+        },
+        "weighted_f1": 1.0
+      },
+      "grid_size": 12,
+      "oof_metrics": {
+        "accuracy": 1.0,
+        "actual_distribution": {
+          "0": 366,
+          "1": 186,
+          "2": 128
+        },
+        "balanced_accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            366,
+            0,
+            0
+          ],
+          [
+            0,
+            186,
+            0
+          ],
+          [
+            0,
+            0,
+            128
+          ]
+        ],
+        "macro_f1": 1.0,
+        "per_class": {
+          "0": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 366
+          },
+          "1": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 186
+          },
+          "2": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 128
+          }
+        },
+        "predicted_distribution": {
+          "0": 366,
+          "1": 186,
+          "2": 128
+        },
+        "weighted_f1": 1.0
+      },
+      "selected_parameters": {
+        "classifier__class_weight": null,
+        "classifier__max_depth": 2,
+        "classifier__min_samples_leaf": 5
+      }
+    },
+    "Dummy": {
+      "cv": {
+        "accuracy": {
+          "fold_training_scores": [
+            0.5392857142857143,
+            0.5846153846153846,
+            0.5410714285714285,
+            0.48035714285714287,
+            0.55
+          ],
+          "fold_validation_scores": [
+            0.5333333333333333,
+            0.3875,
+            0.525,
+            0.8083333333333333,
+            0.5
+          ],
+          "gap": -0.011767399267399226,
+          "training_mean": 0.5390659340659341,
+          "training_std": 0.03360088903574237,
+          "validation_mean": 0.5508333333333333,
+          "validation_std": 0.1389544289806314
+        },
+        "balanced_accuracy": {
+          "fold_training_scores": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333
+          ],
+          "fold_validation_scores": [
+            0.3333333333333333,
+            0.3333333333333333,
+            0.3333333333333333,
+            0.5,
+            0.3333333333333333
+          ],
+          "gap": -0.033333333333333326,
+          "training_mean": 0.3333333333333333,
+          "training_std": 0.0,
+          "validation_mean": 0.36666666666666664,
+          "validation_std": 0.06666666666666668
+        },
+        "macro_f1": {
+          "fold_training_scores": [
+            0.23356535189481828,
+            0.2459546925566343,
+            0.23406720741599074,
+            0.21632488942501005,
+            0.23655913978494625
+          ],
+          "fold_validation_scores": [
+            0.2318840579710145,
+            0.18618618618618618,
+            0.22950819672131148,
+            0.2980030721966206,
+            0.2222222222222222
+          ],
+          "gap": -0.0002664908439910796,
+          "training_mean": 0.23329425621547992,
+          "training_std": 0.00958724641141368,
+          "validation_mean": 0.233560747059471,
+          "validation_std": 0.03617999138486974
+        },
+        "weighted_f1": {
+          "fold_training_scores": [
+            0.37787537288697387,
+            0.4313666915608663,
+            0.37994123489488496,
+            0.31173961743925555,
+            0.3903225806451613
+          ],
+          "fold_validation_scores": [
+            0.3710144927536232,
+            0.21644144144144142,
+            0.3614754098360656,
+            0.7226574500768049,
+            0.3333333333333333
+          ],
+          "gap": -0.02273532600282535,
+          "training_mean": 0.3782490994854284,
+          "training_std": 0.0384545490964894,
+          "validation_mean": 0.40098442548825375,
+          "validation_std": 0.17003851161694244
+        }
+      },
+      "deployment_eligible": false,
+      "full_training_metrics": {
+        "accuracy": 0.538235294117647,
+        "actual_distribution": {
+          "0": 366,
+          "1": 186,
+          "2": 128
+        },
+        "balanced_accuracy": 0.3333333333333333,
+        "confusion_matrix": [
+          [
+            366,
+            0,
+            0
+          ],
+          [
+            186,
+            0,
+            0
+          ],
+          [
+            128,
+            0,
+            0
+          ]
+        ],
+        "macro_f1": 0.2332695984703633,
+        "per_class": {
+          "0": {
+            "f1": 0.6998087954110899,
+            "precision": 0.538235294117647,
+            "recall": 1.0,
+            "support": 366
+          },
+          "1": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 186
+          },
+          "2": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 128
+          }
+        },
+        "predicted_distribution": {
+          "0": 680,
+          "1": 0,
+          "2": 0
+        },
+        "weighted_f1": 0.37666179282420426
+      },
+      "grid_size": 1,
+      "oof_metrics": {
+        "accuracy": 0.538235294117647,
+        "actual_distribution": {
+          "0": 366,
+          "1": 186,
+          "2": 128
+        },
+        "balanced_accuracy": 0.3333333333333333,
+        "confusion_matrix": [
+          [
+            366,
+            0,
+            0
+          ],
+          [
+            186,
+            0,
+            0
+          ],
+          [
+            128,
+            0,
+            0
+          ]
+        ],
+        "macro_f1": 0.2332695984703633,
+        "per_class": {
+          "0": {
+            "f1": 0.6998087954110899,
+            "precision": 0.538235294117647,
+            "recall": 1.0,
+            "support": 366
+          },
+          "1": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 186
+          },
+          "2": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 128
+          }
+        },
+        "predicted_distribution": {
+          "0": 680,
+          "1": 0,
+          "2": 0
+        },
+        "weighted_f1": 0.37666179282420426
+      },
+      "selected_parameters": {}
+    },
+    "Linear SVM": {
+      "cv": {
+        "accuracy": {
+          "fold_training_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fold_validation_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "gap": 0.0,
+          "training_mean": 1.0,
+          "training_std": 0.0,
+          "validation_mean": 1.0,
+          "validation_std": 0.0
+        },
+        "balanced_accuracy": {
+          "fold_training_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fold_validation_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "gap": 0.0,
+          "training_mean": 1.0,
+          "training_std": 0.0,
+          "validation_mean": 1.0,
+          "validation_std": 0.0
+        },
+        "macro_f1": {
+          "fold_training_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fold_validation_scores": [
+            1.0,
+            1.0,
+            1.0,
+            0.6666666666666666,
+            1.0
+          ],
+          "gap": 0.06666666666666676,
+          "training_mean": 1.0,
+          "training_std": 0.0,
+          "validation_mean": 0.9333333333333332,
+          "validation_std": 0.13333333333333336
+        },
+        "weighted_f1": {
+          "fold_training_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fold_validation_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "gap": 0.0,
+          "training_mean": 1.0,
+          "training_std": 0.0,
+          "validation_mean": 1.0,
+          "validation_std": 0.0
+        }
+      },
+      "deployment_eligible": true,
+      "full_training_metrics": {
+        "accuracy": 1.0,
+        "actual_distribution": {
+          "0": 366,
+          "1": 186,
+          "2": 128
+        },
+        "balanced_accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            366,
+            0,
+            0
+          ],
+          [
+            0,
+            186,
+            0
+          ],
+          [
+            0,
+            0,
+            128
+          ]
+        ],
+        "macro_f1": 1.0,
+        "per_class": {
+          "0": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 366
+          },
+          "1": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 186
+          },
+          "2": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 128
+          }
+        },
+        "predicted_distribution": {
+          "0": 366,
+          "1": 186,
+          "2": 128
+        },
+        "weighted_f1": 1.0
+      },
+      "grid_size": 6,
+      "oof_metrics": {
+        "accuracy": 1.0,
+        "actual_distribution": {
+          "0": 366,
+          "1": 186,
+          "2": 128
+        },
+        "balanced_accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            366,
+            0,
+            0
+          ],
+          [
+            0,
+            186,
+            0
+          ],
+          [
+            0,
+            0,
+            128
+          ]
+        ],
+        "macro_f1": 1.0,
+        "per_class": {
+          "0": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 366
+          },
+          "1": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 186
+          },
+          "2": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 128
+          }
+        },
+        "predicted_distribution": {
+          "0": 366,
+          "1": 186,
+          "2": 128
+        },
+        "weighted_f1": 1.0
+      },
+      "selected_parameters": {
+        "classifier__C": 0.1,
+        "classifier__class_weight": null
+      }
+    },
+    "Random Forest": {
+      "cv": {
+        "accuracy": {
+          "fold_training_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fold_validation_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "gap": 0.0,
+          "training_mean": 1.0,
+          "training_std": 0.0,
+          "validation_mean": 1.0,
+          "validation_std": 0.0
+        },
+        "balanced_accuracy": {
+          "fold_training_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fold_validation_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "gap": 0.0,
+          "training_mean": 1.0,
+          "training_std": 0.0,
+          "validation_mean": 1.0,
+          "validation_std": 0.0
+        },
+        "macro_f1": {
+          "fold_training_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fold_validation_scores": [
+            1.0,
+            1.0,
+            1.0,
+            0.6666666666666666,
+            1.0
+          ],
+          "gap": 0.06666666666666676,
+          "training_mean": 1.0,
+          "training_std": 0.0,
+          "validation_mean": 0.9333333333333332,
+          "validation_std": 0.13333333333333336
+        },
+        "weighted_f1": {
+          "fold_training_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fold_validation_scores": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "gap": 0.0,
+          "training_mean": 1.0,
+          "training_std": 0.0,
+          "validation_mean": 1.0,
+          "validation_std": 0.0
+        }
+      },
+      "deployment_eligible": true,
+      "full_training_metrics": {
+        "accuracy": 1.0,
+        "actual_distribution": {
+          "0": 366,
+          "1": 186,
+          "2": 128
+        },
+        "balanced_accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            366,
+            0,
+            0
+          ],
+          [
+            0,
+            186,
+            0
+          ],
+          [
+            0,
+            0,
+            128
+          ]
+        ],
+        "macro_f1": 1.0,
+        "per_class": {
+          "0": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 366
+          },
+          "1": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 186
+          },
+          "2": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 128
+          }
+        },
+        "predicted_distribution": {
+          "0": 366,
+          "1": 186,
+          "2": 128
+        },
+        "weighted_f1": 1.0
+      },
+      "grid_size": 32,
+      "oof_metrics": {
+        "accuracy": 1.0,
+        "actual_distribution": {
+          "0": 366,
+          "1": 186,
+          "2": 128
+        },
+        "balanced_accuracy": 1.0,
+        "confusion_matrix": [
+          [
+            366,
+            0,
+            0
+          ],
+          [
+            0,
+            186,
+            0
+          ],
+          [
+            0,
+            0,
+            128
+          ]
+        ],
+        "macro_f1": 1.0,
+        "per_class": {
+          "0": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 366
+          },
+          "1": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 186
+          },
+          "2": {
+            "f1": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "support": 128
+          }
+        },
+        "predicted_distribution": {
+          "0": 366,
+          "1": 186,
+          "2": 128
+        },
+        "weighted_f1": 1.0
+      },
+      "selected_parameters": {
+        "classifier__class_weight": null,
+        "classifier__max_depth": 6,
+        "classifier__max_features": 0.75,
+        "classifier__min_samples_leaf": 3,
+        "classifier__n_estimators": 100
+      }
+    }
+  },
+  "result_scope": "weak-supervision validation, not human relevance accuracy",
+  "seed": 42,
+  "selection": {
+    "rule": "Among Random Forest and Linear SVM, maximize five-fold profile-grouped weak-CV Macro-F1; within 0.01 prefer balanced accuracy, then smaller training-validation Macro-F1 gap, lower fold variability, then simpler model. Decision Tree and Dummy are baselines only.",
+    "selected_model": "Linear SVM",
+    "tolerance": 0.01
+  },
+  "training": {
+    "class_distribution": {
+      "0": 366,
+      "1": 186,
+      "2": 128
+    },
+    "excluded_evaluation_profile_ids": [
+      "P06",
+      "P08",
+      "P13"
+    ],
+    "profile_ids": [
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P07",
+      "P09",
+      "P10",
+      "P11",
+      "P12",
+      "P14",
+      "P15",
+      "P16",
+      "P17",
+      "P18",
+      "P19",
+      "P20"
+    ],
+    "profiles": 17,
+    "rows": 680,
+    "weak_rule": "verified_tag_interest_coverage_v1"
+  }
+}

@@ -1,6 +1,18 @@
 # POI Dataset Workspace
 
-This directory separates the application's current prototype data from future research-grade data. The current Flask application continues to load `places.csv`; no runtime path or application code changes are required by this workspace.
+This directory separates the archived prototype data from source-traced runtime and evaluation data. The Flask AI service now loads `verified/central_province_runtime_verified_v1.csv`; `places.csv` remains the unchanged synthetic/prototype archive input and is not the active runtime catalogue.
+
+## Central Province runtime catalogue v1
+
+`verified/central_province_runtime_verified_v1.csv` is the bounded 40-POI runtime catalogue: 20 Kandy, 10 Matale, and 10 Nuwara Eliya records. Every row retains a stable Wikidata or OpenStreetMap source ID and direct URL, coordinates, a district, supported tags, and a source-traced verification status. It is a Central Province research catalogue, not a nationwide or exhaustive tourism inventory.
+
+Durations are planning assumptions rather than observed visit times: 60 minutes for focused sites and viewpoints, 90 minutes for structured cultural sites and gardens, 120 minutes for multi-part sites and ordinary hikes, 180 minutes for major ascents, and 240 minutes for long highland routes. Each new record identifies the bounded estimate in `Duration_Basis` and explains it in `Verification_Note`.
+
+The existing frozen relevance SVM is used for inference only. Loading or expanding this catalogue performs no runtime fitting. A separate, versioned retraining decision is required only if future research claims are to be based on newly adjudicated labels.
+
+## Central Province relevance dataset v2
+
+The v2 research manifest contains exactly 20 profiles and 800 profile-POI pairs. It preserves the 15 v1 profiles, the fixed held-out profiles P06/P08/P13, and all 60 existing human labels. Five new profiles are training-only. The remaining rows comprise 680 reproducible weak-supervision training examples and a 120-row evaluation grid: 60 preserved Kandy human judgements plus 60 blank Matale/Nuwara Eliya extension judgements. Reviewer workbooks deliberately omit weak labels and model outputs.
 
 ## Current runtime dataset
 
