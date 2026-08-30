@@ -95,11 +95,10 @@ output_details = tflite_interpreter.get_output_details()
 tflite_lock = threading.Lock()
 print(f"[Landmark] TFLite model loaded from {TFLITE_PATH}")
 
-# Load the optional MobileNetV2 feature extractor + SVM only when explicitly
-# enabled. It needs ImageNet weights on first use; the bundled TFLite model is
-# the reliable offline default.
+# Load Madush's trained SVM classifier by default. MobileNetV2 downloads its
+# feature weights once and caches them; TFLite remains the automatic fallback.
 svm_available = False
-if os.getenv("LANDMARK_ENABLE_SVM", "").lower() in {"1", "true", "yes"}:
+if os.getenv("LANDMARK_ENABLE_SVM", "true").lower() in {"1", "true", "yes"}:
     try:
         from tensorflow.keras.applications import MobileNetV2
         from tensorflow.keras import layers, models as keras_models
@@ -264,7 +263,7 @@ def predict():
         img_batch   = preprocess_image_np(image_bytes)
 
         # Select inference mode
-        mode = request.args.get('mode', 'tflite').lower()
+        mode = request.args.get('mode', 'svm').lower()
         if mode == 'svm' and svm_available:
             probabilities = predict_svm(img_batch)
             engine_used   = "SVM (92.56% accuracy)"
@@ -363,6 +362,6 @@ def landmark_health():
     return jsonify({
         "status": "ok",
         "classes": NUM_CLASSES,
-        "default_engine": "tflite",
+        "default_engine": "svm" if svm_available else "tflite",
         "svm_available": svm_available,
     }), 200

@@ -8,24 +8,10 @@ import {
   Image,
   ActivityIndicator,
   Alert,
-  Linking,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { predictLandmark } from "../services/landmarkService";
 import { colors } from "../src/styles/colors";
-
-//  Helpers
-function openGoogleMaps(gpsCoordinates) {
-  if (!gpsCoordinates) return;
-  const cleaned = gpsCoordinates
-    .replace(/°\s*[NSEW]/g, "")
-    .replace(/\s+/g, "")
-    .trim();
-  const url = `https://www.google.com/maps/search/?api=1&query=${cleaned}`;
-  Linking.openURL(url).catch(() =>
-    Alert.alert("Error", "Cannot open Google Maps.")
-  );
-}
 
 //  Sub-components
 function InfoRow({ label, value }) {
@@ -267,16 +253,8 @@ export default function LandmarkScannerScreen({ onBack, onOpenChat, navigation }
             </View>
           </View>
 
-          {/* Action Buttons Row */}
+          {/* Tour guide action */}
           <View style={styles.actionButtonsRow}>
-            {meta.gps_coordinates !== "" && (
-              <Pressable
-                style={({ pressed }) => [styles.actionBtn, styles.mapsBtn, pressed && styles.pressed]}
-                onPress={() => openGoogleMaps(meta.gps_coordinates)}
-              >
-                <Text style={styles.actionBtnText}>🗺️ Maps</Text>
-              </Pressable>
-            )}
             <Pressable
               style={({ pressed }) => [styles.actionBtn, styles.chatActionBtn, pressed && styles.pressed]}
               onPress={() => handleOpenChat()}
@@ -463,9 +441,6 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "900",
     fontSize: 14,
-  },
-  mapsBtn: {
-    backgroundColor: colors.primary,
   },
   chatActionBtn: {
     backgroundColor: colors.cinnamon,

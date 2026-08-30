@@ -49,7 +49,7 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = 30000) {
  * @param {'svm'|'tflite'} mode - 
  * @returns {Promise<object>} API response JSON
  */
-export async function predictLandmark(imageAsset, mode = "tflite") {
+export async function predictLandmark(imageAsset, mode = "svm") {
   const formData = new FormData();
   
   const photoUri =
