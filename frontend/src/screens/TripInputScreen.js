@@ -152,24 +152,45 @@ export default function TripInputScreen({
         </View>
       )}
 
-      <Text style={styles.label}>End Location</Text>
-      <TextInput
-        style={styles.input}
-        value={form.endLocation}
-        onChangeText={(value) => handleLocationSearch("endLocation", value)}
-        placeholder="Example: Kandy"
-        placeholderTextColor={colors.muted}
-      />
-
-      {endSuggestions.length > 0 && (
-        <View style={styles.suggestionBox}>
-          <FlatList
-            data={endSuggestions}
-            keyExtractor={(item, index) => `${item.displayName}-${index}`}
-            renderItem={({ item }) => renderSuggestion("endLocation", item)}
-            scrollEnabled={false}
+      {hotelContext ? (
+        <>
+          <Text style={styles.label}>Destination Hotel</Text>
+          <View style={styles.lockedDestination}>
+            <Text style={styles.lockedDestinationIcon}>🏨</Text>
+            <View style={styles.lockedDestinationCopy}>
+              <Text style={styles.lockedDestinationName}>
+                {hotelContext.selectedHotel?.hotel?.name || "Selected hotel"}
+              </Text>
+              <Text style={styles.lockedDestinationAddress}>{form.endLocation}</Text>
+              <Text style={styles.lockedDestinationNote}>
+                Automatically selected from your hotel plan
+              </Text>
+            </View>
+            <Text style={styles.lockedDestinationBadge}>LOCKED</Text>
+          </View>
+        </>
+      ) : (
+        <>
+          <Text style={styles.label}>End Location</Text>
+          <TextInput
+            style={styles.input}
+            value={form.endLocation}
+            onChangeText={(value) => handleLocationSearch("endLocation", value)}
+            placeholder="Example: Kandy"
+            placeholderTextColor={colors.muted}
           />
-        </View>
+
+          {endSuggestions.length > 0 && (
+            <View style={styles.suggestionBox}>
+              <FlatList
+                data={endSuggestions}
+                keyExtractor={(item, index) => `${item.displayName}-${index}`}
+                renderItem={({ item }) => renderSuggestion("endLocation", item)}
+                scrollEnabled={false}
+              />
+            </View>
+          )}
+        </>
       )}
 
       <Text style={styles.label}>Vehicle Category</Text>
@@ -206,7 +227,11 @@ export default function TripInputScreen({
         disabled={loading}
       >
         <Text style={styles.buttonText}>
-          {loading ? "Analyzing..." : "Recommend Vehicle"}
+          {loading
+            ? "Analyzing..."
+            : hotelContext
+              ? "Analyze Hotel Route & Recommend Vehicle"
+              : "Recommend Vehicle"}
         </Text>
       </TouchableOpacity>
     </ScrollView>
@@ -292,6 +317,48 @@ const styles = StyleSheet.create({
     shadowColor: "#241F18",
     shadowOpacity: 0.05,
     shadowRadius: 10,
+  },
+  lockedDestination: {
+    backgroundColor: colors.card,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    borderRadius: 16,
+    padding: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 11,
+  },
+  lockedDestinationIcon: {
+    fontSize: 24,
+  },
+  lockedDestinationCopy: {
+    flex: 1,
+  },
+  lockedDestinationName: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: "800",
+  },
+  lockedDestinationAddress: {
+    color: colors.muted,
+    fontSize: 12,
+    marginTop: 3,
+  },
+  lockedDestinationNote: {
+    color: colors.primary,
+    fontSize: 10,
+    fontWeight: "700",
+    marginTop: 5,
+  },
+  lockedDestinationBadge: {
+    color: colors.primary,
+    backgroundColor: colors.backgroundDeep,
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    fontSize: 9,
+    fontWeight: "900",
+    letterSpacing: 0.7,
   },
   suggestionBox: {
     backgroundColor: colors.card,

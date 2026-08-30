@@ -40,6 +40,11 @@ function MainFlow({ navigation, route }) {
   useEffect(() => {
     const request = route.params?.hotelSafetyRequest;
     if (!request || consumedHotelRequest.current === request.id) return;
+    const selectedHotel = request.selectedHotel?.hotel || {};
+    const hotelName = selectedHotel.name || selectedHotel.hotelName || "";
+    const hotelDestination = [hotelName, selectedHotel.district, "Sri Lanka"]
+      .filter((value, index, values) => value && values.indexOf(value) === index)
+      .join(", ");
     consumedHotelRequest.current = request.id;
     setHotelContext(request);
     setResult(null);
@@ -48,7 +53,7 @@ function MainFlow({ navigation, route }) {
       budget: String(request.vehicleRequest?.totalBudget || ""),
       passengers: String(request.vehicleRequest?.passengers || ""),
       startLocation: request.vehicleRequest?.startLocation || "",
-      endLocation: request.selectedHotel?.hotel?.district || request.selectedHotel?.hotel?.name || "",
+      endLocation: hotelDestination,
       preferredCategory: request.vehicleRequest?.preferredCategory || "",
     });
     setScreen("form");
