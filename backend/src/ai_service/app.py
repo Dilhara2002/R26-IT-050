@@ -5,9 +5,11 @@ from flask import Flask, jsonify, request
 from dotenv import load_dotenv
 from flask_cors import CORS
 
-# Capture the process-level opt-in before dotenv can supply a fallback key.
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 load_dotenv()
+
+# Read the guide key after dotenv so the documented backend/.env setup works
+# for both direct Python starts and `npm run ai-service`.
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 from model import (
     CATALOGUE_POI_COUNT,
