@@ -27,6 +27,12 @@
     },
     "plugins": [
       [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow CeylonGo to center the route map on your current location."
+        }
+      ],
+      [
         "expo-image-picker",
         {
           "photosPermission": "Allow CeylonGo to select landmark photos for identification.",

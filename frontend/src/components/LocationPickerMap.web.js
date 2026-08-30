@@ -1,5 +1,5 @@
 import React from "react";
-import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
+import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 function ClickHandler({ onSelect }) {
@@ -11,11 +11,21 @@ function ClickHandler({ onSelect }) {
   return null;
 }
 
-export default function LocationPickerMap({ selected, onSelect }) {
+function CurrentLocationCenter({ location }) {
+  const map = useMap();
+  React.useEffect(() => {
+    if (location) map.setView([location.latitude, location.longitude], 14);
+  }, [location, map]);
+  return null;
+}
+
+export default function LocationPickerMap({ currentLocation, selected, onSelect }) {
   return (
     <MapContainer center={[7.8731, 80.7718]} zoom={7} style={{ height: "100%", width: "100%" }}>
       <TileLayer attribution="&copy; OpenStreetMap contributors" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       <ClickHandler onSelect={onSelect} />
+      <CurrentLocationCenter location={currentLocation} />
+      {currentLocation ? <Marker position={[currentLocation.latitude, currentLocation.longitude]} /> : null}
       {selected ? <Marker position={[selected.latitude, selected.longitude]} /> : null}
     </MapContainer>
   );
