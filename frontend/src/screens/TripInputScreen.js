@@ -22,6 +22,11 @@ const vehicleCategories = [
   "Luxury",
 ];
 
+const locationDisplayValue = (value) => {
+  const match = String(value || "").match(/^geo:[^|]+\|(.+)$/);
+  return match ? match[1] : value;
+};
+
 export default function TripInputScreen({
   form,
   setForm,
@@ -29,6 +34,7 @@ export default function TripInputScreen({
   onSubmit,
   onBack,
   hotelContext,
+  onPickLocation,
 }) {
   const [startSuggestions, setStartSuggestions] = useState([]);
   const [endSuggestions, setEndSuggestions] = useState([]);
@@ -135,11 +141,12 @@ export default function TripInputScreen({
       <Text style={styles.label}>Start Location</Text>
       <TextInput
         style={styles.input}
-        value={form.startLocation}
+        value={locationDisplayValue(form.startLocation)}
         onChangeText={(value) => handleLocationSearch("startLocation", value)}
         placeholder="Example: Colombo"
         placeholderTextColor={colors.muted}
       />
+      {!hotelContext && <TouchableOpacity style={styles.mapPickerButton} onPress={() => onPickLocation("startLocation")}><Text style={styles.mapPickerText}>⌖ Select start on map (optional)</Text></TouchableOpacity>}
 
       {startSuggestions.length > 0 && (
         <View style={styles.suggestionBox}>
@@ -178,11 +185,12 @@ export default function TripInputScreen({
           <Text style={styles.label}>End Location</Text>
           <TextInput
             style={styles.input}
-            value={form.endLocation}
+            value={locationDisplayValue(form.endLocation)}
             onChangeText={(value) => handleLocationSearch("endLocation", value)}
             placeholder="Example: Kandy"
             placeholderTextColor={colors.muted}
           />
+          <TouchableOpacity style={styles.mapPickerButton} onPress={() => onPickLocation("endLocation")}><Text style={styles.mapPickerText}>⌖ Select end on map (optional)</Text></TouchableOpacity>
 
           {endSuggestions.length > 0 && (
             <View style={styles.suggestionBox}>
@@ -322,6 +330,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 10,
   },
+  mapPickerButton:{alignSelf:"flex-start",marginTop:8,paddingVertical:7,paddingHorizontal:11,borderRadius:12,backgroundColor:colors.backgroundDeep,borderWidth:1,borderColor:colors.border},
+  mapPickerText:{color:colors.primary,fontSize:12,fontWeight:"800"},
   lockedDestination: {
     backgroundColor: colors.card,
     borderWidth: 2,

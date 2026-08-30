@@ -101,7 +101,7 @@ const getTrustedCoordinateLocation = (location) => {
     longitude,
     label,
     correctedName: label,
-    source: "Selected hotel coordinates",
+    source: "User-selected coordinates",
     similarity: 1,
   };
 };

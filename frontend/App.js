@@ -22,6 +22,7 @@ import LandmarkChatScreen from "./screens/LandmarkChatScreen";
 import HotelHomeScreen from "./src/screens/HotelHomeScreen";
 import HotelResultsScreen from "./src/screens/HotelResultsScreen";
 import AdminPricingScreen from "./src/screens/AdminPricingScreen";
+import LocationPickerScreen from "./src/screens/LocationPickerScreen";
 import { adminLogin } from "./src/api/adminApi";
 
 const Stack = createNativeStackNavigator();
@@ -35,6 +36,7 @@ function MainFlow({ navigation, route }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [hotelContext, setHotelContext] = useState(null);
   const consumedHotelRequest = useRef(null);
+  const consumedLocationSelection = useRef(null);
   const [form, setForm] = useState({ budget: "", passengers: "", startLocation: "", endLocation: "", preferredCategory: "" });
 
   useEffect(() => {
@@ -64,6 +66,16 @@ function MainFlow({ navigation, route }) {
     });
     setScreen("form");
   }, [route.params?.hotelSafetyRequest]);
+
+  useEffect(() => {
+    const selection = route.params?.locationSelection;
+    if (!selection || consumedLocationSelection.current === selection.id) return;
+    if (selection.field !== "startLocation" && selection.field !== "endLocation") return;
+    consumedLocationSelection.current = selection.id;
+    setHotelContext(null);
+    setForm((current) => ({ ...current, [selection.field]: selection.value }));
+    setScreen("form");
+  }, [route.params?.locationSelection]);
 
   const handleAuth = async ({ name, email, password }) => {
     if (screen === "adminLogin" || screen === "login") {
@@ -163,7 +175,7 @@ function MainFlow({ navigation, route }) {
       {screen === "dashboard" && <DashboardScreen user={user} onOpenModule={openModule} onLogout={logout} />}
       {screen === "admin" && <AdminPricingScreen user={user} token={adminToken} onLogout={logout} />}
       {screen.startsWith("module:") && <ModuleScreen moduleId={screen.split(":")[1]} onBack={() => setScreen("dashboard")} />}
-      {screen === "form" && <TripInputScreen form={form} setForm={setForm} loading={loading} onSubmit={handleSubmit} onBack={leaveSafetyForm} hotelContext={hotelContext} />}
+      {screen === "form" && <TripInputScreen form={form} setForm={setForm} loading={loading} onSubmit={handleSubmit} onBack={leaveSafetyForm} hotelContext={hotelContext} onPickLocation={(field) => navigation.navigate("LocationPicker", { field })} />}
       {screen === "result" && <SafetyResultScreen result={result} errorMessage={errorMessage} onBack={() => setScreen("form")} onNewSearch={handleNewSearch} onShowMap={(selectedRoute) => navigation.navigate("SafetyMap", { selectedRoute })} onReviewTrip={(selectedVehicle, tripResult) => navigation.navigate("TripReview", { selectedVehicle, tripResult, hotelContext })} />}
       {loading && <ActivityIndicator style={styles.loader} color={colors.primary} size="large" />}
     </SafeAreaView>
@@ -186,6 +198,7 @@ export default function App() {
         <Stack.Screen name="LandmarkChat" component={LandmarkChatScreen} options={{ headerShown: false }} />
         <Stack.Screen name="HotelHome" component={HotelHomeScreen} options={{ title: "Hotels & Activities" }} />
         <Stack.Screen name="HotelResults" component={HotelResultsScreen} options={{ title: "Your Hotel Matches" }} />
+        <Stack.Screen name="LocationPicker" component={LocationPickerScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
