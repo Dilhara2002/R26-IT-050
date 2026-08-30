@@ -16,6 +16,31 @@ const AI_SERVICE_BASE_URL = (
   `http://${getDevelopmentHost()}:5002`
 ).replace(/\/$/, "");
 
+async function parseResponse(response) {
+  const contentType = response.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    throw new Error(`Landmark service returned an invalid response (${response.status}).`);
+  }
+  return response.json();
+}
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = 30000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } catch (error) {
+    if (error.name === "AbortError") {
+      throw new Error("Landmark service timed out. Please try again.");
+    }
+    throw new Error(
+      `Cannot connect to the landmark service at ${AI_SERVICE_BASE_URL}. Make sure the AI backend is running.`
+    );
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 /**
  * Predict the landmark in a given image.
  *
@@ -35,15 +60,19 @@ export async function predictLandmark(imageAsset, mode = "tflite") {
   const fileType = imageAsset.mimeType || "image/jpeg";
   const fileName = imageAsset.fileName || (photoUri.split("/").pop() || "photo.jpg");
 
-  formData.append("image", {
-    uri: photoUri,
-    type: fileType,
-    name: fileName,
-  });
+  if (Platform.OS === "web" && imageAsset.file) {
+    formData.append("image", imageAsset.file, fileName);
+  } else {
+    formData.append("image", {
+      uri: photoUri,
+      type: fileType,
+      name: fileName,
+    });
+  }
 
   const url = `${AI_SERVICE_BASE_URL}/api/landmark/predict?mode=${mode}`;
 
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -51,7 +80,7 @@ export async function predictLandmark(imageAsset, mode = "tflite") {
     body: formData,
   });
 
-  const data = await response.json();
+  const data = await parseResponse(response);
 
   if (!response.ok || data.error) {
     throw new Error(data.error || "Prediction failed. Please try again.");
@@ -61,8 +90,8 @@ export async function predictLandmark(imageAsset, mode = "tflite") {
 }
 
 export async function fetchSupportedLandmarks() {
-  const response = await fetch(`${AI_SERVICE_BASE_URL}/api/landmark/list`);
-  const data = await response.json();
+  const response = await fetchWithTimeout(`${AI_SERVICE_BASE_URL}/api/landmark/list`);
+  const data = await parseResponse(response);
   if (!response.ok) throw new Error("Could not fetch landmark list.");
   return data;
 }
@@ -78,7 +107,7 @@ export async function fetchSupportedLandmarks() {
 export async function sendLandmarkChatMessage(message, landmarkName = "", history = []) {
   const url = `${AI_SERVICE_BASE_URL}/api/landmark/chat`;
 
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -91,7 +120,7 @@ export async function sendLandmarkChatMessage(message, landmarkName = "", histor
     }),
   });
 
-  const data = await response.json();
+  const data = await parseResponse(response);
 
   if (!response.ok || data.error) {
     throw new Error(data.error || "Tour guide bot is currently unavailable.");

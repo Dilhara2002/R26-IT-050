@@ -27,6 +27,14 @@
     },
     "plugins": [
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow CeylonGo to select landmark photos for identification.",
+          "cameraPermission": "Allow CeylonGo to take landmark photos for identification.",
+          "microphonePermission": false
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",

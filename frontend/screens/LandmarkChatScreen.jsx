@@ -24,6 +24,8 @@ const QUICK_PROMPTS = [
   "🏨 Nearby hotels",
 ];
 
+const displayMessage = (text) => String(text || "").replace(/\*\*/g, "");
+
 export default function LandmarkChatScreen({ landmarkContext, onBack, navigation, route }) {
   const context = landmarkContext || route?.params?.landmarkContext;
   const activeLandmark = context?.landmark_name || context?.class_id?.replace(/_/g, " ") || "";
@@ -175,7 +177,7 @@ export default function LandmarkChatScreen({ landmarkContext, onBack, navigation
                     msg.role === "user" ? styles.userText : styles.botText,
                   ]}
                 >
-                  {msg.text}
+                  {displayMessage(msg.text)}
                 </Text>
                 <Text
                   style={[

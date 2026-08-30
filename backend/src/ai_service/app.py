@@ -107,7 +107,7 @@ def optimize_itinerary():
 if __name__ == '__main__':
     print("[SYSTEM] Starting Context-Aware AI Routing Server...")
     app.run(
-        debug=True,
+        debug=os.getenv("FLASK_DEBUG", "").lower() in {"1", "true", "yes"},
         host='0.0.0.0',
         port=int(os.getenv("AI_SERVICE_PORT", "5002")),
     )

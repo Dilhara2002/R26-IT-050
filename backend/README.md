@@ -48,7 +48,7 @@ route or its map is unavailable.
 ## Requirements
 
 - Node.js and npm
-- Python **3.14.4** (the currently verified project environment)
+- Python **3.11 or 3.12** for the itinerary and landmark AI service
 - Neo4j
 - MongoDB, when MongoDB functionality is required by the wider backend
 - Ollama (optional) for the final location typo-candidate fallback
@@ -60,8 +60,8 @@ From the `backend` directory:
 ```bash
 npm install
 
-python3 -m venv .venv
-source .venv/bin/activate
+python3.11 -m venv .venv311
+source .venv311/bin/activate
 pip install -r requirements.txt
 ```
 
@@ -84,13 +84,15 @@ The supported variables are:
 | `NEO4J_PASSWORD` | Neo4j password. |
 | `OPENWEATHER_API_KEY` | OpenWeather API key for trip weather context. |
 | `GEOAPIFY_API_KEY` | Geoapify API key for location typo/autocomplete fallback. |
-| `PYTHON_BIN` | Optional absolute Python interpreter override. |
+| `PYTHON_BIN` | Optional Python interpreter override; defaults to `.venv311/bin/python`. |
+| `GEMINI_API_KEY` | Optional; enables Gemini responses in the landmark tour guide. Local knowledge-base replies work without it. |
+| `LANDMARK_ENABLE_SVM` | Optional `true`/`false`; enables the network-dependent SVM feature extractor. TFLite is the offline default. |
 
 Never commit `.env`, credentials, API keys, passwords, tokens, or connection strings. Use `.env.example` as the template, rotate any credential that has ever been exposed, and do not include secrets in logs, documentation, or screenshots.
 
 ## Python Runtime and Model Compatibility
 
-The backend defaults to `backend/.venv/bin/python` for ML inference. Set `PYTHON_BIN` only when an explicit alternative interpreter is needed.
+The Python AI service uses `backend/.venv311/bin/python` by default. TensorFlow is not available for the project's Python 3.14 environment, so use Python 3.11 or 3.12 for landmark recognition.
 
 Python dependencies are pinned in `requirements.txt`. In particular, `scikit-learn==1.7.2` is pinned because the deployed model artifact was created with that version.
 
@@ -352,5 +354,5 @@ Future work should prioritize authoritative dataset sourcing, source citations a
 ## Reproducibility Notes
 
 - Python package versions are pinned in `requirements.txt`.
-- ML inference uses `backend/.venv/bin/python` by default, unless `PYTHON_BIN` is set.
+- Python AI inference uses `backend/.venv311/bin/python` by default, unless `PYTHON_BIN` is set.
 - Run `npm test` successfully before committing changes.

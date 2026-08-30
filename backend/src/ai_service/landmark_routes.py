@@ -1,12 +1,13 @@
 import os
 import io
 import json
+import threading
 import requests
 import numpy as np
 import pandas as pd
 import tensorflow as tf
 import joblib
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from flask import Blueprint, request, jsonify
 
 landmark_bp = Blueprint('landmark_bp', __name__)
@@ -91,6 +92,7 @@ tflite_interpreter = tf.lite.Interpreter(model_path=TFLITE_PATH)
 tflite_interpreter.allocate_tensors()
 input_details  = tflite_interpreter.get_input_details()
 output_details = tflite_interpreter.get_output_details()
+tflite_lock = threading.Lock()
 print(f"[Landmark] TFLite model loaded from {TFLITE_PATH}")
 
 # Load the optional MobileNetV2 feature extractor + SVM only when explicitly
@@ -127,9 +129,10 @@ def preprocess_image_np(image_bytes: bytes) -> np.ndarray:
 
 def predict_tflite(img_batch: np.ndarray) -> np.ndarray:
     normalized = img_batch / 255.0
-    tflite_interpreter.set_tensor(input_details[0]['index'], normalized.astype(np.float32))
-    tflite_interpreter.invoke()
-    return tflite_interpreter.get_tensor(output_details[0]['index'])[0]
+    with tflite_lock:
+        tflite_interpreter.set_tensor(input_details[0]['index'], normalized.astype(np.float32))
+        tflite_interpreter.invoke()
+        return tflite_interpreter.get_tensor(output_details[0]['index'])[0].copy()
 
 def predict_svm(img_batch: np.ndarray) -> np.ndarray:
     features = _feature_model.predict(img_batch, verbose=0)
@@ -246,6 +249,9 @@ GUIDELINES:
 #  Routes
 @landmark_bp.route('/api/landmark/predict', methods=['POST'])
 def predict():
+    if request.content_length and request.content_length > 10 * 1024 * 1024:
+        return jsonify({"error": "Image is too large. Maximum upload size is 10 MB."}), 413
+
     if 'image' not in request.files:
         return jsonify({"error": "No image file provided. Send as multipart form-data with key 'image'."}), 400
 
@@ -258,7 +264,7 @@ def predict():
         img_batch   = preprocess_image_np(image_bytes)
 
         # Select inference mode
-        mode = request.args.get('mode', 'svm').lower()
+        mode = request.args.get('mode', 'tflite').lower()
         if mode == 'svm' and svm_available:
             probabilities = predict_svm(img_batch)
             engine_used   = "SVM (92.56% accuracy)"
@@ -295,6 +301,8 @@ def predict():
 
         return jsonify(response), 200
 
+    except (UnidentifiedImageError, OSError, ValueError):
+        return jsonify({"error": "The uploaded file is not a valid image."}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -348,3 +356,13 @@ def list_landmarks():
             "gps_coordinates": meta.get("gps_coordinates", ""),
         })
     return jsonify({"status": "success", "count": len(landmarks), "landmarks": landmarks}), 200
+
+
+@landmark_bp.route('/api/landmark/health', methods=['GET'])
+def landmark_health():
+    return jsonify({
+        "status": "ok",
+        "classes": NUM_CLASSES,
+        "default_engine": "tflite",
+        "svm_available": svm_available,
+    }), 200

@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "node --watch src/app.js",
-    "ai-service": ".venv/bin/python src/ai_service/app.py",
+    "ai-service": "${PYTHON_BIN:-.venv311/bin/python} src/ai_service/app.py",
     "test": "node --test tests/*.test.js"
   },
   "keywords": [],
