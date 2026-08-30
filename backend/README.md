@@ -86,6 +86,7 @@ The supported variables are:
 | `GEOAPIFY_API_KEY` | Geoapify API key for location typo/autocomplete fallback. |
 | `PYTHON_BIN` | Optional Python interpreter override; defaults to `.venv311/bin/python`. |
 | `GEMINI_API_KEY` | Optional; enables Gemini responses in the landmark tour guide. Local knowledge-base replies work without it. |
+| `GEMINI_MODEL` | Optional Gemini model ID; defaults to `gemini-3.5-flash`. |
 | `LANDMARK_ENABLE_SVM` | Optional `true`/`false`; defaults to `true` for the trained SVM recognizer. MobileNetV2 feature weights download once and are cached; TFLite is the automatic fallback. |
 
 Never commit `.env`, credentials, API keys, passwords, tokens, or connection strings. Use `.env.example` as the template, rotate any credential that has ever been exposed, and do not include secrets in logs, documentation, or screenshots.

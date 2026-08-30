@@ -52,7 +52,11 @@ export default function LandmarkScannerScreen({ onBack, onOpenChat, navigation }
   };
 
   const handleOpenChat = (customContext = null) => {
-    const context = customContext || result?.metadata || (result?.class_id ? { landmark_name: result.class_id.replace(/_/g, " ") } : {});
+    const context = customContext || (result ? {
+      ...result.metadata,
+      class_id: result.class_id,
+      landmark_name: result.metadata?.landmark_name || result.class_id?.replace(/_/g, " "),
+    } : {});
     if (onOpenChat) {
       onOpenChat(context);
     } else if (navigation && navigation.navigate) {

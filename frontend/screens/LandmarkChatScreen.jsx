@@ -29,6 +29,7 @@ const displayMessage = (text) => String(text || "").replace(/\*\*/g, "");
 export default function LandmarkChatScreen({ landmarkContext, onBack, navigation, route }) {
   const context = landmarkContext || route?.params?.landmarkContext;
   const activeLandmark = context?.landmark_name || context?.class_id?.replace(/_/g, " ") || "";
+  const activeLandmarkId = context?.class_id || activeLandmark;
 
   const initialBotMessage = activeLandmark
     ? `Ayubowan! 🙏 I'm your AI Tour Guide for **${activeLandmark}**.\n\nAsk me anything about ticket prices, dress codes, historical background, or nearby places!`
@@ -76,7 +77,7 @@ export default function LandmarkChatScreen({ landmarkContext, onBack, navigation
         text: m.text,
       }));
 
-      const res = await sendLandmarkChatMessage(query, activeLandmark, history);
+      const res = await sendLandmarkChatMessage(query, activeLandmarkId, history);
 
       const botMsg = {
         id: (Date.now() + 1).toString(),

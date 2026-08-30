@@ -60,10 +60,18 @@ def lookup_metadata(class_name: str) -> dict:
     if not class_name:
         return {}
     search_term = CLASS_TO_CSV_SEARCH.get(class_name, class_name.replace('_', ' '))
-    rows = df_landmarks[df_landmarks['Landmark Name'].str.contains(search_term, case=False, na=False)]
+    rows = df_landmarks[
+        df_landmarks['Landmark Name'].str.contains(
+            search_term, case=False, na=False, regex=False
+        )
+    ]
     if rows.empty:
         # Fallback: general query match across description or name
-        rows = df_landmarks[df_landmarks['Landmark Name'].str.contains(class_name, case=False, na=False)]
+        rows = df_landmarks[
+            df_landmarks['Landmark Name'].str.contains(
+                class_name, case=False, na=False, regex=False
+            )
+        ]
     if rows.empty:
         return {}
     row = rows.iloc[0]
@@ -203,9 +211,8 @@ GUIDELINES:
 5. Keep responses engaging, accurate, and easy to read on a mobile screen.
 """
 
-    prompt = f"User Question: {query}\n\nPlease give a helpful, concise tourist response."
-
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
     # Build contents with optional chat history
     contents = []
@@ -226,22 +233,20 @@ GUIDELINES:
     try:
         response = requests.post(
             url,
-            headers={'Content-Type': 'application/json'},
+            headers={
+                'Content-Type': 'application/json',
+                'x-goog-api-key': api_key,
+            },
             json={"contents": contents},
             timeout=8
         )
         if response.status_code == 200:
             res_json = response.json()
             return res_json['candidates'][0]['content']['parts'][0]['text']
-        else:
-            # Fallback to flash-latest or local rules
-            fallback_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={api_key}"
-            res2 = requests.post(fallback_url, headers={'Content-Type': 'application/json'}, json={"contents": contents}, timeout=8)
-            if res2.status_code == 200:
-                return res2.json()['candidates'][0]['content']['parts'][0]['text']
-            return generate_local_rule_response(query, meta)
-    except Exception as e:
-        print(f"[Landmark Chat] Gemini API error: {e}")
+        print(f"[Landmark Chat] Gemini unavailable (HTTP {response.status_code}); using local knowledge base.")
+        return generate_local_rule_response(query, meta)
+    except Exception:
+        print("[Landmark Chat] Gemini request failed; using local knowledge base.")
         return generate_local_rule_response(query, meta)
 
 
