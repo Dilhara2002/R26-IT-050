@@ -1,6 +1,3 @@
-import neo4j from "neo4j-driver";
-
-export const driver = neo4j.driver(
-  "bolt://localhost:7687",
-  neo4j.auth.basic("neo4j", "11110000")
-);
+// Keep legacy imports working while using the single environment-configured
+// Neo4j driver shared by the rest of the backend.
+export { driver } from "./neo4j.js";

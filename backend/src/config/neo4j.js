@@ -57,20 +57,7 @@ export const verifyNeo4jConnection = async () => {
     );
 
 
-    console.log(
-      "✅ Connected to Neo4j Knowledge Graph"
-    );
-
-
-  } catch(error) {
-
-
-    console.error(
-      "❌ Neo4j connection failed:",
-      error.message
-    );
-
-
+    return true;
   } finally {
 
 
