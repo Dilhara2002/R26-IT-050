@@ -30,11 +30,11 @@ export async function generateTourismPackage(prompt, stay) {
   return data;
 }
 
-export async function getSelectedHotelPrice(hotelId, stay) {
+export async function getSelectedHotelPrice(hotelId, stay, currency) {
   const response = await fetch(`${BASE_URL}/hotel-price`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ hotelId, stay }),
+    body: JSON.stringify({ hotelId, stay, currency }),
   });
 
   const data = await response.json().catch(() => ({}));

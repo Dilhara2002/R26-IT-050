@@ -267,22 +267,28 @@ const recommendRouteSafety = async (req, res) => {
   }
   const budgetProvided = req.body?.budget !== undefined;
   const passengersProvided = req.body?.passengers !== undefined;
-  if (budgetProvided !== passengersProvided) {
+  const estimateVehicleCost = req.body?.estimateVehicleCost === true;
+  if ((!estimateVehicleCost && budgetProvided !== passengersProvided) || (estimateVehicleCost && !passengersProvided)) {
     return res.status(400).json({
       success: false,
       code: "INVALID_VEHICLE_REQUEST",
-      message: "budget and passengers must be supplied together.",
+      message: estimateVehicleCost
+        ? "passengers must be supplied when estimating vehicle cost."
+        : "budget and passengers must be supplied together.",
     });
   }
   const budget = req.body?.budget;
   const passengers = req.body?.passengers;
-  if (budgetProvided &&
-      (typeof budget !== "number" || !Number.isFinite(budget) || budget <= 0 ||
-       !Number.isInteger(passengers) || passengers <= 0)) {
+  const invalidPassengers = !Number.isInteger(passengers) || passengers <= 0;
+  const invalidBudget = budgetProvided &&
+    (typeof budget !== "number" || !Number.isFinite(budget) || budget <= 0);
+  if ((budgetProvided || estimateVehicleCost) && (invalidBudget || invalidPassengers)) {
     return res.status(400).json({
       success: false,
       code: "INVALID_VEHICLE_REQUEST",
-      message: "budget must be positive and passengers must be a positive integer.",
+      message: estimateVehicleCost && !budgetProvided
+        ? "passengers must be a positive integer."
+        : "budget must be positive and passengers must be a positive integer.",
     });
   }
 
@@ -291,13 +297,14 @@ const recommendRouteSafety = async (req, res) => {
       startLocation: startLocation.trim(),
       endLocation: endLocation.trim(),
     });
-    const vehicle = budgetProvided
+    const vehicle = (budgetProvided || estimateVehicleCost)
       ? await getWholeTripVehicleRecommendation({
         distanceKm: result.distance_km,
         maxGradient: result.max_gradient,
         riskLevel: result.risk_prediction?.riskLevel || null,
         budget,
         passengers,
+        ignoreBudget: estimateVehicleCost,
         preferredCategory: typeof req.body?.preferredCategory === "string"
           ? req.body.preferredCategory.trim()
           : "",

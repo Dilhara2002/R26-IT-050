@@ -64,7 +64,10 @@ test("getHotelPrice maps a LiteAPI whole-stay retail total", async () => {
   const previousKey = process.env.LITEAPI_KEY;
   const previousFetch = global.fetch;
   process.env.LITEAPI_KEY = "test-key";
-  global.fetch = async () => ({
+  let requestBody;
+  global.fetch = async (_url, options) => {
+    requestBody = JSON.parse(options.body);
+    return ({
     ok: true,
     json: async () => ({
       sandbox: true,
@@ -90,7 +93,8 @@ test("getHotelPrice maps a LiteAPI whole-stay retail total", async () => {
         },
       ],
     }),
-  });
+    });
+  };
 
   try {
     const result = await getHotelPrice(
@@ -100,12 +104,14 @@ test("getHotelPrice maps a LiteAPI whole-stay retail total", async () => {
         checkOutDate: "2026-09-13",
         adults: 4,
         roomQuantity: 2,
-      }
+      },
+      { currency: "LKR" }
     );
     assert.equal(result.status, "available");
     assert.equal(result.environment, "SANDBOX");
     assert.equal(result.offer.total, "300.00");
     assert.equal(result.offer.estimatedPerRoomPerNight, "50.00");
+    assert.equal(requestBody.currency, "LKR");
   } finally {
     global.fetch = previousFetch;
     if (previousKey === undefined) delete process.env.LITEAPI_KEY;

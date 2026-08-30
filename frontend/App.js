@@ -56,7 +56,7 @@ function MainFlow({ navigation, route }) {
     setResult(null);
     setErrorMessage("");
     setForm({
-      budget: String(request.vehicleRequest?.totalBudget || ""),
+      budget: "",
       passengers: String(request.vehicleRequest?.passengers || ""),
       startLocation: request.vehicleRequest?.startLocation || "",
       endLocation: routeDestination,
@@ -91,7 +91,9 @@ function MainFlow({ navigation, route }) {
       setResult(null);
       setErrorMessage("");
       const response = await getLowerRiskRoute({
-        budget: Number(form.budget),
+        ...(hotelContext?.vehicleRequest?.estimateVehicleCost
+          ? { estimateVehicleCost: true }
+          : { budget: Number(form.budget) }),
         passengers: Number(form.passengers),
         startLocation: form.startLocation.trim(),
         endLocation: form.endLocation.trim(),

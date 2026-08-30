@@ -93,7 +93,7 @@ export const validateStayRequest = (stay) => {
   };
 };
 
-export const getHotelPrice = async (hotel, stay) => {
+export const getHotelPrice = async (hotel, stay, options = {}) => {
   const validation = validateStayRequest(stay);
   if (!validation.valid) return unavailable(validation.error);
 
@@ -121,7 +121,7 @@ export const getHotelPrice = async (hotel, stay) => {
       body: JSON.stringify({
         checkin: validation.value.checkInDate,
         checkout: validation.value.checkOutDate,
-        currency: process.env.LITEAPI_CURRENCY || "USD",
+        currency: options.currency || process.env.LITEAPI_CURRENCY || "USD",
         guestNationality: process.env.LITEAPI_GUEST_NATIONALITY || "LK",
         occupancies: buildOccupancies(
           validation.value.adults,

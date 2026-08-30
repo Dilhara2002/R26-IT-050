@@ -183,9 +183,12 @@ export const generatePackageFromPrompt = async (req, res) => {
 
 export const priceSelectedHotel = async (req, res) => {
   try {
-    const { hotelId, stay } = req.body || {};
+    const { hotelId, stay, currency } = req.body || {};
     if (typeof hotelId !== "string" || !hotelId.trim()) {
       return res.status(400).json({ error: "hotelId is required." });
+    }
+    if (currency !== undefined && (typeof currency !== "string" || !/^[A-Z]{3}$/.test(currency))) {
+      return res.status(400).json({ error: "currency must be a three-letter uppercase code." });
     }
 
     const stayValidation = validateStayRequest(stay);
@@ -198,7 +201,7 @@ export const priceSelectedHotel = async (req, res) => {
       return res.status(404).json({ error: "Selected hotel was not found." });
     }
 
-    const hotelPricing = await getHotelPrice(hotel, stayValidation.value);
+    const hotelPricing = await getHotelPrice(hotel, stayValidation.value, { currency });
     return res.json({ hotelId: hotel.hotelId, hotelPricing });
   } catch (error) {
     console.error("HOTEL_PRICE_ERROR:", error);

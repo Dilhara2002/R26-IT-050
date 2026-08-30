@@ -176,6 +176,22 @@ test(
   }
 );
 
+test("hotel package vehicle recommendation estimates cost without a user budget", async () => {
+  const recommendation = await getWholeTripVehicleRecommendation({
+    distanceKm: 100,
+    maxGradient: 8,
+    riskLevel: "Medium",
+    passengers: 4,
+    preferredCategory: "Sedan",
+    ignoreBudget: true,
+  });
+
+  assert.equal(recommendation.status, "available");
+  assert.equal(recommendation.selectionMode, "cost-estimate-without-user-budget");
+  assert.ok(recommendation.bestVehicle?.estimatedHirePrice > 0);
+  assert.equal(recommendation.bestVehicle?.pricing.currency, "LKR");
+});
+
 
 test(
   "POST /api/safety/recommend-vehicle rejects missing required fields",

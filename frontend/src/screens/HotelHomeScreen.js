@@ -28,7 +28,6 @@ export default function HotelHomeScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [includeVehicle, setIncludeVehicle] = useState(false);
   const [startLocation, setStartLocation] = useState("");
-  const [totalBudget, setTotalBudget] = useState("");
   const [passengers, setPassengers] = useState("");
   const [vehicleCategory, setVehicleCategory] = useState("All");
 
@@ -39,8 +38,8 @@ export default function HotelHomeScreen({ navigation }) {
       Alert.alert("Travel request required", "Tell us what kind of stay and activities you are looking for.");
       return;
     }
-    if (includeVehicle && (!startLocation.trim() || Number(totalBudget) <= 0 || Number(passengers) <= 0)) {
-      Alert.alert("Vehicle details required", "Enter your starting location, total trip budget and passenger count.");
+    if (includeVehicle && (!startLocation.trim() || !Number.isInteger(Number(passengers)) || Number(passengers) <= 0)) {
+      Alert.alert("Vehicle details required", "Enter your starting location and a valid passenger count.");
       return;
     }
     try {
@@ -67,7 +66,7 @@ export default function HotelHomeScreen({ navigation }) {
         vehicleRequest: includeVehicle ? {
           enabled: true,
           startLocation: startLocation.trim(),
-          totalBudget: Number(totalBudget),
+          estimateVehicleCost: true,
           passengers: Number(passengers),
           preferredCategory: vehicleCategory === "All" ? "" : vehicleCategory,
         } : { enabled: false },
@@ -108,9 +107,9 @@ export default function HotelHomeScreen({ navigation }) {
         </View>
         {includeVehicle&&<View style={s.vehicleFields}>
           <Text style={s.fieldLabel}>Starting location</Text><TextInput style={s.fieldInput} value={startLocation} onChangeText={setStartLocation} placeholder="e.g. Colombo" placeholderTextColor="#8B8172"/>
-          <View style={s.fieldRow}><View style={s.fieldHalf}><Text style={s.fieldLabel}>Total trip budget (LKR)</Text><TextInput style={s.fieldInput} value={totalBudget} onChangeText={setTotalBudget} keyboardType="numeric" placeholder="100000" placeholderTextColor="#8B8172"/></View><View style={s.fieldHalf}><Text style={s.fieldLabel}>Passengers</Text><TextInput style={s.fieldInput} value={passengers} onChangeText={setPassengers} keyboardType="numeric" placeholder="4" placeholderTextColor="#8B8172"/></View></View>
+          <Text style={s.fieldLabel}>Passengers</Text><TextInput style={s.fieldInput} value={passengers} onChangeText={setPassengers} keyboardType="numeric" placeholder="4" placeholderTextColor="#8B8172"/>
           <Text style={s.fieldLabel}>Preferred vehicle</Text><View style={s.categoryRow}>{vehicleCategories.map(category=><Pressable key={category} style={[s.category,vehicleCategory===category&&s.categoryActive]} onPress={()=>setVehicleCategory(category)}><Text style={[s.categoryText,vehicleCategory===category&&s.categoryTextActive]}>{category}</Text></Pressable>)}</View>
-          <View style={s.vehicleNote}><Ionicons name="information-circle-outline" size={18} color={colors.cinnamon}/><Text style={s.vehicleNoteText}>After choosing a hotel, CeylonGo will calculate a safer route, recommend vehicles and deduct the selected vehicle cost from this total budget.</Text></View>
+          <View style={s.vehicleNote}><Ionicons name="information-circle-outline" size={18} color={colors.cinnamon}/><Text style={s.vehicleNoteText}>After choosing a hotel, CeylonGo will calculate a safer route, recommend a suitable vehicle and add its estimated cost to the hotel price.</Text></View>
         </View>}
       </View>
       <Pressable style={({pressed})=>[s.button,pressed&&s.pressed,loading&&s.disabled]} onPress={generate} disabled={loading}>

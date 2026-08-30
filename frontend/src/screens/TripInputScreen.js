@@ -105,7 +105,7 @@ export default function TripInputScreen({
           <View style={styles.hotelBridgeCopy}>
             <Text style={styles.hotelBridgeLabel}>ISHAN SAFE JOURNEY ANALYSIS</Text>
             <Text style={styles.hotelBridgeTitle}>{hotelContext.selectedHotel?.hotel?.name || "Selected hotel"}</Text>
-            <Text style={styles.hotelBridgeText}>Route details were received from your hotel plan. Total trip budget: LKR {Number(hotelContext.vehicleRequest?.totalBudget || 0).toLocaleString()}.</Text>
+            <Text style={styles.hotelBridgeText}>Route and passenger details were received from your hotel plan. The recommended vehicle cost will be added to the selected hotel price.</Text>
           </View>
         </View>
       )}

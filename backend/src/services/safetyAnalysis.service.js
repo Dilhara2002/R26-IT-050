@@ -253,7 +253,7 @@ const compareRoutes = (first, second) =>
 
 const getUnavailableWeather = () => ({ status: "unavailable" });
 
-const recommendVehicle = async ({ distanceKm, maxGradient, riskLevel, budget, passengers, preferredCategory }) => {
+const recommendVehicle = async ({ distanceKm, maxGradient, riskLevel, budget, passengers, preferredCategory, ignoreBudget = false }) => {
   if (![distanceKm, maxGradient].every(Number.isFinite) || !RISK_ORDER.hasOwnProperty(riskLevel)) {
     return { status: "unavailable", reason: "Complete distance, gradient, and risk evidence is required." };
   }
@@ -305,7 +305,7 @@ const recommendVehicle = async ({ distanceKm, maxGradient, riskLevel, budget, pa
       },
     };
   }).filter((vehicle) =>
-    vehicle.estimatedHirePrice !== null && vehicle.estimatedHirePrice <= budget &&
+    vehicle.estimatedHirePrice !== null && (ignoreBudget || vehicle.estimatedHirePrice <= budget) &&
     vehicle.seatingCapacity >= passengers &&
     vehicle.vehicleSuitability.gradeability >= maxGradient &&
     (!preferredCategory || normalize(vehicle.vehicleCategory).includes(normalize(preferredCategory)))
@@ -316,13 +316,16 @@ const recommendVehicle = async ({ distanceKm, maxGradient, riskLevel, budget, pa
   });
   return {
     status: candidates.length ? "available" : "no_match",
-    reason: candidates.length ? null : "No vehicle met the whole-trip budget, capacity, category, and gradient requirements.",
+    reason: candidates.length ? null : ignoreBudget
+      ? "No vehicle met the whole-trip capacity, category, and gradient requirements."
+      : "No vehicle met the whole-trip budget, capacity, category, and gradient requirements.",
     bestVehicle: candidates[0] || null,
     alternativeOptions: candidates.slice(1, 3),
     calculationScope: "whole-trip-once",
     distanceKm,
     maxGradient,
     riskLevel,
+    selectionMode: ignoreBudget ? "cost-estimate-without-user-budget" : "budget-constrained",
   };
 };
 
