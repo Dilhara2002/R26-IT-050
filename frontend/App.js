@@ -24,6 +24,7 @@ import HotelResultsScreen from "./src/screens/HotelResultsScreen";
 import AdminPricingScreen from "./src/screens/AdminPricingScreen";
 import LocationPickerScreen from "./src/screens/LocationPickerScreen";
 import { adminLogin } from "./src/api/adminApi";
+import MobileBackButton from "./src/components/MobileBackButton";
 
 const Stack = createNativeStackNavigator();
 
@@ -185,7 +186,24 @@ function MainFlow({ navigation, route }) {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Main">
+      <Stack.Navigator
+        initialRouteName="Main"
+        screenOptions={({ navigation }) => ({
+          headerStyle: { backgroundColor: colors.primaryDark },
+          headerTintColor: colors.background,
+          headerTitleStyle: { color: colors.background, fontWeight: "700" },
+          headerShadowVisible: false,
+          headerBackVisible: false,
+          headerLeft: ({ canGoBack }) => canGoBack ? (
+            <MobileBackButton
+              onPress={() => navigation.goBack()}
+              onDark
+              style={{ marginRight: 10 }}
+            />
+          ) : null,
+          contentStyle: { backgroundColor: colors.background },
+        })}
+      >
         <Stack.Screen name="Main" component={MainFlow} options={{ headerShown: false }} />
         <Stack.Screen name="ItineraryHome" component={ItineraryHomeScreen} options={{ title: "Smart Itinerary" }} />
         <Stack.Screen name="ItineraryResult" component={ItineraryResultScreen} options={{ title: "Optimized Itinerary" }} />
