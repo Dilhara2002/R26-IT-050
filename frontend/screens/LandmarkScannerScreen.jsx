@@ -12,6 +12,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { predictLandmark } from "../services/landmarkService";
 import { colors } from "../src/styles/colors";
+import MobileBackButton from "../src/components/MobileBackButton";
 
 //  Sub-components
 function InfoRow({ label, value }) {
@@ -142,12 +143,7 @@ export default function LandmarkScannerScreen({ onBack, onOpenChat, navigation }
       <View style={styles.hero}>
         <View style={styles.heroTopRow}>
           {(onBack || (navigation && navigation.goBack)) && (
-            <Pressable
-              style={({ pressed }) => [styles.backBtn, pressed && styles.pressed]}
-              onPress={handleBack}
-            >
-              <Text style={styles.backBtnText}>← Back</Text>
-            </Pressable>
+            <MobileBackButton onPress={handleBack} onDark />
           )}
           <View style={styles.heroRightActions}>
             <Pressable

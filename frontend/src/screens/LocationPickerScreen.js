@@ -3,6 +3,7 @@ import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-na
 import * as Location from "expo-location";
 import LocationPickerMap from "../components/LocationPickerMap";
 import { colors } from "../styles/colors";
+import MobileBackButton from "../components/MobileBackButton";
 
 const CURRENT_LOCATION_TIMEOUT_MS = 8000;
 
@@ -74,7 +75,7 @@ export default function LocationPickerScreen({ navigation, route }) {
   return (
     <SafeAreaView style={styles.page}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}><Text style={styles.back}>← Back</Text></TouchableOpacity>
+        <MobileBackButton onPress={() => navigation.goBack()} onDark style={styles.backControl} />
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.subtitle}>Tap anywhere on the map, then confirm the selected point.</Text>
         <Text style={styles.locationStatus}>{locationStatus}</Text>
@@ -91,5 +92,5 @@ export default function LocationPickerScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  page:{flex:1,backgroundColor:colors.background},header:{padding:18,backgroundColor:colors.primaryDark},back:{color:colors.turmeric,fontSize:14,fontWeight:"800",marginBottom:10},title:{color:"#F1E9D2",fontSize:23,fontWeight:"800"},subtitle:{color:colors.backgroundDeep,fontSize:12,marginTop:5},locationStatus:{color:colors.turmeric,fontSize:11,fontWeight:"700",marginTop:7},map:{flex:1,minHeight:360},footer:{padding:16,backgroundColor:colors.card,borderTopWidth:1,borderTopColor:colors.border},coordinates:{color:colors.muted,textAlign:"center",marginBottom:10},button:{height:52,borderRadius:14,backgroundColor:colors.primary,alignItems:"center",justifyContent:"center"},disabled:{opacity:.45},buttonText:{color:"#F1E9D2",fontWeight:"900",fontSize:15},
+  page:{flex:1,backgroundColor:colors.background},header:{padding:18,backgroundColor:colors.primaryDark},backControl:{marginBottom:12},title:{color:"#F1E9D2",fontSize:23,fontWeight:"800"},subtitle:{color:colors.backgroundDeep,fontSize:12,marginTop:5},locationStatus:{color:colors.turmeric,fontSize:11,fontWeight:"700",marginTop:7},map:{flex:1,minHeight:360},footer:{padding:16,backgroundColor:colors.card,borderTopWidth:1,borderTopColor:colors.border},coordinates:{color:colors.muted,textAlign:"center",marginBottom:10},button:{height:52,borderRadius:14,backgroundColor:colors.primary,alignItems:"center",justifyContent:"center"},disabled:{opacity:.45},buttonText:{color:"#F1E9D2",fontWeight:"900",fontSize:15},
 });

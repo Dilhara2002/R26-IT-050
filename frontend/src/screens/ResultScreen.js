@@ -10,6 +10,7 @@ import {
 import { colors } from "../styles/colors";
 import VehicleCard from "../components/VehicleCard";
 import RiskCard from "../components/RiskCard";
+import MobileBackButton from "../components/MobileBackButton";
 
 
 const getRiskStyle = (riskLevel) => {
@@ -78,11 +79,7 @@ export default function ResultScreen({
         style={styles.emptyContainer}
         contentContainerStyle={styles.contentContainer}
       >
-        <TouchableOpacity onPress={onBack}>
-          <Text style={styles.backText}>
-            ← Back
-          </Text>
-        </TouchableOpacity>
+        <MobileBackButton onPress={onBack} style={styles.backControl} />
 
         <View style={styles.errorCard}>
           <Text style={styles.errorTitle}>
@@ -163,11 +160,7 @@ export default function ResultScreen({
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
     >
-      <TouchableOpacity onPress={onBack}>
-        <Text style={styles.backText}>
-          ← Back
-        </Text>
-      </TouchableOpacity>
+      <MobileBackButton onPress={onBack} style={styles.backControl} />
 
 
       <View style={styles.hero}>
@@ -524,10 +517,7 @@ const styles = StyleSheet.create({
     paddingBottom: 48,
   },
 
-  backText: {
-    color: colors.primary,
-    fontSize: 16,
-    fontWeight: "700",
+  backControl: {
     marginTop: 10,
     marginBottom: 16,
   },

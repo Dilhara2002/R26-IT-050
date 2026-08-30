@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../styles/colors";
+import MobileBackButton from "../components/MobileBackButton";
 
 export default function AuthScreen({ mode, onSubmit, onBack, onSwitch }) {
   const register = mode === "register";
@@ -9,7 +10,7 @@ export default function AuthScreen({ mode, onSubmit, onBack, onSwitch }) {
   const [name,setName]=useState(""), [email,setEmail]=useState(""), [password,setPassword]=useState(""), [confirm,setConfirm]=useState(""), [visible,setVisible]=useState(false), [error,setError]=useState(""), [loading,setLoading]=useState(false);
   const submit=async()=>{ if(register&&!name.trim())return setError("Please enter your full name."); if(!/^\S+@\S+\.\S+$/.test(email.trim()))return setError("Please enter a valid email address."); if(password.length<6)return setError("Password must contain at least 6 characters."); if(register&&password!==confirm)return setError("Passwords do not match."); try{setError("");setLoading(true);await onSubmit({name,email:email.trim(),password,register});}catch(e){setError(e.message||"Sign in failed.");}finally{setLoading(false);} };
   return <ScrollView style={s.page} contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">
-    <TouchableOpacity style={s.back} onPress={onBack}><Ionicons name="arrow-back" size={22} color={colors.text}/></TouchableOpacity>
+    <MobileBackButton onPress={onBack} accessibilityLabel="Back to welcome" />
     <View style={s.brand}>
       <Image source={require("../../assets/ceylongo-logo.png")} style={s.logo} resizeMode="contain" accessibilityLabel="CeylonGo logo" />
       <Text style={s.title}>{register?"Start your journey":admin?"Administrator access":"Welcome back"}</Text>

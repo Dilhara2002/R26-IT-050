@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { sendLandmarkChatMessage } from "../services/landmarkService";
 import { colors } from "../src/styles/colors";
+import MobileBackButton from "../src/components/MobileBackButton";
 
 const QUICK_PROMPTS = [
   "👗 Dress code & rules",
@@ -113,12 +114,7 @@ export default function LandmarkChatScreen({ landmarkContext, onBack, navigation
       >
         {/* Header */}
         <View style={styles.header}>
-          <Pressable
-            style={({ pressed }) => [styles.backBtn, pressed && styles.pressed]}
-            onPress={handleBack}
-          >
-            <Text style={styles.backBtnText}>← Back</Text>
-          </Pressable>
+          <MobileBackButton onPress={handleBack} onDark />
           <View style={styles.headerCenter}>
             <Text style={styles.headerTitle}>AI Tour Guide</Text>
             {activeLandmark ? (

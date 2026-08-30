@@ -17,6 +17,7 @@ import {
   validateItineraryForm,
 } from "../services/itineraryValidation";
 import MapPicker from "../components/MapPicker";
+import { colors } from "../src/styles/colors";
 
 const MAP_PREVIEW = { latitude: 7.2906, longitude: 80.6337 };
 const CENTRAL_PROVINCE_BOUNDS = {
@@ -252,7 +253,7 @@ export default function HomeScreen({ navigation }) {
           />
           {mapLoading || locationLoading ? (
             <View pointerEvents="none" style={styles.mapStatusOverlay}>
-              <ActivityIndicator color="#1D4ED8" />
+              <ActivityIndicator color={colors.primary} />
               <Text style={styles.mapStatusText}>
                 {mapLoading ? "Loading map…" : "Checking device location…"}
               </Text>
@@ -283,7 +284,7 @@ export default function HomeScreen({ navigation }) {
               value={latitude}
               onChangeText={(value) => { setLatitude(value); clearError("latitude"); }}
               placeholder="7.290600"
-              placeholderTextColor="#64748B"
+              placeholderTextColor={colors.muted}
               keyboardType="numbers-and-punctuation"
               editable={!loading}
               style={[styles.input, errors.latitude && styles.inputError]}
@@ -296,7 +297,7 @@ export default function HomeScreen({ navigation }) {
               value={longitude}
               onChangeText={(value) => { setLongitude(value); clearError("longitude"); }}
               placeholder="80.633700"
-              placeholderTextColor="#64748B"
+              placeholderTextColor={colors.muted}
               keyboardType="numbers-and-punctuation"
               editable={!loading}
               style={[styles.input, errors.longitude && styles.inputError]}
@@ -343,7 +344,7 @@ export default function HomeScreen({ navigation }) {
               value={hours}
               onChangeText={(value) => { setHours(value); clearError("time"); }}
               placeholder="4"
-              placeholderTextColor="#64748B"
+              placeholderTextColor={colors.muted}
               keyboardType="number-pad"
               maxLength={2}
               editable={!loading}
@@ -356,7 +357,7 @@ export default function HomeScreen({ navigation }) {
               value={minutes}
               onChangeText={(value) => { setMinutes(value); clearError("time"); }}
               placeholder="30"
-              placeholderTextColor="#64748B"
+              placeholderTextColor={colors.muted}
               keyboardType="number-pad"
               maxLength={2}
               editable={!loading}
@@ -381,7 +382,7 @@ export default function HomeScreen({ navigation }) {
             value={radius}
             onChangeText={(value) => { setRadius(value); clearError("radius"); }}
             placeholder="For example, 15"
-            placeholderTextColor="#64748B"
+            placeholderTextColor={colors.muted}
             keyboardType="decimal-pad"
             editable={!loading}
             style={[styles.input, errors.radius && styles.inputError]}
@@ -442,44 +443,44 @@ function Field({ label, error, children, style }) {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: "#F1F5F9" },
-  content: { width: "100%", maxWidth: 960, alignSelf: "center", padding: 16, paddingBottom: 48 },
-  hero: { backgroundColor: "#123B72", borderRadius: 24, padding: 24, marginBottom: 16 },
-  eyebrow: { color: "#BFDBFE", fontSize: 12, fontWeight: "900", letterSpacing: 1.1, marginBottom: 10 },
-  title: { color: "#FFFFFF", fontSize: 30, lineHeight: 37, fontWeight: "900", maxWidth: 720 },
-  subtitle: { color: "#DBEAFE", fontSize: 16, lineHeight: 24, marginTop: 12, maxWidth: 760 },
-  card: { backgroundColor: "#FFFFFF", borderRadius: 20, padding: 18, marginBottom: 14, borderWidth: 1, borderColor: "#DCE4EE", elevation: 2 },
+  page: { flex: 1, backgroundColor: colors.background },
+  content: { width: "100%", maxWidth: 960, alignSelf: "center", padding: 20, paddingBottom: 60 },
+  hero: { backgroundColor: colors.primaryDark, borderRadius: 24, padding: 24, marginBottom: 16, borderWidth: 1, borderColor: "rgba(216,154,31,0.42)" },
+  eyebrow: { color: colors.turmeric, fontSize: 12, fontWeight: "900", letterSpacing: 1.1, marginBottom: 10 },
+  title: { color: "#FFFFFF", fontSize: 30, lineHeight: 37, fontWeight: "700", fontFamily: "serif", maxWidth: 720 },
+  subtitle: { color: colors.backgroundDeep, fontSize: 16, lineHeight: 24, marginTop: 12, maxWidth: 760 },
+  card: { backgroundColor: colors.card, borderRadius: 20, padding: 18, marginBottom: 14, borderWidth: 1, borderColor: colors.border, elevation: 1 },
   stepHeader: { flexDirection: "row", alignItems: "flex-start", marginBottom: 16 },
-  stepNumber: { width: 34, height: 34, borderRadius: 17, textAlign: "center", backgroundColor: "#DBEAFE", color: "#1D4ED8", fontWeight: "900", fontSize: 16, marginRight: 12, paddingTop: 7 },
+  stepNumber: { width: 34, height: 34, borderRadius: 17, textAlign: "center", backgroundColor: colors.backgroundDeep, color: colors.primary, fontWeight: "900", fontSize: 16, marginRight: 12, paddingTop: 7 },
   stepCopy: { flex: 1, minWidth: 0 },
-  sectionTitle: { color: "#0F172A", fontSize: 19, lineHeight: 24, fontWeight: "900" },
-  helperText: { color: "#475569", fontSize: 14, lineHeight: 20, marginTop: 4 },
-  mapContainer: { height: 260, width: "100%", borderRadius: 16, overflow: "hidden", borderWidth: 1, borderColor: "#CBD5E1", backgroundColor: "#E2E8F0" },
+  sectionTitle: { color: colors.text, fontSize: 19, lineHeight: 24, fontWeight: "700", fontFamily: "serif" },
+  helperText: { color: colors.muted, fontSize: 14, lineHeight: 20, marginTop: 4 },
+  mapContainer: { height: 260, width: "100%", borderRadius: 16, overflow: "hidden", borderWidth: 1, borderColor: colors.border, backgroundColor: colors.backgroundDeep },
   mapStatusOverlay: { position: "absolute", left: 12, right: 12, bottom: 12, padding: 10, borderRadius: 12, backgroundColor: "rgba(255,255,255,0.94)", flexDirection: "row", alignItems: "center", justifyContent: "center" },
-  mapStatusText: { color: "#1E3A5F", fontWeight: "700", marginLeft: 8 },
-  locationMessage: { color: "#475569", fontSize: 13, lineHeight: 19, marginTop: 9, marginBottom: 12 },
-  locationButton: { alignSelf: "flex-start", minHeight: 44, justifyContent: "center", backgroundColor: "#EFF6FF", borderColor: "#93C5FD", borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, marginBottom: 12 },
-  locationButtonText: { color: "#1D4ED8", fontWeight: "900" },
+  mapStatusText: { color: colors.primaryDark, fontWeight: "700", marginLeft: 8 },
+  locationMessage: { color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: 9, marginBottom: 12 },
+  locationButton: { alignSelf: "flex-start", minHeight: 44, justifyContent: "center", backgroundColor: colors.backgroundDeep, borderColor: colors.border, borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, marginBottom: 12 },
+  locationButtonText: { color: colors.primary, fontWeight: "900" },
   inputRow: { flexDirection: "row", flexWrap: "wrap", marginHorizontal: -5 },
   inputColumn: { flexGrow: 1, flexBasis: 220, minWidth: 0, paddingHorizontal: 5, marginBottom: 8 },
-  inputLabel: { color: "#1E293B", fontSize: 14, fontWeight: "800", marginBottom: 7 },
-  input: { width: "100%", minHeight: 50, backgroundColor: "#F8FAFC", borderWidth: 1.5, borderColor: "#CBD5E1", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, color: "#0F172A", fontSize: 16 },
+  inputLabel: { color: colors.cinnamon, fontSize: 14, fontWeight: "800", marginBottom: 7 },
+  input: { width: "100%", minHeight: 50, backgroundColor: "#FFFFFF", borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, color: colors.text, fontSize: 16 },
   inputError: { borderColor: "#DC2626", backgroundColor: "#FEF2F2" },
   fieldError: { color: "#B91C1C", fontSize: 13, lineHeight: 19, fontWeight: "700", marginTop: 6 },
   chips: { flexDirection: "row", flexWrap: "wrap", margin: -4 },
-  chip: { minHeight: 44, justifyContent: "center", backgroundColor: "#F8FAFC", borderWidth: 1.5, borderColor: "#CBD5E1", borderRadius: 22, paddingHorizontal: 15, paddingVertical: 10, margin: 4 },
-  chipSelected: { backgroundColor: "#1D4ED8", borderColor: "#1D4ED8" },
-  chipText: { color: "#334155", fontSize: 14, fontWeight: "800" },
+  chip: { minHeight: 44, justifyContent: "center", backgroundColor: "#FFFFFF", borderWidth: 1.5, borderColor: colors.border, borderRadius: 22, paddingHorizontal: 15, paddingVertical: 10, margin: 4 },
+  chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
+  chipText: { color: colors.text, fontSize: 14, fontWeight: "800" },
   chipTextSelected: { color: "#FFFFFF" },
   interpretedTime: { color: "#166534", backgroundColor: "#F0FDF4", borderRadius: 10, padding: 10, fontWeight: "800", marginTop: 4 },
   errorBanner: { backgroundColor: "#FEF2F2", borderColor: "#FCA5A5", borderWidth: 1, borderRadius: 16, padding: 15, marginBottom: 14 },
   errorTitle: { color: "#991B1B", fontSize: 16, fontWeight: "900" },
   errorMessage: { color: "#B91C1C", lineHeight: 20, marginTop: 4 },
-  generateButton: { minHeight: 68, backgroundColor: "#0F766E", borderRadius: 18, paddingHorizontal: 20, paddingVertical: 14, flexDirection: "row", alignItems: "center", justifyContent: "center" },
+  generateButton: { minHeight: 68, backgroundColor: colors.primary, borderRadius: 18, paddingHorizontal: 20, paddingVertical: 14, flexDirection: "row", alignItems: "center", justifyContent: "center" },
   generateCopy: { marginLeft: 10, flexShrink: 1, alignItems: "center" },
   generateTitle: { color: "#FFFFFF", fontSize: 17, lineHeight: 22, fontWeight: "900", textAlign: "center" },
-  generateSubtext: { color: "#CCFBF1", fontSize: 12, lineHeight: 17, textAlign: "center", marginTop: 2 },
+  generateSubtext: { color: colors.backgroundDeep, fontSize: 12, lineHeight: 17, textAlign: "center", marginTop: 2 },
   disabledButton: { opacity: 0.58 },
   pressed: { opacity: 0.78 },
-  scopeNote: { color: "#475569", fontSize: 13, lineHeight: 20, textAlign: "center", marginTop: 14, paddingHorizontal: 8 },
+  scopeNote: { color: colors.muted, fontSize: 13, lineHeight: 20, textAlign: "center", marginTop: 14, paddingHorizontal: 8 },
 });
