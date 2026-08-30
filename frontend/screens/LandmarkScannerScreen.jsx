@@ -323,7 +323,7 @@ export default function LandmarkScannerScreen({ onBack, onOpenChat, navigation }
 //  Styles
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.background },
-  content: { padding: 18, paddingBottom: 48, maxWidth: 800, alignSelf: "center", width: "100%" },
+  content: { padding: 20, paddingBottom: 50, maxWidth: 820, alignSelf: "center", width: "100%" },
 
   // Header
   hero: { backgroundColor: colors.primaryDark, borderRadius: 28, padding: 26, marginBottom: 18, borderWidth: 1, borderColor: "rgba(216,154,31,0.42)" },
