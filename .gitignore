@@ -41,15 +41,14 @@ myvenv/
 htmlcov/
 
 # Environment variables
-.env
-.env.*
 !.env.example
 
 # IDE / editor
-.vscode/
 .idea/
 
 # OS files
 .DS_Store
 Thumbs.db*.zip
 *.zip
+config.bat
+node_modules

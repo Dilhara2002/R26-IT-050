@@ -1,8 +1,9 @@
 import React from "react";
-import { View, StyleSheet, Text, Pressable } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 
 // Auto-resolves to ResultMap.js on Mobile, and ResultMap.web.js on Web
 import ResultMap from "../components/ResultMap";
+import MobileBackButton from "../src/components/MobileBackButton";
 
 export default function MapScreen({ route, navigation }) {
   const { startingLocation = null, optimizedStops = [] } = route.params || {};
@@ -41,14 +42,11 @@ export default function MapScreen({ route, navigation }) {
           The blue line is a straight-line planning estimate, not a drivable route or live traffic view.
         </Text>
         
-        <Pressable 
-          onPress={() => navigation.goBack()} 
-          accessibilityRole="button"
+        <MobileBackButton
+          onPress={() => navigation.goBack()}
           accessibilityLabel="Back to itinerary list"
-          style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
-        >
-          <Text style={styles.backBtnText}>Back to List</Text>
-        </Pressable>
+          style={styles.backControl}
+        />
       </View>
     </View>
   );
@@ -87,15 +85,5 @@ const styles = StyleSheet.create({
   cardTitle: { fontSize: 18, fontWeight: "900", color: "#0F172A" },
   cardSub: { color: "#64748B", fontSize: 13, marginTop: 2 },
   cardNote: { color: "#475569", fontSize: 12, lineHeight: 17, marginTop: 7 },
-  backBtn: {
-    marginTop: 15,
-    backgroundColor: '#EFF6FF',
-    padding: 10,
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#BFDBFE'
-  },
-  backBtnText: { color: '#1D4ED8', fontWeight: 'bold' },
-  backBtnPressed: { opacity: 0.72 },
+  backControl: { marginTop: 15 },
 });

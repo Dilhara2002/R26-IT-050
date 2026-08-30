@@ -11,6 +11,7 @@ import {
 
 import { colors } from "../styles/colors";
 import { searchSriLankanLocations } from "../api/locationApi";
+import MobileBackButton from "../components/MobileBackButton";
 
 const vehicleCategories = [
   "All",
@@ -93,9 +94,7 @@ export default function TripInputScreen({
       contentContainerStyle={styles.contentContainer}
       showsVerticalScrollIndicator={false}
     >
-      <TouchableOpacity onPress={onBack}>
-        <Text style={styles.backText}>← Back</Text>
-      </TouchableOpacity>
+      <MobileBackButton onPress={onBack} style={styles.backControl} />
 
       <View style={styles.hero}>
         <Text style={styles.heroBadge}>✦ AI SAFE JOURNEY PLANNER</Text>
@@ -262,10 +261,7 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 48,
   },
-  backText: {
-    color: colors.primary,
-    fontSize: 16,
-    fontWeight: "700",
+  backControl: {
     marginTop: 10,
     marginBottom: 16,
   },
