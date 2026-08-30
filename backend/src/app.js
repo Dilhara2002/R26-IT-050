@@ -23,6 +23,7 @@ import safetyRoutes from "./routes/safetyRoutes.js";
 import itinerarySafetyRoutes from "./routes/itinerarySafety.routes.js";
 import itineraryRoutes from "./routes/itinerary.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 import { seedAdmin } from "./services/adminAuth.service.js";
 
 
@@ -105,6 +106,7 @@ app.use(
 );
 
 app.use("/api/admin", adminRoutes);
+app.use("/api/auth", authRoutes);
 
 
 

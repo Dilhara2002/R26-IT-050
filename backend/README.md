@@ -78,15 +78,16 @@ The supported variables are:
 | Variable | Purpose |
 | --- | --- |
 | `PORT` | HTTP port; defaults to `5001`. |
-| `MONGO_URI` | Optional MongoDB connection string. |
+| `MONGO_URI` | MongoDB connection string for user accounts and saved itineraries; itinerary generation still works when unavailable. |
 | `NEO4J_URI` | Neo4j Bolt URI; default is `bolt://localhost:7687`. |
 | `NEO4J_USERNAME` | Neo4j username; default is `neo4j`. |
 | `NEO4J_PASSWORD` | Neo4j password. |
 | `OPENWEATHER_API_KEY` | OpenWeather API key for trip weather context. |
 | `GEOAPIFY_API_KEY` | Geoapify API key for location typo/autocomplete fallback. |
 | `PYTHON_BIN` | Optional Python interpreter override; defaults to `.venv311/bin/python`. |
-| `GEMINI_API_KEY` | Optional; enables Gemini responses in the landmark tour guide. Local knowledge-base replies work without it. |
-| `GEMINI_MODEL` | Optional Gemini model ID; defaults to `gemini-3.5-flash`. |
+| `GEMINI_API_KEY` | Optional; enables Gemini explanations in the Python AI services. Deterministic itinerary generation works without it. |
+| `GEMINI_MODEL` | Optional Gemini model ID; defaults to `gemini-3.5-flash-lite`. |
+| `USER_TOKEN_SECRET` | Signing secret for ordinary user sessions; set a long independent production value. Without it, a random process-local secret invalidates sessions on restart. |
 | `LANDMARK_ENABLE_SVM` | Optional `true`/`false`; defaults to `true` for the trained SVM recognizer. MobileNetV2 feature weights download once and are cached; TFLite is the automatic fallback. |
 
 Never commit `.env`, credentials, API keys, passwords, tokens, or connection strings. Use `.env.example` as the template, rotate any credential that has ever been exposed, and do not include secrets in logs, documentation, or screenshots.

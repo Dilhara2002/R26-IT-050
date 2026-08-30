@@ -1,7 +1,12 @@
 import {
   generateItineraryFromAI
 } from "../services/itinerary.service.js";
-import Itinerary from "../models/Itinerary.js";
+import mongoose from "mongoose";
+import {
+  deleteOwnedItinerary,
+  listOwnedItineraries,
+  persistGeneratedItinerarySafely,
+} from "../services/itineraryPersistence.service.js";
 
 const requireFiniteNumber = (value, field, minimum, maximum, fallback) => {
   const candidate = value === undefined ? fallback : value;
@@ -149,67 +154,10 @@ export const optimizeItinerary = async (req, res) => {
     ) {
 
 
-      const newTrip = new Itinerary({
-
-        userPreferences:
-          aiResponse.data.user_preferences,
-
-
-        maxTimeAllocatedMins:
-          aiResponse.data.max_time_allocated_mins,
-
-
-        estimatedTimeRequired:
-          aiResponse.data.estimated_time_required,
-
-
-        optimizedRoute:
-          aiResponse.data.optimized_route,
-
-
-        aiSummary:
-          aiResponse.data.ai_summary,
-
-
-        searchRadiusKm:
-          aiResponse.data.search_radius_km,
-
-
-        startingLocation:
-          aiResponse.data.starting_location
-
+      aiResponse.persistence = await persistGeneratedItinerarySafely({
+        ownerUserId: req.user?._id,
+        itineraryData: aiResponse.data,
       });
-
-
-
-      if (Itinerary.db.readyState === 1) {
-        try {
-          await newTrip.save();
-          aiResponse.persistence = {
-            status: "saved",
-            saved: true
-          };
-          console.log(
-            "New itinerary saved to database successfully!"
-          );
-        } catch {
-          aiResponse.persistence = {
-            status: "failed",
-            saved: false
-          };
-          console.warn(
-            "Itinerary persistence failed; returning the optimized itinerary without saving."
-          );
-        }
-      } else {
-        aiResponse.persistence = {
-          status: "skipped",
-          saved: false
-        };
-        console.warn(
-          "Itinerary persistence skipped because MongoDB is not connected."
-        );
-      }
 
     }
 
@@ -241,4 +189,33 @@ export const optimizeItinerary = async (req, res) => {
 
   }
 
+};
+
+export const getSavedItineraries = async (req, res) => {
+  const itineraries = await listOwnedItineraries(req.user._id);
+  if (itineraries === null) {
+    return res.status(503).json({ success: false, message: "Saved itineraries are temporarily unavailable." });
+  }
+  return res.json({
+    success: true,
+    itineraries: itineraries.map((trip) => ({
+      id: String(trip._id),
+      createdAt: trip.createdAt,
+      data: trip.itineraryData,
+    })),
+  });
+};
+
+export const removeSavedItinerary = async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({ success: false, message: "Invalid itinerary ID." });
+  }
+  const deleted = await deleteOwnedItinerary(req.user._id, req.params.id);
+  if (deleted === null) {
+    return res.status(503).json({ success: false, message: "Saved itineraries are temporarily unavailable." });
+  }
+  if (!deleted) {
+    return res.status(404).json({ success: false, message: "Itinerary not found." });
+  }
+  return res.json({ success: true });
 };

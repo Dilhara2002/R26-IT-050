@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -57,7 +57,8 @@ function withTimeout(promise, timeoutMs) {
   });
 }
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation, route }) {
+  const authToken = route.params?.authToken || "";
   const [preferences, setPreferences] = useState([]);
   const [hours, setHours] = useState("");
   const [minutes, setMinutes] = useState("");
@@ -72,10 +73,42 @@ export default function HomeScreen({ navigation }) {
   );
   const [errors, setErrors] = useState({});
   const [requestError, setRequestError] = useState(null);
+  const [savedItineraries, setSavedItineraries] = useState([]);
+  const [savedStatus, setSavedStatus] = useState("");
   const latitudeRef = useRef(null);
   const longitudeRef = useRef(null);
   const hoursRef = useRef(null);
   const radiusRef = useRef(null);
+
+  const authConfig = useMemo(() => ({
+    headers: { Authorization: `Bearer ${authToken}` },
+  }), [authToken]);
+
+  const loadSavedItineraries = async () => {
+    if (!authToken) return;
+    try {
+      setSavedStatus("Loading saved itineraries…");
+      const response = await API.get("/", authConfig);
+      setSavedItineraries(response.data?.itineraries || []);
+      setSavedStatus("");
+    } catch (error) {
+      setSavedStatus(error.response?.data?.message || "Saved itineraries are unavailable.");
+    }
+  };
+
+  useEffect(() => {
+    loadSavedItineraries();
+  }, [authToken]);
+
+  const deleteSavedItinerary = async (id) => {
+    try {
+      await API.delete(`/${id}`, authConfig);
+      setSavedItineraries((current) => current.filter((trip) => trip.id !== id));
+      setSavedStatus("Saved itinerary deleted.");
+    } catch (error) {
+      setSavedStatus(error.response?.data?.message || "The saved itinerary could not be deleted.");
+    }
+  };
 
   const parsedLatitude = Number(String(latitude).trim());
   const parsedLongitude = Number(String(longitude).trim());
@@ -209,11 +242,12 @@ export default function HomeScreen({ navigation }) {
         current_lon: validation.values.longitude,
         ...(validation.values.radiusKm === null ? {} : { radius_km: validation.values.radiusKm }),
       };
-      const response = await API.post("/optimize", payload);
+      const response = await API.post("/optimize", payload, authConfig);
       if (response.data?.status === "success" && response.data?.data) {
         navigation.navigate("ItineraryResult", {
           data: response.data.data,
           persistence: response.data.persistence,
+          authToken,
         });
         return;
       }
@@ -236,6 +270,37 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.subtitle}>
           Choose a start, interests, time budget, and optional travel radius. The planner uses a bounded catalogue of 40 source-traced places.
         </Text>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.savedTitle}>Your saved itineraries</Text>
+        <Text style={styles.savedHelper}>Only plans saved under your signed-in account are shown here.</Text>
+        {savedStatus ? <Text style={styles.savedStatus}>{savedStatus}</Text> : null}
+        {savedItineraries.length ? savedItineraries.map((trip) => (
+          <View key={trip.id} style={styles.savedRow}>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => navigation.navigate("ItineraryResult", {
+                data: trip.data,
+                persistence: { status: "saved", saved: true, itineraryId: trip.id },
+                authToken,
+              })}
+              style={styles.savedOpen}
+            >
+              <Text style={styles.savedName}>
+                {(trip.data?.optimized_stops || []).map((stop) => stop.name).join(" → ") || "Saved itinerary"}
+              </Text>
+              <Text style={styles.savedDate}>{new Date(trip.createdAt).toLocaleString()}</Text>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => deleteSavedItinerary(trip.id)}
+              style={styles.savedDelete}
+            >
+              <Text style={styles.savedDeleteText}>Delete</Text>
+            </Pressable>
+          </View>
+        )) : !savedStatus ? <Text style={styles.savedEmpty}>No saved itineraries yet.</Text> : null}
       </View>
 
       <View style={styles.card}>
@@ -449,6 +514,16 @@ const styles = StyleSheet.create({
   title: { color: "#FFFFFF", fontSize: 30, lineHeight: 37, fontWeight: "900", maxWidth: 720 },
   subtitle: { color: "#DBEAFE", fontSize: 16, lineHeight: 24, marginTop: 12, maxWidth: 760 },
   card: { backgroundColor: "#FFFFFF", borderRadius: 20, padding: 18, marginBottom: 14, borderWidth: 1, borderColor: "#DCE4EE", elevation: 2 },
+  savedTitle: { color: "#0F172A", fontSize: 19, lineHeight: 24, fontWeight: "900" },
+  savedHelper: { color: "#475569", fontSize: 14, lineHeight: 20, marginTop: 4, marginBottom: 10 },
+  savedStatus: { color: "#475569", fontWeight: "700", marginVertical: 8 },
+  savedEmpty: { color: "#64748B", marginTop: 6 },
+  savedRow: { flexDirection: "row", alignItems: "center", borderTopWidth: 1, borderTopColor: "#E2E8F0", paddingVertical: 11 },
+  savedOpen: { flex: 1, minWidth: 0, paddingRight: 10 },
+  savedName: { color: "#1D4ED8", fontWeight: "900", lineHeight: 20 },
+  savedDate: { color: "#64748B", fontSize: 12, marginTop: 3 },
+  savedDelete: { borderWidth: 1, borderColor: "#FCA5A5", backgroundColor: "#FEF2F2", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9 },
+  savedDeleteText: { color: "#B91C1C", fontWeight: "900" },
   stepHeader: { flexDirection: "row", alignItems: "flex-start", marginBottom: 16 },
   stepNumber: { width: 34, height: 34, borderRadius: 17, textAlign: "center", backgroundColor: "#DBEAFE", color: "#1D4ED8", fontWeight: "900", fontSize: 16, marginRight: 12, paddingTop: 7 },
   stepCopy: { flex: 1, minWidth: 0 },

@@ -23,6 +23,7 @@ import HotelHomeScreen from "./src/screens/HotelHomeScreen";
 import HotelResultsScreen from "./src/screens/HotelResultsScreen";
 import AdminPricingScreen from "./src/screens/AdminPricingScreen";
 import { adminLogin } from "./src/api/adminApi";
+import { loginUser, registerUser } from "./src/api/authApi";
 
 const Stack = createNativeStackNavigator();
 
@@ -30,6 +31,7 @@ function MainFlow({ navigation, route }) {
   const [screen, setScreen] = useState("welcome");
   const [user, setUser] = useState(null);
   const [adminToken, setAdminToken] = useState(null);
+  const [userToken, setUserToken] = useState(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
@@ -55,7 +57,7 @@ function MainFlow({ navigation, route }) {
   }, [route.params?.hotelSafetyRequest]);
 
   const handleAuth = async ({ name, email, password }) => {
-    if (screen === "adminLogin" || screen === "login") {
+    if (screen === "adminLogin") {
       try {
         const admin = await adminLogin(email, password);
         if (admin?.user?.role === "admin") {
@@ -64,14 +66,21 @@ function MainFlow({ navigation, route }) {
           setScreen("admin");
           return;
         }
+        throw new Error("Administrator account required.");
       } catch (error) {
-        if (screen === "adminLogin") {
-          throw new Error(error.response?.data?.message || "Cannot connect to the administrator login service.");
-        }
+        throw new Error(error.response?.data?.message || "Cannot connect to the administrator login service.");
       }
     }
-    setUser({ name: name?.trim() || email.split("@")[0], email });
-    setScreen("dashboard");
+    try {
+      const account = screen === "register"
+        ? await registerUser(name, email, password)
+        : await loginUser(email, password);
+      setUser(account.user);
+      setUserToken(account.token);
+      setScreen("dashboard");
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Cannot connect to the user account service.");
+    }
   };
 
   const handleSubmit = async () => {
@@ -116,7 +125,7 @@ function MainFlow({ navigation, route }) {
   };
 
   const openModule = (id) => {
-    if (id === "sasanka") navigation.navigate("ItineraryHome");
+    if (id === "sasanka") navigation.navigate("ItineraryHome", { authToken: userToken });
     else if (id === "dunith") navigation.navigate("HotelHome");
     else if (id === "ishan") { setHotelContext(null); setScreen("form"); }
     else if (id === "madush") navigation.navigate("LandmarkScanner");
@@ -126,6 +135,7 @@ function MainFlow({ navigation, route }) {
   const logout = () => {
     setUser(null);
     setAdminToken(null);
+    setUserToken(null);
     setScreen("welcome");
   };
 
