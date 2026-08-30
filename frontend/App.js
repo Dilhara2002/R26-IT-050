@@ -45,6 +45,12 @@ function MainFlow({ navigation, route }) {
     const hotelDestination = [hotelName, selectedHotel.district, "Sri Lanka"]
       .filter((value, index, values) => value && values.indexOf(value) === index)
       .join(", ");
+    const hotelLatitude = Number(selectedHotel.latitude);
+    const hotelLongitude = Number(selectedHotel.longitude);
+    const routeDestination =
+      Number.isFinite(hotelLatitude) && Number.isFinite(hotelLongitude)
+        ? `geo:${hotelLatitude},${hotelLongitude}|${hotelDestination}`
+        : hotelDestination;
     consumedHotelRequest.current = request.id;
     setHotelContext(request);
     setResult(null);
@@ -53,7 +59,7 @@ function MainFlow({ navigation, route }) {
       budget: String(request.vehicleRequest?.totalBudget || ""),
       passengers: String(request.vehicleRequest?.passengers || ""),
       startLocation: request.vehicleRequest?.startLocation || "",
-      endLocation: hotelDestination,
+      endLocation: routeDestination,
       preferredCategory: request.vehicleRequest?.preferredCategory || "",
     });
     setScreen("form");

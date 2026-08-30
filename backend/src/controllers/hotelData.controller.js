@@ -142,6 +142,8 @@ export const generatePackageFromPrompt = async (req, res) => {
           id: hotelPackage.hotelId,
           name: hotelPackage.hotelName,
           district: hotelPackage.district,
+          latitude: Number(hotelPackage.hotelLatitude),
+          longitude: Number(hotelPackage.hotelLongitude),
           grade: hotelPackage.grade,
           foodType: hotelPackage.foodType,
           category: hotelPackage.hotelCategory,

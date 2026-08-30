@@ -34,6 +34,10 @@ const GEOAPIFY_MATCH_THRESHOLD = 0.72;
 // Its candidate must still resemble the user's original text.
 const OLLAMA_MATCH_THRESHOLD = 0.68;
 
+const OLLAMA_LOCATION_RESOLVER_ENABLED =
+  String(process.env.ENABLE_OLLAMA_LOCATION_RESOLVER || "false").toLowerCase() ===
+  "true";
+
 
 // ==================================================
 // Text helpers
@@ -69,6 +73,37 @@ const formatSriLankaLocation = (location) => {
   }
 
   return `${text}, Sri Lanka`;
+};
+
+const getTrustedCoordinateLocation = (location) => {
+  const match = String(location || "").match(
+    /^geo:(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)\|(.+)$/
+  );
+  if (!match) return null;
+
+  const latitude = Number(match[1]);
+  const longitude = Number(match[2]);
+  const label = match[3].trim();
+  if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude) ||
+    latitude < -90 ||
+    latitude > 90 ||
+    longitude < -180 ||
+    longitude > 180 ||
+    !label
+  ) {
+    return null;
+  }
+
+  return {
+    latitude,
+    longitude,
+    label,
+    correctedName: label,
+    source: "Selected hotel coordinates",
+    similarity: 1,
+  };
 };
 
 
@@ -705,6 +740,11 @@ const geocodeLocation = async (
     throw error;
   }
 
+  const trustedCoordinateLocation = getTrustedCoordinateLocation(cleanLocation);
+  if (trustedCoordinateLocation) {
+    return trustedCoordinateLocation;
+  }
+
 
   // ----------------------------------------------
   // 1. Nominatim direct lookup
@@ -802,10 +842,9 @@ const geocodeLocation = async (
   // ----------------------------------------------
 
   try {
-    const ollamaResult =
-      await geocodeWithOllamaCandidates(
-        cleanLocation
-      );
+    const ollamaResult = OLLAMA_LOCATION_RESOLVER_ENABLED
+      ? await geocodeWithOllamaCandidates(cleanLocation)
+      : null;
 
 
     if (ollamaResult) {

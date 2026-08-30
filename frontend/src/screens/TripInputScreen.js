@@ -161,7 +161,11 @@ export default function TripInputScreen({
               <Text style={styles.lockedDestinationName}>
                 {hotelContext.selectedHotel?.hotel?.name || "Selected hotel"}
               </Text>
-              <Text style={styles.lockedDestinationAddress}>{form.endLocation}</Text>
+              <Text style={styles.lockedDestinationAddress}>
+                {[hotelContext.selectedHotel?.hotel?.district, "Sri Lanka"]
+                  .filter(Boolean)
+                  .join(", ")}
+              </Text>
               <Text style={styles.lockedDestinationNote}>
                 Automatically selected from your hotel plan
               </Text>
