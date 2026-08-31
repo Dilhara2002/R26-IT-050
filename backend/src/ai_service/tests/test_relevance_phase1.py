@@ -145,6 +145,10 @@ class WeakLabelTests(unittest.TestCase):
         self.assertEqual(exported, self.rows)
 
 
+@unittest.skipUnless(
+    REVIEW_A.is_file() and REVIEW_B.is_file(),
+    "Blank reviewer workbook artifacts are not present in this checkout.",
+)
 class ReviewerWorkbookTests(unittest.TestCase):
     def test_packets_have_required_sheets_and_independent_blank_rows(self):
         self.assertEqual(workbook_sheet_names(REVIEW_A), ["Judgements", "Rubric", "POI Reference"])

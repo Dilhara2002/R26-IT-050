@@ -120,7 +120,7 @@ def make_guide_output(stops):
 
 
 def make_guide_response_from_request(*_args, **kwargs):
-    prompt = kwargs["json"]["input"]
+    prompt = kwargs["json"]["contents"][0]["parts"][0]["text"]
     names = []
     for line in prompt.splitlines():
         if line.startswith("Stop ") and " | exact name: " in line:
@@ -137,11 +137,8 @@ def make_guide_response_from_request(*_args, **kwargs):
     response = mock.Mock()
     response.raise_for_status.return_value = None
     response.json.return_value = {
-        "steps": [
-            {
-                "type": "model_output",
-                "content": [{"type": "text", "text": make_guide_output(stops)}],
-            }
+        "candidates": [
+            {"content": {"parts": [{"text": make_guide_output(stops)}]}}
         ]
     }
     return response
@@ -592,7 +589,7 @@ class ModelTestCase(unittest.TestCase):
                 )
                 self.assertIsNone(summary)
 
-    def test_gemini_interactions_request_and_successful_final_model_output(self):
+    def test_gemini_generate_content_request_and_successful_model_output(self):
         stops = make_guide_stops(4)
         guide_output = make_guide_output(stops)
         response = mock.Mock()
@@ -621,7 +618,10 @@ class ModelTestCase(unittest.TestCase):
             )
         self.assertEqual(summary, guide_output)
         self.assertEqual(post.call_count, 1)
-        self.assertEqual(post.call_args.args, (model.GEMINI_INTERACTIONS_URL,))
+        self.assertEqual(
+            post.call_args.args,
+            (f"{model.GEMINI_API_BASE_URL}/gemini-test-model:generateContent",),
+        )
         self.assertEqual(
             post.call_args.kwargs["headers"],
             {
@@ -630,10 +630,8 @@ class ModelTestCase(unittest.TestCase):
             },
         )
         request_body = post.call_args.kwargs["json"]
-        self.assertEqual(set(request_body), {"model", "input", "store"})
-        self.assertEqual(request_body["model"], "gemini-test-model")
-        self.assertFalse(request_body["store"])
-        prompt = request_body["input"]
+        self.assertEqual(set(request_body), {"contents", "generationConfig"})
+        prompt = request_body["contents"][0]["parts"][0]["text"]
         self.assertIn("Selected interests: Nature, Culture", prompt)
         self.assertIn("planned visit: 60 minutes", prompt)
         self.assertIn("exactly one section for every supplied stop", prompt)
@@ -655,6 +653,29 @@ class ModelTestCase(unittest.TestCase):
         self.assertNotIn("AIza-valid-looking-test-key", success_log)
         self.assertNotIn("Deterministic evidence summary.", success_log)
         self.assertNotIn(guide_output, success_log)
+
+    def test_gemini_oauth_style_token_uses_bearer_authorization(self):
+        stops = make_guide_stops(1)
+        response = mock.Mock()
+        response.raise_for_status.return_value = None
+        response.json.return_value = {
+            "candidates": [
+                {"content": {"parts": [{"text": make_guide_output(stops)}]}}
+            ]
+        }
+        token = "AQ.test-oauth-style-token"
+        with mock.patch.object(model.requests, "post", return_value=response) as post:
+            summary = model.generate_itinerary_summary(
+                stops,
+                ["Nature"],
+                token,
+                itinerary_context=make_guide_context(),
+            )
+        self.assertIsNotNone(summary)
+        self.assertEqual(
+            post.call_args.kwargs["headers"],
+            {"Content-Type": "application/json", "Authorization": f"Bearer {token}"},
+        )
 
     def test_gemini_defaults_model_and_selects_final_valid_model_output(self):
         stops = make_guide_stops(1)
@@ -695,7 +716,8 @@ class ModelTestCase(unittest.TestCase):
         self.assertEqual(summary, final_output)
         self.assertEqual(model.DEFAULT_GEMINI_MODEL, "gemini-3.5-flash-lite")
         self.assertEqual(
-            post.call_args.kwargs["json"]["model"], model.DEFAULT_GEMINI_MODEL
+            post.call_args.args[0],
+            f"{model.GEMINI_API_BASE_URL}/{model.DEFAULT_GEMINI_MODEL}:generateContent",
         )
 
     def test_official_steps_join_text_in_order_and_ignore_unsupported_content(self):

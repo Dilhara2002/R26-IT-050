@@ -36,9 +36,7 @@ CATALOGUE_POI_COUNT = sum(EXPECTED_DISTRICT_COUNTS.values())
 VERIFIED_STATUS = "source_trace_verified"
 QUARANTINED_LEGACY_IDS = {"79"}
 GEMINI_REQUEST_TIMEOUT = (2, 10)
-GEMINI_INTERACTIONS_URL = (
-    "https://generativelanguage.googleapis.com/v1beta/interactions"
-)
+GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite"
 MAX_GEMINI_GUIDE_CHARS = 8000
 MAX_GEMINI_PROMPT_CHARS = 12000
@@ -1423,6 +1421,17 @@ def _is_usable_gemini_key(api_key):
     return normalized not in GEMINI_PLACEHOLDER_KEYS
 
 
+def _gemini_auth_headers(credential):
+    """Support Google API keys and OAuth-style access tokens without logging either."""
+    token = credential.strip()
+    headers = {"Content-Type": "application/json"}
+    if token.startswith("AIza"):
+        headers["x-goog-api-key"] = token
+    else:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
+
+
 def _guide_has_required_sections(text, expected_place_names):
     """Validate the presentation contract without interpreting untrusted markup."""
     if not isinstance(text, str) or not re.search(
@@ -1445,9 +1454,29 @@ def _guide_has_required_sections(text, expected_place_names):
 
 
 def _final_gemini_model_output(payload, expected_place_names=None):
-    """Return bounded text from the final valid Interactions model-output step."""
+    """Return bounded text from generateContent or the legacy preview response."""
     if not isinstance(payload, dict):
         return None
+
+    candidates = payload.get("candidates")
+    if isinstance(candidates, list):
+        for candidate in candidates:
+            parts = candidate.get("content", {}).get("parts", []) if isinstance(candidate, dict) else []
+            text = "".join(
+                part.get("text", "")
+                for part in parts
+                if isinstance(part, dict) and isinstance(part.get("text"), str)
+            ).strip()
+            if (
+                text
+                and len(text) <= MAX_GEMINI_GUIDE_CHARS
+                and (
+                    not expected_place_names
+                    or _guide_has_required_sections(text, expected_place_names)
+                )
+            ):
+                return text
+
     steps = payload.get("steps")
     if not isinstance(steps, list):
         # Compatibility with responses used by the earlier preview transport.
@@ -1655,13 +1684,17 @@ def generate_itinerary_summary(
 
     response = None
     try:
+        request_url = f"{GEMINI_API_BASE_URL}/{gemini_model}:generateContent"
         response = requests.post(
-            GEMINI_INTERACTIONS_URL,
-            headers={
-                "x-goog-api-key": api_key,
-                "Content-Type": "application/json",
+            request_url,
+            headers=_gemini_auth_headers(api_key),
+            json={
+                "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+                "generationConfig": {
+                    "temperature": 0.3,
+                    "maxOutputTokens": 2048,
+                },
             },
-            json={"model": gemini_model, "input": prompt, "store": False},
             timeout=GEMINI_REQUEST_TIMEOUT,
         )
         response.raise_for_status()
@@ -1688,4 +1721,3 @@ def generate_itinerary_summary(
     except (ValueError, TypeError, KeyError, IndexError):
         _log_gemini_failure("malformed_output", gemini_model, started_at)
         return None
-

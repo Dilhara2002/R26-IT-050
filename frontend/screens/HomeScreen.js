@@ -28,7 +28,7 @@ const CENTRAL_PROVINCE_BOUNDS = {
 };
 const LOCATION_TIMEOUT_MS = 8000;
 const AVAILABLE_INTERESTS = [
-  "History", "Nature", "Wildlife", "Culture", "Adventure", "City", "Beach", "Religion",
+  "History", "Nature", "Wildlife", "Culture", "Adventure", "City", "Religion",
 ];
 
 const isSupportedStartingPoint = (latitude, longitude) =>
