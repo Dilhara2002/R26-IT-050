@@ -11,6 +11,7 @@ import {
 
 import { colors } from "../styles/colors";
 import { searchSriLankanLocations } from "../api/locationApi";
+import MobileBackButton from "../components/MobileBackButton";
 
 const vehicleCategories = [
   "All",
@@ -22,6 +23,11 @@ const vehicleCategories = [
   "Luxury",
 ];
 
+const locationDisplayValue = (value) => {
+  const match = String(value || "").match(/^geo:[^|]+\|(.+)$/);
+  return match ? match[1] : value;
+};
+
 export default function TripInputScreen({
   form,
   setForm,
@@ -29,6 +35,7 @@ export default function TripInputScreen({
   onSubmit,
   onBack,
   hotelContext,
+  onPickLocation,
 }) {
   const [startSuggestions, setStartSuggestions] = useState([]);
   const [endSuggestions, setEndSuggestions] = useState([]);
@@ -87,9 +94,7 @@ export default function TripInputScreen({
       contentContainerStyle={styles.contentContainer}
       showsVerticalScrollIndicator={false}
     >
-      <TouchableOpacity onPress={onBack}>
-        <Text style={styles.backText}>← Back</Text>
-      </TouchableOpacity>
+      <MobileBackButton onPress={onBack} style={styles.backControl} />
 
       <View style={styles.hero}>
         <Text style={styles.heroBadge}>✦ AI SAFE JOURNEY PLANNER</Text>
@@ -105,7 +110,7 @@ export default function TripInputScreen({
           <View style={styles.hotelBridgeCopy}>
             <Text style={styles.hotelBridgeLabel}>ISHAN SAFE JOURNEY ANALYSIS</Text>
             <Text style={styles.hotelBridgeTitle}>{hotelContext.selectedHotel?.hotel?.name || "Selected hotel"}</Text>
-            <Text style={styles.hotelBridgeText}>Route details were received from your hotel plan. Total trip budget: LKR {Number(hotelContext.vehicleRequest?.totalBudget || 0).toLocaleString()}.</Text>
+            <Text style={styles.hotelBridgeText}>Route and passenger details were received from your hotel plan. The recommended vehicle cost will be added to the selected hotel price.</Text>
           </View>
         </View>
       )}
@@ -135,11 +140,12 @@ export default function TripInputScreen({
       <Text style={styles.label}>Start Location</Text>
       <TextInput
         style={styles.input}
-        value={form.startLocation}
+        value={locationDisplayValue(form.startLocation)}
         onChangeText={(value) => handleLocationSearch("startLocation", value)}
         placeholder="Example: Colombo"
         placeholderTextColor={colors.muted}
       />
+      {!hotelContext && <TouchableOpacity style={styles.mapPickerButton} onPress={() => onPickLocation("startLocation")}><Text style={styles.mapPickerText}>⌖ Select start on map (optional)</Text></TouchableOpacity>}
 
       {startSuggestions.length > 0 && (
         <View style={styles.suggestionBox}>
@@ -152,24 +158,50 @@ export default function TripInputScreen({
         </View>
       )}
 
-      <Text style={styles.label}>End Location</Text>
-      <TextInput
-        style={styles.input}
-        value={form.endLocation}
-        onChangeText={(value) => handleLocationSearch("endLocation", value)}
-        placeholder="Example: Kandy"
-        placeholderTextColor={colors.muted}
-      />
-
-      {endSuggestions.length > 0 && (
-        <View style={styles.suggestionBox}>
-          <FlatList
-            data={endSuggestions}
-            keyExtractor={(item, index) => `${item.displayName}-${index}`}
-            renderItem={({ item }) => renderSuggestion("endLocation", item)}
-            scrollEnabled={false}
+      {hotelContext ? (
+        <>
+          <Text style={styles.label}>Destination Hotel</Text>
+          <View style={styles.lockedDestination}>
+            <Text style={styles.lockedDestinationIcon}>🏨</Text>
+            <View style={styles.lockedDestinationCopy}>
+              <Text style={styles.lockedDestinationName}>
+                {hotelContext.selectedHotel?.hotel?.name || "Selected hotel"}
+              </Text>
+              <Text style={styles.lockedDestinationAddress}>
+                {[hotelContext.selectedHotel?.hotel?.district, "Sri Lanka"]
+                  .filter(Boolean)
+                  .join(", ")}
+              </Text>
+              <Text style={styles.lockedDestinationNote}>
+                Automatically selected from your hotel plan
+              </Text>
+            </View>
+            <Text style={styles.lockedDestinationBadge}>LOCKED</Text>
+          </View>
+        </>
+      ) : (
+        <>
+          <Text style={styles.label}>End Location</Text>
+          <TextInput
+            style={styles.input}
+            value={locationDisplayValue(form.endLocation)}
+            onChangeText={(value) => handleLocationSearch("endLocation", value)}
+            placeholder="Example: Kandy"
+            placeholderTextColor={colors.muted}
           />
-        </View>
+          <TouchableOpacity style={styles.mapPickerButton} onPress={() => onPickLocation("endLocation")}><Text style={styles.mapPickerText}>⌖ Select end on map (optional)</Text></TouchableOpacity>
+
+          {endSuggestions.length > 0 && (
+            <View style={styles.suggestionBox}>
+              <FlatList
+                data={endSuggestions}
+                keyExtractor={(item, index) => `${item.displayName}-${index}`}
+                renderItem={({ item }) => renderSuggestion("endLocation", item)}
+                scrollEnabled={false}
+              />
+            </View>
+          )}
+        </>
       )}
 
       <Text style={styles.label}>Vehicle Category</Text>
@@ -206,7 +238,11 @@ export default function TripInputScreen({
         disabled={loading}
       >
         <Text style={styles.buttonText}>
-          {loading ? "Analyzing..." : "Recommend Vehicle"}
+          {loading
+            ? "Analyzing..."
+            : hotelContext
+              ? "Analyze Hotel Route & Recommend Vehicle"
+              : "Recommend Vehicle"}
         </Text>
       </TouchableOpacity>
     </ScrollView>
@@ -225,10 +261,7 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 48,
   },
-  backText: {
-    color: colors.primary,
-    fontSize: 16,
-    fontWeight: "700",
+  backControl: {
     marginTop: 10,
     marginBottom: 16,
   },
@@ -292,6 +325,50 @@ const styles = StyleSheet.create({
     shadowColor: "#241F18",
     shadowOpacity: 0.05,
     shadowRadius: 10,
+  },
+  mapPickerButton:{alignSelf:"flex-start",marginTop:8,paddingVertical:7,paddingHorizontal:11,borderRadius:12,backgroundColor:colors.backgroundDeep,borderWidth:1,borderColor:colors.border},
+  mapPickerText:{color:colors.primary,fontSize:12,fontWeight:"800"},
+  lockedDestination: {
+    backgroundColor: colors.card,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    borderRadius: 16,
+    padding: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 11,
+  },
+  lockedDestinationIcon: {
+    fontSize: 24,
+  },
+  lockedDestinationCopy: {
+    flex: 1,
+  },
+  lockedDestinationName: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: "800",
+  },
+  lockedDestinationAddress: {
+    color: colors.muted,
+    fontSize: 12,
+    marginTop: 3,
+  },
+  lockedDestinationNote: {
+    color: colors.primary,
+    fontSize: 10,
+    fontWeight: "700",
+    marginTop: 5,
+  },
+  lockedDestinationBadge: {
+    color: colors.primary,
+    backgroundColor: colors.backgroundDeep,
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    fontSize: 9,
+    fontWeight: "900",
+    letterSpacing: 0.7,
   },
   suggestionBox: {
     backgroundColor: colors.card,

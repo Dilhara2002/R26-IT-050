@@ -53,3 +53,5 @@ htmlcov/
 .DS_Store
 Thumbs.db*.zip
 *.zip
+config.bat
+node_modules

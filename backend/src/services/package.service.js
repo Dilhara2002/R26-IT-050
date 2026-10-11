@@ -75,3 +75,29 @@ export const findMatchingPackages = async (preferences) => {
     await session.close();
   }
 };
+
+export const findHotelById = async (hotelId) => {
+  const session = driver.session();
+  try {
+    const result = await session.run(
+      `
+      MATCH (h:Hotel {hotel_id: $hotelId})-[:LOCATED_IN]->(d:District)
+      RETURN
+        h.hotel_id AS hotelId,
+        h.name AS hotelName,
+        h.category AS hotelCategory,
+        h.final_grade AS grade,
+        h.food_type AS foodType,
+        h.rooms AS rooms,
+        h.latitude AS hotelLatitude,
+        h.longitude AS hotelLongitude,
+        d.name AS district
+      LIMIT 1
+      `,
+      { hotelId }
+    );
+    return result.records[0]?.toObject() || null;
+  } finally {
+    await session.close();
+  }
+};

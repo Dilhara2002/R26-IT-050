@@ -22,8 +22,10 @@ import LandmarkChatScreen from "./screens/LandmarkChatScreen";
 import HotelHomeScreen from "./src/screens/HotelHomeScreen";
 import HotelResultsScreen from "./src/screens/HotelResultsScreen";
 import AdminPricingScreen from "./src/screens/AdminPricingScreen";
+import LocationPickerScreen from "./src/screens/LocationPickerScreen";
 import { adminLogin } from "./src/api/adminApi";
 import { loginUser, registerUser } from "./src/api/authApi";
+import MobileBackButton from "./src/components/MobileBackButton";
 
 const Stack = createNativeStackNavigator();
 
@@ -37,24 +39,46 @@ function MainFlow({ navigation, route }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [hotelContext, setHotelContext] = useState(null);
   const consumedHotelRequest = useRef(null);
+  const consumedLocationSelection = useRef(null);
   const [form, setForm] = useState({ budget: "", passengers: "", startLocation: "", endLocation: "", preferredCategory: "" });
 
   useEffect(() => {
     const request = route.params?.hotelSafetyRequest;
     if (!request || consumedHotelRequest.current === request.id) return;
+    const selectedHotel = request.selectedHotel?.hotel || {};
+    const hotelName = selectedHotel.name || selectedHotel.hotelName || "";
+    const hotelDestination = [hotelName, selectedHotel.district, "Sri Lanka"]
+      .filter((value, index, values) => value && values.indexOf(value) === index)
+      .join(", ");
+    const hotelLatitude = Number(selectedHotel.latitude);
+    const hotelLongitude = Number(selectedHotel.longitude);
+    const routeDestination =
+      Number.isFinite(hotelLatitude) && Number.isFinite(hotelLongitude)
+        ? `geo:${hotelLatitude},${hotelLongitude}|${hotelDestination}`
+        : hotelDestination;
     consumedHotelRequest.current = request.id;
     setHotelContext(request);
     setResult(null);
     setErrorMessage("");
     setForm({
-      budget: String(request.vehicleRequest?.totalBudget || ""),
+      budget: "",
       passengers: String(request.vehicleRequest?.passengers || ""),
       startLocation: request.vehicleRequest?.startLocation || "",
-      endLocation: request.selectedHotel?.hotel?.district || request.selectedHotel?.hotel?.name || "",
+      endLocation: routeDestination,
       preferredCategory: request.vehicleRequest?.preferredCategory || "",
     });
     setScreen("form");
   }, [route.params?.hotelSafetyRequest]);
+
+  useEffect(() => {
+    const selection = route.params?.locationSelection;
+    if (!selection || consumedLocationSelection.current === selection.id) return;
+    if (selection.field !== "startLocation" && selection.field !== "endLocation") return;
+    consumedLocationSelection.current = selection.id;
+    setHotelContext(null);
+    setForm((current) => ({ ...current, [selection.field]: selection.value }));
+    setScreen("form");
+  }, [route.params?.locationSelection]);
 
   const handleAuth = async ({ name, email, password }) => {
     if (screen === "adminLogin") {
@@ -89,7 +113,9 @@ function MainFlow({ navigation, route }) {
       setResult(null);
       setErrorMessage("");
       const response = await getLowerRiskRoute({
-        budget: Number(form.budget),
+        ...(hotelContext?.vehicleRequest?.estimateVehicleCost
+          ? { estimateVehicleCost: true }
+          : { budget: Number(form.budget) }),
         passengers: Number(form.passengers),
         startLocation: form.startLocation.trim(),
         endLocation: form.endLocation.trim(),
@@ -160,7 +186,7 @@ function MainFlow({ navigation, route }) {
       {screen === "dashboard" && <DashboardScreen user={user} onOpenModule={openModule} onLogout={logout} />}
       {screen === "admin" && <AdminPricingScreen user={user} token={adminToken} onLogout={logout} />}
       {screen.startsWith("module:") && <ModuleScreen moduleId={screen.split(":")[1]} onBack={() => setScreen("dashboard")} />}
-      {screen === "form" && <TripInputScreen form={form} setForm={setForm} loading={loading} onSubmit={handleSubmit} onBack={leaveSafetyForm} hotelContext={hotelContext} />}
+      {screen === "form" && <TripInputScreen form={form} setForm={setForm} loading={loading} onSubmit={handleSubmit} onBack={leaveSafetyForm} hotelContext={hotelContext} onPickLocation={(field) => navigation.navigate("LocationPicker", { field })} />}
       {screen === "result" && <SafetyResultScreen result={result} errorMessage={errorMessage} onBack={() => setScreen("form")} onNewSearch={handleNewSearch} onShowMap={(selectedRoute) => navigation.navigate("SafetyMap", { selectedRoute })} onReviewTrip={(selectedVehicle, tripResult) => navigation.navigate("TripReview", { selectedVehicle, tripResult, hotelContext })} />}
       {loading && <ActivityIndicator style={styles.loader} color={colors.primary} size="large" />}
     </SafeAreaView>
@@ -170,7 +196,24 @@ function MainFlow({ navigation, route }) {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Main">
+      <Stack.Navigator
+        initialRouteName="Main"
+        screenOptions={({ navigation }) => ({
+          headerStyle: { backgroundColor: colors.primaryDark },
+          headerTintColor: colors.background,
+          headerTitleStyle: { color: colors.background, fontWeight: "700" },
+          headerShadowVisible: false,
+          headerBackVisible: false,
+          headerLeft: ({ canGoBack }) => canGoBack ? (
+            <MobileBackButton
+              onPress={() => navigation.goBack()}
+              onDark
+              style={{ marginRight: 10 }}
+            />
+          ) : null,
+          contentStyle: { backgroundColor: colors.background },
+        })}
+      >
         <Stack.Screen name="Main" component={MainFlow} options={{ headerShown: false }} />
         <Stack.Screen name="ItineraryHome" component={ItineraryHomeScreen} options={{ title: "Smart Itinerary" }} />
         <Stack.Screen name="ItineraryResult" component={ItineraryResultScreen} options={{ title: "Optimized Itinerary" }} />
@@ -183,6 +226,7 @@ export default function App() {
         <Stack.Screen name="LandmarkChat" component={LandmarkChatScreen} options={{ headerShown: false }} />
         <Stack.Screen name="HotelHome" component={HotelHomeScreen} options={{ title: "Hotels & Activities" }} />
         <Stack.Screen name="HotelResults" component={HotelResultsScreen} options={{ title: "Your Hotel Matches" }} />
+        <Stack.Screen name="LocationPicker" component={LocationPickerScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
