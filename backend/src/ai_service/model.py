@@ -28,10 +28,10 @@ TRAFFIC_BUFFER = 1.25
 AVERAGE_SPEED_KM_PER_MINUTE = 0.5  # Explicit assumption: about 30 km/h.
 AVERAGE_SPEED_KMH = AVERAGE_SPEED_KM_PER_MINUTE * 60
 NEAR_IDENTICAL_COORDINATE_KM = 0.05
-DATA_SCOPE = "verified_central_province_v1"
-DATASET_VERSION = "central_province_runtime_verified_v1"
+DATA_SCOPE = "verified_central_province_v3"
+DATASET_VERSION = "central_province_runtime_verified_v3"
 SUPPORTED_DISTRICTS = ("Kandy", "Matale", "Nuwara Eliya")
-EXPECTED_DISTRICT_COUNTS = {"Kandy": 20, "Matale": 10, "Nuwara Eliya": 10}
+EXPECTED_DISTRICT_COUNTS = {"Kandy": 60, "Matale": 53, "Nuwara Eliya": 45}
 CATALOGUE_POI_COUNT = sum(EXPECTED_DISTRICT_COUNTS.values())
 VERIFIED_STATUS = "source_trace_verified"
 QUARANTINED_LEGACY_IDS = {"79"}
@@ -64,7 +64,7 @@ DATASET_PATH = (
     Path(__file__).resolve().parent
     / "data"
     / "verified"
-    / "central_province_runtime_verified_v1.csv"
+    / "central_province_runtime_verified_v3.csv"
 )
 DEFAULT_RELEVANCE_MODEL_PATH = (
     Path(__file__).resolve().parent / "models" / "user_poi_relevance_v1.joblib"
@@ -313,6 +313,32 @@ def _drop_duplicate_places(places):
     return places.loc[kept_indices].copy()
 
 
+def _diverse_candidate_pool(places, limit=15):
+    """Retain the strongest relevant candidates without one tag-set crowding out all others."""
+    if places is None or places.empty:
+        return places
+    ranked = places.sort_values(
+        by=["Composite_Score", "Distance_From_Start", "Place_ID"],
+        ascending=[False, True, True],
+    )
+    selected, seen = [], set()
+    # First pass gives each distinct verified tag signature one high-ranked
+    # representative.  Later passes preserve ranking while filling the cap.
+    for _, row in ranked.iterrows():
+        signature = str(row.get("Tags", "")).casefold()
+        if signature and signature not in seen:
+            selected.append(row.name)
+            seen.add(signature)
+            if len(selected) >= limit:
+                return ranked.loc[selected].copy()
+    for index in ranked.index:
+        if index not in selected:
+            selected.append(index)
+            if len(selected) >= limit:
+                break
+    return ranked.loc[selected].copy()
+
+
 def filter_locations(
     user_preferences,
     user_lat,
@@ -434,7 +460,7 @@ def filter_locations(
         [locked_rows, recommended[~recommended.index.isin(locked_rows.index)]],
         axis=0,
     )
-    return _drop_duplicate_places(combined).reset_index(drop=True).head(15)
+    return _diverse_candidate_pool(_drop_duplicate_places(combined), limit=15).reset_index(drop=True)
 
 
 def evaluate_route(route_indices, df, start_lat, start_lon):
