@@ -11,7 +11,8 @@ import {
 
 
 import {
-  getWeatherByCoordinates
+  getWeatherByCoordinates,
+  normalizeWeather
 } from "../services/weatherService.js";
 
 
@@ -1381,7 +1382,7 @@ router.post(
       // It does NOT arbitrarily modify the ML score.
       // ------------------------------------------------
 
-      const weatherInfo =
+      const weatherInfo = normalizeWeather(
         await safetyDependencies.getWeatherByCoordinates(
           routeDetails
             .startCoordinates
@@ -1390,14 +1391,11 @@ router.post(
           routeDetails
             .startCoordinates
             .longitude
-        );
+        ).catch(() => null));
 
 
       const isRaining =
-        Boolean(
-          weatherInfo
-            ?.isRaining
-        );
+        weatherInfo.isRaining;
 
 
       // ------------------------------------------------
@@ -1979,6 +1977,8 @@ router.post(
             weatherInfo
               ?.locationName ??
             null,
+
+          weatherStatus: weatherInfo.status,
 
           rainDetected:
             isRaining,

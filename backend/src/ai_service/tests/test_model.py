@@ -654,7 +654,7 @@ class ModelTestCase(unittest.TestCase):
         self.assertNotIn("Deterministic evidence summary.", success_log)
         self.assertNotIn(guide_output, success_log)
 
-    def test_gemini_oauth_style_token_uses_bearer_authorization(self):
+    def test_gemini_nonstandard_key_format_uses_api_key_header(self):
         stops = make_guide_stops(1)
         response = mock.Mock()
         response.raise_for_status.return_value = None
@@ -674,7 +674,7 @@ class ModelTestCase(unittest.TestCase):
         self.assertIsNotNone(summary)
         self.assertEqual(
             post.call_args.kwargs["headers"],
-            {"Content-Type": "application/json", "Authorization": f"Bearer {token}"},
+            {"Content-Type": "application/json", "x-goog-api-key": token},
         )
 
     def test_gemini_defaults_model_and_selects_final_valid_model_output(self):

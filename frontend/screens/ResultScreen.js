@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import API from "../services/api";
+import RoadEvidencePanel from "../components/RoadEvidencePanel";
 import { colors } from "../src/styles/colors";
 import {
   applyFailedRegeneration,
@@ -31,7 +32,7 @@ export default function ResultScreen({ route, navigation }) {
     initialData ? createRegenerationContext(initialData) : null
   );
 
-  const optimizedStops = Array.isArray(data?.optimized_stops) ? data.optimized_stops : [];
+  const optimizedStops = useMemo(() => Array.isArray(data?.optimized_stops) ? data.optimized_stops : [], [data?.optimized_stops]);
   const startingLocation = data?.starting_location || null;
   const deterministicExplanation = data?.deterministic_explanation?.summary ||
     data?.route_explanation?.summary || data?.ai_summary;
@@ -78,6 +79,30 @@ export default function ResultScreen({ route, navigation }) {
     }
   };
 
+  const applyVisitWindows = async (visitWindows) => {
+    if (busy) return;
+    setRegenerationLoading({ mode: "reschedule" });
+    setRegenerationError("");
+    setRegenerationMessage("");
+    try {
+      const response = await API.post("/optimize", {
+        ...data.planning_options, visit_windows: visitWindows,
+        preferences: data.user_preferences, max_time_minutes: data.max_time_allocated_mins,
+        current_lat: data.starting_location.lat, current_lon: data.starting_location.lon,
+        radius_km: data.search_radius_km, generation_mode: "reschedule",
+        locked_place_ids: optimizedStops.map((stop) => String(stop.place_id)),
+      });
+      if (response.data?.status !== "success") throw new Error("The schedule could not be rechecked.");
+      setData(response.data.data);
+      setPersistence(response.data.persistence || null);
+      setRegenerationContext(createRegenerationContext(response.data.data));
+      setRegenerationMessage("The same places were rescheduled against the supplied opening windows.");
+    } catch (error) {
+      setRegenerationError(error.response?.data?.error || error.message);
+      setRegenerationErrorKind("no_feasible_alternative");
+    } finally { setRegenerationLoading(null); }
+  };
+
   const openSource = async (sourceUrl) => {
     try {
       await Linking.openURL(sourceUrl);
@@ -104,7 +129,7 @@ export default function ResultScreen({ route, navigation }) {
   return (
     <ScrollView style={styles.page} contentContainerStyle={styles.content}>
       <View style={styles.hero}>
-        <Text style={styles.eyebrow}>FEASIBLE PLAN READY</Text>
+        <Text style={styles.eyebrow}>ESTIMATED PLAN READY</Text>
         <Text style={styles.title}>Your Smart Itinerary</Text>
         <Text style={styles.subtitle}>
           {optimizedStops.length} ordered stop{optimizedStops.length === 1 ? "" : "s"} from the bounded, source-traced Central Province catalogue.
@@ -130,9 +155,14 @@ export default function ResultScreen({ route, navigation }) {
           <Metric label="Remaining" value={`${data.remaining_time_minutes} min`} />
         </View>
         <Text style={styles.limitNote}>
-          Travel uses straight-line Haversine distance, an assumed {data.travel_estimation?.assumed_average_speed_kmh || 30} km/h speed, and a traffic buffer. It excludes real-road routing, live traffic, opening hours, return travel, parking, and walking.
+          {data.travel_estimation?.limitations || `Travel uses straight-line Haversine distance, an assumed ${data.travel_estimation?.assumed_average_speed_kmh || 30} km/h speed, and a traffic buffer. It excludes real-road routing, live traffic, opening hours, return travel, parking, and walking.`}
         </Text>
       </View>
+
+      {data.planning_options?.routing_mode === "road" ? (
+        <RoadEvidencePanel key={`${data.planning_options.departure_time}-${optimizedStops.map((stop) => stop.place_id).join("-")}-${JSON.stringify(data.planning_options.visit_windows)}`}
+          data={data} busy={busy} onApplyWindows={applyVisitWindows} />
+      ) : null}
 
       <View style={[styles.statusBanner, persistenceCopy.tone]}>
         <Text style={styles.statusTitle}>{persistenceCopy.title}</Text>
@@ -153,6 +183,7 @@ export default function ResultScreen({ route, navigation }) {
           kind="loading"
           text={regenerationLoading.mode === "replace_stop"
             ? `Replacing ${regenerationLoading.name} while preserving accepted stops…`
+            : regenerationLoading.mode === "reschedule" ? "Checking the selected places against supplied opening hours…"
             : "Generating another feasible plan variation…"}
         />
       ) : null}
@@ -172,6 +203,8 @@ export default function ResultScreen({ route, navigation }) {
             onPress={() => navigation.navigate("Map", {
               optimizedStops,
               startingLocation,
+              roadGeometry: data.road_geometry,
+              roadMode: data.travel_estimation?.method === "osrm_road_network",
             })}
             disabled={busy}
             style={styles.mapButton}
@@ -208,6 +241,7 @@ export default function ResultScreen({ route, navigation }) {
                   </Text>
                 </View>
               </View>
+              {stop.arrival_time ? <Text style={styles.stopSummary}>Arrival {stop.arrival_time.slice(11, 16)} · visit {stop.visit_start_time.slice(11, 16)}–{stop.departure_time.slice(11, 16)} (Sri Lanka time). Hours: {stop.opening_hours_status === "user_supplied_window" ? "checked against your supplied window" : "unknown — check before travel"}.</Text> : null}
               <Text style={styles.stopSummary}>
                 Matches: {Array.isArray(stop.matched_preferences) && stop.matched_preferences.length
                   ? stop.matched_preferences.join(", ") : "No direct selected-interest match listed"}
@@ -240,6 +274,7 @@ export default function ResultScreen({ route, navigation }) {
                   <EvidenceRow label="Classification score" value={Number.isFinite(stop.relevance_classification_score) ? `${displayNumber(stop.relevance_classification_score, 3)} · not a satisfaction probability` : "Unavailable"} />
                   <EvidenceRow label="Similarity / proximity / combined" value={`${displayNumber(stop.similarity_score, 3)} / ${displayNumber(stop.proximity_score, 3)} / ${displayNumber(stop.composite_score, 3)}`} />
                   <EvidenceRow label="Incoming estimated leg" value={`${displayNumber(stop.leg_distance_km, 2)} km · ${displayNumber(stop.estimated_leg_travel_minutes, 1)} min`} />
+                  {Number.isFinite(stop.road_access_distance_metres) ? <EvidenceRow label="Distance to mapped road" value={`${stop.road_access_distance_metres} m · final access time is not included`} /> : null}
                   <EvidenceRow label="Duration basis" value={stop.duration_basis || "Unavailable"} />
                   <EvidenceRow label="Source status" value={stop.verification_status || "Unavailable"} />
                   <EvidenceRow label="Source" value={`${stop.source_name || "Unavailable"}${stop.source_license ? ` · ${stop.source_license}` : ""}`} />

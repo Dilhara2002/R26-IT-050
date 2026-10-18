@@ -76,6 +76,12 @@ export const buildItineraryPayload = (body) => {
     current_lon: requireFiniteNumber(current_lon, "current_lon", -180, 180, 80.6337)
   };
   const additiveFields = {
+    routing_mode: body.routing_mode,
+    departure_time: body.departure_time,
+    return_to_start: body.return_to_start,
+    break_minutes: body.break_minutes,
+    travel_buffer_percent: body.travel_buffer_percent,
+    visit_windows: body.visit_windows,
     radius_km,
     excluded_place_ids,
     locked_place_ids,
@@ -174,6 +180,8 @@ export const optimizeItinerary = async (req, res) => {
         searchRadiusKm:
           aiResponse.data.search_radius_km,
 
+
+        planningSnapshot: aiResponse.data.planning_options ? aiResponse.data : undefined,
 
         startingLocation:
           aiResponse.data.starting_location

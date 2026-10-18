@@ -12,3 +12,5 @@ Pillow
 flask-cors
 werkzeug
 python-dotenv
+
+requests>=2.31,<3

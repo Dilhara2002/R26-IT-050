@@ -99,6 +99,7 @@ export const getItinerarySafetyRecommendation = async (payload) => {
     if (!response.data) throw new Error("No data received from server.");
     return response.data;
   } catch (error) {
+    if (Array.isArray(error.response?.data?.per_leg_safety_results)) return error.response.data;
     return {
       success: false,
       error: true,

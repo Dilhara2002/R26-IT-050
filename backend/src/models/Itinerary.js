@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 
 const itinerarySchema = new mongoose.Schema({
 
+  // Additive snapshot: preserve old fields and store reproducible road-plan evidence.
+  planningSnapshot: { type: mongoose.Schema.Types.Mixed },
+
   userPreferences: {
 
     type: [String],

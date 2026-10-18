@@ -437,6 +437,9 @@ def filter_locations(
 
 def evaluate_route(route_indices, df, start_lat, start_lon):
     """Return route minutes and summed relevance under explicit traffic assumptions."""
+    if df.attrs.get("road_context"):
+        details = df.attrs["road_context"].evaluate(route_indices)
+        return details["planned_time_minutes"], details["relevance"]
     if not route_indices:
         return 0, 0
 
@@ -475,6 +478,8 @@ def evaluate_route(route_indices, df, start_lat, start_lon):
 
 def evaluate_route_details(route_indices, df, start_lat, start_lon):
     """Return internally consistent visit, estimated travel and relevance totals."""
+    if df.attrs.get("road_context"):
+        return df.attrs["road_context"].evaluate(route_indices)
     if not route_indices:
         return {
             "planned_time_minutes": 0.0,
@@ -501,6 +506,10 @@ def calculate_route_capacity(df, max_time_minutes, start_lat, start_lon):
     """Estimate a time-aware search limit, with a defensive maximum of eight."""
     if df is None or df.empty:
         return 0
+
+    if df.attrs.get("road_context"):
+        # Road feasibility is evaluated directly; do not prune with straight-line estimates.
+        return min(MAX_ROUTE_STOPS, len(df))
 
     # Each estimate includes its visit plus travel from the start. Sorting these
     # gives a deterministic, conservative indication of how many stops the budget
@@ -827,8 +836,16 @@ def find_best_full_regeneration_route(
     start_lon,
     target_stop_count,
     recent_plan_signatures=None,
+    required_place_ids=None,
 ):
     """Return the best feasible unseen fixed-size set in exact open-path order."""
+    if filtered_df is not None and filtered_df.attrs.get("road_context"):
+        return filtered_df.attrs["road_context"].order(
+            range(len(filtered_df)), target=target_stop_count,
+            forbidden=recent_plan_signatures or (), budget=max_time_minutes,
+            required=required_place_ids or (),
+            fitness=lambda route: _route_fitness(route, filtered_df, max_time_minutes, start_lat, start_lon, target_stop_count)[0],
+        )
     if (
         filtered_df is None
         or filtered_df.empty
@@ -1257,7 +1274,10 @@ def run_genetic_algorithm_details(
     else:
         best_route = list(route_indices_override)
         penalty_hit = False
-    if locked_place_ids:
+    road_context = filtered_df.attrs.get("road_context")
+    if road_context:
+        best_route = road_context.order(best_route, budget=max_time_minutes)
+    elif locked_place_ids:
         best_route = minimum_replacement_insertion_order(
             best_route,
             filtered_df,
@@ -1370,7 +1390,7 @@ def run_genetic_algorithm_details(
     utilization_percent = round(
         (rounded_planned / max(1, max_time_minutes)) * 100, 1
     )
-    return {
+    result = {
         "optimized_route": optimal_places,
         "optimized_stops": optimized_stops,
         "estimated_time_required": format_time_display(rounded_planned),
@@ -1399,6 +1419,10 @@ def run_genetic_algorithm_details(
         },
     }
 
+    if road_context and best_route:
+        return road_context.decorate(result, best_route, max_time_minutes)
+    return result
+
 
 def run_genetic_algorithm(
     filtered_df, max_time_minutes, start_lat, start_lon, random_seed=42
@@ -1422,14 +1446,9 @@ def _is_usable_gemini_key(api_key):
 
 
 def _gemini_auth_headers(credential):
-    """Support Google API keys and OAuth-style access tokens without logging either."""
+    """Authenticate Gemini API credentials without logging their value."""
     token = credential.strip()
-    headers = {"Content-Type": "application/json"}
-    if token.startswith("AIza"):
-        headers["x-goog-api-key"] = token
-    else:
-        headers["Authorization"] = f"Bearer {token}"
-    return headers
+    return {"Content-Type": "application/json", "x-goog-api-key": token}
 
 
 def _guide_has_required_sections(text, expected_place_names):
@@ -1583,7 +1602,7 @@ def build_itinerary_guide_prompt(stops, preferences, itinerary_context=None):
             f"Stop {stop['sequence']} | exact name: {stop['name']} | "
             f"district: {stop['district']} | verified categories: {stop['tags']} | "
             f"matched interests: {stop['matched']} | planned visit: {stop['duration']} minutes | "
-            f"incoming straight-line leg: {stop['leg_distance']} / {stop['leg_minutes']} | "
+            f"incoming estimated leg: {stop['leg_distance']} / {stop['leg_minutes']} | "
             f"source status: {stop['source_status']}"
         )
         for stop in safe_stops

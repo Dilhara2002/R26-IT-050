@@ -275,3 +275,10 @@ test("itinerary service preserves insufficient-alternative errors", async () => 
     axios.post = originalPost;
   }
 });
+
+test("controller forwards road scheduling and reschedule fields without changing legacy payloads", () => {
+  const options = { routing_mode: "road", departure_time: "2026-10-01T08:00:00+05:30", return_to_start: true,
+    break_minutes: 30, travel_buffer_percent: 25, visit_windows: {}, generation_mode: "reschedule", locked_place_ids: ["a"] };
+  const payload = buildItineraryPayload({ preferences: ["Nature"], ...options });
+  for (const [key, value] of Object.entries(options)) assert.deepEqual(payload[key], value);
+});

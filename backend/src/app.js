@@ -23,6 +23,8 @@ import safetyRoutes from "./routes/safetyRoutes.js";
 import itinerarySafetyRoutes from "./routes/itinerarySafety.routes.js";
 import itineraryRoutes from "./routes/itinerary.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import { authCorsOptions } from "./services/session.service.js";
 import { seedAdmin } from "./services/adminAuth.service.js";
 
 
@@ -41,7 +43,7 @@ const app = express();
 // Middleware
 // -----------------------------
 
-app.use(cors());
+app.use(cors(authCorsOptions));
 
 app.use(express.json());
 
@@ -104,6 +106,7 @@ app.use(
   itineraryRoutes
 );
 
+app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 
 
@@ -164,6 +167,11 @@ const connectInfrastructure = async () => {
         process.env.MONGO_URI
       );
 
+
+      if (mongoose.connection.name !== "ceylongo") {
+        await mongoose.disconnect();
+        throw new Error("Application requires the ceylongo database.");
+      }
 
       console.log(
         "✅ Connected to MongoDB Atlas"

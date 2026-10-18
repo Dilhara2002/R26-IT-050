@@ -11,6 +11,7 @@ import { colors } from "../styles/colors";
 import VehicleCard from "../components/VehicleCard";
 import RiskCard from "../components/RiskCard";
 import MobileBackButton from "../components/MobileBackButton";
+import { getSafetyOutputLabels } from "../utils/safetyOutput";
 
 
 const getRiskStyle = (riskLevel) => {
@@ -146,6 +147,7 @@ export default function ResultScreen({
     routeResult?.comparisonAvailable && isRecommendedRoute
   );
   const selectedRoute = routeResult;
+  const outputLabels = getSafetyOutputLabels(result);
   const normalizedRiskLevel = String(riskLevel).toLowerCase();
   const riskMessage = normalizedRiskLevel === "high"
     ? "Several historical safety concerns were identified. Extra caution is recommended."
@@ -219,10 +221,14 @@ export default function ResultScreen({
             <Text style={styles.text}>To: {selectedRoute.endLocation}</Text>
             <Text style={styles.text}>Distance: {selectedRoute.distanceKm} km</Text>
             <Text style={styles.text}>Duration: {formatDuration(selectedRoute.durationMinutes)}</Text>
-            {comparisonAvailable && (
-              <Text style={styles.text}>
-                Compared with fastest route: {result?.comparison?.extraMinutesVsFastest ?? 0} mins, {result?.comparison?.extraDistanceKmVsFastest ?? 0} km
-              </Text>
+            <Text style={styles.text}>
+              Compared with fastest route: {outputLabels.comparison}
+            </Text>
+            {selectedRoute.selectedRouteMode === "analyzed-alternative" && (
+              <Text style={styles.noticeText}>Analyzed alternative, not the provider-default route. A lower-risk comparison is unavailable.</Text>
+            )}
+            {selectedRoute.selectedRouteMode === "default-unsupported-route" && (
+              <Text style={styles.noticeText}>Provider-default route shown without a supported risk prediction.</Text>
             )}
             {isAnalyzedRoute && (
               <Text style={styles.noticeText}>
@@ -290,11 +296,7 @@ export default function ResultScreen({
 
         <Text style={styles.text}>
           Rain Detected:{" "}
-          {result?.analysis?.rainDetected === null
-            ? "Unavailable"
-            : result?.analysis?.rainDetected
-              ? "Yes"
-              : "No"}
+          {outputLabels.rain}
         </Text>
 
       </View>
@@ -467,7 +469,10 @@ export default function ResultScreen({
           <Text style={styles.contextNote}>
             This is confidence for this prediction, not the overall accuracy of the system.
           </Text>
-          <Text style={styles.text}>Evidence status: {selectedRoute?.evidenceStatus || "Unavailable"}</Text>
+          <Text style={styles.text}>Model inference: {outputLabels.model}</Text>
+          <Text style={styles.text}>Road evidence: {outputLabels.road}</Text>
+          <Text style={styles.text}>Road coverage: {outputLabels.coverage}</Text>
+          <Text style={styles.text}>Historical graph evidence: {outputLabels.graph}</Text>
           <Text style={styles.text}>Graph match type: {result?.graphRAG?.matchType || "Unknown"}</Text>
           <Text style={styles.text}>Matched road: {result?.analysis?.matchedRoad || "Unavailable"}</Text>
           <Text style={styles.text}>Gradient: {result?.analysis?.gradient ?? "Unavailable"}{result?.analysis?.gradient != null ? "%" : ""}</Text>

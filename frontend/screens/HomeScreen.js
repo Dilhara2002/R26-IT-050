@@ -6,10 +6,12 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  Switch,
   View,
 } from "react-native";
 import * as Location from "expo-location";
 import API from "../services/api";
+import { buildRoadOptions } from "../services/roadEvidence";
 import {
   formatAvailableTime,
   itineraryRequestError,
@@ -65,6 +67,11 @@ export default function HomeScreen({ navigation }) {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [radius, setRadius] = useState("");
+  const [tripDate, setTripDate] = useState(() => new Date(Date.now() + 330 * 60000).toISOString().slice(0, 10));
+  const [departureTime, setDepartureTime] = useState("08:00");
+  const [breakMinutes, setBreakMinutes] = useState("30");
+  const [travelBuffer, setTravelBuffer] = useState("25");
+  const [returnToStart, setReturnToStart] = useState(true);
   const [loading, setLoading] = useState(false);
   const [mapLoading, setMapLoading] = useState(true);
   const [locationLoading, setLocationLoading] = useState(false);
@@ -203,7 +210,9 @@ export default function HomeScreen({ navigation }) {
     setRequestError(null);
     setLoading(true);
     try {
+      const roadOptions = buildRoadOptions({ date: tripDate, time: departureTime, breaks: breakMinutes, returnToStart, buffer: travelBuffer });
       const payload = {
+        ...roadOptions,
         preferences: validation.values.preferences,
         max_time_minutes: validation.values.totalMinutes,
         current_lat: validation.values.latitude,
@@ -223,7 +232,7 @@ export default function HomeScreen({ navigation }) {
         message: response.data?.message || "The bounded verified catalogue could not produce a route for these constraints.",
       });
     } catch (error) {
-      setRequestError(itineraryRequestError(error));
+      setRequestError(error?.isAxiosError ? itineraryRequestError(error) : { title: "Check the day schedule", message: error.message });
     } finally {
       setLoading(false);
     }
@@ -390,6 +399,19 @@ export default function HomeScreen({ navigation }) {
         </Field>
       </View>
 
+      <View style={styles.card}>
+        <StepHeader number="5" title="Day schedule · free road estimates">
+          Driving estimates from OpenStreetMap / OSRM. No API key or payment. Internet required; no live traffic.
+        </StepHeader>
+        <Field label="Trip date (YYYY-MM-DD)"><TextInput accessibilityLabel="Trip date" value={tripDate} onChangeText={setTripDate} editable={!loading} style={styles.input} /></Field>
+        <Field label="Departure (HH:MM, Sri Lanka time)"><TextInput accessibilityLabel="Departure time" value={departureTime} onChangeText={setDepartureTime} editable={!loading} style={styles.input} /></Field>
+        <Field label="Break at first stop, before visit (minutes)"><TextInput accessibilityLabel="Break minutes" value={breakMinutes} onChangeText={setBreakMinutes} keyboardType="numeric" editable={!loading} style={styles.input} /></Field>
+        <Field label="Extra travel buffer (%)"><TextInput accessibilityLabel="Travel buffer percent" value={travelBuffer} onChangeText={setTravelBuffer} keyboardType="numeric" editable={!loading} style={styles.input} /></Field>
+        <Text style={styles.scopeNote}>The 25% default is a planning assumption, not measured traffic. Check each venue’s opening hours before departure.</Text>
+        <Text>Include the drive back to the starting point</Text>
+        <Switch accessibilityLabel="Return to starting point" value={returnToStart} onValueChange={setReturnToStart} disabled={loading} />
+      </View>
+
       {requestError ? (
         <View accessibilityLiveRegion="assertive" style={styles.errorBanner}>
           <Text style={styles.errorTitle}>{requestError.title}</Text>
@@ -414,7 +436,7 @@ export default function HomeScreen({ navigation }) {
         </View>
       </Pressable>
       <Text style={styles.scopeNote}>
-        Planning note: travel uses estimated straight-line distance, not live traffic or real-road routing. Safety evidence is handled separately by the existing Safety Analyzer.
+        Planning note: road estimates and selected coordinates are sent to the free routing service. Weather, road closures and unprovided opening hours are not verified. Safety evidence is handled separately by the existing Safety Analyzer.
       </Text>
     </ScrollView>
   );
