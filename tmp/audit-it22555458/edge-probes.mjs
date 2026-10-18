@@ -1,0 +1,12 @@
+console.error=()=>{};
+const s=await import('../../backend/src/services/safetyAnalysis.service.js');
+const {getWeatherByCoordinates}=await import('../../backend/src/services/weatherService.js');
+const {driver}=await import('../../backend/src/config/neo4j.js');
+const saved=process.env.OPENWEATHER_API_KEY;delete process.env.OPENWEATHER_API_KEY;
+console.log('weather_missing_key',JSON.stringify(await getWeatherByCoordinates(7,80)));
+if(saved)process.env.OPENWEATHER_API_KEY=saved;
+const route=(id,distanceKm,roadNames)=>({id,distanceKm,durationMinutes:distanceKm,roadNames,geometry:{type:'LineString',coordinates:[[80,7],[81,8]]}});
+s.setSafetyAnalysisDependenciesForTesting({getRoadDataByRouteLabels:async names=>names.length?{_matchedRouteFamily:'A1','Max Gradient (%)':8}:null,graphManager:{getMLRiskContext:async()=>({}),getSafetyReasoning:async()=>({})},runRiskPrediction:async()=>({riskLevel:'Low',probabilities:{Low:1}}),getWeatherByCoordinates:async()=>({status:'unavailable'})});
+const r=await s.analyzeSafetyLeg({legSequence:1,from:{lat:7,lon:80,name:'A'},to:{lat:8,lon:81,name:'B'},routeAlternatives:[route('fastest',100,[]),route('alternative',150,['A1'])]});
+console.log('single_evaluable_alternative',JSON.stringify({mode:r.selected_route_mode,distance:r.distance_km,fastestDistance:100}));
+s.resetSafetyAnalysisDependenciesForTesting(); await driver.close();
