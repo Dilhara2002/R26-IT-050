@@ -27,7 +27,7 @@ const QUICK_PROMPTS = [
 
 const displayMessage = (text) => String(text || "").replace(/\*\*/g, "");
 
-export default function LandmarkChatScreen({ landmarkContext, onBack, navigation, route }) {
+export default function LandmarkChatScreen({ landmarkContext, onBack = undefined, navigation = undefined, route = undefined }) {
   const context = landmarkContext || route?.params?.landmarkContext;
   const activeLandmark = context?.landmark_name || context?.class_id?.replace(/_/g, " ") || "";
   const activeLandmarkId = context?.class_id || activeLandmark;

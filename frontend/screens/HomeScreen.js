@@ -89,15 +89,10 @@ export default function HomeScreen({ navigation, route }) {
   const hoursRef = useRef(null);
   const radiusRef = useRef(null);
 
-  const authConfig = useMemo(() => ({
-    headers: { Authorization: `Bearer ${authToken}` },
-  }), [authToken]);
-
   const loadSavedItineraries = async () => {
-    if (!authToken) return;
     try {
       setSavedStatus("Loading saved itineraries…");
-      const response = await API.get("/", authConfig);
+      const response = await API.get("/");
       setSavedItineraries(response.data?.itineraries || []);
       setSavedStatus("");
     } catch (error) {
@@ -111,7 +106,7 @@ export default function HomeScreen({ navigation, route }) {
 
   const deleteSavedItinerary = async (id) => {
     try {
-      await API.delete(`/${id}`, authConfig);
+      await API.delete(`/${id}`, { headers: { "Content-Type": "application/json" } });
       setSavedItineraries((current) => current.filter((trip) => trip.id !== id));
       setSavedStatus("Saved itinerary deleted.");
     } catch (error) {
@@ -253,7 +248,7 @@ export default function HomeScreen({ navigation, route }) {
         current_lon: validation.values.longitude,
         ...(validation.values.radiusKm === null ? {} : { radius_km: validation.values.radiusKm }),
       };
-      const response = await API.post("/optimize", payload, authConfig);
+      const response = await API.post("/optimize", payload);
       if (response.data?.status === "success" && response.data?.data) {
         navigation.navigate("ItineraryResult", {
           data: response.data.data,

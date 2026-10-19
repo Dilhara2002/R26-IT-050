@@ -307,7 +307,7 @@ export const optimizeItinerary = async (req, res) => {
     return res.status(statusCode).json(
       details || {
         status: "error",
-        message: error.message
+        message: statusCode >= 500 ? "The itinerary service is temporarily unavailable. Please try again." : error.message
       }
     );
   }
