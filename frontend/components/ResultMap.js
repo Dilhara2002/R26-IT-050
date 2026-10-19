@@ -4,7 +4,7 @@ import MapView, { Callout, Marker, Polyline, PROVIDER_GOOGLE } from 'react-nativ
 
 const DEFAULT_CENTER = { latitude: 7.2906, longitude: 80.6337 };
 
-export default function ResultMap({ startingLocation, optimizedStops = [] }) {
+export default function ResultMap({ startingLocation, optimizedStops = [], roadGeometry = null, roadMode = false }) {
   const mapRef = useRef(null);
   const startCoordinate = useMemo(() => {
     const latitude = Number(startingLocation?.lat);
@@ -36,6 +36,7 @@ export default function ResultMap({ startingLocation, optimizedStops = [] }) {
     ],
     [startCoordinate, validStops]
   );
+  const lineCoordinates = roadMode ? (roadGeometry?.coordinates || []).map(([longitude, latitude]) => ({ latitude, longitude })) : routeCoordinates;
   const initialCenter = startCoordinate || routeCoordinates[0] || DEFAULT_CENTER;
 
   useEffect(() => {
@@ -64,8 +65,8 @@ export default function ResultMap({ startingLocation, optimizedStops = [] }) {
         longitudeDelta: 0.05,
       }}
     >
-      {routeCoordinates.length > 1 ? (
-        <Polyline coordinates={routeCoordinates} strokeColor="#1D4ED8" strokeWidth={4} />
+      {lineCoordinates.length > 1 ? (
+        <Polyline coordinates={lineCoordinates} strokeColor="#1D4ED8" strokeWidth={4} />
       ) : null}
       {startCoordinate ? (
         <Marker coordinate={startCoordinate} title="Starting location" pinColor="#1D4ED8" />

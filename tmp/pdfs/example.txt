@@ -1,0 +1,564 @@
+
+--- PAGE 1 ---
+REAL-TIME DRIVER AND ROAD MONITORING FOR RISK
+PREDICTION:
+PERSONALIZED DRIVER BEHAVIORAL DEVIATION
+DETECTION
+Senadheera S C C
+IT22134226
+BSc (Hons) in Information Technology
+Specializing in Information Technology
+Department of Information Technology
+Sri Lanka Institute of Information Technology
+Sri Lanka
+April 2026
+
+--- PAGE 2 ---
+REAL-TIME DRIVER AND ROAD MONITORING FOR RISK
+PREDICTION:
+PERSONALIZED DRIVER BEHAVIORAL DEVIATION
+DETECTION
+Senadheera S C C
+IT22134226
+BSc (Hons) in Information Technology
+Specializing in Information Technology
+Department of Information Technology
+Sri Lanka Institute of Information Technology
+Sri Lanka
+April 2026
+
+--- PAGE 3 ---
+DECLARATION OF THE CANDIDATE AND
+SUPERVISOR
+I declare that this is my own work and this report does not incorporate without acknowledgment
+any material previously submitted for a degree or diploma in any other university or Institute of
+higher learning and to the best of my knowledge and belief it does not contain any material
+previously published or written by another person except where the acknowledgment is made in
+the text.
+Name Student ID Signature
+Senadheera S C C IT22134226
+The supervisor/s should certify the finalized report with the following declaration.
+The above candidate is carrying out research for the undergraduate Dissertation under my
+supervision.
+…………………………….. ……………………
+Signature of the supervisor: Date
+…………………………….. ……………………
+Signature of the co-supervisor: Date
+
+--- PAGE 4 ---
+DEDICATION
+This research report is dedicated to our parents, teachers, and mentors, whose continuous guidance
+and encouragement have inspired us throughout my academic journey. I also dedicate this work to all
+individuals contributing to the advancement of knowledge and innovation in the field of Information
+Technology.
+
+--- PAGE 5 ---
+ACKNOWLEDGEMENT
+I would like to express my sincere gratitude to my supervisor Mrs. Manaori Gamage, for her
+continuous guidance, encouragement, and valuable feedback throughout the preparation of this
+report. Her expertise and insightful suggestions have been instrumental in shaping my research
+direction.
+I am also thankful to my co-supervisor Mr. Nelum Chathuranga, for his constructive feedback
+and support during this process.
+Furthermore, I extend my appreciation to my lecturers and the Sri Lanka Institute of Information
+Technology (SLIIT) for providing the academic foundation and resources required for this
+research.
+Finally, I wish to thank my teammates for their collaboration and support, which has been crucial
+in aligning my individual contribution with the overall project.
+
+--- PAGE 6 ---
+ABSTRACT
+This research focuses on improving driver behavior analysis by addressing the limitations of
+existing generalized driver monitoring systems. Traditional approaches often rely on fixed
+thresholds and uniform models, which fail to consider the unique driving patterns of individual
+drivers, leading to inaccurate detection of risky behavior.
+To overcome this limitation, this study proposes a personalized driver behavioral deviation
+detection approach that models individual driving characteristics and identifies deviations in real
+time. The system utilizes key driving parameters such as speed, acceleration, braking patterns,
+and steering behavior to establish a baseline profile for each driver. Real-time data is
+continuously compared against this personalized baseline to detect abnormal behavior.
+The proposed methodology includes data collection, preprocessing, personalized behavior
+modeling, and deviation detection using threshold-based and pattern-based analysis techniques.
+The system is capable of classifying detected deviations into different risk levels, enabling more
+meaningful interpretation of driver behavior.
+Experimental results demonstrate that the personalized approach improves the accuracy and
+reliability of deviation detection compared to traditional generalized systems. The system
+effectively distinguishes between normal and abnormal driving patterns while reducing false
+positive detections.
+The findings highlight the importance of incorporating personalization into driver monitoring
+systems and demonstrate the potential of the proposed approach in enhancing road safety and
+intelligent transportation applications.
+Keywords
+< >
+
+--- PAGE 7 ---
+Table of Contents
+DECLARATION OF THE CANDIDATE AND SUPERVISOR ................................................... 3
+INTRODUCTION .......................................................................................................................... 8
+Background and Literature Overview ......................................................................................... 8
+Research Gap .............................................................................................................................. 9
+Research Problem ..................................................................................................................... 10
+Research Objectives .................................................................................................................. 10
+Main Objective...................................................................................................................... 10
+Specific Objectives ................................................................................................................11
+METHODOLOGY ....................................................................................................................... 12
+RESULTS AND DISCUSSION .................................................................................................... 18
+CONCLUSION ............................................................................................................................. 24
+REFERENCE ................................................................................................................................ 27
+
+--- PAGE 8 ---
+INTRODUCTION
+Background and Literature Overview
+Road traffic accidents remain one of the leading causes of injuries and fatalities worldwide, with
+human error identified as a primary contributing factor. Among these, unsafe driving behaviors
+such as harsh acceleration, sudden braking, and erratic steering play a significant role in
+increasing accident risks. As a result, there has been a growing interest in developing intelligent
+systems capable of monitoring driver behavior and predicting potential risks in real time.
+Traditional driver monitoring systems mainly focus on generalized behavior analysis using
+predefined thresholds or rule-based mechanisms. These systems typically evaluate parameters
+such as speed, acceleration, and braking patterns to detect abnormal driving behavior. While such
+approaches provide basic insights, they fail to account for individual differences in driving styles.
+For instance, a behavior that may be considered aggressive for one driver could be normal for
+another, leading to inaccurate assessments.
+Recent advancements in intelligent transportation systems and data-driven approaches have
+introduced more sophisticated methods for analyzing driving behavior. Machine learning and
+data analytics techniques have been widely used to identify patterns in driver behavior and detect
+anomalies. These approaches utilize large datasets to model driving patterns and classify
+behaviors into categories such as safe or risky. However, many of these systems rely on
+generalized models trained on aggregated data, which limits their ability to adapt to individual
+drivers.
+Furthermore, existing research in driver monitoring often focuses on specific aspects such as
+drowsiness detection, fatigue analysis, or road condition monitoring. While these components are
+important, there is comparatively less emphasis on personalized behavioral deviation
+detection, where the system learns and adapts to the unique driving characteristics of each
+individual.
+Therefore, there is a need for a more adaptive and personalized approach that can accurately
+distinguish between normal and abnormal driving behaviors based on individual driving patterns.
+
+--- PAGE 9 ---
+Research Gap
+Despite the availability of various driver monitoring and risk prediction systems, several
+limitations can be identified in existing approaches.
+Firstly, most existing systems rely on generalized models that apply uniform thresholds or
+classification rules across all drivers. These models do not consider individual variations in
+driving behavior, which can lead to false positives or inaccurate risk detection. For example, a
+driver who naturally exhibits higher acceleration patterns may be incorrectly classified as risky
+under a generalized system.
+Secondly, current systems often focus on isolated behavioral parameters rather than analyzing
+comprehensive driving patterns over time. This limits the ability to detect subtle behavioral
+deviations that may indicate potential risks.
+Additionally, many research efforts prioritize specific components such as driver drowsiness
+detection or environmental monitoring, while neglecting the importance of continuous
+behavioral deviation analysis. As a result, the integration of personalized behavioral modeling
+into real-time monitoring systems remains limited.
+Most importantly, there is a lack of systems that dynamically adapt to individual drivers by
+establishing personalized baseline profiles and detecting deviations relative to those baselines.
+This absence of personalization reduces the effectiveness of existing solutions in real-world
+scenarios.
+Therefore, the key research gap identified in this study is:
+The lack of a personalized driver behavioral deviation detection approach that can model
+individual driving patterns and accurately identify deviations in real time.
+
+--- PAGE 10 ---
+Research Problem
+Based on the identified research gap, the main problem addressed in this study is the inability of
+existing driver monitoring systems to accurately detect risky driving behavior due to the absence
+of personalization.
+Current systems fail to differentiate between normal and abnormal behavior for individual
+drivers, as they rely on generalized assumptions. This leads to unreliable detection results and
+limits the practical applicability of such systems in real-world environments.
+Furthermore, the absence of adaptive mechanisms to learn from individual driving patterns
+prevents these systems from improving over time. As driving behavior is highly subjective and
+varies across individuals, a one-size-fits-all approach is insufficient for accurate risk prediction.
+Therefore, there is a need to develop a system that can:
+• Learn and model individual driving behavior
+• Continuously monitor real-time driving data
+• Detect deviations relative to personalized baselines
+• Provide meaningful insights into potential risks
+Research Objectives
+Main Objective
+The main objective of this research is to develop a personalized driver behavioral deviation
+detection system that can model individual driving patterns and identify deviations in real time to
+support risk prediction.
+
+--- PAGE 11 ---
+Specific Objectives
+To achieve the main objective, the following specific objectives are defined:
+1. To collect and analyze driving behavior data such as speed, acceleration, braking, and
+steering patterns.
+2. To develop a personalized behavioral model that represents the normal driving
+characteristics of individual drivers.
+3. To design and implement a deviation detection mechanism that identifies abnormal
+behavior based on deviations from the personalized baseline.
+4. To evaluate the effectiveness of the proposed approach in detecting risky driving
+behavior under different scenarios.
+5. To analyze the applicability of the system in real-world contexts such as road safety
+improvement and intelligent transportation systems.
+
+--- PAGE 12 ---
+METHODOLOGY
+Overview of the Approach
+The proposed system focuses on detecting deviations in driver behavior by establishing a
+personalized baseline for each driver and continuously monitoring real-time driving patterns.
+Unlike traditional driver monitoring systems that rely on generalized thresholds, this approach
+emphasizes individualized behavioral modeling to improve accuracy and reliability.
+The overall workflow of the system consists of several key stages: data collection, preprocessing,
+baseline behavior modeling, deviation detection, and result generation. Initially, driving-related
+data such as speed, acceleration, braking intensity, and steering patterns are collected. This data
+is then processed to identify normal behavioral patterns unique to each driver.
+Once a baseline profile is established, incoming real-time data is continuously compared against
+this personalized model. Any significant deviation from the baseline is identified as a potential
+risk indicator. The system then generates alerts or classifications based on the severity of the
+deviation.
+This approach enables a more adaptive and context-aware driver monitoring system, capable of
+distinguishing between normal variations in driving style and actual risky behavior.
+Data Collection
+The effectiveness of the proposed system heavily depends on the quality and relevance of the
+collected data. The system utilizes driving-related parameters that directly reflect driver behavior.
+Data Types
+The following types of data are considered:
+• Speed-related data (vehicle speed over time)
+• Acceleration and deceleration patterns
+• Braking intensity and frequency
+• Steering wheel movements
+• Time-based driving patterns
+These attributes were selected because they provide meaningful insights into driver behavior and
+can be used to identify abnormal patterns.
+
+--- PAGE 13 ---
+Data Sources
+Data can be obtained through:
+• Simulated datasets for controlled testing
+• Sensor-based data collection (e.g., mobile sensors, vehicle sensors)
+• Publicly available driving datasets (if applicable)
+For the purpose of this research, a structured dataset is used to represent driving behavior under
+both normal and abnormal conditions.
+Personalized Behavior Modeling
+A key contribution of this research is the development of a personalized behavioral model for
+each driver.
+Instead of applying fixed thresholds across all users, the system builds a unique baseline profile
+using historical driving data. This baseline represents the normal driving behavior of an
+individual, capturing their typical speed ranges, acceleration habits, braking tendencies, and
+steering patterns.
+The modeling process involves:
+• Collecting initial driving data over a defined period
+• Extracting relevant features from the data
+• Establishing average values and acceptable variation ranges
+• Defining behavioral boundaries specific to the driver
+This personalized approach ensures that the system adapts to different driving styles, reducing
+false positives and improving detection accuracy.
+Deviation Detection Mechanism
+Once the baseline behavior is established, the system detects deviations by comparing real-time
+driving data with the personalized model.
+Deviation detection is performed using threshold-based and pattern-based analysis techniques.
+
+--- PAGE 14 ---
+Threshold-Based Detection
+Each behavioral parameter is assigned a dynamic threshold derived from the baseline profile. If
+real-time values exceed these thresholds, the system flags them as deviations.
+For example:
+• Sudden spikes in acceleration beyond normal range
+• Harsh braking events
+• Irregular steering patterns
+Pattern-Based Analysis
+In addition to threshold checks, the system analyzes behavioral trends over time. Repeated
+abnormal patterns are treated as stronger indicators of risky driving.
+This includes:
+• Frequent rapid acceleration and braking cycles
+• Consistent deviation in steering stability
+• Irregular driving behavior over short intervals
+Deviation Classification
+Detected deviations are categorized based on severity levels such as:
+• Low-risk deviation
+• Moderate-risk deviation
+• High-risk deviation
+This classification helps in generating meaningful insights and alerts.
+
+--- PAGE 15 ---
+System Architecture
+The system architecture is designed to support real-time data processing and behavioral analysis.
+The architecture consists of the following components:
+• Data Acquisition Layer
+• Data Processing Module
+• Behavior Modeling Module
+• Deviation Detection Engine
+• Output and Alert System
+Data flows from sensors or datasets into the processing module, where it is cleaned and
+structured. The processed data is then used to update the behavioral model and detect deviations.
+A high-level architecture diagram will be included to illustrate the interaction between these
+components.
+Functional Requirements
+The system satisfies the following functional requirements:
+• Ability to collect and process driving behavior data
+• Generation of personalized driver profiles
+• Detection of behavioral deviations in real-time
+• Classification of detected deviations
+• Display of results and alerts to the user
+Non-Functional Requirements
+The system also addresses several non-functional requirements:
+• Performance: Real-time processing capability
+• Accuracy: Reliable detection of deviations
+• Usability: User-friendly interface
+• Scalability: Ability to handle multiple users
+• Reliability: Consistent system performance
+
+--- PAGE 16 ---
+System Considerations
+Social Aspects
+The system contributes to improving road safety by identifying risky driving behaviors. It can be
+beneficial for individual drivers, fleet management systems, and insurance companies.
+Security Aspects
+Driver data is sensitive and must be protected. Appropriate measures such as data encryption and
+secure storage mechanisms are considered to ensure privacy and security.
+Ethical Aspects
+The system is designed to assist drivers rather than penalize them. It does not replace human
+judgment but provides supportive insights to improve driving behavior.
+Limitations
+• Accuracy depends on quality of data
+• Limited dataset may affect generalization
+• Real-world variations may introduce noise
+Commercialization Aspects
+Target Users
+• Individual drivers
+• Fleet management companies
+• Insurance providers
+• Smart vehicle system developers
+
+--- PAGE 17 ---
+Market Potential
+With the increasing demand for intelligent transportation systems, the proposed solution has
+strong market potential in safety-focused applications.
+Revenue Opportunities
+• Subscription-based services
+• Integration with vehicle systems
+• Data analytics services
+Testing and Implementation
+The system is implemented using suitable tools and technologies for data processing and
+analysis.
+Testing is carried out to evaluate:
+• Accuracy of deviation detection
+• System performance under different conditions
+• Reliability of personalized modeling
+Both simulated and real-world scenarios are considered during testing to validate system
+effectiveness.
+
+--- PAGE 18 ---
+RESULTS AND DISCUSSION
+Results
+The results of the proposed personalized driver behavioral deviation detection system are
+presented based on a series of test scenarios designed to evaluate system performance under
+different driving conditions.
+The system was tested using both normal and abnormal driving patterns to assess its ability to
+accurately identify behavioral deviations. The evaluation focused on key driving parameters such
+as speed variation, acceleration, braking intensity, and steering behavior.
+Normal Driving Behavior
+Under normal driving conditions, the system successfully established a personalized baseline
+profile for the driver. The collected data showed consistent patterns within acceptable ranges
+defined during the modeling phase.
+Key observations include:
+• Stable speed variations within expected limits
+• Smooth acceleration and deceleration patterns
+• Controlled braking behavior
+• Minimal irregular steering movements
+The system correctly identified these patterns as normal behavior, without generating false alerts.
+
+--- PAGE 19 ---
+Detection of Deviations
+The system was further evaluated under conditions involving abnormal driving behavior. These
+included scenarios such as:
+• Sudden acceleration beyond normal limits
+• Harsh and frequent braking
+• Erratic steering patterns
+• Rapid fluctuations in speed
+In these scenarios, the system successfully detected deviations by comparing real-time data with
+the personalized baseline.
+Detected deviations were categorized as:
+• Low-risk deviations (minor variations)
+• Moderate-risk deviations (noticeable irregularities)
+• High-risk deviations (critical unsafe behavior)
+System Output
+The system generates outputs in the form of:
+• Deviation alerts
+• Risk level classification
+• Behavioral summaries
+For each detected deviation, the system provides information regarding:
+• Type of deviation
+• Severity level
+• Time of occurrence
+These outputs enable better understanding of driver behavior and potential risks.
+
+--- PAGE 20 ---
+Performance Evaluation
+The performance of the system was evaluated based on its ability to:
+• Accurately detect deviations
+• Minimize false positives
+• Maintain consistency across different scenarios
+The system demonstrated reliable detection of abnormal patterns while maintaining stability
+during normal driving conditions.
+Research Findings and Discussion
+The results obtained from the evaluation indicate that the proposed personalized approach
+provides significant improvements over generalized driver monitoring systems.
+Effectiveness of Personalization
+One of the key findings of this research is that personalization plays a crucial role in accurately
+identifying driver behavior.
+By establishing individual baseline profiles, the system was able to:
+• Adapt to different driving styles
+• Reduce incorrect classifications
+• Improve detection accuracy
+Unlike traditional systems, this approach avoids applying uniform thresholds, which often lead to
+misleading results.
+
+--- PAGE 21 ---
+Detection Accuracy and Reliability
+The system demonstrated consistent performance in identifying abnormal behavior across
+multiple scenarios.
+Key observations include:
+• High accuracy in detecting sudden behavioral changes
+• Reliable classification of deviation severity
+• Stable performance under continuous monitoring
+However, the accuracy is influenced by:
+• Quality of input data
+• Duration of baseline learning
+• Environmental variations
+Comparison with Existing Approaches
+Compared to traditional driver monitoring systems, the proposed system offers several
+advantages:
+Feature Traditional Systems Proposed System
+Threshold Type Fixed Personalized
+Adaptability Low High
+Accuracy Moderate Higher
+False Positives Higher Reduced
+This comparison highlights the effectiveness of incorporating personalization into behavioral
+analysis.
+
+--- PAGE 22 ---
+Limitations Observed
+Despite the promising results, several limitations were identified:
+• Limited dataset may affect generalization
+• Real-world noise can impact detection accuracy
+• Initial baseline creation requires sufficient data
+• System performance depends on sensor accuracy
+These limitations indicate areas for future improvement.
+Practical Implications
+The proposed system can be applied in various real-world scenarios, including:
+• Road safety monitoring systems
+• Fleet management solutions
+• Insurance risk assessment models
+• Smart vehicle integration
+The ability to detect personalized deviations makes it particularly useful in environments where
+accurate driver assessment is critical.
+
+--- PAGE 23 ---
+Individual Contribution
+This research component, focused on personalized driver behavioral deviation detection, was
+independently designed and implemented by the author.
+The individual contributions include:
+• Identification of the research gap related to lack of personalization in driver behavior
+analysis
+• Design of the personalized behavioral modeling approach
+• Development of the deviation detection mechanism
+• Implementation of system logic for real-time behavior monitoring
+• Analysis and interpretation of experimental results
+This component plays a significant role within the overall system by enabling accurate and
+adaptive driver behavior analysis.
+
+--- PAGE 24 ---
+CONCLUSION
+Conclusion
+This research focused on addressing the limitations of existing driver monitoring systems by
+introducing a personalized approach to behavioral deviation detection. Traditional systems often
+rely on generalized thresholds and predefined rules, which fail to account for the unique driving
+patterns of individual drivers. As a result, such systems may produce inaccurate or misleading
+results when applied in real-world scenarios.
+To overcome these limitations, this study proposed a personalized driver behavioral deviation
+detection system that models individual driving behavior and identifies deviations in real time.
+The system was designed to collect driving-related data, establish a baseline profile for each
+driver, and continuously compare real-time behavior against this personalized model.
+The results of the study demonstrate that the proposed approach is capable of effectively
+distinguishing between normal and abnormal driving behavior. By adapting to individual driving
+styles, the system reduces false detections and provides more meaningful insights into potential
+risks. The ability to classify deviations based on severity further enhances the usefulness of the
+system in practical applications.
+Overall, the research successfully achieved its main objective of developing a system that
+improves the accuracy and reliability of driver behavior analysis through personalization. The
+findings highlight the importance of considering individual differences in driving patterns when
+designing intelligent monitoring systems.
+Achievements of the Study
+The key achievements of this research can be summarized as follows:
+• Development of a personalized behavioral modeling approach for driver analysis
+• Implementation of a deviation detection mechanism based on individual baselines
+• Successful identification and classification of driving behavior deviations
+• Demonstration of improved adaptability compared to traditional systems
+• Contribution to the field of intelligent transportation and road safety
+
+--- PAGE 25 ---
+Practical Implications
+The proposed system has significant potential for real-world applications. It can be integrated
+into intelligent transportation systems to enhance road safety by identifying risky driving
+behaviors in real time.
+In addition, the system can be utilized in:
+• Fleet management systems to monitor driver performance
+• Insurance industries for risk-based assessment and pricing
+• Smart vehicle technologies for advanced driver assistance
+• Research and data analysis in transportation studies
+The personalized nature of the system makes it particularly suitable for applications that require
+accurate and context-aware driver evaluation.
+Limitations of the Study
+Despite the promising results, several limitations were identified during the research:
+• The accuracy of the system depends on the quality and availability of driving data
+• Limited datasets may affect the generalization of results
+• Real-world driving environments may introduce noise and variability
+• Initial baseline creation requires sufficient data collection over time
+These limitations highlight areas where further improvements can be made.
+
+--- PAGE 26 ---
+Future Work
+Future enhancements can be made to improve the effectiveness and scalability of the proposed
+system.
+Potential future developments include:
+• Integration with real-time IoT sensors and vehicle systems
+• Application of advanced machine learning techniques for improved prediction
+• Expansion of datasets to include diverse driving conditions and environments
+• Development of a mobile or web-based interface for wider accessibility
+• Incorporation of additional behavioral parameters such as driver fatigue and
+environmental factors
+These improvements will enable the system to become more robust and applicable in real-world
+scenarios.
+
+--- PAGE 27 ---
+REFERENCE
+[1] J. A. Healey and R. W. Picard, "Detecting stress during real-world driving tasks using
+physiological sensors," IEEE Transactions on Intelligent Transportation Systems, vol. 6,
+no. 2, pp. 156-166, Jun. 2005.
+[2] C. Miyajima et al., "Driver modeling based on driving behavior and its evaluation in
+driver identification performance," Proceedings of the IEEE, vol. 95, no. 2, pp. 427-437,
+Feb. 2007.
+[3] D. A. Johnson and M. M. Trivedi, "Driving style recognition using a smartphone as a
+sensor platform," in Proc. IEEE Intelligent Transportation Systems Conference, pp. 1609-
+1615, 2011.
+[4] B. Aygun et al., "Naturalistic driving datasets and machine learning for driver
+behavior analysis: A systematic review," IEEE Access, vol. 10, pp. 61926-61947, 2022.
+[5] Y. Liang et al., "Real-time detection of driver cognitive distraction using support
+vector machines," IEEE Transactions on Intelligent Transportation Systems, vol. 8, no. 2,
+pp. 340-350, Jun. 2007.
+[6] S. M. Arvin et al., "Driver behavior detection and classification using deep learning,"
+Expert Systems with Applications, vol. 149, pp. 113240, Jul. 2020.
+[7] A. Doshi and M. M. Trivedi, "On the roles of eye gaze and head dynamics in
+predicting driver's intent to change lanes," IEEE Transactions on Intelligent
+Transportation Systems, vol. 10, no. 3, pp. 453-462, Sep. 2009.
+[8] F. Tango and M. Botta, "Real-time detection system of driver distraction using
+machine learning," IEEE Transactions on Intelligent Transportation Systems, vol. 14, no.
+2, pp. 894-905, Jun. 2013.
+[9] K. Li et al., "A comprehensive review of machine learning-based driving behavior
+analysis," IEEE Transactions on Intelligent Vehicles, vol. 7, no. 1, pp. 15-32, Mar. 2022.
+[10] M. Chen et al., "Personalized driver behavior modeling using smartphone sensors
+and machine learning," IEEE Sensors Journal, vol. 21, no. 18, pp. 20537-20547, Sep.
+2021.
+[11] R. Zhang et al., "Anomaly detection in driver behavior using one-class support
+vector machines," Transportation Research Part C: Emerging Technologies, vol. 89, pp.
+118-133, Apr. 2018.
+
+--- PAGE 28 ---
+[12] L. Wang et al., "Individual driving behavior analysis and prediction using
+longitudinal smartphone sensor data," IEEE Transactions on Vehicular Technology, vol.
+70, no. 4, pp. 3098-3110, Apr. 2021.

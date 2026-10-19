@@ -1,15 +1,69 @@
+
 import axios from "axios";
+import { Platform } from "react-native";
+import { API_BASE_URL } from "./apiBase";
 
-const API_BASE_URL = (
-  process.env.EXPO_PUBLIC_API_BASE_URL ||
-  "http://127.0.0.1:8080/api"
-).replace(/\/$/, "");
+// Native sessions stay in memory. Durable native login requires secure storage.
+// Browser authentication uses the server's HttpOnly session cookie.
+let nativeToken = null;
 
-const request = async (path, payload) => {
-  const response = await axios.post(`${API_BASE_URL}/auth/${path}`, payload, { timeout: 10000 });
-  return response.data;
+export const rememberSession = (data) => {
+  if (Platform.OS !== "web") {
+    nativeToken = data?.token ?? null;
+  }
+  return data;
 };
 
-export const loginUser = (email, password) => request("login", { email, password });
+export const sessionRequestConfig = () => ({
+  withCredentials: true,
+  timeout: 10000,
+  headers: Platform.OS === "web"
+    ? {}
+    : {
+        "X-CeylonGo-Client": "native",
+        ...(nativeToken ? { Authorization: `Bearer ${nativeToken}` } : {}),
+      },
+});
+
+export const restoreSession = async () => {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/auth/session`,
+      sessionRequestConfig()
+    );
+    return rememberSession(response.data);
+  } catch (error) {
+    if (error.response?.status === 401) {
+      nativeToken = null;
+      return null;
+    }
+    throw error;
+  }
+};
+
+export const travellerAuth = async ({ name, email, password, register }) => {
+  const response = await axios.post(
+    `${API_BASE_URL}/auth/${register ? "register" : "login"}`,
+    { name, email, password },
+    sessionRequestConfig()
+  );
+  return rememberSession(response.data);
+};
+
+// Backward-compatible API functions for components from the POI branch.
+// These use the session-based backend, not the old JWT user service.
+export const loginUser = (email, password) =>
+  travellerAuth({ email, password, register: false });
+
 export const registerUser = (name, email, password) =>
-  request("register", { name, email, password });
+  travellerAuth({ name, email, password, register: true });
+
+export const endSession = async () => {
+  const response = await axios.post(
+    `${API_BASE_URL}/auth/logout`,
+    {},
+    sessionRequestConfig()
+  );
+  nativeToken = null;
+  return response.data;
+};

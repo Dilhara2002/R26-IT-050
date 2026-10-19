@@ -62,7 +62,7 @@ export default function LocationPickerScreen({ navigation, route }) {
     const latitude = Number(selected.latitude.toFixed(6));
     const longitude = Number(selected.longitude.toFixed(6));
     const label = `Map point ${latitude}, ${longitude}`;
-    navigation.navigate("Main", {
+    navigation.popTo("Main", {
       locationSelection: {
         id: Date.now(),
         field,

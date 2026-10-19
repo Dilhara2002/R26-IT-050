@@ -1,4 +1,4 @@
-const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:5001/api";
+import { API_BASE_URL as BASE_URL } from "../../src/api/apiBase";
 
 export async function generateTourismPackage(prompt, stay) {
   if (!prompt || !prompt.trim()) {

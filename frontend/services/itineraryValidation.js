@@ -136,6 +136,9 @@ export function itineraryRequestError(error) {
       message: "The itinerary services could not be reached. Your inputs have been kept; check the local services and try again.",
     };
   }
+  if (code === "road_routing_unavailable") {
+    return { kind: "service_unavailable", title: "Free road-routing service unavailable", message: serverMessage };
+  }
   if (status === 400) {
     return {
       kind: "invalid_input",

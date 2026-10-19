@@ -1,6 +1,23 @@
 import axios from "axios";
 
 
+// Preserve observed false; absence is not evidence of dry weather.
+export const normalizeWeather = (weather) => {
+  const available = weather?.status !== "unavailable" && Boolean(
+    weather && (weather.status === "available" ||
+      (weather.weatherMain && weather.weatherMain !== "Unknown"))
+  );
+  return {
+    ...weather,
+    status: available ? "available" : "unavailable",
+    isRaining: available && typeof weather.isRaining === "boolean" ? weather.isRaining : null,
+    temperature: available ? weather.temperature ?? null : null,
+    weatherMain: available ? weather.weatherMain ?? "Unknown" : "Unknown",
+    weatherDescription: available ? weather.weatherDescription ?? null : "Weather data unavailable",
+    locationName: available ? weather.locationName ?? null : null,
+  };
+};
+
 export const getWeatherByCoordinates = async (
   latitude,
   longitude
@@ -26,6 +43,7 @@ export const getWeatherByCoordinates = async (
       await axios.get(
         "https://api.openweathermap.org/data/2.5/weather",
         {
+          timeout: 5000,
           params: {
 
             lat: latitude,
@@ -51,6 +69,8 @@ export const getWeatherByCoordinates = async (
 
 
 
+    if (!weatherMain && !weatherDescription) return normalizeWeather(null);
+
     const isRaining =
 
       weatherMain
@@ -71,6 +91,7 @@ export const getWeatherByCoordinates = async (
 
     return {
 
+      status: "available",
       isRaining,
 
       temperature:
@@ -89,31 +110,7 @@ export const getWeatherByCoordinates = async (
   } catch(error) {
 
 
-    console.error(
-
-      "Weather API Error:",
-
-      error.response?.data ||
-      error.message
-
-    );
-
-
-
-    return {
-
-      isRaining: false,
-
-      temperature: null,
-
-      weatherMain: "Unknown",
-
-      weatherDescription:
-        "Weather data unavailable",
-
-      locationName: null,
-
-    };
+    return normalizeWeather(null);
 
   }
 

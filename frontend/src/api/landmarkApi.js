@@ -1,6 +1,6 @@
-const LANDMARK_API_URL = `${(
-  process.env.EXPO_PUBLIC_AI_SERVICE_BASE_URL || "http://localhost:5002"
-).replace(/\/$/, "")}/api/landmark/predict`;
+import { AI_SERVICE_BASE_URL } from "./apiBase";
+
+const LANDMARK_API_URL = `${AI_SERVICE_BASE_URL}/api/landmark/predict`;
 
 export async function recognizeLandmark(asset) {
   const formData = new FormData();

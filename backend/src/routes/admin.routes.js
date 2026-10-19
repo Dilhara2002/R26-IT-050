@@ -5,12 +5,15 @@ import { fileURLToPath } from "url";
 import Admin from "../models/Admin.js";
 import VehiclePricing from "../models/VehiclePricing.js";
 import mongoose from "mongoose";
-import { authenticateAdmin, createAdminToken, verifyPassword } from "../services/adminAuth.service.js";
+import { authenticateAdmin, verifyPassword } from "../services/adminAuth.service.js";
+
+import { issueSession, limitAuthAttempts, protectSessionRequest } from "../services/session.service.js";
 
 const router = express.Router();
+router.use(protectSessionRequest);
 const dataFile = path.join(path.dirname(fileURLToPath(import.meta.url)), "../ai-engine/data/processed_vehicles.csv");
 const split = (line) => line.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).map((v) => v.replace(/^\"|\"$/g, "").trim());
-const requireDatabase = (_req, res, next) => mongoose.connection.readyState === 1
+const requireDatabase = (_req, res, next) => mongoose.connection.readyState === 1 && mongoose.connection.name === "ceylongo"
   ? next()
   : res.status(503).json({ success: false, message: "Admin pricing requires an active MongoDB connection." });
 
@@ -22,13 +25,14 @@ const datasetVehicles = async () => {
   return lines.map((line) => Object.fromEntries(headers.map((header, index) => [header, split(line)[index] || ""])));
 };
 
-router.post("/login", async (req, res) => {
+router.post("/login", limitAuthAttempts, async (req, res) => {
   const email = String(req.body.email || "").trim().toLowerCase();
   const admin = await Admin.findOne({ email });
   if (!admin || !verifyPassword(String(req.body.password || ""), admin.passwordSalt, admin.passwordHash)) {
     return res.status(401).json({ success: false, message: "Invalid administrator email or password." });
   }
-  return res.json({ success: true, token: createAdminToken(admin), user: { name: admin.name, email: admin.email, role: "admin" } });
+  const session = await issueSession(req, res, admin, "admin");
+  return res.json({ success: true, ...session });
 });
 
 router.get("/vehicle-pricing", authenticateAdmin, async (_req, res) => {

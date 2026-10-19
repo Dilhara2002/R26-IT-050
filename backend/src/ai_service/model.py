@@ -36,9 +36,7 @@ CATALOGUE_POI_COUNT = sum(EXPECTED_DISTRICT_COUNTS.values())
 VERIFIED_STATUS = "source_trace_verified"
 QUARANTINED_LEGACY_IDS = {"79"}
 GEMINI_REQUEST_TIMEOUT = (2, 10)
-GEMINI_INTERACTIONS_URL = (
-    "https://generativelanguage.googleapis.com/v1beta/interactions"
-)
+GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite"
 MAX_GEMINI_GUIDE_CHARS = 8000
 MAX_GEMINI_PROMPT_CHARS = 12000
@@ -465,6 +463,9 @@ def filter_locations(
 
 def evaluate_route(route_indices, df, start_lat, start_lon):
     """Return route minutes and summed relevance under explicit traffic assumptions."""
+    if df.attrs.get("road_context"):
+        details = df.attrs["road_context"].evaluate(route_indices)
+        return details["planned_time_minutes"], details["relevance"]
     if not route_indices:
         return 0, 0
 
@@ -503,6 +504,8 @@ def evaluate_route(route_indices, df, start_lat, start_lon):
 
 def evaluate_route_details(route_indices, df, start_lat, start_lon):
     """Return internally consistent visit, estimated travel and relevance totals."""
+    if df.attrs.get("road_context"):
+        return df.attrs["road_context"].evaluate(route_indices)
     if not route_indices:
         return {
             "planned_time_minutes": 0.0,
@@ -529,6 +532,10 @@ def calculate_route_capacity(df, max_time_minutes, start_lat, start_lon):
     """Estimate a time-aware search limit, with a defensive maximum of eight."""
     if df is None or df.empty:
         return 0
+
+    if df.attrs.get("road_context"):
+        # Road feasibility is evaluated directly; do not prune with straight-line estimates.
+        return min(MAX_ROUTE_STOPS, len(df))
 
     # Each estimate includes its visit plus travel from the start. Sorting these
     # gives a deterministic, conservative indication of how many stops the budget
@@ -855,8 +862,16 @@ def find_best_full_regeneration_route(
     start_lon,
     target_stop_count,
     recent_plan_signatures=None,
+    required_place_ids=None,
 ):
     """Return the best feasible unseen fixed-size set in exact open-path order."""
+    if filtered_df is not None and filtered_df.attrs.get("road_context"):
+        return filtered_df.attrs["road_context"].order(
+            range(len(filtered_df)), target=target_stop_count,
+            forbidden=recent_plan_signatures or (), budget=max_time_minutes,
+            required=required_place_ids or (),
+            fitness=lambda route: _route_fitness(route, filtered_df, max_time_minutes, start_lat, start_lon, target_stop_count)[0],
+        )
     if (
         filtered_df is None
         or filtered_df.empty
@@ -1285,7 +1300,10 @@ def run_genetic_algorithm_details(
     else:
         best_route = list(route_indices_override)
         penalty_hit = False
-    if locked_place_ids:
+    road_context = filtered_df.attrs.get("road_context")
+    if road_context:
+        best_route = road_context.order(best_route, budget=max_time_minutes)
+    elif locked_place_ids:
         best_route = minimum_replacement_insertion_order(
             best_route,
             filtered_df,
@@ -1398,7 +1416,7 @@ def run_genetic_algorithm_details(
     utilization_percent = round(
         (rounded_planned / max(1, max_time_minutes)) * 100, 1
     )
-    return {
+    result = {
         "optimized_route": optimal_places,
         "optimized_stops": optimized_stops,
         "estimated_time_required": format_time_display(rounded_planned),
@@ -1427,6 +1445,10 @@ def run_genetic_algorithm_details(
         },
     }
 
+    if road_context and best_route:
+        return road_context.decorate(result, best_route, max_time_minutes)
+    return result
+
 
 def run_genetic_algorithm(
     filtered_df, max_time_minutes, start_lat, start_lon, random_seed=42
@@ -1447,6 +1469,12 @@ def _is_usable_gemini_key(api_key):
         return False
     normalized = re.sub(r"[^A-Z0-9]", "", api_key.upper())
     return normalized not in GEMINI_PLACEHOLDER_KEYS
+
+
+def _gemini_auth_headers(credential):
+    """Authenticate Gemini API credentials without logging their value."""
+    token = credential.strip()
+    return {"Content-Type": "application/json", "x-goog-api-key": token}
 
 
 def _guide_has_required_sections(text, expected_place_names):
@@ -1471,9 +1499,29 @@ def _guide_has_required_sections(text, expected_place_names):
 
 
 def _final_gemini_model_output(payload, expected_place_names=None):
-    """Return bounded text from the final valid Interactions model-output step."""
+    """Return bounded text from generateContent or the legacy preview response."""
     if not isinstance(payload, dict):
         return None
+
+    candidates = payload.get("candidates")
+    if isinstance(candidates, list):
+        for candidate in candidates:
+            parts = candidate.get("content", {}).get("parts", []) if isinstance(candidate, dict) else []
+            text = "".join(
+                part.get("text", "")
+                for part in parts
+                if isinstance(part, dict) and isinstance(part.get("text"), str)
+            ).strip()
+            if (
+                text
+                and len(text) <= MAX_GEMINI_GUIDE_CHARS
+                and (
+                    not expected_place_names
+                    or _guide_has_required_sections(text, expected_place_names)
+                )
+            ):
+                return text
+
     steps = payload.get("steps")
     if not isinstance(steps, list):
         # Compatibility with responses used by the earlier preview transport.
@@ -1580,7 +1628,7 @@ def build_itinerary_guide_prompt(stops, preferences, itinerary_context=None):
             f"Stop {stop['sequence']} | exact name: {stop['name']} | "
             f"district: {stop['district']} | verified categories: {stop['tags']} | "
             f"matched interests: {stop['matched']} | planned visit: {stop['duration']} minutes | "
-            f"incoming straight-line leg: {stop['leg_distance']} / {stop['leg_minutes']} | "
+            f"incoming estimated leg: {stop['leg_distance']} / {stop['leg_minutes']} | "
             f"source status: {stop['source_status']}"
         )
         for stop in safe_stops
@@ -1681,13 +1729,17 @@ def generate_itinerary_summary(
 
     response = None
     try:
+        request_url = f"{GEMINI_API_BASE_URL}/{gemini_model}:generateContent"
         response = requests.post(
-            GEMINI_INTERACTIONS_URL,
-            headers={
-                "x-goog-api-key": api_key,
-                "Content-Type": "application/json",
+            request_url,
+            headers=_gemini_auth_headers(api_key),
+            json={
+                "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+                "generationConfig": {
+                    "temperature": 0.3,
+                    "maxOutputTokens": 2048,
+                },
             },
-            json={"model": gemini_model, "input": prompt, "store": False},
             timeout=GEMINI_REQUEST_TIMEOUT,
         )
         response.raise_for_status()
@@ -1714,4 +1766,3 @@ def generate_itinerary_summary(
     except (ValueError, TypeError, KeyError, IndexError):
         _log_gemini_failure("malformed_output", gemini_model, started_at)
         return None
-

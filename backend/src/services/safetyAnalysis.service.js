@@ -8,7 +8,7 @@ import {
   getRouteAlternatives,
   getRouteAlternativesByCoordinates,
 } from "./routeService.js";
-import { getWeatherByCoordinates } from "./weatherService.js";
+import { getWeatherByCoordinates, normalizeWeather } from "./weatherService.js";
 import { applyPricingOverride, getPricingOverrides } from "./vehiclePricing.service.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -251,7 +251,7 @@ const compareRoutes = (first, second) =>
   first.route.distanceKm - second.route.distanceKm ||
   String(first.route.routeId).localeCompare(String(second.route.routeId));
 
-const getUnavailableWeather = () => ({ status: "unavailable" });
+const getUnavailableWeather = () => normalizeWeather(null);
 
 const recommendVehicle = async ({ distanceKm, maxGradient, riskLevel, budget, passengers, preferredCategory, ignoreBudget = false }) => {
   if (![distanceKm, maxGradient].every(Number.isFinite) || !RISK_ORDER.hasOwnProperty(riskLevel)) {
@@ -358,6 +358,7 @@ const analyzeSafetyLeg = async ({ legSequence, from, to, routeAlternatives = nul
   }
 
   const evaluated = [];
+  const roadEvidenceByRoute = new Map();
   const usedFamilies = new Set();
   for (const route of routes) {
     let roadInfo = null;
@@ -366,6 +367,7 @@ const analyzeSafetyLeg = async ({ legSequence, from, to, routeAlternatives = nul
     } catch {
       roadInfo = null;
     }
+    roadEvidenceByRoute.set(route, roadInfo);
     const family = roadInfo?._matchedRouteFamily;
     if (!roadInfo || !family || usedFamilies.has(normalize(family))) continue;
     usedFamilies.add(normalize(family));
@@ -386,12 +388,12 @@ const analyzeSafetyLeg = async ({ legSequence, from, to, routeAlternatives = nul
   }
 
   let selected = evaluated.sort(compareRoutes)[0] || null;
-  let selectedRouteMode = evaluated.length >= 2 ? "lower-risk-recommended" : "default-analyzed-route";
   const defaultRoute = routes[0];
   if (!selected) {
     let roadInfo = null;
     try {
-      roadInfo = await dependencies.getRoadDataByNames(from.name, to.name);
+      roadInfo = roadEvidenceByRoute.get(defaultRoute) ||
+        await dependencies.getRoadDataByNames(from.name, to.name);
     } catch {
       roadInfo = null;
     }
@@ -403,6 +405,7 @@ const analyzeSafetyLeg = async ({ legSequence, from, to, routeAlternatives = nul
       } catch {
         // Neo4j is optional enrichment.
       }
+      selected = { route: defaultRoute, roadInfo, graphContext, riskPrediction: null };
       try {
         const riskPrediction = await dependencies.runRiskPrediction(buildMlInput(roadInfo, graphContext));
         if (RISK_ORDER.hasOwnProperty(riskPrediction?.riskLevel)) {
@@ -415,6 +418,13 @@ const analyzeSafetyLeg = async ({ legSequence, from, to, routeAlternatives = nul
   }
 
   const chosenRoute = selected?.route || defaultRoute;
+  const selectedRouteMode = evaluated.length >= 2 ? "lower-risk-recommended"
+    : chosenRoute !== defaultRoute ? "analyzed-alternative"
+      : selected?.riskPrediction ? "default-analyzed-route" : "default-unsupported-route";
+  const defaultRiskEvidenceAvailable = Boolean(
+    evaluated.some(candidate => candidate.route === defaultRoute) ||
+    (chosenRoute === defaultRoute && selected?.riskPrediction)
+  );
   if (!Number.isFinite(Number(chosenRoute.distanceKm)) || Number(chosenRoute.distanceKm) <= 0 ||
       !Number.isFinite(Number(chosenRoute.durationMinutes)) || Number(chosenRoute.durationMinutes) < 0) {
     const error = new Error("The selected route did not contain valid distance and duration evidence.");
@@ -428,7 +438,7 @@ const analyzeSafetyLeg = async ({ legSequence, from, to, routeAlternatives = nul
 
   let weather = getUnavailableWeather();
   try {
-    weather = await dependencies.getWeatherByCoordinates(from.lat, from.lon) || weather;
+    weather = normalizeWeather(await dependencies.getWeatherByCoordinates(from.lat, from.lon));
   } catch {
     // Weather is optional enrichment.
   }
@@ -444,7 +454,45 @@ const analyzeSafetyLeg = async ({ legSequence, from, to, routeAlternatives = nul
     }
   }
 
+  const roadInfo = selected?.roadInfo;
+  const matchedLabels = roadInfo?._matchedLabelCount;
+  const totalLabels = roadInfo?._routeLabelCount;
+  const reasoning = graphContext.reasoning;
+  const graphAvailable = reasoning?.status === "available";
+  const roadEvidence = {
+    status: roadInfo ? "available" : "unavailable",
+    matchedRoad: roadInfo?._matchedRouteFamily || roadInfo?.["Route/Segment Name"] || null,
+    coverage: {
+      scope: "route-family approximation; not traversed-segment coverage",
+      status: Number.isInteger(matchedLabels) && Number.isInteger(totalLabels) && totalLabels > 0
+        ? (matchedLabels === totalLabels ? "all-provider-labels-matched" : "partial-provider-label-match")
+        : "unknown",
+      matchedLabelCount: Number.isInteger(matchedLabels) ? matchedLabels : null,
+      totalLabelCount: Number.isInteger(totalLabels) ? totalLabels : null,
+    },
+  };
+  const validMetrics = (route) => Number.isFinite(route.durationMinutes) && route.durationMinutes >= 0 &&
+    Number.isFinite(route.distanceKm) && route.distanceKm > 0;
+  const fastest = routes.every(validMetrics)
+    ? routes.reduce((best, route) => route.durationMinutes < best.durationMinutes ? route : best)
+    : null;
+  const comparisonAvailable = evaluated.length >= 2 && fastest !== null;
+  const comparison = {
+    status: comparisonAvailable ? "available" : "unavailable",
+    extraMinutesVsFastest: comparisonAvailable
+      ? Number((chosenRoute.durationMinutes - fastest.durationMinutes).toFixed(2)) : null,
+    extraDistanceKmVsFastest: comparisonAvailable
+      ? Number((chosenRoute.distanceKm - fastest.distanceKm).toFixed(2)) : null,
+  };
+
   return {
+    road_evidence: roadEvidence,
+    model_evidence: { status: selected?.riskPrediction ? "available" : "unavailable" },
+    historical_graph_evidence: {
+      status: graphAvailable ? (reasoning.matchType === "no-match" || !reasoning.matchedRisks?.length
+        ? "no-match" : "available") : "unavailable",
+    },
+    comparison,
     leg_sequence: legSequence,
     from,
     to,
@@ -453,6 +501,10 @@ const analyzeSafetyLeg = async ({ legSequence, from, to, routeAlternatives = nul
     duration_minutes: Number(chosenRoute.durationMinutes),
     route_geometry: routeGeometry,
     selected_route_mode: selectedRouteMode,
+    provider_default_route_id: defaultRoute.routeId || null,
+    selected_route_id: chosenRoute.routeId || null,
+    selected_is_provider_default: chosenRoute === defaultRoute,
+    provider_default_risk_evidence_available: defaultRiskEvidenceAvailable,
     risk_prediction: selected?.riskPrediction || null,
     weather,
     graph_context: graphContext,

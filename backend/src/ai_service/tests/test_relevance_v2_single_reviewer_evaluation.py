@@ -22,7 +22,7 @@ import evaluate_relevance_v2_single_reviewer as evaluator
 import validate_central_extension_review_workbooks as packet_validator
 
 
-WORKBOOK = Path(r"C:\Users\user\Downloads\reviewer_a_central_extension_60_completed.xlsx")
+WORKBOOK = evaluator.DEFAULT_WORKBOOK
 LABELS_CSV = evaluator.LABELS_OUT
 RESULTS_CSV = evaluator.RESULTS_OUT
 METRICS_JSON = evaluator.METRICS_OUT
@@ -36,6 +36,10 @@ def read_csv(path):
         return list(csv.DictReader(handle))
 
 
+@unittest.skipUnless(
+    WORKBOOK.is_file(),
+    "The private completed reviewer workbook is not available.",
+)
 class CompletedWorkbookValidationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -135,6 +139,8 @@ class FrozenEvaluationConsistencyTests(unittest.TestCase):
 
     def test_artifact_and_workbook_hashes_are_frozen(self):
         self.assertEqual(evaluator.sha256(V2_ARTIFACT), evaluator.EXPECTED_ARTIFACT_SHA256)
+        if not WORKBOOK.is_file():
+            self.skipTest("The private completed reviewer workbook is not available.")
         self.assertEqual(
             evaluator.sha256(WORKBOOK),
             "2bc4408f840087a152fecefb2a933ab1746177b72b599dc8f8c90a8668379a4a",

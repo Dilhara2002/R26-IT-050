@@ -1,20 +1,5 @@
 import { Platform } from "react-native";
-import Constants from "expo-constants";
-
-function getDevelopmentHost() {
-  if (Platform.OS === "web" && globalThis.location?.hostname) {
-    return globalThis.location.hostname;
-  }
-
-  const expoHost =
-    Constants.expoConfig?.hostUri || Constants.expoGoConfig?.debuggerHost || "";
-  return expoHost.split(":")[0] || "localhost";
-}
-
-const AI_SERVICE_BASE_URL = (
-  process.env.EXPO_PUBLIC_AI_SERVICE_BASE_URL ||
-  `http://${getDevelopmentHost()}:5002`
-).replace(/\/$/, "");
+import { AI_SERVICE_BASE_URL } from "../src/api/apiBase";
 
 async function parseResponse(response) {
   const contentType = response.headers.get("content-type") || "";
@@ -52,10 +37,9 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = 30000) {
 export async function predictLandmark(imageAsset, mode = "svm") {
   const formData = new FormData();
   
-  const photoUri =
-    Platform.OS === "android"
-      ? imageAsset.uri
-      : imageAsset.uri.replace("file://", "");
+  // React Native's multipart implementation expects the original picker URI
+  // (including file:// on iOS). Stripping the scheme makes the upload unreadable.
+  const photoUri = imageAsset.uri;
 
   const fileType = imageAsset.mimeType || "image/jpeg";
   const fileName = imageAsset.fileName || (photoUri.split("/").pop() || "photo.jpg");

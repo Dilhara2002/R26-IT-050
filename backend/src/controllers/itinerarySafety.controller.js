@@ -44,6 +44,10 @@ const validateRequest = (body = {}) => {
     throw new ValidationError("optimized_stops must contain between 1 and 8 stops.");
   }
 
+  if (body.return_to_start !== undefined && typeof body.return_to_start !== "boolean") {
+    throw new ValidationError("return_to_start must be a boolean.");
+  }
+  const returnToStart = body.return_to_start === true;
   const placeIds = new Set();
   const coordinates = new Set([`${startingLocation.lat},${startingLocation.lon}`]);
   const stops = body.optimized_stops.map((stop, index) => {
@@ -68,7 +72,9 @@ const validateRequest = (body = {}) => {
     if (placeIds.has(placeId)) {
       throw new ValidationError(`Duplicate place_id is not allowed: ${placeId}.`);
     }
-    if (coordinates.has(coordinateKey)) {
+    const isExplicitReturn = returnToStart && index > 0 && index === body.optimized_stops.length - 1 &&
+      stop.latitude === startingLocation.lat && stop.longitude === startingLocation.lon;
+    if (coordinates.has(coordinateKey) && !isExplicitReturn) {
       throw new ValidationError("Duplicate itinerary coordinates are not allowed.");
     }
     placeIds.add(placeId);
@@ -108,6 +114,7 @@ const validateRequest = (body = {}) => {
       name: startingLocation.name.trim(),
     },
     stops,
+    returnToStart,
     vehicleRequested: budgetProvided,
     budget: body.budget,
     passengers: body.passengers,
@@ -135,6 +142,7 @@ const settleWithConcurrency = async (items, limit, operation) => {
 
 const sanitizeLegFailure = (leg, settlement) => ({
   leg_sequence: leg.legSequence,
+  is_return_leg: Boolean(leg.isReturnLeg),
   from: leg.from,
   to: leg.to,
   status: "failed",
@@ -184,7 +192,17 @@ const recommendItinerarySafety = async (req, res) => {
     to: locations[index + 1],
   }));
 
-  const settlements = await settleWithConcurrency(legs, 2, (leg) => analyzeSafetyLeg(leg));
+  if (input.returnToStart) {
+    const last = locations[locations.length - 1];
+    if (last.lat !== input.startingLocation.lat || last.lon !== input.startingLocation.lon) {
+      legs.push({ legSequence: legs.length + 1, from: last, to: input.startingLocation });
+    }
+    legs[legs.length - 1].isReturnLeg = true;
+  }
+
+  const settlements = await settleWithConcurrency(legs, 2, async (leg) => ({
+    ...await analyzeSafetyLeg(leg), is_return_leg: Boolean(leg.isReturnLeg),
+  }));
   const perLegResults = settlements.map((settlement, index) =>
     settlement.status === "fulfilled" ? settlement.value : sanitizeLegFailure(legs[index], settlement)
   );
@@ -206,15 +224,29 @@ const recommendItinerarySafety = async (req, res) => {
     error: result.error,
   }));
 
+  const incompleteLegs = perLegResults.flatMap(result => {
+    const reasons = [];
+    if (result.status !== "success") reasons.push("route_failed");
+    if (!Number.isFinite(result.distance_km) || result.distance_km <= 0) reasons.push("distance_unavailable");
+    if (!result.risk_evidence_available || !RISK_ORDER.hasOwnProperty(result.risk_prediction?.riskLevel)) reasons.push("risk_unavailable");
+    if (!Number.isFinite(result.max_gradient) || result.max_gradient < 0) reasons.push("gradient_unavailable");
+    return reasons.length ? [{ leg_sequence: result.leg_sequence, from: result.from, to: result.to,
+      is_return_leg: result.is_return_leg, reasons }] : [];
+  });
+
   let vehicleRecommendation = {
     status: "not_requested",
     reason: "budget and passengers were not supplied.",
   };
   if (input.vehicleRequested) {
-    if (successful.length === 0) {
+    if (incompleteLegs.length > 0) {
       vehicleRecommendation = {
         status: "unavailable",
-        reason: "No successful route evidence was available for a whole-trip vehicle recommendation.",
+        reason: "Whole-trip cost and vehicle feasibility are unavailable because required leg evidence is incomplete.",
+        calculationScope: "unavailable",
+        excludedSegments: incompleteLegs,
+        bestVehicle: null,
+        alternativeOptions: [],
       };
     } else {
       const distances = successful.map((result) => result.distance_km).filter(Number.isFinite);
@@ -234,7 +266,9 @@ const recommendItinerarySafety = async (req, res) => {
 
   const response = {
     success: successful.length > 0,
-    partial: failed.length > 0,
+    partial: incompleteLegs.length > 0,
+    incomplete_legs: incompleteLegs,
+    return_to_start: input.returnToStart,
     tripRiskComplete,
     original_optimized_stop_order: input.stops,
     per_leg_safety_results: perLegResults,
@@ -315,6 +349,10 @@ const recommendRouteSafety = async (req, res) => {
       routeResult: {
         mode: result.selected_route_mode,
         selectedRouteMode: result.selected_route_mode,
+        providerDefaultRouteId: result.provider_default_route_id,
+        selectedRouteId: result.selected_route_id,
+        selectedIsProviderDefault: result.selected_is_provider_default,
+        providerDefaultRiskEvidenceAvailable: result.provider_default_risk_evidence_available,
         routeGeometryAvailable: Boolean(result.route_geometry),
         startLocation: result.from.name,
         endLocation: result.to.name,
@@ -327,9 +365,13 @@ const recommendRouteSafety = async (req, res) => {
         classProbabilities: result.risk_prediction?.probabilities || null,
         modelName: result.risk_prediction?.modelName || null,
         evidenceAvailable: result.risk_evidence_available,
-        comparisonAvailable: result.selected_route_mode === "lower-risk-recommended",
+        comparisonAvailable: result.comparison?.status === "available",
+        roadEvidence: result.road_evidence,
+        modelEvidence: result.model_evidence,
+        historicalGraphEvidence: result.historical_graph_evidence,
         vehicleUsesSelectedRoute: Boolean(vehicle?.bestVehicle),
       },
+      comparison: result.comparison,
       riskPrediction: result.risk_prediction,
       trip: {
         from: result.from.name,
@@ -342,6 +384,8 @@ const recommendRouteSafety = async (req, res) => {
           : "",
       },
       analysis: {
+        matchedRoad: result.road_evidence?.matchedRoad ?? null,
+        weatherStatus: result.weather?.status || "unavailable",
         gradient: result.max_gradient,
         terrain: result.terrain,
         roadSurface: result.road_surface,

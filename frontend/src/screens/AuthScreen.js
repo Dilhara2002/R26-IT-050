@@ -8,18 +8,18 @@ export default function AuthScreen({ mode, onSubmit, onBack, onSwitch }) {
   const register = mode === "register";
   const admin = mode === "adminLogin";
   const [name,setName]=useState(""), [email,setEmail]=useState(""), [password,setPassword]=useState(""), [confirm,setConfirm]=useState(""), [visible,setVisible]=useState(false), [error,setError]=useState(""), [loading,setLoading]=useState(false);
-  const submit=async()=>{ if(register&&!name.trim())return setError("Please enter your full name."); if(!/^\S+@\S+\.\S+$/.test(email.trim()))return setError("Please enter a valid email address."); if(password.length<6)return setError("Password must contain at least 6 characters."); if(register&&password!==confirm)return setError("Passwords do not match."); try{setError("");setLoading(true);await onSubmit({name,email:email.trim(),password,register});}catch(e){setError(e.message||"Sign in failed.");}finally{setLoading(false);} };
+  const submit=async()=>{ if(register&&!name.trim())return setError("Please enter your full name."); if(!/^\S+@\S+\.\S+$/.test(email.trim()))return setError("Please enter a valid email address."); if(!password || password.length>128 || (register&&password.length<12))return setError("New passwords require 12–128 characters."); if(register&&password!==confirm)return setError("Passwords do not match."); try{setError("");setLoading(true);await onSubmit({name,email:email.trim(),password,register});}catch(e){setError(e.message||"Sign in failed.");}finally{setLoading(false);} };
   return <ScrollView style={s.page} contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">
     <MobileBackButton onPress={onBack} accessibilityLabel="Back to welcome" />
     <View style={s.brand}>
       <Image source={require("../../assets/ceylongo-logo.png")} style={s.logo} resizeMode="contain" accessibilityLabel="CeylonGo logo" />
       <Text style={s.title}>{register?"Start your journey":admin?"Administrator access":"Welcome back"}</Text>
-      <Text style={s.subtitle}>{register?"Create your CeylonGo account and explore smarter.":admin?"Sign in with the protected administrator account to manage verified vehicle rates.":"Sign in to continue planning your Sri Lankan adventure."}</Text>
+      <Text style={s.subtitle}>{register?"Create a server-backed account. Earlier local-only profiles must register once.":admin?"Sign in with the protected administrator account to manage verified vehicle rates.":"Sign in to continue planning your Sri Lankan adventure."}</Text>
     </View>
     <View style={s.form}>
       {register&&<Field label="Full name" icon="person-outline" value={name} onChangeText={setName} placeholder="Your full name"/>}
       <Field label="Email address" icon="mail-outline" value={email} onChangeText={setEmail} placeholder="name@example.com" keyboardType="email-address" autoCapitalize="none"/>
-      <View><Text style={s.label}>Password</Text><View style={s.inputWrap}><Ionicons name="lock-closed-outline" size={20} color={colors.muted}/><TextInput style={s.input} value={password} onChangeText={setPassword} placeholder="At least 6 characters" placeholderTextColor="#94A3B8" secureTextEntry={!visible}/><TouchableOpacity onPress={()=>setVisible(!visible)}><Ionicons name={visible?"eye-off-outline":"eye-outline"} size={21} color={colors.muted}/></TouchableOpacity></View></View>
+      <View><Text style={s.label}>Password</Text><View style={s.inputWrap}><Ionicons name="lock-closed-outline" size={20} color={colors.muted}/><TextInput style={s.input} value={password} onChangeText={setPassword} placeholder={register?"At least 12 characters":"Your password"} placeholderTextColor="#94A3B8" secureTextEntry={!visible}/><TouchableOpacity onPress={()=>setVisible(!visible)}><Ionicons name={visible?"eye-off-outline":"eye-outline"} size={21} color={colors.muted}/></TouchableOpacity></View></View>
       {register&&<Field label="Confirm password" icon="shield-checkmark-outline" value={confirm} onChangeText={setConfirm} placeholder="Enter password again" secureTextEntry={!visible}/>} 
       {!!error&&<View style={s.error}><Ionicons name="alert-circle" size={18} color="#B91C1C"/><Text style={s.errorText}>{error}</Text></View>}
       {!register&&!admin&&<TouchableOpacity><Text style={s.forgot}>Forgot password?</Text></TouchableOpacity>}

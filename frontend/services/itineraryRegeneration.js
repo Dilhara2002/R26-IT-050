@@ -149,6 +149,7 @@ function baseRequest(data) {
     throw new Error("The original itinerary inputs are incomplete.");
   }
   const request = {
+    ...(data.planning_options || {}),
     preferences,
     max_time_minutes: Number(data.max_time_allocated_mins),
     current_lat: Number(startingLocation.lat),

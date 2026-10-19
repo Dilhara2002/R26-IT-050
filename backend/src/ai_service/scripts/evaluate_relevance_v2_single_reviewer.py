@@ -6,6 +6,7 @@ import argparse
 import csv
 import hashlib
 import json
+import os
 from pathlib import Path
 import sys
 from xml.sax.saxutils import escape
@@ -32,7 +33,10 @@ import validate_central_extension_review_workbooks as packet_validator  # noqa: 
 EVALUATION_DIR = AI_SERVICE_DIR / "data" / "evaluation"
 MODELS_DIR = AI_SERVICE_DIR / "models"
 DEFAULT_WORKBOOK = Path(
-    r"C:\Users\user\Downloads\reviewer_a_central_extension_60_completed.xlsx"
+    os.environ.get(
+        "RELEVANCE_REVIEW_WORKBOOK",
+        EVALUATION_DIR / "reviewer_a_central_extension_60_completed.xlsx",
+    )
 )
 ARTIFACT_PATH = MODELS_DIR / "user_poi_relevance_v2_candidate.joblib"
 METADATA_PATH = ARTIFACT_PATH.with_suffix(".metadata.json")
