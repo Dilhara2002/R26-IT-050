@@ -327,3 +327,8 @@ test("controller forwards road scheduling and reschedule fields without changing
   const payload = buildItineraryPayload({ preferences: ["Nature"], ...options });
   for (const [key, value] of Object.entries(options)) assert.deepEqual(payload[key], value);
 });
+
+test("unreachable itinerary engine returns a safe 503", async t => {
+  t.mock.method(axios, "post", async () => { throw Object.assign(new Error("connect ECONNREFUSED"), { code: "ECONNREFUSED" }); });
+  await assert.rejects(generateItineraryFromAI({}), error => error.statusCode === 503 && /temporarily unavailable/.test(error.message));
+});
