@@ -1,8 +1,6 @@
 import axios from "axios";
+import { API_BASE_URL } from "./apiBase";
 
-const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_BASE_URL ||
-  "http://localhost:5001/api";
 
 const COMBINED_ANALYSIS_TIMEOUT_MS = 70000;
 
@@ -101,6 +99,7 @@ export const getItinerarySafetyRecommendation = async (payload) => {
     if (!response.data) throw new Error("No data received from server.");
     return response.data;
   } catch (error) {
+    if (Array.isArray(error.response?.data?.per_leg_safety_results)) return error.response.data;
     return {
       success: false,
       error: true,

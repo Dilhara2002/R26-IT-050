@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -11,17 +11,21 @@ import {
 import VehicleCard from "../src/components/VehicleCard";
 import { getItinerarySafetyRecommendation } from "../src/api/safetyApi";
 import { colors } from "../src/styles/colors";
-import { buildItineraryVehiclePayload } from "../services/itineraryVehicle";
+import { buildItineraryVehiclePayload, buildItinerarySafetySummary } from "../services/itineraryVehicle";
 
 const CATEGORIES = ["", "Economy", "Sedan", "SUV", "Van", "MUV", "Luxury"];
 
-export default function ItineraryVehicleScreen({ route }) {
+export default function ItineraryVehicleScreen({ route, navigation }) {
   const itinerary = route.params?.itinerary || null;
-  const [form, setForm] = useState({ budget: "", passengers: "", preferredCategory: "" });
+  const [form, setForm] = useState(route.params?.vehicleState?.form || { budget: "", passengers: "", preferredCategory: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [result, setResult] = useState(null);
-  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [result, setResult] = useState(route.params?.vehicleState?.result || null);
+  const [selectedVehicle, setSelectedVehicle] = useState(route.params?.vehicleState?.selectedVehicle || null);
+
+  useEffect(() => {
+    navigation.setParams({ vehicleState: { form, result, selectedVehicle } });
+  }, [form, result, selectedVehicle, navigation]);
 
   const analyze = async () => {
     if (loading) return;
@@ -38,7 +42,7 @@ export default function ItineraryVehicleScreen({ route }) {
     setLoading(true);
     const response = await getItinerarySafetyRecommendation(payload);
     setLoading(false);
-    if (!response?.success) {
+    if (!response?.success && !Array.isArray(response?.per_leg_safety_results)) {
       setError(response?.message || "No route-aware vehicle recommendation could be generated.");
       return;
     }
@@ -48,7 +52,7 @@ export default function ItineraryVehicleScreen({ route }) {
   const vehicle = result?.vehicle_recommendation || null;
   const bestVehicle = vehicle?.bestVehicle || null;
   const alternatives = Array.isArray(vehicle?.alternativeOptions) ? vehicle.alternativeOptions : [];
-  const risk = result?.whole_trip_risk_summary || null;
+  const summary = buildItinerarySafetySummary(result);
   const legs = Array.isArray(result?.per_leg_safety_results) ? result.per_leg_safety_results : [];
 
   return (
@@ -106,15 +110,17 @@ export default function ItineraryVehicleScreen({ route }) {
       {result ? (
         <>
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Whole-trip safety summary</Text>
+            <Text style={styles.cardTitle}>{summary.title}</Text>
             <View style={styles.metrics}>
-              <Metric label="Risk level" value={risk?.risk_level || "Unknown"} />
-              <Metric label="Successful legs" value={`${risk?.successful_legs ?? 0}/${risk?.total_legs ?? legs.length}`} />
-              <Metric label="Complete analysis" value={risk?.complete ? "Yes" : "Partial"} />
+              <Metric label={summary.riskLabel} value={summary.riskValue} />
+              <Metric label="Routes calculated" value={summary.routeCoverage} />
+              <Metric label="Risk evidence coverage" value={summary.riskCoverage} />
+              <Metric label="Complete safety data" value={summary.safetyCoverage} />
+              <Metric label="Complete analysis" value={summary.complete ? "Yes" : "Incomplete"} />
             </View>
             {legs.map((leg) => (
               <View key={leg.leg_sequence} style={styles.legRow}>
-                <Text style={styles.legTitle}>{leg.leg_sequence}. {leg.from?.name} → {leg.to?.name}</Text>
+                <Text style={styles.legTitle}>{leg.leg_sequence}. {leg.from?.name} → {leg.to?.name}{leg.is_return_leg ? " (return)" : ""}</Text>
                 <Text style={styles.legMeta}>
                   {leg.status === "success"
                     ? `${leg.distance_km ?? "—"} km · ${leg.risk_prediction?.riskLevel || "Risk unavailable"}`
@@ -124,6 +130,13 @@ export default function ItineraryVehicleScreen({ route }) {
             ))}
           </View>
 
+          {result.incomplete_legs?.map((leg) => (
+            <View key={`missing-${leg.leg_sequence}`} style={styles.warning}>
+              <Text style={styles.warningText}>
+                Incomplete leg {leg.leg_sequence}: {leg.from?.name} → {leg.to?.name}. {leg.reasons.map(reason => reason.replace(/_/g, " ")).join(", ")}.
+              </Text>
+            </View>
+          ))}
           {bestVehicle ? (
             <VehicleCard vehicle={bestVehicle} title="Best whole-trip match" onSelect={setSelectedVehicle} />
           ) : (

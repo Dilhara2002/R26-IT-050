@@ -1,3 +1,4 @@
+
 /**
  * Main Entry Point:
  * AI-Powered Safety-Aware Tourism Platform
@@ -6,10 +7,11 @@
  * - Hotel data APIs
  * - Safety recommendation engine
  * - Itinerary APIs
+ * - Authentication APIs
+ * - Admin APIs
  * - MongoDB connection
  * - Neo4j GraphRAG connection
  */
-
 
 import express from "express";
 import mongoose from "mongoose";
@@ -17,6 +19,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 
+// -----------------------------
+// Route Imports
+// -----------------------------
 
 import hotelDataRoutes from "./routes/hotelData.routes.js";
 import safetyRoutes from "./routes/safetyRoutes.js";
@@ -24,68 +29,59 @@ import itinerarySafetyRoutes from "./routes/itinerarySafety.routes.js";
 import itineraryRoutes from "./routes/itinerary.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+
+// -----------------------------
+// Service Imports
+// -----------------------------
+
+import { authCorsOptions } from "./services/session.service.js";
 import { seedAdmin } from "./services/adminAuth.service.js";
 
+// -----------------------------
+// Neo4j Configuration
+// -----------------------------
 
 import { verifyNeo4jConnection } from "./config/neo4j.js";
 
+// -----------------------------
+// Environment Configuration
+// -----------------------------
 
 dotenv.config();
 
-
-
 const app = express();
-
-
 
 // -----------------------------
 // Middleware
 // -----------------------------
 
-app.use(cors());
+app.use(cors(authCorsOptions));
 
 app.use(express.json());
-
-
-
 
 // -----------------------------
 // Health Check
 // -----------------------------
 
 app.get("/", (req, res) => {
-
   res.status(200).json({
-
     success: true,
-
     message:
       "AI-Powered Safety-Aware Tourism Platform Backend is Running 🚀",
-
-    status:
-      "Healthy",
-
-    engine:
-      "Real ML Inference + Neo4j GraphRAG"
-
+    status: "Healthy",
+    engine: "Real ML Inference + Neo4j GraphRAG"
   });
-
 });
-
-
-
 
 // -----------------------------
 // Routes
 // -----------------------------
-
 
 // Hotel APIs
 app.use(
   "/api",
   hotelDataRoutes
 );
-
 
 // Safety Analyzer APIs
 app.use(
@@ -98,222 +94,162 @@ app.use(
   itinerarySafetyRoutes
 );
 
-
 // Itinerary APIs
 app.use(
   "/api/itinerary",
   itineraryRoutes
 );
 
-app.use("/api/admin", adminRoutes);
-app.use("/api/auth", authRoutes);
+// Authentication APIs
+app.use(
+  "/api/auth",
+  authRoutes
+);
 
-
-
-
+// Admin APIs
+app.use(
+  "/api/admin",
+  adminRoutes
+);
 
 // -----------------------------
 // Global Error Handler
 // -----------------------------
 
 app.use((err, req, res, next) => {
-
-
   console.error(
     "SERVER_ERROR:",
     err.stack
   );
 
-
   res.status(500).json({
-
     success: false,
-
-    message:
-      "Internal Server Error",
-
-    error:
-      err.message
-
+    message: "Internal Server Error",
+    error: err.message
   });
-
-
 });
-
-
-
-
-
 
 // -----------------------------
 // Infrastructure
 // -----------------------------
 
-
 const connectInfrastructure = async () => {
 
-
-
+  // -----------------------------
   // MongoDB Connection
+  // -----------------------------
 
   if (process.env.MONGO_URI) {
-
-
     try {
-
-
       await mongoose.connect(
         process.env.MONGO_URI
       );
 
+      if (mongoose.connection.name !== "ceylongo") {
+        await mongoose.disconnect();
+
+        throw new Error(
+          "Application requires the ceylongo database."
+        );
+      }
 
       console.log(
         "✅ Connected to MongoDB Atlas"
       );
 
+      // Seed administrator if required
       await seedAdmin();
 
-
-    } catch(error) {
-
-
+    } catch (error) {
       console.error(
-
         "❌ MongoDB connection error:",
-
         error.message
-
       );
-
-
     }
 
-
-
   } else {
-
-
     console.warn(
-
       "⚠️ MONGO_URI not found. MongoDB features may be limited."
-
     );
-
-
   }
 
-
-
-
+  // -----------------------------
   // Neo4j Connection
+  // -----------------------------
 
   try {
-
-
     await verifyNeo4jConnection();
-
 
     console.log(
       "✅ Neo4j connection verified"
     );
 
-
-  } catch(error) {
-
-
+  } catch (error) {
     console.error(
-
       "❌ Neo4j connection error:",
-
       error.message
-
     );
-
-
   }
-
-
-
 };
-
-
-
-
-
-
-
 
 // -----------------------------
 // Start Server
 // -----------------------------
 
-
 const startServer = async () => {
 
-
-
   await connectInfrastructure();
-
-
 
   const PORT =
     process.env.PORT || 5001;
 
+  app.listen(PORT, () => {
 
+    console.log(
+      `🚀 Server running on http://localhost:${PORT}`
+    );
 
-
-  app.listen(
-    PORT,
-    () => {
-
-
-      console.log(
-
-        `🚀 Server running on http://localhost:${PORT}`
-
-      );
-
-
-      console.log(
-
-        `🔗 Safety API:
+    console.log(
+      `🔗 Safety API:
 http://localhost:${PORT}/api/safety/recommend-vehicle`
+    );
 
-      );
-
-
-      console.log(
-
-        `🗺️ Itinerary API:
+    console.log(
+      `🗺️ Itinerary API:
 http://localhost:${PORT}/api/itinerary`
+    );
 
-      );
-
-
-      console.log(
-
-        `🏨 Hotel API:
+    console.log(
+      `🏨 Hotel API:
 http://localhost:${PORT}/api`
+    );
 
-      );
+    console.log(
+      `🔐 Authentication API:
+http://localhost:${PORT}/api/auth`
+    );
 
+    console.log(
+      `👤 Admin API:
+http://localhost:${PORT}/api/admin`
+    );
 
-    }
-
-  );
-
-
+  });
 };
 
+// -----------------------------
+// Execute Main Server
+// -----------------------------
 
-
-
-
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+if (
+  process.argv[1] &&
+  fileURLToPath(import.meta.url) === process.argv[1]
+) {
   startServer();
 }
 
-
-
+// -----------------------------
+// Export Express Application
+// -----------------------------
 
 export default app;
