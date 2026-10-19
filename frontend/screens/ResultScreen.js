@@ -20,7 +20,6 @@ const displayNumber = (value, digits = 1) =>
 
 export default function ResultScreen({ route, navigation }) {
   const initialData = route.params?.data || null;
-  const authToken = route.params?.authToken || "";
   const [data, setData] = useState(initialData);
   const [persistence, setPersistence] = useState(route.params?.persistence || null);
   const [validationError, setValidationError] = useState("");
@@ -62,9 +61,7 @@ export default function ResultScreen({ route, navigation }) {
       const requestPayload = mode === "replace_stop"
         ? buildReplacementRequest(data, action.placeId)
         : buildFullRegenerationRequest(data, regenerationContext);
-      const response = await API.post("/optimize", requestPayload, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
+      const response = await API.post("/optimize", requestPayload);
       const nextState = applySuccessfulRegeneration(previousState, response.data);
       setData(nextState.data);
       setPersistence(nextState.persistence);

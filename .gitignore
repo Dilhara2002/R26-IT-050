@@ -42,12 +42,9 @@ myvenv/
 htmlcov/
 
 # Environment variables
-.env
-.env.*
 !.env.example
 
 # IDE / editor
-.vscode/
 .idea/
 
 # OS files
