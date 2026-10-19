@@ -136,6 +136,12 @@ export function itineraryRequestError(error) {
       message: "The itinerary services could not be reached. Your inputs have been kept; check the local services and try again.",
     };
   }
+  if (status === 401) {
+    return { kind: "authentication_required", title: "Sign in required", message: "Please sign in again to use Smart Itinerary. Your inputs have been kept." };
+  }
+  if (status === 503 || status === 504) {
+    return { kind: "service_unavailable", title: "Itinerary service unavailable", message: serverMessage || "Please try again shortly. Your inputs have been kept." };
+  }
   if (code === "road_routing_unavailable") {
     return { kind: "service_unavailable", title: "Free road-routing service unavailable", message: serverMessage };
   }
