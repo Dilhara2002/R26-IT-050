@@ -6,7 +6,10 @@ import {
   generateItineraryFromAI,
   PYTHON_AI_TIMEOUT_MS
 } from "../src/services/itinerary.service.js";
-import { buildItineraryPayload } from "../src/controllers/itinerary.controller.js";
+import {
+  buildItineraryPayload,
+  optimizeItinerary,
+} from "../src/controllers/itinerary.controller.js";
 
 
 test("itinerary service preserves controlled verified-evidence errors", async () => {
@@ -209,6 +212,48 @@ test("itinerary service forwards optional guide explanation unchanged", async ()
     const result = await generateItineraryFromAI({ preferences: ["Nature"] });
     assert.strictEqual(result, upstream);
     assert.equal(result.data.guide_explanation, "Optional friendly paraphrase.");
+  } finally {
+    axios.post = originalPost;
+  }
+});
+
+test("controller returns generated itinerary when MongoDB persistence is unavailable", async () => {
+  const originalPost = axios.post;
+  axios.post = async () => ({
+    data: {
+      status: "success",
+      data: {
+        user_preferences: ["Nature"],
+        max_time_allocated_mins: 120,
+        optimized_stops: [{ place_id: "a", name: "Place A" }],
+      },
+    },
+  });
+  const req = {
+    body: {
+      preferences: ["Nature"],
+      max_time_minutes: 120,
+      current_lat: 7.2906,
+      current_lon: 80.6337,
+    },
+    user: { _id: "507f1f77bcf86cd799439011" },
+  };
+  let statusCode;
+  let responseBody;
+  const res = {
+    status(value) { statusCode = value; return this; },
+    json(value) { responseBody = value; return this; },
+  };
+  try {
+    await optimizeItinerary(req, res);
+    assert.equal(statusCode, 200);
+    assert.equal(responseBody.status, "success");
+    assert.strictEqual(responseBody.data.optimized_stops[0].name, "Place A");
+    assert.deepEqual(responseBody.persistence, {
+      status: "skipped",
+      saved: false,
+      reason: "database_unavailable",
+    });
   } finally {
     axios.post = originalPost;
   }

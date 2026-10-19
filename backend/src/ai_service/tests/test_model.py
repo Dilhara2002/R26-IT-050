@@ -217,6 +217,19 @@ class ModelTestCase(unittest.TestCase):
             result["Composite_Score"], expected, check_names=False
         )
 
+    def test_diverse_candidate_pool_keeps_top_distinct_tag_signatures(self):
+        places = pd.DataFrame(
+            {
+                "Place_ID": ["nature-1", "nature-2", "culture-1", "history-1"],
+                "Tags": ["Nature", "Nature", "Culture", "History"],
+                "Composite_Score": [0.99, 0.98, 0.97, 0.96],
+                "Distance_From_Start": [1.0, 2.0, 3.0, 4.0],
+            }
+        )
+        result = model._diverse_candidate_pool(places, limit=3)
+        self.assertEqual(result["Place_ID"].tolist(), ["nature-1", "culture-1", "history-1"])
+        self.assertEqual(result["Tags"].nunique(), 3)
+
     def test_pothgulgala_legacy_id_79_is_quarantined(self):
         result = model.filter_locations(["Nature", "Adventure"], 7.2906, 80.6337, 30)
         self.assertIsNotNone(result)

@@ -1,3 +1,4 @@
+
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { SafeAreaView, ActivityIndicator, StyleSheet, Alert, Platform, Text, Button } from "react-native";
 import { NavigationContainer, getPathFromState, getStateFromPath } from "@react-navigation/native";
@@ -110,11 +111,11 @@ function MainFlow({ navigation, route }) {
     setScreen("form");
   }, [route.params?.locationSelection, setScreen]);
 
-  const handleAuth = async ({ name, email, password, register }) => {
+  const handleAuth = async ({ name, email, password }) => {
     try {
       const authenticated = screen === "adminLogin"
         ? await adminLogin(email, password)
-        : await travellerAuth({ name, email, password, register });
+        : await travellerAuth({ name, email, password, register: screen === "register" });
       if (!authenticated?.user || (screen === "adminLogin" && authenticated.user.role !== "admin")) {
         throw new Error("Authentication failed.");
       }
@@ -168,7 +169,7 @@ function MainFlow({ navigation, route }) {
   };
 
   const openModule = (id) => {
-    if (id === "sasanka") navigation.navigate("ItineraryHome");
+    if (id === "sasanka") navigation.navigate("ItineraryHome", { authToken: session?.token ?? null });
     else if (id === "dunith") navigation.navigate("HotelHome");
     else if (id === "ishan") { setHotelContext(null); setScreen("form"); }
     else if (id === "madush") navigation.navigate("LandmarkScanner");

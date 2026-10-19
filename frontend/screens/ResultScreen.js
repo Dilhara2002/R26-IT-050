@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState } from "react";
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import API from "../services/api";
@@ -19,6 +20,7 @@ const displayNumber = (value, digits = 1) =>
 
 export default function ResultScreen({ route, navigation }) {
   const initialData = route.params?.data || null;
+  const authToken = route.params?.authToken || "";
   const [data, setData] = useState(initialData);
   const [persistence, setPersistence] = useState(route.params?.persistence || null);
   const [validationError, setValidationError] = useState("");
@@ -60,7 +62,9 @@ export default function ResultScreen({ route, navigation }) {
       const requestPayload = mode === "replace_stop"
         ? buildReplacementRequest(data, action.placeId)
         : buildFullRegenerationRequest(data, regenerationContext);
-      const response = await API.post("/optimize", requestPayload);
+      const response = await API.post("/optimize", requestPayload, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
       const nextState = applySuccessfulRegeneration(previousState, response.data);
       setData(nextState.data);
       setPersistence(nextState.persistence);

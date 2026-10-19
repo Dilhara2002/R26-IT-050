@@ -14,9 +14,9 @@ The existing frozen relevance SVM is used for inference only. Loading or expandi
 
 The v2 research manifest contains exactly 20 profiles and 800 profile-POI pairs. It preserves the 15 v1 profiles, the fixed held-out profiles P06/P08/P13, and all 60 existing human labels. Five new profiles are training-only. The remaining rows comprise 680 reproducible weak-supervision training examples and a 120-row evaluation grid: 60 preserved Kandy human judgements plus 60 blank Matale/Nuwara Eliya extension judgements. Reviewer workbooks deliberately omit weak labels and model outputs.
 
-## Current runtime dataset
+## Archived prototype dataset
 
-`places.csv` is the current 1,000-record, AI-assisted synthetic/prototype POI dataset used for application, routing, and integration testing. It must not be used as evidence for final model-performance claims or as an independently verified catalogue of Sri Lankan tourism POIs.
+`places.csv` is the archived 1,000-record, AI-assisted synthetic/prototype POI dataset retained for legacy testing and forensic comparison. It is not the active itinerary runtime catalogue and must not be used as evidence for final model-performance claims or as an independently verified catalogue of Sri Lankan tourism POIs.
 
 Recorded identity of the current version:
 
