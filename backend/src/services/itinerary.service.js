@@ -74,7 +74,9 @@ export const generateItineraryFromAI = async (itineraryData) => {
       "Error communicating with Python AI Engine:",
       error.message
     );
-    throw new Error("Failed to generate itinerary from AI Engine");
+    const unavailable = new Error("The itinerary engine is temporarily unavailable. Please try again shortly.");
+    unavailable.statusCode = 503;
+    throw unavailable;
 
 
   }
