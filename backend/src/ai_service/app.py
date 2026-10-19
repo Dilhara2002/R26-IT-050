@@ -11,6 +11,8 @@ load_dotenv()
 # for both direct Python starts and `npm run ai-service`.
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
+from road_routing import RoadContext, RoadRoutingError, validate_options
+
 from model import (
     CATALOGUE_POI_COUNT,
     DATA_SCOPE,
@@ -42,7 +44,7 @@ CORS(app)
 if landmark_bp is not None:
     app.register_blueprint(landmark_bp)
 
-ALLOWED_GENERATION_MODES = {"initial", "replace_stop", "full_regeneration"}
+ALLOWED_GENERATION_MODES = {"initial", "replace_stop", "full_regeneration", "reschedule"}
 MAX_TIME_MINUTES = 1440
 MAX_RECENT_PLAN_SIGNATURES = 8
 
@@ -197,7 +199,7 @@ def _validate_constraints(data, user_lat, user_lon, radius_km, max_time_minutes)
                 code="locked_place_outside_radius",
             )
 
-    if locked_ids:
+    if locked_ids and data.get("routing_mode", "legacy") != "road":
         locked_frame = PLACES_DF.set_index("Place_ID", drop=False).loc[
             locked_ids
         ].reset_index(drop=True)
@@ -223,7 +225,12 @@ def _validate_constraints(data, user_lat, user_lon, radius_km, max_time_minutes)
         raise RequestValidationError(
             f"target_stop_count must be an integer from 1 to {MAX_ROUTE_STOPS}."
         )
-    if generation_mode == "replace_stop":
+    if generation_mode == "reschedule":
+        if data.get("routing_mode") != "road" or not 1 <= len(locked_ids) <= MAX_ROUTE_STOPS or excluded_ids or current_signature or recent_signatures or replaced_place_id is not None:
+            raise RequestValidationError("Rescheduling requires road mode and exactly the accepted stop IDs as locked places.")
+        target_stop_count = len(locked_ids)
+        replaced_place_id = None
+    elif generation_mode == "replace_stop":
         if replaced_place_id is None:
             raise RequestValidationError("replaced_place_id is required for replace_stop mode.")
         replaced_place_id = _normalize_id(replaced_place_id, "replaced_place_id")
@@ -294,6 +301,7 @@ def optimize_itinerary():
         if not isinstance(data, dict):
             raise RequestValidationError("The request body must be a JSON object.")
 
+        planning_options = validate_options(data)
         user_preferences = data.get("preferences", [])
         max_time_minutes = _finite_number(
             data, "max_time_minutes", 480, 1, MAX_TIME_MINUTES
@@ -351,8 +359,24 @@ def optimize_itinerary():
                 search_radius_km=radius_km,
             )
 
+        if planning_options:
+            unknown_windows = set(planning_options["visit_windows"]) - set(_verified_places_by_id())
+            if unknown_windows:
+                raise RequestValidationError("Visit windows contain unknown place IDs.", "invalid_day_plan")
+            filtered_places.attrs["road_context"] = RoadContext(
+                filtered_places, user_lat, user_lon, planning_options
+            )
+
         target_stop_count = constraints["target_stop_count"]
         selected_route_indices = None
+        if planning_options and generation_mode == "reschedule":
+            locked_indices = [index for index, row in enumerate(filtered_places.to_dict("records")) if str(row["Place_ID"]) in locked_ids]
+            selected_route_indices = filtered_places.attrs["road_context"].order(locked_indices, budget=max_time_minutes)
+        elif planning_options and generation_mode == "replace_stop":
+            selected_route_indices = find_best_full_regeneration_route(
+                filtered_places, max_time_minutes, user_lat, user_lon,
+                target_stop_count, required_place_ids=locked_ids,
+            )
         if generation_mode == "full_regeneration":
             selected_route_indices = find_best_full_regeneration_route(
                 filtered_places,
@@ -401,7 +425,7 @@ def optimize_itinerary():
             and optimization["planned_time_minutes"] <= max_time_minutes
             and len(returned_ids) <= MAX_ROUTE_STOPS
         )
-        if generation_mode in {"replace_stop", "full_regeneration"}:
+        if generation_mode in {"replace_stop", "full_regeneration", "reschedule"}:
             constraints_satisfied = constraints_satisfied and len(returned_ids) == target_stop_count
         if generation_mode == "full_regeneration":
             returned_signature = tuple(sorted(returned_ids))
@@ -418,7 +442,7 @@ def optimize_itinerary():
             )
             return _controlled_error(
                 "No verified route can satisfy the requested stops, exclusions, active radius, "
-                "and time budget without dropping a locked stop.",
+                "time budget, and any supplied opening windows without dropping a locked stop.",
                 code,
                 409,
                 generation_mode=generation_mode,
@@ -427,6 +451,11 @@ def optimize_itinerary():
                 search_radius_km=radius_km,
             )
 
+        if planning_options:
+            optimization["route_explanation"]["selection_method"] = (
+                "seeded_genetic_algorithm_with_road_time_constraints"
+                if generation_mode == "initial" else "bounded_directed_road_subset_search"
+            )
         core_summary = optimization["route_explanation"]["summary"]
         optional_paraphrase = generate_itinerary_summary(
             optimized_stops,
@@ -439,7 +468,7 @@ def optimize_itinerary():
                 "planned_time_minutes": optimization["planned_time_minutes"],
                 "remaining_time_minutes": optimization["remaining_time_minutes"],
                 "time_utilization_percent": optimization["time_utilization_percent"],
-                "route_limitations": (
+                "route_limitations": optimization["travel_estimation"].get("limitations") or (
                     "Straight-line Haversine travel estimate with an assumed average "
                     "speed and traffic buffer; no real-road routing, live traffic, "
                     "opening hours, return travel, parking, or walking."
@@ -463,6 +492,11 @@ def optimize_itinerary():
                     else "Itinerary optimized successfully."
                 ),
                 "data": {
+                    **{key: optimization[key] for key in (
+                        "planning_options", "waiting_time_minutes", "break_time_minutes",
+                        "scheduled_finish_time", "return_travel_minutes", "validation_status",
+                        "road_geometry", "road_geometry_status",
+                    ) if key in optimization},
                     "starting_location": {"lat": user_lat, "lon": user_lon},
                     "data_scope": DATA_SCOPE,
                     "dataset_version": DATASET_VERSION,
@@ -507,7 +541,7 @@ def optimize_itinerary():
                 },
             }
         ), 200
-    except RequestValidationError as error:
+    except (RequestValidationError, RoadRoutingError) as error:
         return _controlled_error(error, error.code, error.status)
     except Exception as error:
         return jsonify({"status": "error", "error": str(error)}), 500

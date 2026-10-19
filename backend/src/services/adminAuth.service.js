@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import Admin from "../models/Admin.js";
+import { readSession } from "./session.service.js";
 
 const iterations = 120000;
 const digest = "sha256";
@@ -19,7 +20,8 @@ export const verifyPassword = (password, salt, expectedHash) => {
   return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
 };
 
-const tokenSecret = () => process.env.ADMIN_TOKEN_SECRET || "ceylongo-local-admin-secret-change-me";
+const ephemeralSecret = crypto.randomBytes(32).toString("hex");
+const tokenSecret = () => process.env.ADMIN_TOKEN_SECRET || ephemeralSecret;
 const encode = (value) => Buffer.from(JSON.stringify(value)).toString("base64url");
 
 export const createAdminToken = (admin) => {
@@ -30,13 +32,19 @@ export const createAdminToken = (admin) => {
 
 export const authenticateAdmin = async (req, res, next) => {
   try {
+    if (!req.headers.authorization || /^Bearer [a-f0-9]{64}$/i.test(req.headers.authorization)) {
+      const session = await readSession(req);
+      if (session?.user?.role !== "admin") throw new Error("Admin session required");
+      req.admin = { ...session.user, _id: session.user.id };
+      return next();
+    }
     const token = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "");
     const [payload, signature] = token.split(".");
     if (!payload || !signature) throw new Error("Missing token");
     const expected = crypto.createHmac("sha256", tokenSecret()).update(payload).digest("base64url");
     if (signature.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) throw new Error("Bad signature");
     const claims = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-    if (claims.role !== "admin" || claims.exp < Date.now()) throw new Error("Expired token");
+    if (claims.role !== "admin" || !Number.isFinite(claims.exp) || claims.exp <= Date.now()) throw new Error("Expired token");
     const admin = await Admin.findById(claims.sub).select("_id name email role");
     if (!admin) throw new Error("Admin not found");
     req.admin = admin;
@@ -47,10 +55,11 @@ export const authenticateAdmin = async (req, res, next) => {
 };
 
 export const seedAdmin = async () => {
-  const email = (process.env.ADMIN_EMAIL || "admin@ceylongo.lk").toLowerCase();
+  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const password = process.env.ADMIN_PASSWORD;
+  if (!email || !password || password.length < 12) return;
   if (await Admin.exists({ email })) return;
-  const password = process.env.ADMIN_PASSWORD || "Admin@123";
   const { salt, hash } = hashPassword(password);
   await Admin.create({ name: "CeylonGo Administrator", email, passwordSalt: salt, passwordHash: hash });
-  console.warn(`Admin account created for ${email}. Configure ADMIN_EMAIL and ADMIN_PASSWORD before production.`);
+  console.warn("Configured administrator initialized.");
 };

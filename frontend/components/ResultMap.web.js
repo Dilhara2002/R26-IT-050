@@ -32,7 +32,7 @@ function FitMapBounds({ points }) {
   return null;
 }
 
-export default function ResultMap({ startingLocation, optimizedStops = [] }) {
+export default function ResultMap({ startingLocation, optimizedStops = [], roadGeometry = null, roadMode = false }) {
   const startPosition = useMemo(() => {
     const latitude = Number(startingLocation?.lat);
     const longitude = Number(startingLocation?.lon);
@@ -62,14 +62,15 @@ export default function ResultMap({ startingLocation, optimizedStops = [] }) {
     ],
     [startPosition, validStops]
   );
+  const linePoints = roadMode ? (roadGeometry?.coordinates || []).map(([lon, lat]) => [lat, lon]) : routePoints;
   const initialCenter = startPosition || routePoints[0] || DEFAULT_CENTER;
 
   return (
     <MapContainer center={initialCenter} zoom={12} style={{ height: '100%', width: '100%' }}>
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       <FitMapBounds points={routePoints} />
-      {routePoints.length > 1 ? (
-        <Polyline positions={routePoints} pathOptions={{ color: '#1D4ED8', weight: 4 }} />
+      {linePoints.length > 1 ? (
+        <Polyline positions={linePoints} pathOptions={{ color: '#1D4ED8', weight: 4 }} />
       ) : null}
       {startPosition ? (
         <Marker position={startPosition} icon={startIcon}>

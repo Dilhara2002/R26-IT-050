@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
-import { SafeAreaView, ActivityIndicator, StyleSheet, Alert } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
+
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { SafeAreaView, ActivityIndicator, StyleSheet, Alert, Platform, Text, Button } from "react-native";
+import { NavigationContainer, getPathFromState, getStateFromPath } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { getLowerRiskRoute } from "./src/api/safetyApi";
 import { colors } from "./src/styles/colors";
@@ -24,23 +25,53 @@ import HotelResultsScreen from "./src/screens/HotelResultsScreen";
 import AdminPricingScreen from "./src/screens/AdminPricingScreen";
 import LocationPickerScreen from "./src/screens/LocationPickerScreen";
 import { adminLogin } from "./src/api/adminApi";
-import { loginUser, registerUser } from "./src/api/authApi";
+import { restoreSession, travellerAuth, endSession } from "./src/api/authApi";
+import { screenPaths, mainPage, readNavigation, saveNavigation, clearNavigation, navigationForUrl, navigationForLink, hasRequiredRouteData } from "./services/sessionNavigation";
 import MobileBackButton from "./src/components/MobileBackButton";
 
 const Stack = createNativeStackNavigator();
+const SessionContext = createContext(null);
+const browserStorage = () => {
+  try { return Platform.OS === "web" ? globalThis.sessionStorage : null; } catch { return null; }
+};
+
+function withRouteData(Screen) {
+  return function RestoredRoute(props) {
+    if (!hasRequiredRouteData(props.route.name, props.route.params)) return (
+      <SafeAreaView style={styles.container}>
+        <Text>Trip details are unavailable in this browser tab. Open a plan to continue.</Text>
+        <Button title="Open dashboard" onPress={() => props.navigation.navigate("Main", { page: "dashboard" })} />
+      </SafeAreaView>
+    );
+    return <Screen {...props} />;
+  };
+}
+const RestoredItineraryResult = withRouteData(ItineraryResultScreen);
+const RestoredItineraryVehicle = withRouteData(ItineraryVehicleScreen);
+const RestoredMap = withRouteData(MapScreen);
+const RestoredSafetyMap = withRouteData(SafetyMapScreen);
+const RestoredTripReview = withRouteData(TripReviewScreen);
 
 function MainFlow({ navigation, route }) {
-  const [screen, setScreen] = useState("welcome");
-  const [user, setUser] = useState(null);
-  const [adminToken, setAdminToken] = useState(null);
-  const [userToken, setUserToken] = useState(null);
+  const { session, acceptSession, logout, savedFlow, persistFlow } = useContext(SessionContext);
+  const user = session?.user;
+  const [publicScreen, setPublicScreen] = useState(globalThis.location?.pathname && globalThis.location.pathname !== "/" ? "login" : "welcome");
+  const screen = user ? mainPage(route.params?.page || savedFlow?.screen, user.role) : publicScreen;
+  const setScreen = useCallback(value => user ? navigation.setParams({ page: value }) : setPublicScreen(value), [user, navigation]);
+  useEffect(() => {
+    if (user && route.params?.page !== screen) navigation.setParams({ page: screen });
+  }, [user, screen, route.params?.page, navigation]);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState(savedFlow?.result || null);
   const [errorMessage, setErrorMessage] = useState("");
-  const [hotelContext, setHotelContext] = useState(null);
+  const [hotelContext, setHotelContext] = useState(savedFlow?.hotelContext || null);
   const consumedHotelRequest = useRef(null);
   const consumedLocationSelection = useRef(null);
-  const [form, setForm] = useState({ budget: "", passengers: "", startLocation: "", endLocation: "", preferredCategory: "" });
+  const [form, setForm] = useState(savedFlow?.form || { budget: "", passengers: "", startLocation: "", endLocation: "", preferredCategory: "" });
+
+  useEffect(() => {
+    if (user) persistFlow({ screen, form, result, hotelContext });
+  }, [user, screen, form, result, hotelContext, persistFlow]);
 
   useEffect(() => {
     const request = route.params?.hotelSafetyRequest;
@@ -68,7 +99,7 @@ function MainFlow({ navigation, route }) {
       preferredCategory: request.vehicleRequest?.preferredCategory || "",
     });
     setScreen("form");
-  }, [route.params?.hotelSafetyRequest]);
+  }, [route.params?.hotelSafetyRequest, setScreen]);
 
   useEffect(() => {
     const selection = route.params?.locationSelection;
@@ -78,32 +109,19 @@ function MainFlow({ navigation, route }) {
     setHotelContext(null);
     setForm((current) => ({ ...current, [selection.field]: selection.value }));
     setScreen("form");
-  }, [route.params?.locationSelection]);
+  }, [route.params?.locationSelection, setScreen]);
 
   const handleAuth = async ({ name, email, password }) => {
-    if (screen === "adminLogin") {
-      try {
-        const admin = await adminLogin(email, password);
-        if (admin?.user?.role === "admin") {
-          setUser(admin.user);
-          setAdminToken(admin.token);
-          setScreen("admin");
-          return;
-        }
-        throw new Error("Administrator account required.");
-      } catch (error) {
-        throw new Error(error.response?.data?.message || "Cannot connect to the administrator login service.");
-      }
-    }
     try {
-      const account = screen === "register"
-        ? await registerUser(name, email, password)
-        : await loginUser(email, password);
-      setUser(account.user);
-      setUserToken(account.token);
-      setScreen("dashboard");
+      const authenticated = screen === "adminLogin"
+        ? await adminLogin(email, password)
+        : await travellerAuth({ name, email, password, register: screen === "register" });
+      if (!authenticated?.user || (screen === "adminLogin" && authenticated.user.role !== "admin")) {
+        throw new Error("Authentication failed.");
+      }
+      acceptSession(authenticated);
     } catch (error) {
-      throw new Error(error.response?.data?.message || "Cannot connect to the user account service.");
+      throw new Error(error.response?.data?.message || error.message || "Unable to sign in.");
     }
   };
 
@@ -151,18 +169,11 @@ function MainFlow({ navigation, route }) {
   };
 
   const openModule = (id) => {
-    if (id === "sasanka") navigation.navigate("ItineraryHome", { authToken: userToken });
+    if (id === "sasanka") navigation.navigate("ItineraryHome", { authToken: session?.token ?? null });
     else if (id === "dunith") navigation.navigate("HotelHome");
     else if (id === "ishan") { setHotelContext(null); setScreen("form"); }
     else if (id === "madush") navigation.navigate("LandmarkScanner");
     else setScreen(`module:${id}`);
-  };
-
-  const logout = () => {
-    setUser(null);
-    setAdminToken(null);
-    setUserToken(null);
-    setScreen("welcome");
   };
 
   const leaveSafetyForm = () => {
@@ -184,7 +195,7 @@ function MainFlow({ navigation, route }) {
       {screen === "welcome" && <WelcomeScreen onLogin={() => setScreen("login")} onRegister={() => setScreen("register")} onAdminLogin={() => setScreen("adminLogin")} />}
       {(screen === "login" || screen === "register" || screen === "adminLogin") && <AuthScreen mode={screen} onSubmit={handleAuth} onBack={() => setScreen("welcome")} onSwitch={() => setScreen(screen === "login" ? "register" : "login")} />}
       {screen === "dashboard" && <DashboardScreen user={user} onOpenModule={openModule} onLogout={logout} />}
-      {screen === "admin" && <AdminPricingScreen user={user} token={adminToken} onLogout={logout} />}
+      {screen === "admin" && <AdminPricingScreen user={user} token={null} onLogout={logout} />}
       {screen.startsWith("module:") && <ModuleScreen moduleId={screen.split(":")[1]} onBack={() => setScreen("dashboard")} />}
       {screen === "form" && <TripInputScreen form={form} setForm={setForm} loading={loading} onSubmit={handleSubmit} onBack={leaveSafetyForm} hotelContext={hotelContext} onPickLocation={(field) => navigation.navigate("LocationPicker", { field })} />}
       {screen === "result" && <SafetyResultScreen result={result} errorMessage={errorMessage} onBack={() => setScreen("form")} onNewSearch={handleNewSearch} onShowMap={(selectedRoute) => navigation.navigate("SafetyMap", { selectedRoute })} onReviewTrip={(selectedVehicle, tripResult) => navigation.navigate("TripReview", { selectedVehicle, tripResult, hotelContext })} />}
@@ -194,8 +205,74 @@ function MainFlow({ navigation, route }) {
 }
 
 export default function App() {
+  const [session, setSession] = useState(null);
+  const [checking, setChecking] = useState(true);
+  const [sessionError, setSessionError] = useState(false);
+  const snapshot = useRef(null);
+  const navigationRef = useRef(null);
+  const sessionRef = useRef(null);
+  const acceptSession = useCallback(value => {
+    const previous = sessionRef.current?.user?.id;
+    if (previous && previous !== value?.user?.id) clearNavigation(browserStorage(), previous);
+    if (previous !== value?.user?.id) snapshot.current = value ? readNavigation(browserStorage(), value.user.id) : null;
+    sessionRef.current = value;
+    setSession(value);
+  }, []);
+  const checkSession = useCallback(async () => {
+    try {
+      acceptSession(await restoreSession());
+      setSessionError(false);
+    } catch {
+      setSessionError(true);
+    } finally { setChecking(false); }
+  }, [acceptSession]);
+  useEffect(() => { checkSession(); }, [checkSession]);
+  useEffect(() => {
+    if (!session) return undefined;
+    const remaining = Date.parse(session.expiresAt) - Date.now();
+    const timer = setTimeout(() => acceptSession(null), Math.max(0, remaining));
+    if (Platform.OS === "web") globalThis.addEventListener?.("focus", checkSession);
+    return () => {
+      clearTimeout(timer);
+      if (Platform.OS === "web") globalThis.removeEventListener?.("focus", checkSession);
+    };
+  }, [session, acceptSession, checkSession]);
+  const persistNavigation = useCallback(state => {
+    if (!sessionRef.current || !state) return;
+    snapshot.current = { ...snapshot.current, navigation: state, path: getPathFromState(navigationForLink(state), { screens: screenPaths }) };
+    saveNavigation(browserStorage(), sessionRef.current.user.id, snapshot.current);
+  }, []);
+  const persistFlow = useCallback(flow => {
+    snapshot.current = { ...snapshot.current, flow };
+    saveNavigation(browserStorage(), sessionRef.current?.user?.id, snapshot.current);
+  }, []);
+  const logout = async () => {
+    try {
+      await endSession();
+      clearNavigation(browserStorage(), session?.user?.id);
+      snapshot.current = null;
+      acceptSession(null);
+    } catch { Alert.alert("Logout unavailable", "Unable to end the server session. Please retry."); }
+  };
+  if (checking) return <SafeAreaView style={styles.container}><ActivityIndicator accessibilityLabel="Restoring session" /></SafeAreaView>;
+  if (sessionError) return <SafeAreaView style={styles.container}><Text>Unable to verify your session. Check the API connection.</Text><Button title="Retry" onPress={checkSession} /></SafeAreaView>;
+  const linking = session ? {
+    prefixes: [], config: { screens: screenPaths },
+    getPathFromState: (state, options) => getPathFromState(navigationForLink(state), options),
+    getStateFromPath: (path, options) => {
+      const state = getStateFromPath(path, options);
+      if (state) state.routes = state.routes.map(item => ({ ...item, params: {
+        ...snapshot.current?.navigation?.routes?.find(old => old.name === item.name)?.params,
+        ...(item.name === "Main" ? { page: item.params?.page } : {}),
+      } }));
+      return state;
+    },
+  } : undefined;
   return (
-    <NavigationContainer>
+    <SessionContext.Provider value={{ session, acceptSession, logout, savedFlow: snapshot.current?.flow, persistFlow }}>
+    <NavigationContainer key={session?.user?.id || "anonymous"} ref={navigationRef} linking={linking}
+      initialState={session && Platform.OS === "web" ? navigationForUrl(snapshot.current, globalThis.location?.pathname) : undefined}
+      onReady={() => persistNavigation(navigationRef.current?.getRootState())} onStateChange={persistNavigation}>
       <Stack.Navigator
         initialRouteName="Main"
         screenOptions={({ navigation }) => ({
@@ -215,20 +292,23 @@ export default function App() {
         })}
       >
         <Stack.Screen name="Main" component={MainFlow} options={{ headerShown: false }} />
+        {session && <>
         <Stack.Screen name="ItineraryHome" component={ItineraryHomeScreen} options={{ title: "Smart Itinerary" }} />
-        <Stack.Screen name="ItineraryResult" component={ItineraryResultScreen} options={{ title: "Optimized Itinerary" }} />
-        <Stack.Screen name="ItineraryVehicle" component={ItineraryVehicleScreen} options={{ title: "Route & Vehicle Match" }} />
-        <Stack.Screen name="Map" component={MapScreen} options={{ title: "Itinerary Map" }} />
-        <Stack.Screen name="SafetyMap" component={SafetyMapScreen} options={{ title: "Safe Route Map" }} />
-        <Stack.Screen name="TripReview" component={TripReviewScreen} options={{ title: "Review Trip Plan" }} />
+        <Stack.Screen name="ItineraryResult" component={RestoredItineraryResult} options={{ title: "Optimized Itinerary" }} />
+        <Stack.Screen name="ItineraryVehicle" component={RestoredItineraryVehicle} options={{ title: "Route & Vehicle Match" }} />
+        <Stack.Screen name="Map" component={RestoredMap} options={{ title: "Itinerary Map" }} />
+        <Stack.Screen name="SafetyMap" component={RestoredSafetyMap} options={{ title: "Safe Route Map" }} />
+        <Stack.Screen name="TripReview" component={RestoredTripReview} options={{ title: "Review Trip Plan" }} />
         <Stack.Screen name="LandmarkExplorer" component={LandmarkExplorerScreen} options={{ title: "Landmark Explorer" }} />
         <Stack.Screen name="LandmarkScanner" component={LandmarkScannerScreen} options={{ headerShown: false }} />
         <Stack.Screen name="LandmarkChat" component={LandmarkChatScreen} options={{ headerShown: false }} />
         <Stack.Screen name="HotelHome" component={HotelHomeScreen} options={{ title: "Hotels & Activities" }} />
         <Stack.Screen name="HotelResults" component={HotelResultsScreen} options={{ title: "Your Hotel Matches" }} />
         <Stack.Screen name="LocationPicker" component={LocationPickerScreen} options={{ headerShown: false }} />
+        </>}
       </Stack.Navigator>
     </NavigationContainer>
+    </SessionContext.Provider>
   );
 }
 

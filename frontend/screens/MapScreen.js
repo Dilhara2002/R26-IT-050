@@ -6,7 +6,7 @@ import ResultMap from "../components/ResultMap";
 import MobileBackButton from "../src/components/MobileBackButton";
 
 export default function MapScreen({ route, navigation }) {
-  const { startingLocation = null, optimizedStops = [] } = route.params || {};
+  const { startingLocation = null, optimizedStops = [], roadGeometry = null, roadMode = false } = route.params || {};
   const hasStartingLocation =
     Number.isFinite(Number(startingLocation?.lat)) &&
     Number.isFinite(Number(startingLocation?.lon));
@@ -25,7 +25,7 @@ export default function MapScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <ResultMap startingLocation={startingLocation} optimizedStops={optimizedStops} />
+      <ResultMap startingLocation={startingLocation} optimizedStops={optimizedStops} roadGeometry={roadGeometry} roadMode={roadMode} />
 
       {dataWarning ? (
         <View style={styles.emptyState}>
@@ -39,7 +39,7 @@ export default function MapScreen({ route, navigation }) {
           Numbered markers follow the optimized itinerary order.
         </Text>
         <Text style={styles.cardNote}>
-          The blue line is a straight-line planning estimate, not a drivable route or live traffic view.
+          {roadMode ? (roadGeometry ? "Blue line: OSRM road route, including return when requested. No live traffic. Map data © OpenStreetMap contributors." : "Road geometry is unavailable; only stop markers are shown. No live traffic.") : "The blue line is a straight-line planning estimate, not a drivable route or live traffic view."}
         </Text>
         
         <MobileBackButton
@@ -55,6 +55,7 @@ export default function MapScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   emptyState: {
+    zIndex: 1000,
     position: 'absolute',
     bottom: 24,
     alignSelf: 'center',
@@ -68,6 +69,7 @@ const styles = StyleSheet.create({
   },
   emptyStateText: { color: '#9A3412', textAlign: 'center', fontWeight: '700' },
   floatingCard: {
+    zIndex: 1000,
     position: 'absolute',
     top: 16,
     alignSelf: 'center',

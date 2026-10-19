@@ -400,5 +400,172 @@ test("itinerary safety integration", async (t) => {
     assert.equal(response.body.success, true);
   });
 
+  await t.test("named route preserves unknown weather and observed dry weather", async () => {
+    for (const weather of [null, { status: "unavailable", isRaining: false }, { status: "available", isRaining: false }]) {
+      installMocks();
+      setSafetyAnalysisDependenciesForTesting({ getWeatherByCoordinates: async () => weather });
+      const { body } = await postRoute({ startLocation: "Start", endLocation: "A" });
+      assert.equal(body.analysis.weatherStatus, weather?.status === "available" ? "available" : "unavailable");
+      assert.equal(body.analysis.rainDetected, weather?.status === "available" ? false : null);
+    }
+    installMocks({ weatherFails: true });
+    const { body } = await postRoute({ startLocation: "Start", endLocation: "A" });
+    assert.equal(body.analysis.weatherStatus, "unavailable");
+    assert.equal(body.analysis.rainDetected, null);
+  });
+
+  await t.test("named route separates road, model and historical graph evidence", async () => {
+    installMocks({ graphFails: true });
+    setSafetyAnalysisDependenciesForTesting({ getRoadDataByRouteLabels: async () => ({
+      _matchedRouteFamily: "Road A", _matchedLabelCount: 2, _routeLabelCount: 3,
+      "Max Gradient (%)": 3,
+    }) });
+    let response = await postRoute({ startLocation: "Start", endLocation: "A" });
+    assert.equal(response.body.routeResult.evidenceAvailable, true);
+    assert.equal(response.body.routeResult.roadEvidence.status, "available");
+    assert.equal(response.body.analysis.matchedRoad, "Road A");
+    assert.equal(response.body.routeResult.historicalGraphEvidence.status, "unavailable");
+    assert.equal(response.body.routeResult.roadEvidence.coverage.status, "partial-provider-label-match");
+    assert.equal(response.body.routeResult.roadEvidence.coverage.matchedLabelCount, 2);
+    setSafetyAnalysisDependenciesForTesting({ runRiskPrediction: async () => { throw new Error("model unavailable"); } });
+    response = await postRoute({ startLocation: "Start", endLocation: "A" });
+    assert.equal(response.body.routeResult.evidenceAvailable, false);
+    assert.equal(response.body.routeResult.modelEvidence.status, "unavailable");
+    assert.equal(response.body.routeResult.roadEvidence.status, "available");
+    installMocks({ noRisk: new Set(["A"]) });
+    response = await postRoute({ startLocation: "Start", endLocation: "A" });
+    assert.equal(response.body.routeResult.roadEvidence.status, "unavailable");
+    assert.equal(response.body.analysis.matchedRoad, null);
+    for (const matchedRisks of [[], [{ riskId: "example" }]]) {
+      installMocks();
+      setSafetyAnalysisDependenciesForTesting({ graphManager: {
+        getMLRiskContext: async () => ({ matchType: "route-level" }),
+        getSafetyReasoning: async () => ({ status: "available", matchedRisks }),
+      } });
+      response = await postRoute({ startLocation: "Start", endLocation: "A" });
+      assert.equal(response.body.routeResult.historicalGraphEvidence.status, matchedRisks.length ? "available" : "no-match");
+    }
+  });
+
+  await t.test("named route returns real fastest-route deltas or explicit unknown values", async () => {
+    installMocks({ gradients: { HighRoad: 8, LowRoad: 2 } });
+    const routes = [
+      { routeId: "fast", distanceKm: 9, durationMinutes: 15, roadNames: ["HighRoad"] },
+      { routeId: "slow", distanceKm: 10, durationMinutes: 17, roadNames: ["LowRoad"] },
+    ].map(route => ({ ...route, correctedStartLocation: "Start", correctedEndLocation: "A",
+      startCoordinates: { latitude: 7.29, longitude: 80.63 },
+      endCoordinates: { latitude: 7.3, longitude: 80.64 },
+    }));
+    setSafetyAnalysisDependenciesForTesting({ getRouteAlternatives: async () => routes });
+    let response = await postRoute({ startLocation: "Start", endLocation: "A" });
+    assert.equal(response.body.routeResult.comparisonAvailable, true);
+    assert.deepEqual(response.body.comparison, { status: "available", extraMinutesVsFastest: 2, extraDistanceKmVsFastest: 1 });
+    routes[1].durationMinutes = 15;
+    routes[1].distanceKm = 9;
+    response = await postRoute({ startLocation: "Start", endLocation: "A" });
+    assert.equal(response.body.comparison.extraMinutesVsFastest, 0);
+    assert.equal(response.body.comparison.extraDistanceKmVsFastest, 0);
+    routes[0].durationMinutes = null;
+    response = await postRoute({ startLocation: "Start", endLocation: "A" });
+    assert.equal(response.body.routeResult.comparisonAvailable, false);
+    assert.equal(response.body.comparison.extraMinutesVsFastest, null);
+    installMocks();
+    response = await postRoute({ startLocation: "Start", endLocation: "A" });
+    assert.deepEqual(response.body.comparison, { status: "unavailable", extraMinutesVsFastest: null, extraDistanceKmVsFastest: null });
+  });
+
+  await t.test("unsupported 100 km default and supported 150 km alternative keep distinct identities", async () => {
+    installMocks();
+    const routes = [
+      { routeId: "provider-default", distanceKm: 100, durationMinutes: 100, roadNames: [] },
+      { routeId: "alternative", distanceKm: 150, durationMinutes: 150, roadNames: ["A"] },
+    ].map(route => ({ ...route, startCoordinates: { latitude: 7.29, longitude: 80.63 },
+      endCoordinates: { latitude: 7.3, longitude: 80.64 } }));
+    setSafetyAnalysisDependenciesForTesting({ getRouteAlternatives: async () => routes,
+      getRoadDataByRouteLabels: async names => names.length ? { _matchedRouteFamily: "A", "Max Gradient (%)": 3 } : null,
+      getRoadDataByNames: async () => null,
+    });
+    let { body } = await postRoute({ startLocation: "Start", endLocation: "A" });
+    assert.equal(body.routeResult.selectedRouteMode, "analyzed-alternative");
+    assert.equal(body.routeResult.distanceKm, 150);
+    assert.equal(body.routeResult.providerDefaultRouteId, "provider-default");
+    assert.equal(body.routeResult.selectedRouteId, "alternative");
+    assert.equal(body.routeResult.selectedIsProviderDefault, false);
+    assert.equal(body.routeResult.providerDefaultRiskEvidenceAvailable, false);
+    assert.equal(body.routeResult.comparisonAvailable, false);
+    assert.equal(body.comparison.extraDistanceKmVsFastest, null);
+    routes.pop();
+    ({ body } = await postRoute({ startLocation: "Start", endLocation: "A" }));
+    assert.equal(body.routeResult.selectedRouteMode, "default-unsupported-route");
+    assert.equal(body.routeResult.distanceKm, 100);
+    assert.equal(body.routeResult.selectedIsProviderDefault, true);
+    assert.equal(body.riskPrediction, null);
+  });
+
+  await t.test("incomplete, unknown-gradient and failed journeys never invoke whole-trip quotation", async () => {
+    for (const scenario of [
+      { failures: new Set(["B"]) }, { noRisk: new Set(["B"]) },
+      { gradients: { B: "" } }, { failures: new Set(["A", "B"]) },
+    ]) {
+      installMocks(scenario);
+      const { body } = await post(makeBody(["A", "B"], { budget: 15000, passengers: 4 }));
+      assert.equal(body.partial, true);
+      assert.equal(body.vehicle_recommendation.status, "unavailable");
+      assert.equal(body.vehicle_recommendation.bestVehicle, null);
+      assert.equal(body.vehicle_recommendation.calculationScope, "unavailable");
+      assert.ok(body.incomplete_legs.some(leg => leg.leg_sequence === 2));
+      assert.deepEqual(body.vehicle_recommendation.excludedSegments, body.incomplete_legs);
+      assert.equal(vehicleCalls, 0);
+    }
+    installMocks();
+    const { body } = await post(makeBody(["A", "B"], { budget: 15000, passengers: 4 }));
+    assert.equal(body.partial, false);
+    assert.equal(body.vehicle_recommendation.status, "available");
+    assert.equal(body.vehicle_recommendation.calculationScope, "whole-trip-once");
+    assert.equal(vehicleCalls, 1);
+  });
+
+  await t.test("round trip includes exactly one return in distance, risk and vehicle suitability", async () => {
+    installMocks({ gradients: { A: 2, B: 3, Start: 9 } });
+    const { body } = await post(makeBody(["A", "B"], { budget: 50000, passengers: 4, return_to_start: true }));
+    assert.equal(body.per_leg_safety_results.length, 3);
+    assert.equal(body.per_leg_safety_results.filter(leg => leg.is_return_leg).length, 1);
+    assert.equal(body.per_leg_safety_results[2].to.name, "Start");
+    assert.equal(body.whole_trip_risk_summary.risk_level, "High");
+    assert.equal(body.whole_trip_risk_summary.total_legs, 3);
+    assert.equal(vehicleContexts[0].distanceKm, 49);
+    assert.equal(vehicleContexts[0].maxGradient, 9);
+    assert.equal(vehicleContexts[0].riskLevel, "High");
+    assert.equal(vehicleCalls, 1);
+    assert.equal(body.original_optimized_stop_order.length, 2);
+  });
+
+  await t.test("failed return leg withholds quote and is exposed as incomplete", async () => {
+    installMocks({ failures: new Set(["Start"]) });
+    const { body } = await post(makeBody(["A"], { budget: 50000, passengers: 4, return_to_start: true }));
+    assert.equal(body.tripRiskComplete, false);
+    assert.equal(body.incomplete_legs[0].is_return_leg, true);
+    assert.equal(body.incomplete_legs[0].leg_sequence, 2);
+    assert.equal(body.vehicle_recommendation.status, "unavailable");
+    assert.equal(vehicleCalls, 0);
+  });
+
+  await t.test("explicit final return is not duplicated; omitted or false return remains one-way", async () => {
+    installMocks();
+    const requestBody = makeBody(["A", "Start"], { return_to_start: true });
+    requestBody.optimized_stops[1].latitude = startingLocation.lat;
+    requestBody.optimized_stops[1].longitude = startingLocation.lon;
+    const response = await post(requestBody);
+    assert.equal(response.status, 200);
+    assert.equal(response.body.per_leg_safety_results.length, 2);
+    assert.equal(response.body.per_leg_safety_results[1].is_return_leg, true);
+    for (const extra of [{}, { return_to_start: false }]) {
+      const { body } = await post(makeBody(["A"], extra));
+      assert.equal(body.per_leg_safety_results.length, 1);
+      assert.equal(body.return_to_start, false);
+    }
+    assert.equal((await post(makeBody(["A"], { return_to_start: "true" }))).status, 400);
+  });
+
   resetSafetyAnalysisDependenciesForTesting();
 });

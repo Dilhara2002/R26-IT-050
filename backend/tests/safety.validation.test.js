@@ -421,3 +421,18 @@ test(
     }
   }
 );
+
+
+test("legacy vehicle endpoint preserves unknown versus observed dry weather", async () => {
+  for (const weather of [null, { status: "unavailable", isRaining: false }, { status: "available", isRaining: false }]) {
+    setSafetyRouteDependenciesForTesting({ getWeatherByCoordinates: async () => weather });
+    const response = await requestSafetyAnalysis(standardSafetyRequest);
+    assert.equal(response.status, 200);
+    assert.equal(response.body.analysis.weatherStatus, weather?.status === "available" ? "available" : "unavailable");
+    assert.equal(response.body.analysis.rainDetected, weather?.status === "available" ? false : null);
+  }
+  setSafetyRouteDependenciesForTesting({ getWeatherByCoordinates: async () => { throw new Error("weather unavailable"); } });
+  const response = await requestSafetyAnalysis(standardSafetyRequest);
+  assert.equal(response.status, 200);
+  assert.equal(response.body.analysis.rainDetected, null);
+});

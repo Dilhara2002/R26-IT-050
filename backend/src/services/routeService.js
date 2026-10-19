@@ -60,6 +60,14 @@ const compactText = (value) => {
 };
 
 
+const normalizeLocationForComparison = (value) =>
+  normalizeText(value)
+    .replace(/\b(?:sri lanka|lk)\b/g, " ")
+    .replace(/\b(?:district|province)\b/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+
 const formatSriLankaLocation = (location) => {
   const text =
     String(location || "").trim();
@@ -249,12 +257,12 @@ const similarityScore = (
   secondValue
 ) => {
   const normalFirst =
-    normalizeText(
+    normalizeLocationForComparison(
       firstValue
     );
 
   const normalSecond =
-    normalizeText(
+    normalizeLocationForComparison(
       secondValue
     );
 
@@ -274,10 +282,10 @@ const similarityScore = (
   const compactScore =
     basicSimilarity(
       compactText(
-        firstValue
+        normalFirst
       ),
       compactText(
-        secondValue
+        normalSecond
       )
     );
 
@@ -1004,5 +1012,6 @@ export {
   getRouteDetails,
   getRouteAlternatives,
   getRouteAlternativesByCoordinates,
+  similarityScore,
   ROUTING_REQUEST_TIMEOUT_MS,
 };
